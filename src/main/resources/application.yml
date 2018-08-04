@@ -1,0 +1,15 @@
+springfox:
+  documentation:
+    swagger:
+      v2:
+        path: /api-spec
+
+myskills:
+  security:
+    # Preliminary user configuration for simple authentication/authorization
+    # Syntax: "username,password,role1,role2,...,activation"
+    users:
+      - admin,{noop}123,ROLE_USER,ROLE_ADMIN,enabled
+      - cathi,{noop}123,ROLE_USER,enabled
+      - georg,{noop}123,ROLE_USER,enabled
+      - denny,{noop}123,ROLE_USER,enabled
