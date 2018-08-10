@@ -1,5 +1,6 @@
 package io.knowledgeassets.myskills.server.userskill.query;
 
+import io.knowledgeassets.myskills.server.skill.query.Skill;
 import io.knowledgeassets.myskills.server.user.query.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,5 +51,11 @@ public class UserSkillQueryService {
 	@Transactional(readOnly = true)
 	public Stream<UserSkillPriorityAggregation> getTop10PrioritizedSkills() {
 		return StreamSupport.stream(userSkillQueryRepository.findTop10PrioritizedSkills().spliterator(), false);
+	}
+
+	@Transactional(readOnly = true)
+	public Stream<Skill> getUserSkillSuggestions(String userId, String search) {
+		return StreamSupport.stream(userSkillQueryRepository.findSkillSuggestionsByUserId(userId, search)
+				.spliterator(), false);
 	}
 }

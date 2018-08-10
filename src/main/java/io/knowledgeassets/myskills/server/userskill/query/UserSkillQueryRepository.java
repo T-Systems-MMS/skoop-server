@@ -1,5 +1,6 @@
 package io.knowledgeassets.myskills.server.userskill.query;
 
+import io.knowledgeassets.myskills.server.skill.query.Skill;
 import io.knowledgeassets.myskills.server.user.query.User;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
@@ -31,4 +32,11 @@ public interface UserSkillQueryRepository extends Neo4jRepository<UserSkill, Str
 			"ORDER BY AVG(userSkill.priority) DESC, COUNT(*) DESC, MAX(userSkill.priority) DESC " +
 			"LIMIT 10")
 	Iterable<UserSkillPriorityAggregation> findTop10PrioritizedSkills();
+
+	@Query("MATCH (skill:Skill) " +
+			"WHERE NOT EXISTS((skill)-[:RELATED_TO]-(:User {id:{userId}})) " +
+			"AND TOLOWER(skill.name) CONTAINS TOLOWER({search}) " +
+			"RETURN skill " +
+			"ORDER BY skill.name ASC")
+	Iterable<Skill> findSkillSuggestionsByUserId(@Param("userId") String userId, @Param("search") String search);
 }
