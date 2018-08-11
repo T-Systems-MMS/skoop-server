@@ -1,6 +1,8 @@
 package io.knowledgeassets.myskills.server.user;
 
 import io.knowledgeassets.myskills.server.userskill.UserSkill;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Property;
@@ -9,6 +11,7 @@ import org.neo4j.ogm.annotation.Relationship;
 import java.util.List;
 import java.util.UUID;
 
+@Data
 @NodeEntity
 public class User {
 	@Id
@@ -22,16 +25,9 @@ public class User {
 	private String lastName;
 	@Property(name = "email")
 	private String email;
+	@EqualsAndHashCode.Exclude
 	@Relationship(type = "RELATED_TO", direction = Relationship.UNDIRECTED)
 	private List<UserSkill> userSkills;
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
 
 	public User id(String id) {
 		this.id = id;
@@ -43,25 +39,9 @@ public class User {
 		return this;
 	}
 
-	public String getUserName() {
-		return userName;
-	}
-
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-
 	public User userName(String userName) {
 		this.userName = userName;
 		return this;
-	}
-
-	public String getFirstName() {
-		return firstName;
-	}
-
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
 	}
 
 	public User firstName(String firstName) {
@@ -69,38 +49,14 @@ public class User {
 		return this;
 	}
 
-	public String getLastName() {
-		return lastName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-
 	public User lastName(String lastName) {
 		this.lastName = lastName;
 		return this;
 	}
 
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
 	public User email(String email) {
 		this.email = email;
 		return this;
-	}
-
-	public List<UserSkill> getUserSkills() {
-		return userSkills;
-	}
-
-	public void setUserSkills(List<UserSkill> userSkills) {
-		this.userSkills = userSkills;
 	}
 
 	public User userSkills(List<UserSkill> userSkills) {

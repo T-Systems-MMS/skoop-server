@@ -37,6 +37,7 @@ dependencies {
 	compile('javax.xml.bind:jaxb-api')
 	compile("io.springfox:springfox-swagger2:${springfoxSwagger2Version}")
 	compile("org.apache.commons:commons-lang3:${commonsLang3Version}")
+	compileOnly('org.projectlombok:lombok')
 
 	/*
 	 * Application runtime dependencies
@@ -47,11 +48,7 @@ dependencies {
 	 * Annotation processors
 	 */
 	annotationProcessor('org.springframework.boot:spring-boot-configuration-processor')
-	/*
-	 * Lombok up to version 1.18.0 does not work for Gradle 4.9 + JDK 10,
-	 * see https://github.com/rzwitserloot/lombok/issues/1716
-	 */
-//	annotationProcessor('org.projectlombok:lombok')
+	annotationProcessor('org.projectlombok:lombok')
 
 	/*
 	 * Test compile dependencies

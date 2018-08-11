@@ -2,15 +2,24 @@ package io.knowledgeassets.myskills.server.userskill;
 
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.user.User;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Setter;
 import org.neo4j.ogm.annotation.*;
 
+@Data
 @RelationshipEntity(type = "RELATED_TO")
 public class UserSkill {
 	@Id
 	@Property(name = "id")
 	private String id;
+	@Setter(AccessLevel.NONE)
+	@EqualsAndHashCode.Exclude
 	@StartNode
 	private User user;
+	@Setter(AccessLevel.NONE)
+	@EqualsAndHashCode.Exclude
 	@EndNode
 	private Skill skill;
 	@Property(name = "currentLevel")
@@ -20,21 +29,9 @@ public class UserSkill {
 	@Property(name = "priority")
 	private Integer priority;
 
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
 	public UserSkill id(String id) {
 		this.id = id;
 		return this;
-	}
-
-	public User getUser() {
-		return user;
 	}
 
 	public void setUser(User user) {
@@ -48,10 +45,6 @@ public class UserSkill {
 		return this;
 	}
 
-	public Skill getSkill() {
-		return skill;
-	}
-
 	public void setSkill(Skill skill) {
 		this.skill = skill;
 		generateId();
@@ -63,38 +56,14 @@ public class UserSkill {
 		return this;
 	}
 
-	public Integer getCurrentLevel() {
-		return currentLevel;
-	}
-
-	public void setCurrentLevel(Integer currentLevel) {
-		this.currentLevel = currentLevel;
-	}
-
 	public UserSkill currentLevel(Integer currentLevel) {
 		this.currentLevel = currentLevel;
 		return this;
 	}
 
-	public Integer getDesiredLevel() {
-		return desiredLevel;
-	}
-
-	public void setDesiredLevel(Integer desiredLevel) {
-		this.desiredLevel = desiredLevel;
-	}
-
 	public UserSkill desiredLevel(Integer desiredLevel) {
 		this.desiredLevel = desiredLevel;
 		return this;
-	}
-
-	public Integer getPriority() {
-		return priority;
-	}
-
-	public void setPriority(Integer priority) {
-		this.priority = priority;
 	}
 
 	public UserSkill priority(Integer priority) {
