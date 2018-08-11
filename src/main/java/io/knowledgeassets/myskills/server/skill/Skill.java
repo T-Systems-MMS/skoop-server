@@ -1,12 +1,13 @@
-package io.knowledgeassets.myskills.server.skill.query;
+package io.knowledgeassets.myskills.server.skill;
 
-import io.knowledgeassets.myskills.server.userskill.query.UserSkill;
+import io.knowledgeassets.myskills.server.userskill.UserSkill;
 import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Property;
 import org.neo4j.ogm.annotation.Relationship;
 
 import java.util.List;
+import java.util.UUID;
 
 @NodeEntity
 public class Skill {
@@ -30,6 +31,11 @@ public class Skill {
 
 	public Skill id(String id) {
 		this.id = id;
+		return this;
+	}
+
+	public Skill newId() {
+		id = UUID.randomUUID().toString();
 		return this;
 	}
 

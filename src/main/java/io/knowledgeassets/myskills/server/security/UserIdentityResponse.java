@@ -1,4 +1,4 @@
-package io.knowledgeassets.myskills.server.user;
+package io.knowledgeassets.myskills.server.security;
 
 import java.util.List;
 

@@ -1,7 +1,5 @@
-package io.knowledgeassets.myskills.server.user.query;
+package io.knowledgeassets.myskills.server.security;
 
-import io.knowledgeassets.myskills.server.security.UserIdentity;
-import io.knowledgeassets.myskills.server.user.UserIdentityResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -18,7 +16,7 @@ import static java.util.stream.Collectors.toList;
 
 @Api(tags = "MyIdentity", description = "API allowing queries of the user identity for the authenticated user")
 @RestController
-public class MyIdentityQueryController {
+public class MyIdentityController {
 	@ApiOperation(value = "Get identity of the authenticated user",
 			notes = "Get the identity details of the authenticated user including user ID, user name, granted roles " +
 					"and additional user data.")

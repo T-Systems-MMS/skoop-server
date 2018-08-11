@@ -1,4 +1,4 @@
-package io.knowledgeassets.myskills.server.userskill;
+package io.knowledgeassets.myskills.server.userskill.query;
 
 import io.knowledgeassets.myskills.server.skill.SkillResponse;
 

@@ -1,4 +1,4 @@
-package io.knowledgeassets.myskills.server.userskill;
+package io.knowledgeassets.myskills.server.userskill.command;
 
 public class UpdateUserSkillRequest {
 	private Integer currentLevel;

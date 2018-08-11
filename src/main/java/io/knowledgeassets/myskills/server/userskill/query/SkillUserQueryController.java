@@ -1,7 +1,6 @@
 package io.knowledgeassets.myskills.server.userskill.query;
 
 import io.knowledgeassets.myskills.server.user.UserResponse;
-import io.knowledgeassets.myskills.server.userskill.SkillUserResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;

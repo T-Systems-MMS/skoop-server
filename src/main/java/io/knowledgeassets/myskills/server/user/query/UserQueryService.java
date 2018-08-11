@@ -1,5 +1,7 @@
 package io.knowledgeassets.myskills.server.user.query;
 
+import io.knowledgeassets.myskills.server.user.User;
+import io.knowledgeassets.myskills.server.user.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -9,24 +11,24 @@ import java.util.stream.StreamSupport;
 
 @Service
 public class UserQueryService {
-	private UserQueryRepository userQueryRepository;
+	private UserRepository userRepository;
 
-	public UserQueryService(UserQueryRepository userQueryRepository) {
-		this.userQueryRepository = userQueryRepository;
+	public UserQueryService(UserRepository userRepository) {
+		this.userRepository = userRepository;
 	}
 
 	@Transactional(readOnly = true)
 	public Stream<User> getUsers() {
-		return StreamSupport.stream(userQueryRepository.findAll().spliterator(), false);
+		return StreamSupport.stream(userRepository.findAll().spliterator(), false);
 	}
 
 	@Transactional(readOnly = true)
 	public Optional<User> getUserById(String userId) {
-		return userQueryRepository.findById(userId);
+		return userRepository.findById(userId);
 	}
 
 	@Transactional(readOnly = true)
 	public Optional<User> getUserByUserName(String userName) {
-		return userQueryRepository.findByUserName(userName);
+		return userRepository.findByUserName(userName);
 	}
 }

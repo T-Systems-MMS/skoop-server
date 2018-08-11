@@ -1,6 +1,6 @@
 = MySkills Server
 Georg Wittberger <georg.wittberger@gmail.com>
-v0.0.1, 2018-08-04
+v0.0.1, 2018-08-11
 
 A lightweight web application to capture, manage and analyze skills of users and help them improve their capabilities by connecting them with each other and assisting with personalized suggestions for coaches, trainings, projects and many more.
 
@@ -59,9 +59,8 @@ As described in the introduction the MySkills Server is a pure server applicatio
 * https://spring.io/projects/spring-boot[Spring Boot]: Provides the basis for the Java web application. Within the application itself it faciliates the configuration of the Spring application context. Furthermore, we use the Spring Boot Gradle plugin to build the executable JAR file including an embedded Tomcat server.
 * https://spring.io/projects/spring-framework[Spring Web MVC]: The REST API provided by the application is implemented using Spring Web MVC controllers. We use that synchronous variant instead of WebFlux at the moment.
 * https://spring.io/projects/spring-security[Spring Security]: Provides the authentication and authorization, including access control for the REST endpoints.
-* https://neo4j.com/[Neo4j]: We use a graph database to create the query data model used to obtain insights in the network of relationships between users, skills and more domain objects. The Neo4j database is typically connected to the application by the Bolt driver which is auto-configured by Spring Boot. For test automation there is also the embedded driver in the project setup.
+* https://neo4j.com/[Neo4j]: We use this graph database to store the current state of the domain model and to obtain insights in the network of relationships between users, skills and more domain objects. The Neo4j database is typically connected to the application by the Bolt driver which is auto-configured by Spring Boot. For test automation there is also the embedded driver in the project setup.
 * https://projects.spring.io/spring-data-neo4j/[Spring Data Neo4j]: The graph database is accessed via Spring Data repositories and Spring Transaction handles the transaction management. Most of this data access layer is also auto-configured by Spring Boot.
-* http://www.axonframework.org/[Axon Framework]: The framework is used to facilitate the implementation of the CQRS pattern. It comes into play for all the writing operations (e.g. creating a skill).
 * http://springfox.github.io/springfox/[Springfox]: Provides the auto-generated Swagger UI with the REST API documentation.
 * https://junit.org/junit5/[JUnit 5] and Spring Test support are used to implement automated tests for different slices of the application. Neo4j repository tests are supported by an embedded Neo4j database.
 
@@ -127,20 +126,16 @@ The base package `io.knowledgeassets.myskills.server` contains several sub-packa
 
 _A basic design principle of MySkills Server is the application of the CQRS pattern (Command Query Responsibility Segregation)._
 
-In short words, all read access to the domain model is strictly separated from the write access. The persistent application state is only allowed to be changed via the execution of so called _"commands"_ which are handled inside their corresponding _aggregate_ implementation (e.g. the `UpdateSkillCommand` is handled in the `SkillAggregate` class by a special command handler method). The read access to the domain model makes direct use of separate query repositories which are intended to provide the current application state.
+In short words, all read access to the domain model is strictly separated from the write access. This segregation is made explicit by the separate `command` and `query` packages inside each domain package. For example:
 
-This segregation is made explicit by the separate `command` and `query` packages inside each domain package. For example:
-
-* `io.knowledgeassets.myskills.server.skill.command`: Contains all the code required for modifications of skills (aggregate class, commands, events, command REST controller).
-* `io.knowledgeassets.myskills.server.skill.query`: Contains all the code required to read skills (query model class, query repository, query REST controller)
+* `io.knowledgeassets.myskills.server.skill.command`: Contains all the code dedicated to modifications of skills
+** Service implementation with methods representing the commands which alter the state of the domain model
+** Controller implementation which provides POST, PUT and DELETE operations to modify the domain model
+* `io.knowledgeassets.myskills.server.skill.query`: Contains all the code dedicated to reading skills
+** Service implementation with methods to lookup domain objects and compile different views on the domain model
+** Controller implementation which provides GET operations to request views on the domain model
 
 _Important rule: Code from the `command` package may use code from the `query` package, e.g. to perform validation. But under no circumstances is the code in the `query` package allowed to use code from the `command` package!_
-
-The http://www.axonframework.org/[Axon Framework] is used in the project to facilitate the implementation of the CQRS pattern. Nevertheless, there is no separation of the aggregate storage and the query data model so far. When Axon needs to load or save an aggregate state this data access is delegated to the Neo4j repositories in the `query` package. See the custom Axon repository implementations using our superclass `io.knowledgeassets.myskills.server.common.AbstractDelegateRepository` for the delegation.
-
-It is an open discussion whether we really should stick with Axon just for CQRS. It is debatable if MySkills really needs two separate databases for storing the domain model state and providing a lightweight view for queries. There is also the question if we really should use event sourcing for storing the application state. So expect movement in this part of the architecture!
-
-See the https://docs.axonframework.org/[documentation of the Axon Framework] for deeper insights how CQRS works with that framework.
 
 == License
 

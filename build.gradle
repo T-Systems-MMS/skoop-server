@@ -34,7 +34,6 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-data-neo4j')
 	compile('org.springframework.boot:spring-boot-starter-security')
 	compile('org.springframework.boot:spring-boot-starter-web')
-	compile("org.axonframework:axon-spring-boot-starter:${axonFrameworkVersion}")
 	compile('javax.xml.bind:jaxb-api')
 	compile("io.springfox:springfox-swagger2:${springfoxSwagger2Version}")
 	compile("org.apache.commons:commons-lang3:${commonsLang3Version}")

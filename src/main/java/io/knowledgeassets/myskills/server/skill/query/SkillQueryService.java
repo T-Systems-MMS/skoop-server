@@ -1,5 +1,7 @@
 package io.knowledgeassets.myskills.server.skill.query;
 
+import io.knowledgeassets.myskills.server.skill.Skill;
+import io.knowledgeassets.myskills.server.skill.SkillRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -9,24 +11,24 @@ import java.util.stream.StreamSupport;
 
 @Service
 public class SkillQueryService {
-	private SkillQueryRepository skillQueryRepository;
+	private SkillRepository skillRepository;
 
-	public SkillQueryService(SkillQueryRepository skillQueryRepository) {
-		this.skillQueryRepository = skillQueryRepository;
+	public SkillQueryService(SkillRepository skillRepository) {
+		this.skillRepository = skillRepository;
 	}
 
 	@Transactional(readOnly = true)
 	public Stream<Skill> getSkills() {
-		return StreamSupport.stream(skillQueryRepository.findAll().spliterator(), false);
+		return StreamSupport.stream(skillRepository.findAll().spliterator(), false);
 	}
 
 	@Transactional(readOnly = true)
 	public Optional<Skill> getSkillById(String skillId) {
-		return skillQueryRepository.findById(skillId);
+		return skillRepository.findById(skillId);
 	}
 
 	@Transactional(readOnly = true)
 	public Optional<Skill> getSkillByName(String skillName) {
-		return skillQueryRepository.findByName(skillName);
+		return skillRepository.findByName(skillName);
 	}
 }

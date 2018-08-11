@@ -1,7 +1,7 @@
-package io.knowledgeassets.myskills.server.userskill.query;
+package io.knowledgeassets.myskills.server.userskill;
 
-import io.knowledgeassets.myskills.server.skill.query.Skill;
-import io.knowledgeassets.myskills.server.user.query.User;
+import io.knowledgeassets.myskills.server.skill.Skill;
+import io.knowledgeassets.myskills.server.user.User;
 import org.neo4j.ogm.annotation.*;
 
 @RelationshipEntity(type = "RELATED_TO")
@@ -39,10 +39,12 @@ public class UserSkill {
 
 	public void setUser(User user) {
 		this.user = user;
+		generateId();
 	}
 
 	public UserSkill user(User user) {
 		this.user = user;
+		generateId();
 		return this;
 	}
 
@@ -52,10 +54,12 @@ public class UserSkill {
 
 	public void setSkill(Skill skill) {
 		this.skill = skill;
+		generateId();
 	}
 
 	public UserSkill skill(Skill skill) {
 		this.skill = skill;
+		generateId();
 		return this;
 	}
 
@@ -96,5 +100,9 @@ public class UserSkill {
 	public UserSkill priority(Integer priority) {
 		this.priority = priority;
 		return this;
+	}
+
+	private void generateId() {
+		id = (user != null ? user.getId() : "null") + ';' + (skill != null ? skill.getId() : "null");
 	}
 }

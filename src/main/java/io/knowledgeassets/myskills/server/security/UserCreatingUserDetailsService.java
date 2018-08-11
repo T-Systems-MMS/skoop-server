@@ -1,7 +1,7 @@
 package io.knowledgeassets.myskills.server.security;
 
+import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.user.command.UserCommandService;
-import io.knowledgeassets.myskills.server.user.query.User;
 import io.knowledgeassets.myskills.server.user.query.UserQueryService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

@@ -1,12 +1,12 @@
 package io.knowledgeassets.myskills.server.userskill.command;
 
+import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.skill.command.SkillCommandService;
-import io.knowledgeassets.myskills.server.skill.query.Skill;
 import io.knowledgeassets.myskills.server.skill.query.SkillQueryService;
-import io.knowledgeassets.myskills.server.userskill.command.UserSkillAggregate.UserSkillAggregateKey;
-import io.knowledgeassets.myskills.server.userskill.query.UserSkill;
-import io.knowledgeassets.myskills.server.userskill.query.UserSkillQueryService;
-import org.axonframework.commandhandling.gateway.CommandGateway;
+import io.knowledgeassets.myskills.server.user.User;
+import io.knowledgeassets.myskills.server.user.query.UserQueryService;
+import io.knowledgeassets.myskills.server.userskill.UserSkill;
+import io.knowledgeassets.myskills.server.userskill.UserSkillRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,17 +14,17 @@ import static java.lang.String.format;
 
 @Service
 public class UserSkillCommandService {
-	private CommandGateway commandGateway;
+	private UserQueryService userQueryService;
 	private SkillQueryService skillQueryService;
 	private SkillCommandService skillCommandService;
-	private UserSkillQueryService userSkillQueryService;
+	private UserSkillRepository userSkillRepository;
 
-	public UserSkillCommandService(CommandGateway commandGateway, SkillQueryService skillQueryService,
-								   SkillCommandService skillCommandService, UserSkillQueryService userSkillQueryService) {
-		this.commandGateway = commandGateway;
+	public UserSkillCommandService(UserQueryService userQueryService, SkillQueryService skillQueryService,
+								   SkillCommandService skillCommandService, UserSkillRepository userSkillRepository) {
+		this.userQueryService = userQueryService;
 		this.skillQueryService = skillQueryService;
 		this.skillCommandService = skillCommandService;
-		this.userSkillQueryService = userSkillQueryService;
+		this.userSkillRepository = userSkillRepository;
 	}
 
 	/**
@@ -40,10 +40,12 @@ public class UserSkillCommandService {
 	@Transactional
 	public UserSkill createUserSkillBySkillId(String userId, String skillId, Integer currentLevel, Integer desiredLevel,
 											  Integer priority) {
-		commandGateway.sendAndWait(new CreateUserSkillCommand(userId, skillId, currentLevel, desiredLevel, priority));
-		return userSkillQueryService.getUserSkillByUserIdAndSkillId(userId, skillId)
-				.orElseThrow(() -> new IllegalStateException(
-						format("User with ID '%s' not related to skill with ID '%s'", userId, skillId)));
+		User user = userQueryService.getUserById(userId).orElseThrow(() -> new IllegalArgumentException(
+				format("User with ID '%s' not found", userId)));
+		Skill skill = skillQueryService.getSkillById(skillId).orElseThrow(() -> new IllegalArgumentException(
+				format("Skill with ID '%s' not found", skillId)));
+		return userSkillRepository.save(new UserSkill().user(user).skill(skill)
+				.currentLevel(currentLevel).desiredLevel(desiredLevel).priority(priority));
 	}
 
 	/**
@@ -68,15 +70,20 @@ public class UserSkillCommandService {
 	@Transactional
 	public UserSkill updateUserSkill(String userId, String skillId, Integer currentLevel, Integer desiredLevel,
 									 Integer priority) {
-		commandGateway.sendAndWait(new UpdateUserSkillCommand(new UserSkillAggregateKey(userId, skillId), currentLevel,
-				desiredLevel, priority));
-		return userSkillQueryService.getUserSkillByUserIdAndSkillId(userId, skillId)
-				.orElseThrow(() -> new IllegalStateException(
-						format("User with ID '%s' not related to skill with ID '%s'", userId, skillId)));
+		UserSkill userSkill = userSkillRepository.findByUserIdAndSkillId(userId, skillId)
+				.orElseThrow(() -> new IllegalArgumentException(
+						format("User with ID '%s' is not related to skill with ID '%s'", userId, skillId)));
+		userSkill.setCurrentLevel(currentLevel);
+		userSkill.setDesiredLevel(desiredLevel);
+		userSkill.setPriority(priority);
+		return userSkillRepository.save(userSkill);
 	}
 
 	@Transactional
 	public void deleteUserSkill(String userId, String skillId) {
-		commandGateway.sendAndWait(new DeleteUserSkillCommand(new UserSkillAggregateKey(userId, skillId)));
+		UserSkill userSkill = userSkillRepository.findByUserIdAndSkillId(userId, skillId)
+				.orElseThrow(() -> new IllegalArgumentException(
+						format("User with ID '%s' is not related to skill with ID '%s'", userId, skillId)));
+		userSkillRepository.delete(userSkill);
 	}
 }

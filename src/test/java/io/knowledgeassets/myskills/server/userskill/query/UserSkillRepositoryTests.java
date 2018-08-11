@@ -1,9 +1,11 @@
 package io.knowledgeassets.myskills.server.userskill.query;
 
-import io.knowledgeassets.myskills.server.skill.query.Skill;
-import io.knowledgeassets.myskills.server.skill.query.SkillQueryRepository;
-import io.knowledgeassets.myskills.server.user.query.User;
-import io.knowledgeassets.myskills.server.user.query.UserQueryRepository;
+import io.knowledgeassets.myskills.server.skill.Skill;
+import io.knowledgeassets.myskills.server.skill.SkillRepository;
+import io.knowledgeassets.myskills.server.user.User;
+import io.knowledgeassets.myskills.server.user.UserRepository;
+import io.knowledgeassets.myskills.server.userskill.UserSkill;
+import io.knowledgeassets.myskills.server.userskill.UserSkillRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,13 +20,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
 @DataNeo4jTest
-class UserSkillQueryRepositoryTests {
+class UserSkillRepositoryTests {
 	@Autowired
-	private UserQueryRepository userQueryRepository;
+	private UserRepository userRepository;
 	@Autowired
-	private SkillQueryRepository skillQueryRepository;
+	private SkillRepository skillRepository;
 	@Autowired
-	private UserSkillQueryRepository userSkillQueryRepository;
+	private UserSkillRepository userSkillRepository;
 
 	@Test
 	@DisplayName("Provides the skills not related to the user and containing the search term")
@@ -34,16 +36,16 @@ class UserSkillQueryRepositoryTests {
 		Skill springBoot = new Skill().id("34").name("Spring Boot").description("Java Application Framework");
 		Skill springSecurity = new Skill().id("56").name("Spring Security").description("Java Security Framework");
 		Skill springData = new Skill().id("78").name("Spring Data").description("Java Data Access Framework");
-		skillQueryRepository.save(angular);
-		skillQueryRepository.save(springBoot);
-		skillQueryRepository.save(springSecurity);
-		skillQueryRepository.save(springData);
+		skillRepository.save(angular);
+		skillRepository.save(springBoot);
+		skillRepository.save(springSecurity);
+		skillRepository.save(springData);
 		User user = new User().id("123").userName("tester");
 		user.userSkills(singletonList(new UserSkill().id("123;34").user(user).skill(springBoot)
 				.currentLevel(2).desiredLevel(3).priority(4)));
-		userQueryRepository.save(user);
+		userRepository.save(user);
 		// When
-		Iterable<Skill> skills = userSkillQueryRepository.findSkillSuggestionsByUserId("123", "spr");
+		Iterable<Skill> skills = userSkillRepository.findSkillSuggestionsByUserId("123", "spr");
 		// Then
 		assertThat(skills).hasSize(2);
 		Iterator<Skill> skillIterator = skills.iterator();

@@ -1,10 +1,8 @@
 package io.knowledgeassets.myskills.server.userskill.command;
 
 import io.knowledgeassets.myskills.server.skill.SkillResponse;
-import io.knowledgeassets.myskills.server.userskill.CreateUserSkillRequest;
-import io.knowledgeassets.myskills.server.userskill.UpdateUserSkillRequest;
+import io.knowledgeassets.myskills.server.userskill.UserSkill;
 import io.knowledgeassets.myskills.server.userskill.UserSkillResponse;
-import io.knowledgeassets.myskills.server.userskill.query.UserSkill;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;

@@ -1,5 +1,7 @@
 package io.knowledgeassets.myskills.server.skill.query;
 
+import io.knowledgeassets.myskills.server.skill.Skill;
+import io.knowledgeassets.myskills.server.skill.SkillRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,17 +15,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
 @DataNeo4jTest
-class SkillQueryRepositoryTests {
+class SkillRepositoryTests {
 	@Autowired
-	private SkillQueryRepository skillQueryRepository;
+	private SkillRepository skillRepository;
 
 	@Test
 	@DisplayName("Provides the existing skill queried by its name")
 	void providesSkillByName() {
 		// Given
-		skillQueryRepository.save(new Skill().id("123").name("Angular").description("JavaScript Framework"));
+		skillRepository.save(new Skill().id("123").name("Angular").description("JavaScript Framework"));
 		// When
-		Optional<Skill> skill = skillQueryRepository.findByName("Angular");
+		Optional<Skill> skill = skillRepository.findByName("Angular");
 		// Then
 		assertThat(skill).isNotEmpty();
 		assertThat(skill.get().getId()).isEqualTo("123");

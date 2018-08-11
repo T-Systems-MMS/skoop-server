@@ -1,8 +1,7 @@
 package io.knowledgeassets.myskills.server.user.command;
 
-import io.knowledgeassets.myskills.server.user.query.User;
-import io.knowledgeassets.myskills.server.user.query.UserQueryRepository;
-import org.axonframework.commandhandling.gateway.CommandGateway;
+import io.knowledgeassets.myskills.server.user.User;
+import io.knowledgeassets.myskills.server.user.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,37 +9,39 @@ import static java.lang.String.format;
 
 @Service
 public class UserCommandService {
-	private CommandGateway commandGateway;
-	private UserQueryRepository userQueryRepository;
+	private UserRepository userRepository;
 
-	public UserCommandService(CommandGateway commandGateway, UserQueryRepository userQueryRepository) {
-		this.commandGateway = commandGateway;
-		this.userQueryRepository = userQueryRepository;
+	public UserCommandService(UserRepository userRepository) {
+		this.userRepository = userRepository;
 	}
 
 	@Transactional
 	public User createUser(String userName) {
-		String id = commandGateway.sendAndWait(new CreateUserCommand(userName, null, null, null));
-		return userQueryRepository.findById(id).orElseThrow(() -> new IllegalStateException(
-				format("User with ID '%s' not found", id)));
+		return createUser(userName, null, null, null);
 	}
 
 	@Transactional
 	public User createUser(String userName, String firstName, String lastName, String email) {
-		String id = commandGateway.sendAndWait(new CreateUserCommand(userName, firstName, lastName, email));
-		return userQueryRepository.findById(id).orElseThrow(() -> new IllegalStateException(
-				format("User with ID '%s' not found", id)));
+		// TODO: Check if user with given name already exists.
+		return userRepository.save(new User().newId().userName(userName).firstName(firstName).lastName(lastName)
+				.email(email));
 	}
 
 	@Transactional
 	public User updateUser(String id, String userName, String firstName, String lastName, String email) {
-		commandGateway.sendAndWait(new UpdateUserCommand(id, userName, firstName, lastName, email));
-		return userQueryRepository.findById(id).orElseThrow(() -> new IllegalStateException(
+		User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(
 				format("User with ID '%s' not found", id)));
+		user.setUserName(userName);
+		user.setFirstName(firstName);
+		user.setLastName(lastName);
+		user.setEmail(email);
+		return userRepository.save(user);
 	}
 
 	@Transactional
 	public void deleteUser(String id) {
-		commandGateway.sendAndWait(new DeleteUserCommand(id));
+		User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(
+				format("User with ID '%s' not found", id)));
+		userRepository.delete(user);
 	}
 }

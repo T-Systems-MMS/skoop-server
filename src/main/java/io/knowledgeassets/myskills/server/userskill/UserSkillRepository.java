@@ -1,7 +1,7 @@
-package io.knowledgeassets.myskills.server.userskill.query;
+package io.knowledgeassets.myskills.server.userskill;
 
-import io.knowledgeassets.myskills.server.skill.query.Skill;
-import io.knowledgeassets.myskills.server.user.query.User;
+import io.knowledgeassets.myskills.server.skill.Skill;
+import io.knowledgeassets.myskills.server.user.User;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface UserSkillQueryRepository extends Neo4jRepository<UserSkill, String> {
+public interface UserSkillRepository extends Neo4jRepository<UserSkill, String> {
 	Iterable<UserSkill> findByUserId(String userId);
 
 	Iterable<UserSkill> findBySkillId(String skillId);
@@ -22,7 +22,8 @@ public interface UserSkillQueryRepository extends Neo4jRepository<UserSkill, Str
 	@Query("MATCH (user:User {id:{userId}})-[userSkill:RELATED_TO]-(:Skill {id:{skillId}})" +
 			"-[coachSkill:RELATED_TO]-(coach:User) " +
 			"WHERE coachSkill.currentLevel >= userSkill.desiredLevel " +
-			"RETURN coach")
+			"RETURN coach " +
+			"LIMIT 20")
 	Iterable<User> findCoachesByUserIdAndSkillId(@Param("userId") String userId, @Param("skillId") String skillId);
 
 	@Query("MATCH (skill:Skill)-[userSkill:RELATED_TO]-(:User) " +
@@ -37,6 +38,7 @@ public interface UserSkillQueryRepository extends Neo4jRepository<UserSkill, Str
 			"WHERE NOT EXISTS((skill)-[:RELATED_TO]-(:User {id:{userId}})) " +
 			"AND TOLOWER(skill.name) CONTAINS TOLOWER({search}) " +
 			"RETURN skill " +
-			"ORDER BY skill.name ASC")
+			"ORDER BY skill.name ASC " +
+			"LIMIT 20")
 	Iterable<Skill> findSkillSuggestionsByUserId(@Param("userId") String userId, @Param("search") String search);
 }

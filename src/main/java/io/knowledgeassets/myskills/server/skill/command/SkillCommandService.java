@@ -1,8 +1,7 @@
 package io.knowledgeassets.myskills.server.skill.command;
 
-import io.knowledgeassets.myskills.server.skill.query.Skill;
-import io.knowledgeassets.myskills.server.skill.query.SkillQueryRepository;
-import org.axonframework.commandhandling.gateway.CommandGateway;
+import io.knowledgeassets.myskills.server.skill.Skill;
+import io.knowledgeassets.myskills.server.skill.SkillRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,30 +9,31 @@ import static java.lang.String.format;
 
 @Service
 public class SkillCommandService {
-	private CommandGateway commandGateway;
-	private SkillQueryRepository skillQueryRepository;
+	private SkillRepository skillRepository;
 
-	public SkillCommandService(CommandGateway commandGateway, SkillQueryRepository skillQueryRepository) {
-		this.commandGateway = commandGateway;
-		this.skillQueryRepository = skillQueryRepository;
+	public SkillCommandService(SkillRepository skillRepository) {
+		this.skillRepository = skillRepository;
 	}
 
 	@Transactional
 	public Skill createSkill(String name, String description) {
-		String id = commandGateway.sendAndWait(new CreateSkillCommand(name, description));
-		return skillQueryRepository.findById(id).orElseThrow(() -> new IllegalStateException(
-				format("Skill with ID '%s' not found", id)));
+		// TODO: Check if skill with given name already exists.
+		return skillRepository.save(new Skill().newId().name(name).description(description));
 	}
 
 	@Transactional
 	public Skill updateSkill(String id, String name, String description) {
-		commandGateway.sendAndWait(new UpdateSkillCommand(id, name, description));
-		return skillQueryRepository.findById(id).orElseThrow(() -> new IllegalStateException(
+		Skill skill = skillRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(
 				format("Skill with ID '%s' not found", id)));
+		skill.setName(name);
+		skill.setDescription(description);
+		return skillRepository.save(skill);
 	}
 
 	@Transactional
-	public void deleteSkill(String skillId) {
-		commandGateway.sendAndWait(new DeleteSkillCommand(skillId));
+	public void deleteSkill(String id) {
+		Skill skill = skillRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(
+				format("Skill with ID '%s' not found", id)));
+		skillRepository.delete(skill);
 	}
 }

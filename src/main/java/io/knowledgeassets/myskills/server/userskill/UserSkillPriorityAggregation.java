@@ -1,6 +1,6 @@
-package io.knowledgeassets.myskills.server.userskill.query;
+package io.knowledgeassets.myskills.server.userskill;
 
-import io.knowledgeassets.myskills.server.skill.query.Skill;
+import io.knowledgeassets.myskills.server.skill.Skill;
 import org.springframework.data.neo4j.annotation.QueryResult;
 
 @QueryResult
