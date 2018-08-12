@@ -21,7 +21,7 @@ For running the application using the executable JAR file:
 * Java Runtime Environment 10 (version 11 not tested so far)
 * Neo4j Community Edition 3.3.x
 
-For running the application as a Docker container (coming soon):
+For running the application as a Docker container:
 
 * Docker 18.06 (or higher)
 * _Optional:_ Docker Compose
@@ -32,13 +32,29 @@ For development:
 * Neo4j Community Edition 3.3.x
 * _Optional:_ Docker 18.06 (or higher), useful for setting up a Neo4j database
 
+=== Building the application from source
+
+The project uses https://gradle.org/[Gradle] as the build tool. Run the following command in the project root to build the application:
+
+    gradlew build
+
+The final executable JAR file is produced in the `build/libs` directory.
+
 === Running the executable JAR file
 
-    java -jar myskills-server-0.0.1-SNAPSHOT.jar
+After completing the Gradle build you can run the MySkills Server like a simple Java application:
+
+    java -jar build/libs/myskills-server-0.0.1-SNAPSHOT.jar
 
 === Running as Docker container
 
-There is no Docker support yet. Stay tuned.
+We do not offer public Docker images at the moment but you can create your own after completing the Gradle build. Run the following command in the project root (mind the dot at the end):
+
+    docker build --tag myskills/server:latest --build-arg JAR_FILE=build/libs/myskills-server-0.0.1-SNAPSHOT.jar .
+
+Then you can start the container as usual:
+
+    docker run --name myskills --rm -p 8080:8080 myskills/server:latest
 
 === Testing the setup
 
@@ -104,14 +120,6 @@ In case you should have to provide your custom users you can replicate the `appl
     --spring.config.location=file:/path/to/my/application.yml
 
 _Note: This is an intermediate solution which will be replaced by OAuth2 in the future._
-
-=== Building the application
-
-The project uses https://gradle.org/[Gradle] as the build tool. Run the following command in the project root to build the application:
-
-    gradlew build
-
-The final executable JAR file is produced in the `build/libs` directory.
 
 === Testing the application
 
