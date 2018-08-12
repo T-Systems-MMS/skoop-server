@@ -36,10 +36,11 @@ public class SkillCommandController {
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<SkillResponse> createSkill(@RequestBody SkillRequest request) {
 		Skill skill = skillCommandService.createSkill(request.getName(), request.getDescription());
-		return ResponseEntity.status(HttpStatus.CREATED).body(new SkillResponse()
+		return ResponseEntity.status(HttpStatus.CREATED).body(SkillResponse.builder()
 				.id(skill.getId())
 				.name(skill.getName())
-				.description(skill.getDescription()));
+				.description(skill.getDescription())
+				.build());
 	}
 
 	@ApiOperation(value = "Update an existing skill",
@@ -57,7 +58,11 @@ public class SkillCommandController {
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	public SkillResponse updateSkill(@PathVariable("skillId") String skillId, @RequestBody SkillRequest request) {
 		Skill skill = skillCommandService.updateSkill(skillId, request.getName(), request.getDescription());
-		return new SkillResponse().id(skill.getId()).name(skill.getName()).description(skill.getDescription());
+		return SkillResponse.builder()
+				.id(skill.getId())
+				.name(skill.getName())
+				.description(skill.getDescription())
+				.build();
 	}
 
 	@ApiOperation(value = "Delete an existing skill",

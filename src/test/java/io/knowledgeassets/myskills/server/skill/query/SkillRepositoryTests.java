@@ -23,7 +23,7 @@ class SkillRepositoryTests {
 	@DisplayName("Provides the existing skill queried by its name")
 	void providesSkillByName() {
 		// Given
-		skillRepository.save(new Skill().id("123").name("Angular").description("JavaScript Framework"));
+		skillRepository.save(Skill.builder().id("123").name("Angular").description("JavaScript Framework").build());
 		// When
 		Optional<Skill> skill = skillRepository.findByName("Angular");
 		// Then

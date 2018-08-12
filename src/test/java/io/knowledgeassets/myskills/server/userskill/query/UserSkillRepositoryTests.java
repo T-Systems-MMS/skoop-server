@@ -32,17 +32,17 @@ class UserSkillRepositoryTests {
 	@DisplayName("Provides the skills not related to the user and containing the search term")
 	void providesSkillSuggestionsByUserId() {
 		// Given
-		Skill angular = new Skill().id("12").name("Angular").description("JavaScript Framework");
-		Skill springBoot = new Skill().id("34").name("Spring Boot").description("Java Application Framework");
-		Skill springSecurity = new Skill().id("56").name("Spring Security").description("Java Security Framework");
-		Skill springData = new Skill().id("78").name("Spring Data").description("Java Data Access Framework");
+		Skill angular = Skill.builder().id("12").name("Angular").description("JavaScript Framework").build();
+		Skill springBoot = Skill.builder().id("34").name("Spring Boot").description("Java Application Framework").build();
+		Skill springSecurity = Skill.builder().id("56").name("Spring Security").description("Java Security Framework").build();
+		Skill springData = Skill.builder().id("78").name("Spring Data").description("Java Data Access Framework").build();
 		skillRepository.save(angular);
 		skillRepository.save(springBoot);
 		skillRepository.save(springSecurity);
 		skillRepository.save(springData);
-		User user = new User().id("123").userName("tester");
-		user.userSkills(singletonList(new UserSkill().id("123;34").user(user).skill(springBoot)
-				.currentLevel(2).desiredLevel(3).priority(4)));
+		User user = User.builder().id("123").userName("tester").build();
+		user.setUserSkills(singletonList(UserSkill.builder().id("123;34").user(user).skill(springBoot)
+				.currentLevel(2).desiredLevel(3).priority(4).build()));
 		userRepository.save(user);
 		// When
 		Iterable<Skill> skills = userSkillRepository.findSkillSuggestionsByUserId("123", "spr");

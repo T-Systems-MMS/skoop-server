@@ -38,8 +38,8 @@ class UserSkillSuggestionControllerTests {
 	void providesSkillSuggestions() throws Exception {
 		given(userSkillQueryService.getUserSkillSuggestions("123", "spr"))
 				.willReturn(Stream.of(
-						new Skill().id("456").name("Spring Boot").description("Java Application Framework"),
-						new Skill().id("789").name("Spring Data").description("Java Data Access Framework")
+						Skill.builder().id("456").name("Spring Boot").description("Java Application Framework").build(),
+						Skill.builder().id("789").name("Spring Data").description("Java Data Access Framework").build()
 				));
 		mockMvc.perform(get("/users/123/skill-suggestions").param("search", "spr")
 				.accept(MediaType.APPLICATION_JSON)

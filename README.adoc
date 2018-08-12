@@ -66,17 +66,26 @@ As described in the introduction the MySkills Server is a pure server applicatio
 
 === Setting up the Neo4j database
 
-MySkills requires a https://neo4j.com/[Neo4j] database for persistent storage. You can either download and install the database server directly on your system or use Docker to get started quickly:
+MySkills Server requires a https://neo4j.com/[Neo4j] database for persistent storage. You can either download and install the database server directly on your system or use Docker to get started quickly:
 
     docker run -p 7474:7474 -p 7687:7687 -v $HOME/neo4j/data:/data -e NEO4J_AUTH=none neo4j:3.3
 
 _Note: During development we can start the database without any authentication enabled. So, we do not have to provide credentials in our application configuration._
 
+=== Configuring annotation processors
+
+The source code makes use of https://projectlombok.org/[Lombok] annotations to generate getters, setters, etc. in POJO classes. The build process takes care of processing these annotations at compile time but any IDE may require further configuration to make internal builds work.
+
+For IntelliJ IDEA:
+
+* Install the https://plugins.jetbrains.com/plugin/6317-lombok-plugin[Lombok Plugin]
+* Open the project settings, navigate to `Build, Execution, Deployment > Compiler > Annotation Processors` and activate the checkbox `Enable annotation processing`.
+
 === Running the application from the IDE
 
 You can run the application by using the Java class `io.knowledgeassets.myskills.server.MySkillsServerApplication` as main class in a usual Java launch configuration.
 
-For example, in IntelliJ IDEA right-click on this class and select _"Run 'MySkillsServer....main()'"_ from the context menu.
+For example, in IntelliJ IDEA right-click on this class and select `Run 'MySkillsServer....main()'` from the context menu.
 
 === Configuring a different HTTP port
 
@@ -88,9 +97,13 @@ In case you should have to use another HTTP port than 8080 you can pass the foll
 
 Currently, the authentication of MySkills only works with test users directly defined in the application configuration (see `src/main/resources/application.yml`).
 
+For example, you can use `admin` with the password `123` for testing.
+
 In case you should have to provide your custom users you can replicate the `application.yml` file in your file system, modify the users list and start the application with this additional argument:
 
     --spring.config.location=file:/path/to/my/application.yml
+
+_Note: This is an intermediate solution which will be replaced by OAuth2 in the future._
 
 === Building the application
 

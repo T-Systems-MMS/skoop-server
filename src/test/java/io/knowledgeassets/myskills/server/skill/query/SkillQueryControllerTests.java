@@ -38,8 +38,8 @@ class SkillQueryControllerTests {
 	@DisplayName("Responds with the list of skills provided by the internal service")
 	void respondsWithListOfSkills() throws Exception {
 		given(skillQueryService.getSkills()).willReturn(Stream.of(
-				new Skill().id("123").name("Angular").description("JavaScript Framework"),
-				new Skill().id("456").name("Spring Boot").description("Java Framework")
+				Skill.builder().id("123").name("Angular").description("JavaScript Framework").build(),
+				Skill.builder().id("456").name("Spring Boot").description("Java Framework").build()
 		));
 		mockMvc.perform(get("/skills").accept(MediaType.APPLICATION_JSON)
 				.with(user("tester").password("123").roles("USER")))
@@ -58,7 +58,7 @@ class SkillQueryControllerTests {
 	@DisplayName("Responds with the single skill provided by the internal service")
 	void respondsWithRequestedSkill() throws Exception {
 		given(skillQueryService.getSkillById("123")).willReturn(Optional.of(
-				new Skill().id("123").name("Angular").description("JavaScript Framework")));
+				Skill.builder().id("123").name("Angular").description("JavaScript Framework").build()));
 		mockMvc.perform(get("/skills/123").accept(MediaType.APPLICATION_JSON)
 				.with(user("tester").password("123").roles("USER")))
 				.andExpect(status().isOk())

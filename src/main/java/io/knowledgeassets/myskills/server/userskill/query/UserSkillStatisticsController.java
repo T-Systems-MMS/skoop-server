@@ -35,14 +35,16 @@ public class UserSkillStatisticsController {
 	@GetMapping(path = "/statistics/skills/top-priority", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<UserSkillPriorityAggregationResponse> getTop10PrioritizedSkills() {
 		return userSkillQueryService.getTop10PrioritizedSkills()
-				.map(aggregation -> new UserSkillPriorityAggregationResponse()
-						.skill(new SkillResponse()
+				.map(aggregation -> UserSkillPriorityAggregationResponse.builder()
+						.skill(SkillResponse.builder()
 								.id(aggregation.getSkill().getId())
 								.name(aggregation.getSkill().getName())
-								.description(aggregation.getSkill().getDescription()))
+								.description(aggregation.getSkill().getDescription())
+								.build())
 						.averagePriority(aggregation.getAveragePriority())
 						.maximumPriority(aggregation.getMaximumPriority())
-						.userCount(aggregation.getUserCount()))
+						.userCount(aggregation.getUserCount())
+						.build())
 				.collect(toList());
 	}
 }

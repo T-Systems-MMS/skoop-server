@@ -5,6 +5,8 @@ import io.knowledgeassets.myskills.server.skill.SkillRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 import static java.lang.String.format;
 
 @Service
@@ -17,8 +19,14 @@ public class SkillCommandService {
 
 	@Transactional
 	public Skill createSkill(String name, String description) {
-		// TODO: Check if skill with given name already exists.
-		return skillRepository.save(new Skill().newId().name(name).description(description));
+		skillRepository.findByName(name).ifPresent(skill -> {
+			throw new IllegalArgumentException(format("Skill with name '%s' already exists", name));
+		});
+		return skillRepository.save(Skill.builder()
+				.id(UUID.randomUUID().toString())
+				.name(name)
+				.description(description)
+				.build());
 	}
 
 	@Transactional

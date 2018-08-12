@@ -42,16 +42,18 @@ public class SkillUserQueryController {
 												 @RequestParam(value = "minPriority", required = false)
 														 Integer minPriority) {
 		return userSkillQueryService.getUserSkillsBySkillId(skillId, minPriority)
-				.map(userSkill -> new SkillUserResponse()
-						.user(new UserResponse()
+				.map(userSkill -> SkillUserResponse.builder()
+						.user(UserResponse.builder()
 								.id(userSkill.getUser().getId())
 								.userName(userSkill.getUser().getUserName())
 								.firstName(userSkill.getUser().getFirstName())
 								.lastName(userSkill.getUser().getLastName())
-								.email(userSkill.getUser().getEmail()))
+								.email(userSkill.getUser().getEmail())
+								.build())
 						.currentLevel(userSkill.getCurrentLevel())
 						.desiredLevel(userSkill.getDesiredLevel())
-						.priority(userSkill.getPriority()))
+						.priority(userSkill.getPriority())
+						.build())
 				.collect(toList());
 	}
 
@@ -69,16 +71,18 @@ public class SkillUserQueryController {
 	public SkillUserResponse getSkillUsers(@PathVariable("skillId") String skillId,
 										   @PathVariable("userId") String userId) {
 		return userSkillQueryService.getUserSkillByUserIdAndSkillId(userId, skillId)
-				.map(userSkill -> new SkillUserResponse()
-						.user(new UserResponse()
+				.map(userSkill -> SkillUserResponse.builder()
+						.user(UserResponse.builder()
 								.id(userSkill.getUser().getId())
 								.userName(userSkill.getUser().getUserName())
 								.firstName(userSkill.getUser().getFirstName())
 								.lastName(userSkill.getUser().getLastName())
-								.email(userSkill.getUser().getEmail()))
+								.email(userSkill.getUser().getEmail())
+								.build())
 						.currentLevel(userSkill.getCurrentLevel())
 						.desiredLevel(userSkill.getDesiredLevel())
-						.priority(userSkill.getPriority()))
+						.priority(userSkill.getPriority())
+						.build())
 				.orElseThrow(() -> new IllegalArgumentException(
 						format("Skill with ID '%s' not related to user with ID '%s'", skillId, userId)));
 	}

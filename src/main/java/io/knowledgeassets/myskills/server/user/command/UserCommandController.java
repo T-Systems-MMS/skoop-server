@@ -37,12 +37,13 @@ public class UserCommandController {
 	public ResponseEntity<UserResponse> createUser(@RequestBody UserRequest request) {
 		User user = userCommandService.createUser(request.getUserName(), request.getFirstName(), request.getLastName(),
 				request.getEmail());
-		return ResponseEntity.status(HttpStatus.CREATED).body(new UserResponse()
+		return ResponseEntity.status(HttpStatus.CREATED).body(UserResponse.builder()
 				.id(user.getId())
 				.userName(user.getUserName())
 				.firstName(user.getFirstName())
 				.lastName(user.getLastName())
-				.email(user.getEmail()));
+				.email(user.getEmail())
+				.build());
 	}
 
 	@ApiOperation(value = "Update an existing user",
@@ -61,12 +62,13 @@ public class UserCommandController {
 	public UserResponse updateUser(@PathVariable("userId") String userId, @RequestBody UserRequest request) {
 		User user = userCommandService.updateUser(userId, request.getUserName(), request.getFirstName(),
 				request.getLastName(), request.getEmail());
-		return new UserResponse()
+		return UserResponse.builder()
 				.id(user.getId())
 				.userName(user.getUserName())
 				.firstName(user.getFirstName())
 				.lastName(user.getLastName())
-				.email(user.getEmail());
+				.email(user.getEmail())
+				.build();
 	}
 
 	@ApiOperation(value = "Delete an existing user",

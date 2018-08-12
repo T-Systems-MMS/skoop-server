@@ -40,14 +40,16 @@ public class UserSkillQueryController {
 	@GetMapping(path = "/users/{userId}/skills", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<UserSkillResponse> getUserSkills(@PathVariable("userId") String userId) {
 		return userSkillQueryService.getUserSkillsByUserId(userId)
-				.map(userSkill -> new UserSkillResponse()
-						.skill(new SkillResponse()
+				.map(userSkill -> UserSkillResponse.builder()
+						.skill(SkillResponse.builder()
 								.id(userSkill.getSkill().getId())
 								.name(userSkill.getSkill().getName())
-								.description(userSkill.getSkill().getDescription()))
+								.description(userSkill.getSkill().getDescription())
+								.build())
 						.currentLevel(userSkill.getCurrentLevel())
 						.desiredLevel(userSkill.getDesiredLevel())
-						.priority(userSkill.getPriority()))
+						.priority(userSkill.getPriority())
+						.build())
 				.collect(toList());
 	}
 
@@ -65,14 +67,16 @@ public class UserSkillQueryController {
 	public UserSkillResponse getUserSkill(@PathVariable("userId") String userId,
 										  @PathVariable("skillId") String skillId) {
 		return userSkillQueryService.getUserSkillByUserIdAndSkillId(userId, skillId)
-				.map(userSkill -> new UserSkillResponse()
-						.skill(new SkillResponse()
+				.map(userSkill -> UserSkillResponse.builder()
+						.skill(SkillResponse.builder()
 								.id(userSkill.getSkill().getId())
 								.name(userSkill.getSkill().getName())
-								.description(userSkill.getSkill().getDescription()))
+								.description(userSkill.getSkill().getDescription())
+								.build())
 						.currentLevel(userSkill.getCurrentLevel())
 						.desiredLevel(userSkill.getDesiredLevel())
-						.priority(userSkill.getPriority()))
+						.priority(userSkill.getPriority())
+						.build())
 				.orElseThrow(() -> new IllegalArgumentException(
 						format("User with ID '%s' not related to skill with ID '%s'", userId, skillId)));
 	}
@@ -92,12 +96,13 @@ public class UserSkillQueryController {
 	public List<UserResponse> getUserSkillCoaches(@PathVariable("userId") String userId,
 												  @PathVariable("skillId") String skillId) {
 		return userSkillQueryService.getCoachesByUserIdAndSkillId(userId, skillId)
-				.map(coach -> new UserResponse()
+				.map(coach -> UserResponse.builder()
 						.id(coach.getId())
 						.userName(coach.getUserName())
 						.firstName(coach.getFirstName())
 						.lastName(coach.getLastName())
-						.email(coach.getEmail()))
+						.email(coach.getEmail())
+						.build())
 				.collect(toList());
 	}
 }

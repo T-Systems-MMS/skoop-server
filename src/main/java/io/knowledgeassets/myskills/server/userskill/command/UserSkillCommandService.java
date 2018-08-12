@@ -40,12 +40,22 @@ public class UserSkillCommandService {
 	@Transactional
 	public UserSkill createUserSkillBySkillId(String userId, String skillId, Integer currentLevel, Integer desiredLevel,
 											  Integer priority) {
+		userSkillRepository.findByUserIdAndSkillId(userId, skillId).ifPresent(userSkill -> {
+			throw new IllegalArgumentException(format("User with ID '%s' is already related to skill with ID '%s'",
+					userId, skillId));
+		});
 		User user = userQueryService.getUserById(userId).orElseThrow(() -> new IllegalArgumentException(
 				format("User with ID '%s' not found", userId)));
 		Skill skill = skillQueryService.getSkillById(skillId).orElseThrow(() -> new IllegalArgumentException(
 				format("Skill with ID '%s' not found", skillId)));
-		return userSkillRepository.save(new UserSkill().user(user).skill(skill)
-				.currentLevel(currentLevel).desiredLevel(desiredLevel).priority(priority));
+		return userSkillRepository.save(UserSkill.builder()
+				.id(userId + ';' + skillId)
+				.user(user)
+				.skill(skill)
+				.currentLevel(currentLevel)
+				.desiredLevel(desiredLevel)
+				.priority(priority)
+				.build());
 	}
 
 	/**

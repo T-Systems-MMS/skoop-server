@@ -36,12 +36,13 @@ public class UserQueryController {
 	@GetMapping(path = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<UserResponse> getUsers() {
 		return userQueryService.getUsers()
-				.map(user -> new UserResponse()
+				.map(user -> UserResponse.builder()
 						.id(user.getId())
 						.userName(user.getUserName())
 						.firstName(user.getFirstName())
 						.lastName(user.getLastName())
-						.email(user.getEmail()))
+						.email(user.getEmail())
+						.build())
 				.collect(toList());
 	}
 
@@ -57,12 +58,13 @@ public class UserQueryController {
 	@GetMapping(path = "/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public UserResponse getUserById(@PathVariable("userId") String userId) {
 		return userQueryService.getUserById(userId)
-				.map(user -> new UserResponse()
+				.map(user -> UserResponse.builder()
 						.id(user.getId())
 						.userName(user.getUserName())
 						.firstName(user.getFirstName())
 						.lastName(user.getLastName())
-						.email(user.getEmail()))
+						.email(user.getEmail())
+						.build())
 				.orElseThrow(() -> new IllegalArgumentException(format("User with ID '%s' not found", userId)));
 	}
 }

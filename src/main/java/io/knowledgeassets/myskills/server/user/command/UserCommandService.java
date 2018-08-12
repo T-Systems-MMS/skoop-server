@@ -5,6 +5,8 @@ import io.knowledgeassets.myskills.server.user.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 import static java.lang.String.format;
 
 @Service
@@ -22,9 +24,16 @@ public class UserCommandService {
 
 	@Transactional
 	public User createUser(String userName, String firstName, String lastName, String email) {
-		// TODO: Check if user with given name already exists.
-		return userRepository.save(new User().newId().userName(userName).firstName(firstName).lastName(lastName)
-				.email(email));
+		userRepository.findByUserName(userName).ifPresent(user -> {
+			throw new IllegalArgumentException(format("User with name '%s' already exists", userName));
+		});
+		return userRepository.save(User.builder()
+				.id(UUID.randomUUID().toString())
+				.userName(userName)
+				.firstName(firstName)
+				.lastName(lastName)
+				.email(email)
+				.build());
 	}
 
 	@Transactional

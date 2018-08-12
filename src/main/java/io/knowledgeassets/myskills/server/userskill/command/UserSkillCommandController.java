@@ -52,14 +52,16 @@ public class UserSkillCommandController {
 		} else {
 			throw new IllegalArgumentException("Either the property 'skillId' or 'skillName' is required");
 		}
-		return ResponseEntity.status(HttpStatus.CREATED).body(new UserSkillResponse()
-				.skill(new SkillResponse()
+		return ResponseEntity.status(HttpStatus.CREATED).body(UserSkillResponse.builder()
+				.skill(SkillResponse.builder()
 						.id(userSkill.getSkill().getId())
 						.name(userSkill.getSkill().getName())
-						.description(userSkill.getSkill().getDescription()))
+						.description(userSkill.getSkill().getDescription())
+						.build())
 				.currentLevel(userSkill.getCurrentLevel())
 				.desiredLevel(userSkill.getDesiredLevel())
-				.priority(userSkill.getPriority()));
+				.priority(userSkill.getPriority())
+				.build());
 	}
 
 	@ApiOperation(value = "Update a relationship between a user and a skill",
@@ -80,14 +82,16 @@ public class UserSkillCommandController {
 											 @RequestBody UpdateUserSkillRequest request) {
 		UserSkill userSkill = userSkillCommandService.updateUserSkill(userId, skillId, request.getCurrentLevel(),
 				request.getDesiredLevel(), request.getPriority());
-		return new UserSkillResponse()
-				.skill(new SkillResponse()
+		return UserSkillResponse.builder()
+				.skill(SkillResponse.builder()
 						.id(userSkill.getSkill().getId())
 						.name(userSkill.getSkill().getName())
-						.description(userSkill.getSkill().getDescription()))
+						.description(userSkill.getSkill().getDescription())
+						.build())
 				.currentLevel(userSkill.getCurrentLevel())
 				.desiredLevel(userSkill.getDesiredLevel())
-				.priority(userSkill.getPriority());
+				.priority(userSkill.getPriority())
+				.build();
 	}
 
 	@ApiOperation(value = "Delete a relationship between a user and a skill",
