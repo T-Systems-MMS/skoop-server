@@ -2,38 +2,65 @@ package io.knowledgeassets.myskills.server.security;
 
 import io.knowledgeassets.myskills.server.user.command.UserCommandService;
 import io.knowledgeassets.myskills.server.user.query.UserQueryService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
+import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
+import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.token.AccessTokenConverter;
+import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter;
+import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.UserAuthenticationConverter;
+import org.springframework.security.oauth2.provider.token.store.jwk.JwkTokenStore;
 
-import java.util.Properties;
+import java.util.Set;
 
-@EnableWebSecurity
+@Configuration
+@EnableResourceServer
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-	private static final Logger log = LoggerFactory.getLogger(SecurityConfiguration.class);
+public class SecurityConfiguration extends ResourceServerConfigurerAdapter {
+	private final ResourceServerProperties resourceServerProperties;
+	private final MySkillsProperties mySkillsProperties;
 
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests().anyRequest().authenticated()
-				.and().httpBasic()
-				// TODO: Use cookie-based CSRF token repository for production
-//				.and().csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-				.and().csrf().disable()
-				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+	public SecurityConfiguration(ResourceServerProperties resourceServerProperties,
+								 MySkillsProperties mySkillsProperties) {
+		this.resourceServerProperties = resourceServerProperties;
+		this.mySkillsProperties = mySkillsProperties;
+	}
+
+	@Bean
+	public UserAuthenticationConverter userAuthenticationConverter(UserQueryService userQueryService,
+																   UserCommandService userCommandService) {
+		return new UserCreatingUserAuthenticationConverter(userQueryService, userCommandService,
+				Set.copyOf(mySkillsProperties.getSecurity().getDefaultRoles()));
+	}
+
+	@Bean
+	public AccessTokenConverter accessTokenConverter(UserQueryService userQueryService,
+													 UserCommandService userCommandService) {
+		DefaultAccessTokenConverter accessTokenConverter = new DefaultAccessTokenConverter();
+		accessTokenConverter.setUserTokenConverter(userAuthenticationConverter(userQueryService, userCommandService));
+		return accessTokenConverter;
+	}
+
+	@Bean
+	public TokenStore tokenStore(UserQueryService userQueryService, UserCommandService userCommandService) {
+		return new JwkTokenStore(resourceServerProperties.getJwk().getKeySetUri(),
+				accessTokenConverter(userQueryService, userCommandService));
 	}
 
 	@Override
-	public void configure(WebSecurity web) throws Exception {
-		// Exclude paths related to Swagger UI from Spring Security filter chain to allow public access to API docs.
-		web.ignoring().antMatchers(
+	public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
+		resources.resourceId(resourceServerProperties.getResourceId());
+	}
+
+	@Override
+	public void configure(HttpSecurity http) throws Exception {
+		http.authorizeRequests().antMatchers(
 				"/",
 				"/favicon.ico",
 				"/csrf",
@@ -41,22 +68,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				"/swagger-ui.html",
 				"/webjars/**",
 				"/swagger-resources/**",
-				"/api-spec");
-	}
-
-	@Bean
-	public UserDetailsService userDetailsService(UserQueryService userQueryService,
-												 UserCommandService userCommandService,
-												 MySkillsProperties properties) {
-		// Configure preliminary users from given application settings (see application.yml).
-		Properties users = new Properties();
-		properties.getSecurity().getUsers().forEach(userEntry -> {
-			int userNameDelimiter = userEntry.indexOf(',');
-			String userName = userEntry.substring(0, userNameDelimiter);
-			String userSettings = userEntry.substring(userNameDelimiter + 1);
-			users.setProperty(userName, userSettings);
-			log.info("Configuring user '{}' with settings: {}", userName, userSettings);
-		});
-		return new UserCreatingUserDetailsService(users, userQueryService, userCommandService);
+				"/api-spec").permitAll()
+				.anyRequest().authenticated()
+				// TODO: Use cookie-based CSRF token repository for production
+//				.and().csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+				.and().csrf().disable()
+				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 	}
 }

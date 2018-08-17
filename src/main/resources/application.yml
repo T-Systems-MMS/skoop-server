@@ -1,3 +1,13 @@
+security:
+  oauth2:
+    resource:
+      # Client ID to be used to identify this application in the authorization server
+      id: myskills
+      jwk:
+        # URL to retrieve the public key for ID token validation from
+        key-set-uri: http://localhost:9000/auth/realms/MySkills/protocol/openid-connect/certs
+      service-id: myskills
+
 springfox:
   documentation:
     swagger:
@@ -6,10 +16,6 @@ springfox:
 
 myskills:
   security:
-    # Preliminary user configuration for simple authentication/authorization
-    # Syntax: "username,password,role1,role2,...,activation"
-    users:
-      - admin,{noop}123,ROLE_USER,ROLE_ADMIN,enabled
-      - cathi,{noop}123,ROLE_USER,enabled
-      - georg,{noop}123,ROLE_USER,enabled
-      - denny,{noop}123,ROLE_USER,enabled
+    # Roles granted to users by default
+    default-roles:
+      - ROLE_USER

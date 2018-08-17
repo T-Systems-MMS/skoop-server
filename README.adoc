@@ -111,15 +111,27 @@ In case you should have to use another HTTP port than 8080 you can pass the foll
 
 === Configuring test users
 
-Currently, the authentication of MySkills only works with test users directly defined in the application configuration (see `src/main/resources/application.yml`).
+MySkills Server uses OpenID Connect for authentication via an external identity provider. The application expects an ID token to be passed as bearer token with each API request.
 
-For example, you can use `admin` with the password `123` for testing.
+Each request must contain the appropriate `Authorization` header:
 
-In case you should have to provide your custom users you can replicate the `application.yml` file in your file system, modify the users list and start the application with this additional argument:
+    Authorization: Bearer <ID token>
 
-    --spring.config.location=file:/path/to/my/application.yml
+During development a local https://www.keycloak.org/[KeyCloak] server can be used to manage test users and create token. It can be easily set up with Docker:
 
-_Note: This is an intermediate solution which will be replaced by OAuth2 in the future._
+    docker run --name keycloak -p 9000:8080 -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=admin jboss/keycloak:4.3.0.Final
+
+The authorization server must have a realm called `MySkills` containing a client registration with the ID `myskills`. There is an export of a suitable test realm in `tools/keycloak/myskills-realm.json` which can be imported into the KeyCloak server.
+
+In order to obtain an ID token you must call the following URL in your browser:
+
+http://localhost:9000/auth/realms/MySkills/protocol/openid-connect/auth?client_id=myskills&response_type=id_token&scope=openid+profile&nonce=123&redirect_uri=http://localhost:4200/
+
+After logging in to the authorization server you will be redirected to http://localhost:4200/ with the ID token passed in the `id_token` query parameter. This URL is preconfigured as valid redirect URL in the test realm.
+
+The authorization server must provide the user name in the `user_name` claim of the issued ID tokens. This is preconfigured in the test realm.
+
+If you want to use a different port for the KeyCloak server or different names for realm and client you have to adjust the MySkills configuration accordingly (see `src/main/resources/application.yml`).
 
 === Testing the application
 

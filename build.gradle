@@ -33,8 +33,8 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-actuator')
 	compile('org.springframework.boot:spring-boot-starter-data-neo4j')
 	compile('org.springframework.boot:spring-boot-starter-security')
+	compile("org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:${springSecurityOauth2AutoconfigureVersion}")
 	compile('org.springframework.boot:spring-boot-starter-web')
-	compile('javax.xml.bind:jaxb-api')
 	compile("io.springfox:springfox-swagger2:${springfoxSwagger2Version}")
 	compile("org.apache.commons:commons-lang3:${commonsLang3Version}")
 	compileOnly('org.projectlombok:lombok')
@@ -43,6 +43,10 @@ dependencies {
 	 * Application runtime dependencies
 	 */
 	runtime("io.springfox:springfox-swagger-ui:${springfoxSwagger2Version}")
+	runtime('javax.xml.bind:jaxb-api')
+	runtime("com.sun.xml.bind:jaxb-core:${jaxbVersion}")
+	runtime("com.sun.xml.bind:jaxb-impl:${jaxbVersion}")
+	runtime("javax.activation:activation:${javaxActivationVersion}")
 
 	/*
 	 * Annotation processors

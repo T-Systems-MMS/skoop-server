@@ -16,10 +16,10 @@ public class MySkillsProperties {
 	}
 
 	public class Security {
-		private final List<String> users = new ArrayList<>();
+		private final List<String> defaultRoles = new ArrayList<>();
 
-		public List<String> getUsers() {
-			return users;
+		public List<String> getDefaultRoles() {
+			return defaultRoles;
 		}
 	}
 }

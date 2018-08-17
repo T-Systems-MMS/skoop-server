@@ -21,6 +21,8 @@ import static springfox.documentation.swagger.web.UiConfiguration.Constants.DEFA
  */
 @Configuration
 public class OpenAPIConfiguration {
+	// TODO: Extend Swagger UI configuration to offer OAuth 2.0 login
+
 	@Bean
 	public Docket mySkillsApi(@Value("${server.servlet.context-path:/}") String contextPath) {
 		return new Docket(SWAGGER_2)
