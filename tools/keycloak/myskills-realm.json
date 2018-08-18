@@ -408,6 +408,8 @@
       "clientAuthenticatorType": "client-secret",
       "secret": "**********",
       "redirectUris": [
+        "http://localhost:4200/silent-refresh.html",
+        "http://localhost:4200/index.html",
         "http://localhost:4200/"
       ],
       "webOrigins": [],
@@ -947,13 +949,13 @@
   ],
   "defaultDefaultClientScopes": [
     "role_list",
-    "email",
-    "profile"
+    "profile",
+    "email"
   ],
   "defaultOptionalClientScopes": [
-    "phone",
+    "offline_access",
     "address",
-    "offline_access"
+    "phone"
   ],
   "browserSecurityHeaders": {
     "xContentTypeOptions": "nosniff",
