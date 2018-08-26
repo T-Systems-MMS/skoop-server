@@ -1,6 +1,6 @@
 = MySkills Server
 Georg Wittberger <georg.wittberger@gmail.com>
-v0.0.1, 2018-08-11
+v0.0.1, 2018-08-26
 
 A lightweight web application to capture, manage and analyze skills of users and help them improve their capabilities by connecting them with each other and assisting with personalized suggestions for coaches, trainings, projects and many more.
 
@@ -111,27 +111,28 @@ In case you should have to use another HTTP port than 8080 you can pass the foll
 
 === Configuring test users
 
-MySkills Server uses OpenID Connect for authentication via an external identity provider. The application expects an ID token to be passed as bearer token with each API request.
+MySkills Server requires an external OpenID Connect provider to generate ID token which can be used to authorize API requests.
 
-Each request must contain the appropriate `Authorization` header:
-
-    Authorization: Bearer <ID token>
-
-During development a local https://www.keycloak.org/[KeyCloak] server can be used to manage test users and create token. It can be easily set up with Docker:
+During development a local https://www.keycloak.org/[KeyCloak] server is recommended to manage test users and create ID token. It can be easily set up with Docker:
 
     docker run --name keycloak -p 9000:8080 -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=admin jboss/keycloak:4.3.0.Final
 
-The authorization server must have a realm called `MySkills` containing a client registration with the ID `myskills`. There is an export of a suitable test realm in `tools/keycloak/myskills-realm.json` which can be imported into the KeyCloak server.
+Alternatively, you can download an install KeyCloak from the official website.
 
-In order to obtain an ID token you must call the following URL in your browser:
+There is an export of a suitable test realm in `tools/keycloak/myskills-realm.json` which can be imported into the KeyCloak server. The realm already contains two test users:
+
+* Username: `georg` - Password: `georg`
+* Username: `admin` - Password: `admin`
+
+In order to obtain an ID token you must call the following URL in your browser (assuming that KeyCloak listens on port 9000):
 
 http://localhost:9000/auth/realms/MySkills/protocol/openid-connect/auth?client_id=myskills&response_type=id_token&scope=openid+profile&nonce=123&redirect_uri=http://localhost:4200/
 
-After logging in to the authorization server you will be redirected to http://localhost:4200/ with the ID token passed in the `id_token` query parameter. This URL is preconfigured as valid redirect URL in the test realm.
+After logging in with one of the test users you will be redirected to http://localhost:4200/ with the ID token passed in the `id_token` query parameter. You can copy this token and use it to authorize API requests by sending an `Authorization` header:
 
-The authorization server must provide the user name in the `user_name` claim of the issued ID tokens. This is preconfigured in the test realm.
+    Authorization: Bearer <ID token>
 
-If you want to use a different port for the KeyCloak server or different names for realm and client you have to adjust the MySkills configuration accordingly (see `src/main/resources/application.yml`).
+_Note: The default configuration of MySkills Server assumes that the KeyCloak server is available at `localhost:9000` and contains a realm named `MySkills`. The realm must allow the client `myskills` to perform the OIDC implicit flow._
 
 === Testing the application
 
@@ -155,6 +156,8 @@ Open the Swagger UI of the running application: http://localhost:8080/swagger-ui
 
 Fundamentally, the MySkills Server is based on the conventions of the https://spring.io/projects/spring-boot[Spring Boot] framework. If you are familiar with that framework you should have an easy start with the project.
 
+==== Source code structure
+
 The base package `io.knowledgeassets.myskills.server` contains several sub-packages with focus on specific parts of the domain model. For example, `io.knowledgeassets.myskills.server.skill` contains everything related to skills as a domain object, including entity classes, data repositories, service implementations and controllers for the corresponding REST API.
 
 _A basic design principle of MySkills Server is the application of the CQRS pattern (Command Query Responsibility Segregation)._
@@ -169,6 +172,16 @@ In short words, all read access to the domain model is strictly separated from t
 ** Controller implementation which provides GET operations to request views on the domain model
 
 _Important rule: Code from the `command` package may use code from the `query` package, e.g. to perform validation. But under no circumstances is the code in the `query` package allowed to use code from the `command` package!_
+
+==== Authentication and authorization
+
+The https://spring.io/projects/spring-security[Spring Security] framework is used to implement user authentication and access control for the provided API resources.
+
+The application is implemented as a stateless OAuth2 resource server. Each API request must be authorized by including an `Authorization` header with a valid ID token:
+
+    Authorization: Bearer <ID token>
+
+The signature of the ID token is validated using the public key of the authorization server (offline validation). By default, this public key is automatically loaded on startup from the JWK set URI of the authorization server.
 
 == License
 
