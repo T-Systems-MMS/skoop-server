@@ -1,6 +1,6 @@
 = MySkills Server
 Georg Wittberger <georg.wittberger@gmail.com>
-v0.0.1, 2018-08-26
+v0.0.1, 2018-08-28
 
 A lightweight web application to capture, manage and analyze skills of users and help them improve their capabilities by connecting them with each other and assisting with personalized suggestions for coaches, trainings, projects and many more.
 
@@ -82,9 +82,19 @@ As described in the introduction the MySkills Server is a pure server applicatio
 
 === Setting up the Neo4j database
 
-MySkills Server requires a https://neo4j.com/[Neo4j] database for persistent storage. You can either download and install the database server directly on your system or use Docker to get started quickly:
+MySkills Server requires a https://neo4j.com/[Neo4j] database for persistent storage.
 
-    docker run -p 7474:7474 -p 7687:7687 -v $HOME/neo4j/data:/data -e NEO4J_AUTH=none neo4j:3.3
+Option 1: You can download the database server https://neo4j.com/download-center/#releases[directly from the website] and install it on your system.
+
+Option 2: You can start Neo4j as a Docker container.
+
+    docker run --name neo4j -d -p 7474:7474 -p 7687:7687 -v $HOME/neo4j/data:/data -e NEO4J_AUTH=none neo4j:3.3
+
+This will create a container named `neo4j` which you start/stop simply like this:
+
+    docker start neo4j
+
+    docker stop neo4j
 
 _Note: During development we can start the database without any authentication enabled. So, we do not have to provide credentials in our application configuration._
 
@@ -113,26 +123,31 @@ In case you should have to use another HTTP port than 8080 you can pass the foll
 
 MySkills Server requires an external OpenID Connect provider to generate ID token which can be used to authorize API requests.
 
-During development a local https://www.keycloak.org/[KeyCloak] server is recommended to manage test users and create ID token. It can be easily set up with Docker:
+During development a local https://www.keycloak.org/[KeyCloak] server is recommended to manage test users and create ID token.
 
-    docker run --name keycloak -p 9000:8080 -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=admin jboss/keycloak:4.3.0.Final
+Option 1: You can download KeyCloak https://www.keycloak.org/downloads.html[directly from the website] and install it on your system.
 
-Alternatively, you can download an install KeyCloak from the official website.
+Option 2: You can start KeyCloak as a Docker container.
 
-There is an export of a suitable test realm in `tools/keycloak/myskills-realm.json` which can be imported into the KeyCloak server. The realm already contains two test users:
+    docker run --name keycloak -d -p 9000:8080 -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=admin jboss/keycloak:4.3.0.Final
 
-* Username: `georg` - Password: `georg`
-* Username: `admin` - Password: `admin`
+This will create a container named `keycloak` which you start/stop simply like this:
+
+    docker start keycloak
+
+    docker stop keycloak
+
+There is an export of a suitable test realm in `tools/keycloak/myskills-realm.json` which can be imported into the KeyCloak server. The realm comes with a preconfigured client for MySkills but contains no test users. You have to create users manually within the `MySkills` realm.
 
 In order to obtain an ID token you must call the following URL in your browser (assuming that KeyCloak listens on port 9000):
 
 http://localhost:9000/auth/realms/MySkills/protocol/openid-connect/auth?client_id=myskills&response_type=id_token&scope=openid+profile&nonce=123&redirect_uri=http://localhost:4200/
 
-After logging in with one of the test users you will be redirected to http://localhost:4200/ with the ID token passed in the `id_token` query parameter. You can copy this token and use it to authorize API requests by sending an `Authorization` header:
+After logging in you will be redirected to http://localhost:4200/ with the ID token passed in the `id_token` query parameter. You can copy this token and use it to authorize API requests by sending an `Authorization` header:
 
     Authorization: Bearer <ID token>
 
-_Note: The default configuration of MySkills Server assumes that the KeyCloak server is available at `localhost:9000` and contains a realm named `MySkills`. The realm must allow the client `myskills` to perform the OIDC implicit flow._
+_Note: The default configuration of MySkills Server assumes that the KeyCloak server is available at `localhost:9000` and contains a realm named `MySkills`._
 
 === Testing the application
 
