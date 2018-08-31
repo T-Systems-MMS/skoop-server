@@ -40,6 +40,18 @@ The project uses https://gradle.org/[Gradle] as the build tool. Run the followin
 
 The final executable JAR file is produced in the `build/libs` directory.
 
+*Tip:* If you are using a proxy you should create a gradle.properties in your home directory ($HOME), and set below properties:
+```
+systemProp.http.proxyHost=hostname
+systemProp.http.proxyPort=8080
+systemProp.http.proxyUser=username
+systemProp.http.proxyPassword=xxx
+systemProp.https.proxyHost=hostname
+systemProp.https.proxyPort=8080
+systemProp.https.proxyUser=username
+systemProp.https.proxyPassword=xxx
+```
+
 === Running the executable JAR file
 
 After completing the Gradle build you can run the MySkills Server like a simple Java application:
@@ -87,6 +99,12 @@ MySkills Server requires a https://neo4j.com/[Neo4j] database for persistent sto
 Option 1: You can download the database server https://neo4j.com/download-center/#releases[directly from the website] and install it on your system.
 
 Option 2: You can start Neo4j as a Docker container.
+
+* In windows:
+
+    docker run --name neo4j -d -p 7474:7474 -p 7687:7687 -v C:\Develop\workspace\neo4j\data:/data -e NEO4J_AUTH=none neo4j:3.3
+
+* In Linux:
 
     docker run --name neo4j -d -p 7474:7474 -p 7687:7687 -v $HOME/neo4j/data:/data -e NEO4J_AUTH=none neo4j:3.3
 
