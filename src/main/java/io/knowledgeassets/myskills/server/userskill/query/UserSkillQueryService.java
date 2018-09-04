@@ -1,5 +1,6 @@
 package io.knowledgeassets.myskills.server.userskill.query;
 
+import io.knowledgeassets.myskills.server.report.UserSkillPriorityAggregationReport;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.userskill.UserSkill;
@@ -54,6 +55,11 @@ public class UserSkillQueryService {
 	@Transactional(readOnly = true)
 	public Stream<UserSkillPriorityAggregation> getTop10PrioritizedSkills() {
 		return StreamSupport.stream(userSkillRepository.findTop10PrioritizedSkills().spliterator(), false);
+	}
+
+	@Transactional(readOnly = true)
+	public Stream<UserSkillPriorityAggregationReport> findPrioritizedSkillsToCreateReport() {
+		return StreamSupport.stream(userSkillRepository.findPrioritizedSkillsToCreateReport().spliterator(), false);
 	}
 
 	@Transactional(readOnly = true)
