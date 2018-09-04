@@ -42,6 +42,7 @@ dependencies {
 	/*
 	 * Application runtime dependencies
 	 */
+	runtime('org.springframework.boot:spring-boot-devtools')
 	runtime("io.springfox:springfox-swagger-ui:${springfoxSwagger2Version}")
 	runtime('javax.xml.bind:jaxb-api')
 	runtime("com.sun.xml.bind:jaxb-core:${jaxbVersion}")
