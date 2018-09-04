@@ -7,6 +7,11 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 
 import java.util.List;
 
+/**
+ * The result from {@link io.knowledgeassets.myskills.server.userskill.query.UserSkillQueryService}
+ * .findPrioritizedSkillsToCreateReport() method, is a list of objects from this class.
+ * We later save this list of objects, as a report in {@link io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReport} entity.
+ */
 @Data
 @Builder
 @NoArgsConstructor

@@ -23,6 +23,7 @@ sourceCompatibility = 10
 targetCompatibility = 10
 
 repositories {
+	mavenLocal()
 	mavenCentral()
 }
 

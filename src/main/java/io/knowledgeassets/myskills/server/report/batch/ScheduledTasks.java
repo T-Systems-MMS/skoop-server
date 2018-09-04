@@ -1,8 +1,8 @@
 package io.knowledgeassets.myskills.server.report.batch;
 
 import io.knowledgeassets.myskills.server.report.UserSkillPriorityAggregationReport;
-import io.knowledgeassets.myskills.server.report.report.command.UserSkillPriorityReportCommandService;
-import io.knowledgeassets.myskills.server.report.report.query.UserSkillPriorityReportQueryService;
+import io.knowledgeassets.myskills.server.report.userskillpriorityreport.command.UserSkillPriorityReportCommandService;
+import io.knowledgeassets.myskills.server.report.userskillpriorityreport.query.UserSkillPriorityReportQueryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 
 /**
  * Scheduling UserSkillPriorityReport.
- * This scheduler creates <b>skill priorities report</b> every week on Sundays.
+ * This scheduler creates <b>skill priorities userskillpriorityreport</b> every week on Sundays.
  */
 @Component
 @Slf4j

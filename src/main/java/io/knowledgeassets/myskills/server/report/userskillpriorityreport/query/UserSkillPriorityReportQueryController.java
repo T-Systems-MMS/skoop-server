@@ -1,7 +1,7 @@
-package io.knowledgeassets.myskills.server.report.report.query;
+package io.knowledgeassets.myskills.server.report.userskillpriorityreport.query;
 
-import io.knowledgeassets.myskills.server.report.priorityreportdetails.UserSkillPriorityReportDetailsResponse;
-import io.knowledgeassets.myskills.server.report.report.UserSkillPriorityReportResponse;
+import io.knowledgeassets.myskills.server.report.userskillprioritydetailsreport.UserSkillPriorityReportDetailsResponse;
+import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReportResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -40,13 +40,13 @@ public class UserSkillPriorityReportQueryController {
 				.map(userSkillPriorityReport -> UserSkillPriorityReportResponse.builder()
 						.id(userSkillPriorityReport.getId())
 						.date(userSkillPriorityReport.getDate())
-						.skillCount(userSkillPriorityReport.getUserSkillPriorityReportDetails().size()) // TODO: 9/4/2018 getSkillCount
+						.skillCount(userSkillPriorityReport.getUserSkillPriorityDetailReports().size())
 						.build())
 				.collect(toList());
 		return collect;
 	}
 
-	@ApiOperation(value = "Get a specific report",
+	@ApiOperation(value = "Get a specific userskillpriorityreport",
 			notes = "Get a specific user currently stored in the system.")
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "Successful execution"),

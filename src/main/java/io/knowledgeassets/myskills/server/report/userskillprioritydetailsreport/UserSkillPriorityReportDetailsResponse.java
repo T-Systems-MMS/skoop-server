@@ -1,8 +1,6 @@
-package io.knowledgeassets.myskills.server.report.priorityreportdetails;
+package io.knowledgeassets.myskills.server.report.userskillprioritydetailsreport;
 
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @Data
 @Builder

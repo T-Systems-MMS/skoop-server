@@ -1,10 +1,10 @@
-package io.knowledgeassets.myskills.server.report.report.query;
+package io.knowledgeassets.myskills.server.report.userskillpriorityreport.query;
 
-import io.knowledgeassets.myskills.server.report.priorityreportdetails.UserSkillPriorityReportDetails;
-import io.knowledgeassets.myskills.server.report.priorityreportdetails.UserSkillPriorityReportDetailsRepository;
+import io.knowledgeassets.myskills.server.report.userskillprioritydetailsreport.UserSkillPriorityDetailsReport;
+import io.knowledgeassets.myskills.server.report.userskillprioritydetailsreport.UserSkillPriorityReportDetailsRepository;
 import io.knowledgeassets.myskills.server.report.UserSkillPriorityAggregationReport;
-import io.knowledgeassets.myskills.server.report.report.UserSkillPriorityReport;
-import io.knowledgeassets.myskills.server.report.report.UserSkillPriorityReportRepository;
+import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReport;
+import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReportRepository;
 import io.knowledgeassets.myskills.server.userskill.query.UserSkillQueryService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +37,7 @@ public class UserSkillPriorityReportQueryService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<UserSkillPriorityReportDetails> getUserSkillPriorityReportDetailsByReportId(String reportId) {
+	public Optional<UserSkillPriorityDetailsReport> getUserSkillPriorityReportDetailsByReportId(String reportId) {
 		return userSkillPriorityReportDetailsRepository.findById(reportId);
 	}
 }

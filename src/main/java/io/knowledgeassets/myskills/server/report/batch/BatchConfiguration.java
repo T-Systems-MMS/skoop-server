@@ -1,4 +1,4 @@
-//package io.knowledgeassets.myskills.server.report.batch;
+//package io.knowledgeassets.myskills.server.userskillpriorityreport.batch;
 //
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.context.annotation.Bean;

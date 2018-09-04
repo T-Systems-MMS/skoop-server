@@ -1,4 +1,4 @@
-package io.knowledgeassets.myskills.server.report.priorityreportdetails;
+package io.knowledgeassets.myskills.server.report.userskillprioritydetailsreport;
 
 import io.knowledgeassets.myskills.server.report.UserSkillPriorityAggregationReport;
 import org.springframework.data.neo4j.annotation.Query;
@@ -6,7 +6,7 @@ import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UserSkillPriorityReportDetailsRepository extends Neo4jRepository<UserSkillPriorityReportDetails, String> {
+public interface UserSkillPriorityReportDetailsRepository extends Neo4jRepository<UserSkillPriorityDetailsReport, String> {
 
 	@Query("MATCH (skillReport:SkillReport)-[have:HAVE]-(userReport:UserReport) " +
 			"WHERE userSkill.priority > 0 " +

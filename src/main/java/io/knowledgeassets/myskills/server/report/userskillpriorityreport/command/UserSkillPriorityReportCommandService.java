@@ -1,9 +1,9 @@
-package io.knowledgeassets.myskills.server.report.report.command;
+package io.knowledgeassets.myskills.server.report.userskillpriorityreport.command;
 
-import io.knowledgeassets.myskills.server.report.priorityreportdetails.UserSkillPriorityReportDetails;
+import io.knowledgeassets.myskills.server.report.userskillprioritydetailsreport.UserSkillPriorityDetailsReport;
 import io.knowledgeassets.myskills.server.report.UserSkillPriorityAggregationReport;
-import io.knowledgeassets.myskills.server.report.report.UserSkillPriorityReport;
-import io.knowledgeassets.myskills.server.report.report.UserSkillPriorityReportRepository;
+import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReport;
+import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReportRepository;
 import io.knowledgeassets.myskills.server.report.skillreport.SkillReport;
 import io.knowledgeassets.myskills.server.report.userreport.UserReport;
 import org.springframework.stereotype.Service;
@@ -31,9 +31,9 @@ public class UserSkillPriorityReportCommandService {
 				.id(UUID.randomUUID().toString())
 				.date(LocalDateTime.now())
 				.build();
-		Set<UserSkillPriorityReportDetails> userSkillPriorityReportDetails = new HashSet<>();
+		Set<UserSkillPriorityDetailsReport> userSkillPriorityDetailReports = new HashSet<>();
 		userSkillPriorityAggregationReportStream.forEach(userSkillPriorityAggregationReport ->
-				userSkillPriorityReportDetails.add(UserSkillPriorityReportDetails.builder()
+				userSkillPriorityDetailReports.add(UserSkillPriorityDetailsReport.builder()
 						.id(UUID.randomUUID().toString())
 						.averagePriority(userSkillPriorityAggregationReport.getAveragePriority())
 						.maximumPriority(userSkillPriorityAggregationReport.getMaximumPriority())
@@ -56,7 +56,7 @@ public class UserSkillPriorityReportCommandService {
 						)
 						.build())
 		);
-		userSkillPriorityReport.setUserSkillPriorityReportDetails(userSkillPriorityReportDetails);
+		userSkillPriorityReport.setUserSkillPriorityDetailReports(userSkillPriorityDetailReports);
 		userSkillPriorityReportRepository.save(userSkillPriorityReport);
 	}
 

@@ -1,6 +1,6 @@
-package io.knowledgeassets.myskills.server.report.report;
+package io.knowledgeassets.myskills.server.report.userskillpriorityreport;
 
-import io.knowledgeassets.myskills.server.report.priorityreportdetails.UserSkillPriorityReportDetails;
+import io.knowledgeassets.myskills.server.report.userskillprioritydetailsreport.UserSkillPriorityDetailsReport;
 import lombok.*;
 import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -10,6 +10,10 @@ import org.neo4j.ogm.annotation.Relationship;
 import java.time.LocalDateTime;
 import java.util.Set;
 
+/**
+ * Report class.
+ * We save Report object by Batch Job Scheduling.
+ */
 @Data
 @Builder
 @NoArgsConstructor
@@ -25,6 +29,6 @@ public class UserSkillPriorityReport {
 
 	@EqualsAndHashCode.Exclude
 	@Relationship(type = "HAVE")
-	private Set<UserSkillPriorityReportDetails> userSkillPriorityReportDetails;
+	private Set<UserSkillPriorityDetailsReport> userSkillPriorityDetailReports;
 
 }

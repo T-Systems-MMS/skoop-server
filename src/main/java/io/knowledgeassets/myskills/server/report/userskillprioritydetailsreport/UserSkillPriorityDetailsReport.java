@@ -1,4 +1,4 @@
-package io.knowledgeassets.myskills.server.report.priorityreportdetails;
+package io.knowledgeassets.myskills.server.report.userskillprioritydetailsreport;
 
 import io.knowledgeassets.myskills.server.report.skillreport.SkillReport;
 import io.knowledgeassets.myskills.server.report.userreport.UserReport;
@@ -12,7 +12,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @NodeEntity
-public class UserSkillPriorityReportDetails {
+public class UserSkillPriorityDetailsReport {
 
 	@Id
 	@Property(name = "id")

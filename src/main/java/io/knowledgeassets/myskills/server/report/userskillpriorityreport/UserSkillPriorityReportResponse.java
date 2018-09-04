@@ -1,8 +1,7 @@
-package io.knowledgeassets.myskills.server.report.report;
+package io.knowledgeassets.myskills.server.report.userskillpriorityreport;
 
 import lombok.Builder;
 import lombok.Data;
-import org.neo4j.ogm.annotation.Property;
 
 import java.time.LocalDateTime;
 
