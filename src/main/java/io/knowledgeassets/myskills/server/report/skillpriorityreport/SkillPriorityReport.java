@@ -1,18 +1,16 @@
-package io.knowledgeassets.myskills.server.report.userskillprioritydetailsreport;
+package io.knowledgeassets.myskills.server.report.skillpriorityreport;
 
 import io.knowledgeassets.myskills.server.report.skillreport.SkillReport;
-import io.knowledgeassets.myskills.server.report.userreport.UserReport;
+import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReport;
 import lombok.*;
 import org.neo4j.ogm.annotation.*;
-
-import java.util.Set;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@NodeEntity
-public class UserSkillPriorityDetailsReport {
+@RelationshipEntity(type = "REPORT_SKILL_RELATED_TO")
+public class SkillPriorityReport {
 
 	@Id
 	@Property(name = "id")
@@ -24,11 +22,9 @@ public class UserSkillPriorityDetailsReport {
 	@Property(name = "userCount")
 	private Integer userCount;
 
-	@EqualsAndHashCode.Exclude
-	@Relationship(type = "HAVE_SKILL")
+	@StartNode
+	private UserSkillPriorityReport userSkillPriorityReport;
+	@EndNode
 	private SkillReport skillReport;
-	@EqualsAndHashCode.Exclude
-	@Relationship(type = "HAVE_USERS")
-	private Set<UserReport> userReports;
 
 }

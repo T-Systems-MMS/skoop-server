@@ -1,5 +1,6 @@
-package io.knowledgeassets.myskills.server.report.userskillprioritydetailsreport;
+package io.knowledgeassets.myskills.server.report.skillpriorityreport;
 
+import io.knowledgeassets.myskills.server.skill.SkillResponse;
 import lombok.*;
 
 @Data
@@ -9,6 +10,6 @@ public class UserSkillPriorityReportDetailsResponse {
 	private Double averagePriority;
 	private Double maximumPriority;
 	private Integer userCount;
-	private String skillName;
+	private SkillResponse skill;
 
 }
