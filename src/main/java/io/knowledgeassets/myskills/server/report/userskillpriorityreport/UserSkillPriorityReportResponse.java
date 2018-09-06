@@ -10,5 +10,5 @@ import java.time.LocalDateTime;
 public class UserSkillPriorityReportResponse {
 	private String id;
 	private LocalDateTime date;
-	private Integer skillCount;
+	private Long skillCount;
 }

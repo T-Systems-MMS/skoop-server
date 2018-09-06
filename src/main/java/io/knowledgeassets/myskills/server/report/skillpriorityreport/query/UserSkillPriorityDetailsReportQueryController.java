@@ -1,6 +1,5 @@
 package io.knowledgeassets.myskills.server.report.skillpriorityreport.query;
 
-import io.knowledgeassets.myskills.server.report.skillpriorityreport.SkillPriorityReportQueryService;
 import io.knowledgeassets.myskills.server.report.skillpriorityreport.UserSkillPriorityReportDetailsResponse;
 import io.knowledgeassets.myskills.server.report.userskillpriorityreport.query.UserSkillPriorityReportQueryService;
 import io.knowledgeassets.myskills.server.skill.SkillResponse;

@@ -1,6 +1,7 @@
-package io.knowledgeassets.myskills.server.report.skillpriorityreport;
+package io.knowledgeassets.myskills.server.report.skillpriorityreport.query;
 
 import io.knowledgeassets.myskills.server.report.UserSkillPriorityReportResult;
+import io.knowledgeassets.myskills.server.report.skillpriorityreport.SkillPriorityReportRepository;
 import io.knowledgeassets.myskills.server.report.userreport.UserReport;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

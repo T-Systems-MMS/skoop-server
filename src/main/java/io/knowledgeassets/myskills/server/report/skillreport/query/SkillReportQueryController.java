@@ -1,10 +1,6 @@
 package io.knowledgeassets.myskills.server.report.skillreport.query;
 
-import io.knowledgeassets.myskills.server.report.skillreport.SkillReportQueryService;
-import io.knowledgeassets.myskills.server.report.userskillreport.UserSkillReportQueryService;
 import io.knowledgeassets.myskills.server.skill.SkillResponse;
-import io.knowledgeassets.myskills.server.user.UserResponse;
-import io.knowledgeassets.myskills.server.userskill.query.SkillUserResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -15,10 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
 
 @Api(tags = "Priority UserSkillPriorityReport", description = "API allowing queries of reports")
 @RestController

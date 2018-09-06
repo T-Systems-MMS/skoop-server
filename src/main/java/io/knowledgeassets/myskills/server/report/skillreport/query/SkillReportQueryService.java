@@ -1,5 +1,7 @@
-package io.knowledgeassets.myskills.server.report.skillreport;
+package io.knowledgeassets.myskills.server.report.skillreport.query;
 
+import io.knowledgeassets.myskills.server.report.skillreport.SkillReport;
+import io.knowledgeassets.myskills.server.report.skillreport.SkillReportRepository;
 import io.knowledgeassets.myskills.server.report.userskillreport.UserSkillReport;
 import io.knowledgeassets.myskills.server.report.userskillreport.UserSkillReportRepository;
 import org.springframework.stereotype.Service;

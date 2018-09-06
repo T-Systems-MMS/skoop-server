@@ -34,7 +34,7 @@ public class UserSkillStatisticsController {
 	@PreAuthorize("hasRole('USER')")
 	@GetMapping(path = "/statistics/skills/top-priority", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<UserSkillPriorityAggregationResponse> getTop10PrioritizedSkills() {
-		return userSkillQueryService.getTop10PrioritizedSkills()
+		List<UserSkillPriorityAggregationResponse> collect = userSkillQueryService.getTop10PrioritizedSkills()
 				.map(aggregation -> UserSkillPriorityAggregationResponse.builder()
 						.skill(SkillResponse.builder()
 								.id(aggregation.getSkill().getId())
@@ -46,5 +46,6 @@ public class UserSkillStatisticsController {
 						.userCount(aggregation.getUserCount())
 						.build())
 				.collect(toList());
+		return  collect;
 	}
 }

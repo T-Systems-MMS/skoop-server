@@ -1,6 +1,6 @@
 package io.knowledgeassets.myskills.server.report.userskillpriorityreport;
 
-import io.knowledgeassets.myskills.server.report.userskillprioritydetailsreport.UserSkillPriorityDetailsReport;
+import io.knowledgeassets.myskills.server.report.skillpriorityreport.SkillPriorityReport;
 import lombok.*;
 import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -8,7 +8,7 @@ import org.neo4j.ogm.annotation.Property;
 import org.neo4j.ogm.annotation.Relationship;
 
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.List;
 
 /**
  * Report class.
@@ -28,7 +28,7 @@ public class UserSkillPriorityReport {
 	private LocalDateTime date;
 
 	@EqualsAndHashCode.Exclude
-	@Relationship(type = "HAVE")
-	private Set<UserSkillPriorityDetailsReport> userSkillPriorityDetailReports;
+	@Relationship(type = "REPORT_SKILL_RELATED_TO", direction = Relationship.UNDIRECTED)
+	private List<SkillPriorityReport> skillPriorityReports;
 
 }

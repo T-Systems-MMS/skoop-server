@@ -20,6 +20,8 @@ public interface UserSkillRepository extends Neo4jRepository<UserSkill, String> 
 
 	Optional<UserSkill> findByUserIdAndSkillId(String userId, String skillId);
 
+	Optional<UserSkill> findByUserIdAndSkillName(String userId, String skillName);
+
 	@Query("MATCH (user:User {id:{userId}})-[userSkill:RELATED_TO]-(:Skill {id:{skillId}})" +
 			"-[coachSkill:RELATED_TO]-(coach:User) " +
 			"WHERE coachSkill.currentLevel >= userSkill.desiredLevel " +
@@ -37,8 +39,8 @@ public interface UserSkillRepository extends Neo4jRepository<UserSkill, String> 
 
 	@Query("MATCH (skill:Skill)-[userSkill:RELATED_TO]-(user:User) " +
 			"WHERE userSkill.priority > 0 " +
-			"RETURN skill AS skill, AVG(userSkill.priority) AS averagePriority, collect (user) AS users, " +
-			"MAX(userSkill.priority) AS maximumPriority, COUNT(*) AS userCount " +
+			"RETURN skill AS skill, AVG(userSkill.priority) AS averagePriority, " +
+			"MAX(userSkill.priority) AS maximumPriority, COUNT(*) AS userCount, collect (user) AS users  " +
 			"ORDER BY AVG(userSkill.priority) DESC, COUNT(*) DESC, MAX(userSkill.priority) DESC ")
 	Iterable<UserSkillPriorityAggregationReport> findPrioritizedSkillsToCreateReport();
 
