@@ -38,6 +38,7 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-web')
 	compile("io.springfox:springfox-swagger2:${springfoxSwagger2Version}")
 	compile("org.apache.commons:commons-lang3:${commonsLang3Version}")
+	compile("org.springframework.boot:spring-boot-starter-batch")
 	compileOnly('org.projectlombok:lombok')
 
 	/*
@@ -49,6 +50,7 @@ dependencies {
 	runtime("com.sun.xml.bind:jaxb-core:${jaxbVersion}")
 	runtime("com.sun.xml.bind:jaxb-impl:${jaxbVersion}")
 	runtime("javax.activation:activation:${javaxActivationVersion}")
+	compile("org.springframework.batch:spring-batch-test")
 
 	/*
 	 * Annotation processors
