@@ -1,5 +1,6 @@
 package io.knowledgeassets.myskills.server.report.userreport;
 
+import io.knowledgeassets.myskills.server.report.userskillreport.UserSkillReport;
 import io.knowledgeassets.myskills.server.userskill.UserSkill;
 import lombok.*;
 import org.neo4j.ogm.annotation.Id;
@@ -26,4 +27,8 @@ public class UserReport {
 	private String lastName;
 	@Property(name = "email")
 	private String email;
+
+	@EqualsAndHashCode.Exclude
+	@Relationship(type = "SKILL_USER_RELATED_TO", direction = Relationship.UNDIRECTED)
+	private List<UserSkillReport> userSkillReports;
 }
