@@ -1,6 +1,7 @@
 package io.knowledgeassets.myskills.server.report.batch;
 
 import io.knowledgeassets.myskills.server.report.UserSkillPriorityAggregationReport;
+import io.knowledgeassets.myskills.server.report.skillpriorityreport.SkillPriorityReport;
 import io.knowledgeassets.myskills.server.report.userskillpriorityreport.command.UserSkillPriorityReportCommandService;
 import io.knowledgeassets.myskills.server.report.userskillpriorityreport.query.UserSkillPriorityReportQueryService;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.stream.Stream;
 
 /**
@@ -31,16 +33,30 @@ public class ScheduledTasks {
 
 	/**
 	 * second, minute, hour, day of month, month, day of week
+	 * Examples:
+	 *
+	 * @Scheduled(cron = "0 0 0 * * SUN")                    // This schedule starts every week on Sundays.
+	 * @Scheduled(cron = "0 0 0 * * ?")                    // This schedule starts every day.
+	 * @Scheduled(cron = "0 0 * * * ?")                    // This schedule starts every hour.
+	 * @Scheduled(initialDelay = 0, fixedRate = 3600000)    // This schedule starts every hour.
 	 */
-//	@Scheduled(cron = "0 0 0 * * SUN")                    // This schedule starts every week on Sunday.
-//	@Scheduled(cron = "0 0 * * * ?")                    // This schedule starts every every hour.
-	@Scheduled(initialDelay = 0, fixedRate = 3600000)    // This schedule starts every every hour.
+	@Scheduled(initialDelay = 0, fixedRate = 3600000)    // This schedule starts every hour.
 	public void reportCurrentTime() {
-//		Stream<UserSkillPriorityAggregationReport> prioritizedSkillsForReport = userSkillPriorityReportQueryService.getPrioritizedSkillsToCreateReport();
-//		System.out.println("Count of records: " + prioritizedSkillsForReport.count());
-//		userSkillPriorityReportCommandService.deleteAllPriorityReports();
-		Stream<UserSkillPriorityAggregationReport> prioritizedSkillsForReport = userSkillPriorityReportQueryService.getPrioritizedSkillsToCreateReport();
-		userSkillPriorityReportCommandService.createPriorityReport(prioritizedSkillsForReport);
-		log.info("The time is now {}", dateFormat.format(new Date()));
+		userSkillPriorityReportCommandService.deleteAllPriorityReports();
+		Stream<UserSkillPriorityAggregationReport> prioritizedSkillsForReport = read();
+		List<SkillPriorityReport> skillPriorityReports = convert(prioritizedSkillsForReport);
+		write(skillPriorityReports);
+	}
+
+	public Stream<UserSkillPriorityAggregationReport> read() {
+		return userSkillPriorityReportQueryService.getPrioritizedSkillsToCreateReport();
+	}
+
+	public List<SkillPriorityReport> convert(Stream<UserSkillPriorityAggregationReport> prioritizedSkillsForReport) {
+		return userSkillPriorityReportCommandService.convert(prioritizedSkillsForReport);
+	}
+
+	public void write(List<SkillPriorityReport> skillPriorityReports) {
+		userSkillPriorityReportCommandService.createPriorityReport(skillPriorityReports);
 	}
 }

@@ -1,3 +1,9 @@
+spring:
+  batch:
+    job:
+      # Prevent Spring Boot to trigger the Spring Batch Job automatically
+      enabled: false
+
 security:
   oauth2:
     resource:

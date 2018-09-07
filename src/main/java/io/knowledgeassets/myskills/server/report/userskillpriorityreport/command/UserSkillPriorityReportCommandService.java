@@ -30,16 +30,8 @@ public class UserSkillPriorityReportCommandService {
 		this.userSkillRepository = userSkillRepository;
 	}
 
-	@Transactional
-	public void createPriorityReport(Stream<UserSkillPriorityAggregationReport> userSkillPriorityAggregationReportStream) {
-
-		UserSkillPriorityReport userSkillPriorityReport = UserSkillPriorityReport.builder()
-				.id(UUID.randomUUID().toString())
-				.date(LocalDateTime.now())
-				.build();
-
+	public List<SkillPriorityReport> convert(Stream<UserSkillPriorityAggregationReport> userSkillPriorityAggregationReportStream) {
 		List<SkillPriorityReport> skillPriorityReports = new ArrayList<>();
-
 		userSkillPriorityAggregationReportStream.forEach(userSkillPriorityAggregationReport -> {
 					skillPriorityReports.add(SkillPriorityReport.builder()
 							.id(UUID.randomUUID().toString())
@@ -48,13 +40,26 @@ public class UserSkillPriorityReportCommandService {
 							.userCount(userSkillPriorityAggregationReport.getUserCount())
 							.skillReport(createSkillReport(userSkillPriorityAggregationReport)
 							)
-							.userSkillPriorityReport(userSkillPriorityReport)
 							.build());
 				}
 		);
+		return skillPriorityReports;
+	}
+
+	@Transactional
+	public void createPriorityReport(List<SkillPriorityReport> skillPriorityReports) {
+
+		UserSkillPriorityReport userSkillPriorityReport = UserSkillPriorityReport.builder()
+				.id(UUID.randomUUID().toString())
+				.date(LocalDateTime.now())
+				.build();
+
+		for (SkillPriorityReport skillPriorityReport : skillPriorityReports) {
+			skillPriorityReport.setUserSkillPriorityReport(userSkillPriorityReport);
+		}
+
 		userSkillPriorityReport.setSkillPriorityReports(skillPriorityReports);
 		userSkillPriorityReportRepository.save(userSkillPriorityReport);
-
 	}
 
 	private SkillReport createSkillReport(UserSkillPriorityAggregationReport userSkillPriorityAggregationReport) {
@@ -97,4 +102,8 @@ public class UserSkillPriorityReportCommandService {
 		return userSkillReports;
 	}
 
+	@Transactional
+	public void deleteAllPriorityReports() {
+		userSkillPriorityReportRepository.deleteAll();
+	}
 }
