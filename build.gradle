@@ -67,6 +67,7 @@ dependencies {
 	}
 	testCompile('org.springframework.security:spring-security-test')
 	testCompile('org.junit.jupiter:junit-jupiter-api')
+	testCompile("org.mockito:mockito-junit-jupiter:${mockitoJUnitJupiterVersion}")
 
 	/*
 	 * Test runtime dependencies
