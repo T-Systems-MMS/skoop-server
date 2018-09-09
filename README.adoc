@@ -1,6 +1,10 @@
 = MySkills Server
 Georg Wittberger <georg.wittberger@gmail.com>
-v0.0.1, 2018-08-28
+v0.0.1, 2018-09-09
+
+image:https://travis-ci.org/KnowledgeAssets/myskills-server.svg?branch=master["Build Status", link="https://travis-ci.org/KnowledgeAssets/myskills-server"]
+image:https://img.shields.io/github/issues-raw/KnowledgeAssets/myskills-server.svg["GitHub issues",link="https://github.com/KnowledgeAssets/myskills-server/issues"]
+image:https://img.shields.io/github/license/KnowledgeAssets/myskills-server.svg["MIT License"]
 
 A lightweight web application to capture, manage and analyze skills of users and help them improve their capabilities by connecting them with each other and assisting with personalized suggestions for coaches, trainings, projects and many more.
 
