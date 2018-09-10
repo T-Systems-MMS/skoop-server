@@ -17,7 +17,7 @@ import java.util.List;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 
-@Api(tags = "Priority UserSkillPriorityReport", description = "API allowing queries of reports")
+@Api(tags = "Priority UserSkillPriorityReport", description = "API allowing queries of user skill report")
 @RestController
 public class UserSkillReportQueryController {
 	private UserSkillReportQueryService userSkillReportQueryService;
@@ -26,8 +26,8 @@ public class UserSkillReportQueryController {
 		this.userSkillReportQueryService = userSkillReportQueryService;
 	}
 
-	@ApiOperation(value = "Get a specific userskillpriorityreport",
-			notes = "Get a specific user currently stored in the system.")
+	@ApiOperation(value = "Get a specific userSkillPriorityAggregationReportId",
+			notes = "Get the list of users along with user skill information.")
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "Successful execution"),
 			@ApiResponse(code = 403, message = "Insufficient privileges to access resource, e.g. foreign user data"),
@@ -35,15 +35,13 @@ public class UserSkillReportQueryController {
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
 	@PreAuthorize("hasRole('USER')")
-	@GetMapping(path = "/reports/skill/{skillId}/users", produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<SkillUserResponse> getUserSkillReportById(@PathVariable("skillId") String skillId) {
-		return userSkillReportQueryService.getUserSkillReportById(skillId)
+	@GetMapping(path = "/reports/{userSkillPriorityAggregationReportId}/users", produces = MediaType.APPLICATION_JSON_VALUE)
+	public List<SkillUserResponse> getUsersByUserSkillPriorityAggregationReportId(
+			@PathVariable("userSkillPriorityAggregationReportId") String userSkillPriorityAggregationReportId) {
+		return userSkillReportQueryService.getUsersByUserSkillPriorityAggregationReportId(userSkillPriorityAggregationReportId)
 				.map(userSkill -> SkillUserResponse.builder()
 						.user(UserResponse.builder()
-								.userName(userSkill.getUserReport().getUserName())
-								.firstName(userSkill.getUserReport().getFirstName())
-								.lastName(userSkill.getUserReport().getLastName())
-								.email(userSkill.getUserReport().getEmail())
+								.userName(userSkill.getUserName())
 								.build())
 						.currentLevel(userSkill.getCurrentLevel())
 						.desiredLevel(userSkill.getDesiredLevel())

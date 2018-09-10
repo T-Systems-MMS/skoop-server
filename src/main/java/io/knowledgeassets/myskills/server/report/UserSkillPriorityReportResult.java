@@ -1,6 +1,5 @@
 package io.knowledgeassets.myskills.server.report;
 
-import io.knowledgeassets.myskills.server.report.skillreport.SkillReport;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.user.User;
 import lombok.*;
@@ -18,8 +17,6 @@ public class UserSkillPriorityReportResult {
 	private Double averagePriority;
 	private Double maximumPriority;
 	private Integer userCount;
-
-	private SkillReport skillReport;
 
 	@EqualsAndHashCode.Exclude
 	private List<User> users;

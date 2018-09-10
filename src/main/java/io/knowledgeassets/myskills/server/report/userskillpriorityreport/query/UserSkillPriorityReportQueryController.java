@@ -1,6 +1,6 @@
 package io.knowledgeassets.myskills.server.report.userskillpriorityreport.query;
 
-import io.knowledgeassets.myskills.server.report.skillpriorityreport.query.SkillPriorityReportQueryService;
+import io.knowledgeassets.myskills.server.report.userskillpriorityaggregationreport.query.UserSkillPriorityAggregationReportQueryService;
 import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReportResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -19,16 +19,16 @@ import static java.util.stream.Collectors.toList;
 @RestController
 public class UserSkillPriorityReportQueryController {
 	private UserSkillPriorityReportQueryService userSkillPriorityReportQueryService;
-	private SkillPriorityReportQueryService skillPriorityReportQueryService;
+	private UserSkillPriorityAggregationReportQueryService userSkillPriorityAggregationReportQueryService;
 
 	public UserSkillPriorityReportQueryController(UserSkillPriorityReportQueryService userSkillPriorityReportQueryService,
-												  SkillPriorityReportQueryService skillPriorityReportQueryService) {
+												  UserSkillPriorityAggregationReportQueryService userSkillPriorityAggregationReportQueryService) {
 		this.userSkillPriorityReportQueryService = userSkillPriorityReportQueryService;
-		this.skillPriorityReportQueryService = skillPriorityReportQueryService;
+		this.userSkillPriorityAggregationReportQueryService = userSkillPriorityAggregationReportQueryService;
 	}
 
 	@ApiOperation(value = "Get all reports",
-			notes = "Get all reports currently stored in the system. The list is unsorted.")
+			notes = "Get all reports currently stored in the system. The list is sorted By date DESC.")
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "Successful execution"),
 			@ApiResponse(code = 403, message = "Insufficient privileges to access resource"),
@@ -37,11 +37,11 @@ public class UserSkillPriorityReportQueryController {
 	@PreAuthorize("hasRole('USER')")
 	@GetMapping(path = "/reports", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<UserSkillPriorityReportResponse> getReports() {
-		List<UserSkillPriorityReportResponse> collect = userSkillPriorityReportQueryService.getReports()
+		List<UserSkillPriorityReportResponse> collect = userSkillPriorityReportQueryService.getAllReports()
 				.map(userSkillPriorityReport -> UserSkillPriorityReportResponse.builder()
 						.id(userSkillPriorityReport.getId())
 						.date(userSkillPriorityReport.getDate())
-						.skillCount(skillPriorityReportQueryService.countBySkillReportId(userSkillPriorityReport.getId()))
+						.skillCount(userSkillPriorityReport.getUserSkillPriorityAggregationReports().size())
 						.build())
 				.collect(toList());
 		return collect;

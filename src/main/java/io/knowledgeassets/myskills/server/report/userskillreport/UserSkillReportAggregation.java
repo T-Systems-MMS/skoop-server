@@ -1,7 +1,5 @@
 package io.knowledgeassets.myskills.server.report.userskillreport;
 
-import io.knowledgeassets.myskills.server.report.skillreport.SkillReport;
-import io.knowledgeassets.myskills.server.report.userreport.UserReport;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,5 +21,4 @@ public class UserSkillReportAggregation {
 	private Integer currentLevel;
 	private Integer desiredLevel;
 	private Integer priority;
-	private UserReport userReport;
 }

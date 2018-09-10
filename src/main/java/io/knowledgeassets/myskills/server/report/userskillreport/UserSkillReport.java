@@ -1,9 +1,5 @@
 package io.knowledgeassets.myskills.server.report.userskillreport;
 
-import io.knowledgeassets.myskills.server.report.skillreport.SkillReport;
-import io.knowledgeassets.myskills.server.report.userreport.UserReport;
-import io.knowledgeassets.myskills.server.skill.Skill;
-import io.knowledgeassets.myskills.server.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,7 +10,7 @@ import org.neo4j.ogm.annotation.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@RelationshipEntity(type = "SKILL_USER_RELATED_TO")
+@NodeEntity
 public class UserSkillReport {
 
 	@Id
@@ -26,9 +22,9 @@ public class UserSkillReport {
 	private Integer desiredLevel;
 	@Property(name = "priority")
 	private Integer priority;
+	@Property(name = "skillName")
+	private String skillName;
+	@Property(name = "userName")
+	private String userName;
 
-	@StartNode
-	private SkillReport skillReport;
-	@EndNode
-	private UserReport userReport;
 }

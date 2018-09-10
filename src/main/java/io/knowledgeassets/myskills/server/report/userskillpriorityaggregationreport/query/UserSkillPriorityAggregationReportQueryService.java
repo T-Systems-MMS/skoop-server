@@ -1,0 +1,28 @@
+package io.knowledgeassets.myskills.server.report.userskillpriorityaggregationreport.query;
+
+import io.knowledgeassets.myskills.server.report.UserSkillPriorityReportResult;
+import io.knowledgeassets.myskills.server.report.userskillpriorityaggregationreport.UserSkillPriorityAggregationReport;
+import io.knowledgeassets.myskills.server.report.userskillpriorityaggregationreport.UserSkillPriorityAggregationReportRepository;
+import io.knowledgeassets.myskills.server.report.userskillpriorityaggregationreport.UserSkillPriorityReportDetailsResponse;
+import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReportRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
+@Service
+public class UserSkillPriorityAggregationReportQueryService {
+
+	private UserSkillPriorityAggregationReportRepository userSkillPriorityAggregationReportRepository;
+
+	public UserSkillPriorityAggregationReportQueryService(UserSkillPriorityAggregationReportRepository userSkillPriorityAggregationReportRepository) {
+		this.userSkillPriorityAggregationReportRepository = userSkillPriorityAggregationReportRepository;
+	}
+
+	@Transactional(readOnly = true)
+	public Stream<UserSkillPriorityAggregationReport> getUserSkillPriorityAggregationReportsByReportId(String reportId) {
+		return StreamSupport.stream(userSkillPriorityAggregationReportRepository.findPrioritizedSkillsForReport(reportId).spliterator(), false);
+	}
+
+}

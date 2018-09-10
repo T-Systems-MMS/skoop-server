@@ -1,4 +1,4 @@
-package io.knowledgeassets.myskills.server.report.skillpriorityreport;
+package io.knowledgeassets.myskills.server.report.userskillpriorityaggregationreport;
 
 import io.knowledgeassets.myskills.server.skill.SkillResponse;
 import lombok.*;

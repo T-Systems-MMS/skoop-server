@@ -1,6 +1,6 @@
-package io.knowledgeassets.myskills.server.report.skillpriorityreport.query;
+package io.knowledgeassets.myskills.server.report.userskillpriorityaggregationreport.query;
 
-import io.knowledgeassets.myskills.server.report.skillpriorityreport.UserSkillPriorityReportDetailsResponse;
+import io.knowledgeassets.myskills.server.report.userskillpriorityaggregationreport.UserSkillPriorityReportDetailsResponse;
 import io.knowledgeassets.myskills.server.report.userskillpriorityreport.query.UserSkillPriorityReportQueryService;
 import io.knowledgeassets.myskills.server.skill.SkillResponse;
 import io.swagger.annotations.Api;
@@ -16,20 +16,20 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Api(tags = "Priority UserSkillPriorityReport", description = "API allowing queries of reports")
+@Api(tags = "Priority UserSkillPriorityAggregationReport", description = "API allowing queries details of a specific report")
 @RestController
-public class UserSkillPriorityDetailsReportQueryController {
+public class UserSkillPriorityAggregationReportQueryController {
 	private UserSkillPriorityReportQueryService userSkillPriorityReportQueryService;
-	private SkillPriorityReportQueryService skillPriorityReportQueryService;
+	private UserSkillPriorityAggregationReportQueryService userSkillPriorityAggregationReportQueryService;
 
-	public UserSkillPriorityDetailsReportQueryController(UserSkillPriorityReportQueryService userSkillPriorityReportQueryService,
-														 SkillPriorityReportQueryService skillPriorityReportQueryService) {
+	public UserSkillPriorityAggregationReportQueryController(UserSkillPriorityReportQueryService userSkillPriorityReportQueryService,
+															 UserSkillPriorityAggregationReportQueryService userSkillPriorityAggregationReportQueryService) {
 		this.userSkillPriorityReportQueryService = userSkillPriorityReportQueryService;
-		this.skillPriorityReportQueryService = skillPriorityReportQueryService;
+		this.userSkillPriorityAggregationReportQueryService = userSkillPriorityAggregationReportQueryService;
 	}
 
-	@ApiOperation(value = "Get a specific userskillpriorityreport",
-			notes = "Get a specific user currently stored in the system.")
+	@ApiOperation(value = "Get details of a a specific report",
+			notes = "Get details of a a specific report, currently stored in the system.")
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "Successful execution"),
 			@ApiResponse(code = 403, message = "Insufficient privileges to access resource, e.g. foreign user data"),
@@ -38,21 +38,20 @@ public class UserSkillPriorityDetailsReportQueryController {
 	})
 	@PreAuthorize("hasRole('USER')")
 	@GetMapping(path = "/reports/{reportId}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<UserSkillPriorityReportDetailsResponse> getReportDetailsByReportIds(@PathVariable("reportId") String reportId) {
+	public List<UserSkillPriorityReportDetailsResponse> getReportDetailsByReportId(@PathVariable("reportId") String reportId) {
 
-		List<UserSkillPriorityReportDetailsResponse> collect = skillPriorityReportQueryService.getUserSkillPriorityReportDetailsByReportId(reportId)
+		return userSkillPriorityAggregationReportQueryService.getUserSkillPriorityAggregationReportsByReportId(reportId)
 				.map(userSkillPriorityAggregationReport -> UserSkillPriorityReportDetailsResponse.builder()
+						.id(userSkillPriorityAggregationReport.getId())
 						.averagePriority(userSkillPriorityAggregationReport.getAveragePriority())
 						.maximumPriority(userSkillPriorityAggregationReport.getMaximumPriority())
 						.userCount(userSkillPriorityAggregationReport.getUserCount())
 						.skill(SkillResponse.builder()
-								.id(userSkillPriorityAggregationReport.getSkillReport().getId())
-								.name(userSkillPriorityAggregationReport.getSkillReport().getName())
-								.description(userSkillPriorityAggregationReport.getSkillReport().getDescription())
+								.name(userSkillPriorityAggregationReport.getSkillName())
+								.description(userSkillPriorityAggregationReport.getSkillDescription())
 								.build()
 						)
 						.build())
 				.collect(Collectors.toList());
-		return collect;
 	}
 }
