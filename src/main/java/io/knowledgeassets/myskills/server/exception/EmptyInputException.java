@@ -7,10 +7,10 @@ import lombok.Builder;
  *
  * @author hadi
  */
-public class InvalidInputException extends BusinessException {
+public class EmptyInputException extends BusinessException {
 
 	@Builder
-	public InvalidInputException(String message, Long code) {
+	public EmptyInputException(String message, Long code) {
 		super(message, code);
 	}
 }
