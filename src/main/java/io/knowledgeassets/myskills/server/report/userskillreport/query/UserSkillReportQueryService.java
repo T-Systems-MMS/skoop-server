@@ -3,9 +3,11 @@ package io.knowledgeassets.myskills.server.report.userskillreport.query;
 import io.knowledgeassets.myskills.server.report.userskillreport.UserSkillReport;
 import io.knowledgeassets.myskills.server.report.userskillreport.UserSkillReportAggregation;
 import io.knowledgeassets.myskills.server.report.userskillreport.UserSkillReportRepository;
+import io.knowledgeassets.myskills.server.userskill.UserSkill;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -29,4 +31,8 @@ public class UserSkillReportQueryService {
 		return StreamSupport.stream(userSkillReportRepository.findUsersByUserSkillPriorityAggregationReportId(userSkillPriorityAggregationReportId).spliterator(), false);
 	}
 
+	@Transactional(readOnly = true)
+	public Optional<UserSkillReport> getById(String userSkillReportId) {
+		return userSkillReportRepository.findById(userSkillReportId);
+	}
 }

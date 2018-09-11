@@ -1,5 +1,7 @@
 package io.knowledgeassets.myskills.server.report.userskillpriorityaggregationreport.query;
 
+import io.knowledgeassets.myskills.server.exception.BusinessException;
+import io.knowledgeassets.myskills.server.exception.EmptyInputException;
 import io.knowledgeassets.myskills.server.report.userskillpriorityaggregationreport.UserSkillPriorityReportDetailsResponse;
 import io.knowledgeassets.myskills.server.report.userskillpriorityreport.query.UserSkillPriorityReportQueryService;
 import io.knowledgeassets.myskills.server.skill.SkillResponse;
@@ -15,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static java.lang.String.format;
 
 @Api(tags = "Priority UserSkillPriorityAggregationReport", description = "API allowing queries details of a specific report")
 @RestController
@@ -38,8 +42,7 @@ public class UserSkillPriorityAggregationReportQueryController {
 	})
 	@PreAuthorize("hasRole('USER')")
 	@GetMapping(path = "/reports/{reportId}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<UserSkillPriorityReportDetailsResponse> getReportDetailsByReportId(@PathVariable("reportId") String reportId) {
-
+	public List<UserSkillPriorityReportDetailsResponse> getReportDetailsByReportId(@PathVariable("reportId") String reportId) throws BusinessException {
 		return userSkillPriorityAggregationReportQueryService.getUserSkillPriorityAggregationReportsByReportId(reportId)
 				.map(userSkillPriorityAggregationReport -> UserSkillPriorityReportDetailsResponse.builder()
 						.id(userSkillPriorityAggregationReport.getId())

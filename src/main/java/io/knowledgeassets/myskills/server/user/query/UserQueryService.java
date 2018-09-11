@@ -1,5 +1,6 @@
 package io.knowledgeassets.myskills.server.user.query;
 
+import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.user.UserRepository;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,12 @@ public class UserQueryService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<User> getUserByUserName(String userName) {
+	public Optional<User> getByUserName(String userName) {
 		return userRepository.findByUserName(userName);
+	}
+
+	@Transactional(readOnly = true)
+	public Optional<User> getById(String userId) {
+		return userRepository.findById(userId);
 	}
 }

@@ -4,24 +4,27 @@ import io.knowledgeassets.myskills.server.report.UserSkillPriorityAggregationRep
 import io.knowledgeassets.myskills.server.report.userskillpriorityaggregationreport.UserSkillPriorityAggregationReport;
 import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReport;
 import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReportRepository;
+import io.knowledgeassets.myskills.server.report.userskillreport.UserSkillReport;
+import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.userskill.query.UserSkillQueryService;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 @Service
 public class UserSkillPriorityReportQueryService {
 
-	private UserSkillQueryService userSkillQueryService;
 	private UserSkillPriorityReportRepository userSkillPriorityReportRepository;
+	private UserSkillQueryService userSkillQueryService;
 
 	public UserSkillPriorityReportQueryService(UserSkillPriorityReportRepository userSkillPriorityReportRepository,
 											   UserSkillQueryService userSkillQueryService) {
-		this.userSkillQueryService = userSkillQueryService;
 		this.userSkillPriorityReportRepository = userSkillPriorityReportRepository;
+		this.userSkillQueryService = userSkillQueryService;
 	}
 
 	/**
@@ -37,6 +40,11 @@ public class UserSkillPriorityReportQueryService {
 	@Transactional(readOnly = true)
 	public Stream<UserSkillPriorityReport> getAllReports() {
 		return StreamSupport.stream(userSkillPriorityReportRepository.findAll(orderByDate()).spliterator(), false);
+	}
+
+	@Transactional(readOnly = true)
+	public Optional<UserSkillPriorityReport> getById(String userSkillPriorityReportId) {
+		return userSkillPriorityReportRepository.findById(userSkillPriorityReportId);
 	}
 
 	private Sort orderByDate() {

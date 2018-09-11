@@ -1,5 +1,6 @@
 package io.knowledgeassets.myskills.server.skill.query;
 
+import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReport;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.skill.SkillRepository;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,12 @@ public class SkillQueryService {
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<Skill> getSkillByName(String skillName) {
+	public Optional<Skill> getByName(String skillName) {
 		return skillRepository.findByName(skillName);
+	}
+
+	@Transactional(readOnly = true)
+	public Optional<Skill> getById(String skillId) {
+		return skillRepository.findById(skillId);
 	}
 }

@@ -56,7 +56,7 @@ public class UserSkillCommandController {
 			userSkill = userSkillCommandService.createUserSkillBySkillName(userId, request.getSkillName(),
 					request.getCurrentLevel(), request.getDesiredLevel(), request.getPriority());
 		} else {
-			throw new IllegalArgumentException("Either the property 'skillId' or 'skillName' is required!!");
+			throw new IllegalArgumentException("Either the property 'skillId' or 'skillName' is required!");
 		}
 		return ResponseEntity.status(HttpStatus.CREATED).body(UserSkillResponse.builder()
 				.skill(SkillResponse.builder()

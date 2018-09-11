@@ -42,7 +42,7 @@ public class UserCreatingUserAuthenticationConverter extends DefaultUserAuthenti
 		String userName = (String) map.get(USERNAME);
 		Collection<? extends GrantedAuthority> authorities = getAuthorities(map);
 		// TODO: Extract first name, last name, etc. from claim map and create user with this additional data.
-		User user = userQueryService.getUserByUserName(userName)
+		User user = userQueryService.getByUserName(userName)
 				.orElseGet(() -> userCommandService.createUser(userName));
 		UserIdentity principal = new UserIdentity(user.getId(), user.getUserName(), user.getFirstName(),
 				user.getLastName(), user.getEmail(), "N/A", true, true,

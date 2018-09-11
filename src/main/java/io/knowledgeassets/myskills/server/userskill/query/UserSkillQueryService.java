@@ -1,7 +1,6 @@
 package io.knowledgeassets.myskills.server.userskill.query;
 
 import io.knowledgeassets.myskills.server.report.UserSkillPriorityAggregationReportResult;
-import io.knowledgeassets.myskills.server.report.userskillpriorityaggregationreport.UserSkillPriorityAggregationReport;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.userskill.UserSkill;
@@ -39,18 +38,23 @@ public class UserSkillQueryService {
 	}
 
 	@Transactional(readOnly = true)
-	public Stream<UserSkill> getUserSkillsBySkillId(String skillId) {
-		return getUserSkillsBySkillId(skillId, 0);
+	public Stream<UserSkill> getBySkillId(String skillId) {
+		return getBySkillId(skillId, 0);
 	}
 
 	@Transactional(readOnly = true)
-	public Stream<UserSkill> getUserSkillsBySkillId(String skillId, Integer minPriority) {
+	public Stream<UserSkill> getBySkillId(String skillId, Integer minPriority) {
 		if (minPriority != null && minPriority > 0) {
 			return StreamSupport.stream(userSkillRepository.findBySkillIdAndPriorityGreaterThanEqual(
 					skillId, minPriority).spliterator(), false);
 		} else {
 			return StreamSupport.stream(userSkillRepository.findBySkillId(skillId).spliterator(), false);
 		}
+	}
+
+	@Transactional(readOnly = true)
+	public Optional<UserSkill> getById(String userSkillId) {
+		return userSkillRepository.findById(userSkillId);
 	}
 
 	@Transactional(readOnly = true)
