@@ -1,5 +1,6 @@
 package io.knowledgeassets.myskills.server.user.command;
 
+import io.knowledgeassets.myskills.server.aspect.CheckBindingResult;
 import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.user.UserRequest;
 import io.knowledgeassets.myskills.server.user.UserResponse;
@@ -11,7 +12,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @Api(tags = "Users", description = "API allowing modifications of users")
 @RestController
@@ -34,7 +38,9 @@ public class UserCommandController {
 	@PostMapping(path = "/users",
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<UserResponse> createUser(@RequestBody UserRequest request) {
+	@CheckBindingResult
+	public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserRequest request,
+												   BindingResult bindingResult) {
 		User user = userCommandService.createUser(request.getUserName(), request.getFirstName(), request.getLastName(),
 				request.getEmail());
 		return ResponseEntity.status(HttpStatus.CREATED).body(UserResponse.builder()
@@ -59,9 +65,10 @@ public class UserCommandController {
 	@PutMapping(path = "/users/{userId}",
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE)
-	public UserResponse updateUser(@PathVariable("userId") String userId, @RequestBody UserRequest request) {
-		User user = userCommandService.updateUser(userId, request.getUserName(), request.getFirstName(),
-				request.getLastName(), request.getEmail());
+	@CheckBindingResult
+	public UserResponse updateUser(@PathVariable("userId") String userId, @Valid @RequestBody UserRequest userRequest,
+								   BindingResult bindingResult) {
+		User user = userCommandService.updateUser(userId, userRequest);
 		return UserResponse.builder()
 				.id(user.getId())
 				.userName(user.getUserName())

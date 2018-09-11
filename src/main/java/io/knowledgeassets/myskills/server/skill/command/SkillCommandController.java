@@ -1,5 +1,6 @@
 package io.knowledgeassets.myskills.server.skill.command;
 
+import io.knowledgeassets.myskills.server.aspect.CheckBindingResult;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.skill.SkillRequest;
 import io.knowledgeassets.myskills.server.skill.SkillResponse;
@@ -11,7 +12,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @Api(tags = "Skills", description = "API allowing modifications of skills")
 @RestController
@@ -34,7 +38,9 @@ public class SkillCommandController {
 	@PostMapping(path = "/skills",
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<SkillResponse> createSkill(@RequestBody SkillRequest request) {
+	@CheckBindingResult
+	public ResponseEntity<SkillResponse> createSkill(@Valid @RequestBody SkillRequest request,
+													 BindingResult bindingResult) {
 		Skill skill = skillCommandService.createSkill(request.getName(), request.getDescription());
 		return ResponseEntity.status(HttpStatus.CREATED).body(SkillResponse.builder()
 				.id(skill.getId())
@@ -56,7 +62,9 @@ public class SkillCommandController {
 	@PutMapping(path = "/skills/{skillId}",
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE)
-	public SkillResponse updateSkill(@PathVariable("skillId") String skillId, @RequestBody SkillRequest request) {
+	@CheckBindingResult
+	public SkillResponse updateSkill(@PathVariable("skillId") String skillId, @Valid @RequestBody SkillRequest request,
+									 BindingResult bindingResult) {
 		Skill skill = skillCommandService.updateSkill(skillId, request.getName(), request.getDescription());
 		return SkillResponse.builder()
 				.id(skill.getId())

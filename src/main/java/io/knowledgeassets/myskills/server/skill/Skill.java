@@ -23,7 +23,6 @@ public class Skill {
 	@Property(name = "id")
 	private String id;
 
-	@NotNull
 	@NotBlank
 	@Size(max = 64)
 	@Property(name = "name")

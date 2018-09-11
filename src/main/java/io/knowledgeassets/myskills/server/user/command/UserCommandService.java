@@ -2,6 +2,7 @@ package io.knowledgeassets.myskills.server.user.command;
 
 import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.user.UserRepository;
+import io.knowledgeassets.myskills.server.user.UserRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,13 +38,13 @@ public class UserCommandService {
 	}
 
 	@Transactional
-	public User updateUser(String id, String userName, String firstName, String lastName, String email) {
+	public User updateUser(String id, UserRequest userRequest) {
 		User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(
 				format("User with ID '%s' not found", id)));
-		user.setUserName(userName);
-		user.setFirstName(firstName);
-		user.setLastName(lastName);
-		user.setEmail(email);
+		user.setUserName(userRequest.getUserName());
+		user.setFirstName(userRequest.getFirstName());
+		user.setLastName(userRequest.getLastName());
+		user.setEmail(userRequest.getEmail());
 		return userRepository.save(user);
 	}
 

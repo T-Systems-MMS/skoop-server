@@ -26,6 +26,7 @@ public class User {
 	private String lastName;
 	@Property(name = "email")
 	private String email;
+
 	@EqualsAndHashCode.Exclude
 	@Relationship(type = "RELATED_TO", direction = Relationship.UNDIRECTED)
 	private List<UserSkill> userSkills;

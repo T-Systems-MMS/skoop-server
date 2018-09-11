@@ -83,9 +83,11 @@ public class UserSkillCommandController {
 	@PutMapping(path = "/users/{userId}/skills/{skillId}",
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE)
+	@CheckBindingResult
 	public UserSkillResponse updateUserSkill(@PathVariable("userId") String userId,
 											 @PathVariable("skillId") String skillId,
-											 @RequestBody UpdateUserSkillRequest request) {
+											 @Valid @RequestBody UpdateUserSkillRequest request,
+											 BindingResult bindingResult) {
 		UserSkill userSkill = userSkillCommandService.updateUserSkill(userId, skillId, request.getCurrentLevel(),
 				request.getDesiredLevel(), request.getPriority());
 		return UserSkillResponse.builder()
