@@ -47,7 +47,7 @@ public class LowLevelExceptionHandler extends ResponseEntityExceptionHandler imp
 
         ResponseError responseError = new ResponseError(HttpStatus.INTERNAL_SERVER_ERROR);
         responseError.setMessage(ex.getLocalizedMessage());
-        responseError.setErrorCode(10003L);
+        responseError.setErrorCode(10000L);
 
         return buildResponseEntity(ex, responseError);
     }

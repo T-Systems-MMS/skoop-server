@@ -9,8 +9,7 @@ import java.util.Map;
 import java.util.stream.IntStream;
 
 /**
- * Handles NoSuchResourceException.
- * If a resource (like entity) not found, we throw this exception.
+ * If a resource (like entity) does not found, we throw this exception.
  */
 public class NoSuchResourceException extends BusinessException {
 

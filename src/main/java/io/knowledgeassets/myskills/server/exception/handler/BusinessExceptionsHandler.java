@@ -40,7 +40,7 @@ public class BusinessExceptionsHandler extends ResponseEntityExceptionHandler im
 
     /**
      * Handles NoSuchResourceException.
-     * Created to encapsulate errors with more detail than javax.persistence.EntityNotFoundException.
+     * If a resource (like entity) not found, we throw this exception.
      */
     @ExceptionHandler(NoSuchResourceException.class)
     protected ResponseEntity<Object> handleNoSuchResource(
