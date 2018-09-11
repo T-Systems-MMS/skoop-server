@@ -39,6 +39,7 @@ dependencies {
 	compile("io.springfox:springfox-swagger2:${springfoxSwagger2Version}")
 	compile("org.apache.commons:commons-lang3:${commonsLang3Version}")
 	compileOnly('org.projectlombok:lombok')
+	compile('org.springframework.boot:spring-boot-starter-aop')
 
 	/*
 	 * Application runtime dependencies
