@@ -28,7 +28,7 @@ public class UserSkillReportQueryService {
 	}
 
 	/**
-	 * this method get a UserSkillPriorityAggregationReportId, and return all the users along with user skill information.
+	 * this method get a UserSkillPriorityAggregationReportId, and returns all the users along with user skill information.
 	 *
 	 * @param userSkillPriorityAggregationReportId
 	 * @return

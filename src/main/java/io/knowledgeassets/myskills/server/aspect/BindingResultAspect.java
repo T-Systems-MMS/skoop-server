@@ -38,13 +38,11 @@ public class BindingResultAspect {
 
     @Before("methodAcceptBindingResult() && controllers() && getBindingResult()")
     public void myAdvice(JoinPoint jp) throws MethodArgumentNotValidException {
-		System.out.println("Inside the myAdvice");
         for (Object arg : jp.getArgs()) {
             if (!(arg instanceof BindingResult))
                 continue;
             BindingResult bindingResult = (BindingResult) arg;
             if (bindingResult.hasErrors()) {
-				System.out.println("bindingResult.hasErrors()");
                 log.error("Input data is corrupted.");
                 throw MethodArgumentNotValidException.builder()
                         .code(10003L)

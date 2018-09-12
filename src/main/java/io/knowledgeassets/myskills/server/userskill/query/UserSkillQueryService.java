@@ -72,4 +72,8 @@ public class UserSkillQueryService {
 		return StreamSupport.stream(userSkillRepository.findSkillSuggestionsByUserId(userId, search)
 				.spliterator(), false);
 	}
+
+	public Optional<UserSkill> findByUserIdAndSkillName(String userId, String skillName) {
+		return userSkillRepository.findByUserIdAndSkillName(userId, skillName);
+	}
 }

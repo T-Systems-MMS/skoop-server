@@ -9,6 +9,7 @@ import io.knowledgeassets.myskills.server.report.userskillreport.UserSkillReport
 import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.userskill.UserSkill;
 import io.knowledgeassets.myskills.server.userskill.UserSkillRepository;
+import io.knowledgeassets.myskills.server.userskill.query.UserSkillQueryService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,14 +21,14 @@ import java.util.stream.Stream;
 public class UserSkillPriorityReportCommandService {
 
 	private UserSkillPriorityReportRepository userSkillPriorityReportRepository;
-	private UserSkillRepository userSkillRepository;
+	private UserSkillQueryService userSkillQueryService;
 	private UserSkillPriorityReportQueryService userSkillPriorityReportQueryService;
 
 	public UserSkillPriorityReportCommandService(UserSkillPriorityReportRepository userSkillPriorityReportRepository,
-												 UserSkillRepository userSkillRepository,
+												 UserSkillQueryService userSkillQueryService,
 												 UserSkillPriorityReportQueryService userSkillPriorityReportQueryService) {
 		this.userSkillPriorityReportRepository = userSkillPriorityReportRepository;
-		this.userSkillRepository = userSkillRepository;
+		this.userSkillQueryService = userSkillQueryService;
 		this.userSkillPriorityReportQueryService = userSkillPriorityReportQueryService;
 	}
 
@@ -37,6 +38,7 @@ public class UserSkillPriorityReportCommandService {
 	 * 1- read data from existing data.
 	 * 2- convert it to List<UserSkillPriorityAggregationReport> and after that assign it to a UserSkillPriorityReport object.
 	 * 3- save the UserSkillPriorityReport object.
+	 *
 	 * @return
 	 */
 	@Transactional
@@ -71,25 +73,24 @@ public class UserSkillPriorityReportCommandService {
 	private List<UserSkillReport> setUsers(UserSkillPriorityAggregationReportResult userSkillPriorityAggregationReport) {
 		List<UserSkillReport> userSkillReports = new ArrayList<>();
 		for (User user : userSkillPriorityAggregationReport.getUsers()) {
-			Optional<UserSkill> byUserIdAndSkillName = userSkillRepository
+			Optional<UserSkill> byUserIdAndSkillName = userSkillQueryService
 					.findByUserIdAndSkillName(user.getId(), userSkillPriorityAggregationReport.getSkill().getName());
 
-			if (byUserIdAndSkillName.isPresent()) {
-				UserSkill userSkill = byUserIdAndSkillName.get();
-				userSkillReports.add(UserSkillReport.builder()
-						.id(UUID.randomUUID().toString())
-						.currentLevel(userSkill.getCurrentLevel())
-						.desiredLevel(userSkill.getDesiredLevel())
-						.priority(userSkill.getPriority())
-						.userName(user.getUserName())
-						.skillName(userSkillPriorityAggregationReport.getSkill().getName())
-						.build()
-				);
-			}
+			// because creating a report will be done by ourselves (by system), so we are sure that
+			// byUserIdAndSkillName.get() method always returns an object.
+			UserSkill userSkill = byUserIdAndSkillName.get();
+			userSkillReports.add(UserSkillReport.builder()
+					.id(UUID.randomUUID().toString())
+					.currentLevel(userSkill.getCurrentLevel())
+					.desiredLevel(userSkill.getDesiredLevel())
+					.priority(userSkill.getPriority())
+					.userName(user.getUserName())
+					.skillName(userSkillPriorityAggregationReport.getSkill().getName())
+					.build()
+			);
 		}
 		return userSkillReports;
 	}
-
 
 	private UserSkillPriorityReport saveReport(List<UserSkillPriorityAggregationReport> userSkillPriorityAggregationReports) {
 		UserSkillPriorityReport userSkillPriorityReport = UserSkillPriorityReport.builder()

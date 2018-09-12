@@ -1,7 +1,5 @@
 package io.knowledgeassets.myskills.server.exception.enums;
 
-import io.knowledgeassets.myskills.server.report.userskillpriorityaggregationreport.UserSkillPriorityAggregationReport;
-
 /**
  * Each model points an Entity. We usually use it in exception messages.
  *
