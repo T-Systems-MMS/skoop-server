@@ -1,5 +1,8 @@
 package io.knowledgeassets.myskills.server.userskill.query;
 
+import io.knowledgeassets.myskills.server.exception.BusinessException;
+import io.knowledgeassets.myskills.server.exception.EmptyInputException;
+import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -38,7 +41,7 @@ public class UserSkillSuggestionController {
 	@PreAuthorize("hasRole('USER')")
 	@GetMapping(path = "/users/{userId}/skill-suggestions", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<String> getUserSkillSuggestions(@PathVariable("userId") String userId,
-												@RequestParam("search") String search) {
+												@RequestParam("search") String search) throws BusinessException {
 		return userSkillQueryService.getUserSkillSuggestions(userId, search).map(Skill::getName).collect(toList());
 	}
 }

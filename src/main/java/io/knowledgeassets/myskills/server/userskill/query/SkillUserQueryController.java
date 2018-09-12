@@ -1,5 +1,6 @@
 package io.knowledgeassets.myskills.server.userskill.query;
 
+import io.knowledgeassets.myskills.server.exception.BusinessException;
 import io.knowledgeassets.myskills.server.exception.EmptyInputException;
 import io.knowledgeassets.myskills.server.user.UserResponse;
 import io.swagger.annotations.Api;
@@ -41,7 +42,7 @@ public class SkillUserQueryController {
 	@GetMapping(path = "/skills/{skillId}/users", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<SkillUserResponse> getSkillUsers(@PathVariable("skillId") String skillId,
 												 @RequestParam(value = "minPriority", required = false)
-														 Integer minPriority) throws EmptyInputException {
+														 Integer minPriority) throws BusinessException {
 		return userSkillQueryService.getBySkillId(skillId, minPriority)
 				.map(userSkill -> SkillUserResponse.builder()
 						.user(UserResponse.builder()

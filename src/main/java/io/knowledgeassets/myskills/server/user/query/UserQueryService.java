@@ -1,5 +1,6 @@
 package io.knowledgeassets.myskills.server.user.query;
 
+import io.knowledgeassets.myskills.server.exception.EmptyInputException;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.user.UserRepository;
@@ -33,4 +34,14 @@ public class UserQueryService {
 		return userRepository.findByUserName(userName);
 	}
 
+	@Transactional(readOnly = true)
+	public boolean exists(String userId) throws EmptyInputException {
+		if (userId == null) {
+			throw EmptyInputException.builder()
+					.code(111111L)
+					.message("userId is null.")
+					.build();
+		}
+		return userRepository.existsById(userId);
+	}
 }

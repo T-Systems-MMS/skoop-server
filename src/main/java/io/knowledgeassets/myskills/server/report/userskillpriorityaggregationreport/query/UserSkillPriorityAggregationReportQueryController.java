@@ -62,6 +62,6 @@ public class UserSkillPriorityAggregationReportQueryController {
 	@GetMapping(path = "/reports/userskillpriorityaggregationreport/{id}",
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	public String getById(@PathVariable("id") String userSkillPriorityAggregationReportId) throws BusinessException {
-		return userSkillPriorityAggregationReportQueryService.getById(userSkillPriorityAggregationReportId).getSkillName();
+		return userSkillPriorityAggregationReportQueryService.getById(userSkillPriorityAggregationReportId ).getSkillName();
 	}
 }

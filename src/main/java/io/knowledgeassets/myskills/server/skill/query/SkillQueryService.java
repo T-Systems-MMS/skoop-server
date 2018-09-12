@@ -1,5 +1,6 @@
 package io.knowledgeassets.myskills.server.skill.query;
 
+import io.knowledgeassets.myskills.server.exception.EmptyInputException;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.skill.SkillRepository;
 import org.springframework.stereotype.Service;
@@ -32,4 +33,14 @@ public class SkillQueryService {
 		return skillRepository.findByName(skillName);
 	}
 
+	@Transactional(readOnly = true)
+	public boolean exists(String skillId) throws EmptyInputException {
+		if (skillId == null) {
+			throw EmptyInputException.builder()
+					.code(111111L)
+					.message("skillId is null.")
+					.build();
+		}
+		return skillRepository.existsById(skillId);
+	}
 }
