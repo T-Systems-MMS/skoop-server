@@ -29,12 +29,12 @@ public class UserSkillPriorityAggregationReportQueryService {
 	public Stream<UserSkillPriorityAggregationReport> getUserSkillPriorityAggregationReportsByReportId(String reportId) throws BusinessException {
 		if (reportId == null) {
 			throw EmptyInputException.builder()
-					.message("reportId is null")
 					.code(10010L)
+					.message("reportId is null")
 					.build();
 		}
-		if (!userSkillPriorityReportQueryService.getById(reportId).isPresent()) {
-			String[] searchParamsMap = {"reportId", reportId};
+		if (!userSkillPriorityReportQueryService.exists(reportId)) {
+			String[] searchParamsMap = {"id", reportId};
 			throw NoSuchResourceException.builder()
 					.model(Model.UserSkillPriorityReport)
 					.code(10011L)
@@ -44,4 +44,35 @@ public class UserSkillPriorityAggregationReportQueryService {
 		return StreamSupport.stream(userSkillPriorityAggregationReportRepository.findPrioritizedSkillsForReport(reportId).spliterator(), false);
 	}
 
+	/**
+	 * If it finds the entity with the input id parameter, it will return it, otherwise it returns and exception.
+	 *
+	 * @param userSkillPriorityAggregationReportId
+	 * @return
+	 * @throws BusinessException
+	 */
+	@Transactional(readOnly = true)
+	public UserSkillPriorityAggregationReport getById(String userSkillPriorityAggregationReportId) throws BusinessException {
+		if (exists(userSkillPriorityAggregationReportId)) {
+			return userSkillPriorityAggregationReportRepository.findById(userSkillPriorityAggregationReportId).get();
+		} else {
+			String[] searchParamsMap = {"id", userSkillPriorityAggregationReportId};
+			throw NoSuchResourceException.builder()
+					.model(Model.UserSkillPriorityAggregationReport)
+					.code(111111L)
+					.searchParamsMap(searchParamsMap)
+					.build();
+		}
+	}
+
+	@Transactional(readOnly = true)
+	public boolean exists(String userSkillPriorityAggregationReportId) throws EmptyInputException {
+		if (userSkillPriorityAggregationReportId == null) {
+			throw EmptyInputException.builder()
+					.code(111111L)
+					.message("userSkillPriorityAggregationReportId is null.")
+					.build();
+		}
+		return userSkillPriorityAggregationReportRepository.existsById(userSkillPriorityAggregationReportId);
+	}
 }

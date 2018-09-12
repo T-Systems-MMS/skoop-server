@@ -1,5 +1,6 @@
 package io.knowledgeassets.myskills.server.report.userskillreport.query;
 
+import io.knowledgeassets.myskills.server.exception.BusinessException;
 import io.knowledgeassets.myskills.server.user.UserResponse;
 import io.knowledgeassets.myskills.server.userskill.query.SkillUserResponse;
 import io.swagger.annotations.Api;
@@ -37,7 +38,7 @@ public class UserSkillReportQueryController {
 	@PreAuthorize("hasRole('USER')")
 	@GetMapping(path = "/reports/{userSkillPriorityAggregationReportId}/users", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<SkillUserResponse> getUsersByUserSkillPriorityAggregationReportId(
-			@PathVariable("userSkillPriorityAggregationReportId") String userSkillPriorityAggregationReportId) {
+			@PathVariable("userSkillPriorityAggregationReportId") String userSkillPriorityAggregationReportId) throws BusinessException {
 		return userSkillReportQueryService.getUsersByUserSkillPriorityAggregationReportId(userSkillPriorityAggregationReportId)
 				.map(userSkill -> SkillUserResponse.builder()
 						.user(UserResponse.builder()

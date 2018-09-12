@@ -33,8 +33,4 @@ public class UserQueryService {
 		return userRepository.findByUserName(userName);
 	}
 
-	@Transactional(readOnly = true)
-	public Optional<User> getById(String userId) {
-		return userRepository.findById(userId);
-	}
 }
