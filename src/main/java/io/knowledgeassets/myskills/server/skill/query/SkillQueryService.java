@@ -43,4 +43,8 @@ public class SkillQueryService {
 		}
 		return skillRepository.existsById(skillId);
 	}
+
+	public Boolean isSkillExist(String search) {
+		return skillRepository.findByNameIgnoreCase(search);
+	}
 }
