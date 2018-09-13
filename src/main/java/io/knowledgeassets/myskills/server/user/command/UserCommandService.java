@@ -54,4 +54,5 @@ public class UserCommandService {
 				format("User with ID '%s' not found", id)));
 		userRepository.delete(user);
 	}
+
 }

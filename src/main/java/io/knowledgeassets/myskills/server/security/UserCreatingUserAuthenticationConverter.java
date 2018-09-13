@@ -14,6 +14,7 @@ import org.springframework.util.StringUtils;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 @Slf4j
 public class UserCreatingUserAuthenticationConverter extends DefaultUserAuthenticationConverter {
@@ -34,6 +35,22 @@ public class UserCreatingUserAuthenticationConverter extends DefaultUserAuthenti
 
 	@Override
 	public Authentication extractAuthentication(Map<String, ?> map) {
+
+		User forCreate = getUserDataFromOAuth2IdentityToken(map);
+		if (forCreate == null) return null;
+
+		Collection<? extends GrantedAuthority> authorities = getAuthorities(map);
+
+		User user = userQueryService.getByUserName(forCreate.getUserName())
+				.orElseGet(() -> userCommandService.createUser(forCreate.getUserName(), forCreate.getFirstName(), forCreate.getLastName(), forCreate.getEmail()));
+
+		UserIdentity principal = new UserIdentity(user.getId(), user.getUserName(), user.getFirstName(),
+				user.getLastName(), user.getEmail(), "N/A", true, true,
+				true, true, authorities);
+		return new UsernamePasswordAuthenticationToken(principal, "N/A", authorities);
+	}
+
+	private User getUserDataFromOAuth2IdentityToken(Map<String, ?> map) {
 		if (!map.containsKey(USERNAME)) {
 			log.warn("Claim '{}' not found in token", USERNAME);
 			return null;
@@ -46,14 +63,13 @@ public class UserCreatingUserAuthenticationConverter extends DefaultUserAuthenti
 		String email = (String) map.get(EMAIL);
 		String firstName = (String) map.get(FIRST_NAME);
 		String lastName = (String) map.get(LAST_NAME);
-		Collection<? extends GrantedAuthority> authorities = getAuthorities(map);
 
-		User user = userQueryService.getByUserName(userName)
-				.orElseGet(() -> userCommandService.createUser(userName, firstName, lastName, email));
-		UserIdentity principal = new UserIdentity(user.getId(), user.getUserName(), user.getFirstName(),
-				user.getLastName(), user.getEmail(), "N/A", true, true,
-				true, true, authorities);
-		return new UsernamePasswordAuthenticationToken(principal, "N/A", authorities);
+		return User.builder()
+				.userName(userName)
+				.firstName(firstName)
+				.lastName(lastName)
+				.email(email)
+				.build();
 	}
 
 	private Collection<? extends GrantedAuthority> getAuthorities(Map<String, ?> map) {
