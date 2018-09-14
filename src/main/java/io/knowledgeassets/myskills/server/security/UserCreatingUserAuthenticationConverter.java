@@ -40,7 +40,7 @@ public class UserCreatingUserAuthenticationConverter extends DefaultUserAuthenti
 		if (forCreate == null) return null;
 
 		Collection<? extends GrantedAuthority> authorities = getAuthorities(map);
-
+		// TODO: 9/14/2018 Problem in below method. sometimes it return two records.
 		User user = userQueryService.getByUserName(forCreate.getUserName())
 				.orElseGet(() -> userCommandService.createUser(forCreate.getUserName(), forCreate.getFirstName(), forCreate.getLastName(), forCreate.getEmail()));
 
