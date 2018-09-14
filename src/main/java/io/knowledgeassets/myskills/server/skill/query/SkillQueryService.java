@@ -28,9 +28,15 @@ public class SkillQueryService {
 		return skillRepository.findById(skillId);
 	}
 
+	/**
+	 * It ignores case sensitivity
+	 *
+	 * @param skillName
+	 * @return
+	 */
 	@Transactional(readOnly = true)
-	public Optional<Skill> getByName(String skillName) {
-		return skillRepository.findByName(skillName);
+	public Optional<Skill> findByNameIgnoreCase(String skillName) {
+		return skillRepository.findByNameIgnoreCase(skillName);
 	}
 
 	@Transactional(readOnly = true)
@@ -45,6 +51,6 @@ public class SkillQueryService {
 	}
 
 	public Boolean isSkillExist(String search) {
-		return skillRepository.findByNameIgnoreCase(search);
+		return skillRepository.isSkillExistByNameIgnoreCase(search);
 	}
 }

@@ -19,7 +19,7 @@ public class SkillCommandService {
 
 	@Transactional
 	public Skill createSkill(String name, String description) {
-		skillRepository.findByName(name).ifPresent(skill -> {
+		skillRepository.findByNameIgnoreCase(name).ifPresent(skill -> {
 			throw new IllegalArgumentException(format("Skill with name '%s' already exists", name));
 		});
 		return skillRepository.save(Skill.builder()

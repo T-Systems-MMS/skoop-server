@@ -3,15 +3,10 @@ package io.knowledgeassets.myskills.server.skill;
 import io.knowledgeassets.myskills.server.userskill.UserSkill;
 import lombok.*;
 import org.neo4j.ogm.annotation.*;
-import org.neo4j.ogm.session.event.Event;
-import org.neo4j.ogm.session.event.EventListener;
-import org.neo4j.ogm.session.event.EventListenerAdapter;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
-import java.util.UUID;
 
 @Data
 @Builder

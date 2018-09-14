@@ -72,7 +72,7 @@ public class UserSkillCommandService {
 	@Transactional
 	public UserSkill createUserSkillBySkillName(String userId, String skillName, Integer currentLevel,
 												Integer desiredLevel, Integer priority) {
-		Skill skill = skillQueryService.getByName(skillName)
+		Skill skill = skillQueryService.findByNameIgnoreCase(skillName)
 				.orElseGet(() -> skillCommandService.createSkill(skillName, null));
 		return createUserSkillBySkillId(userId, skill.getId(), currentLevel, desiredLevel, priority);
 	}
