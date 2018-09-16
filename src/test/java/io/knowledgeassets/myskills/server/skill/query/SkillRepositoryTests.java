@@ -25,7 +25,7 @@ class SkillRepositoryTests {
 		// Given
 		skillRepository.save(Skill.builder().id("123").name("Angular").description("JavaScript Framework").build());
 		// When
-		Optional<Skill> skill = skillRepository.findByName("Angular");
+		Optional<Skill> skill = skillRepository.findByNameIgnoreCase("Angular");
 		// Then
 		assertThat(skill).isNotEmpty();
 		assertThat(skill.get().getId()).isEqualTo("123");

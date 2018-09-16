@@ -2,9 +2,6 @@ package io.knowledgeassets.myskills.server.report.userskillpriorityreport.comman
 
 import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReport;
 import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReportResponse;
-import io.knowledgeassets.myskills.server.skill.Skill;
-import io.knowledgeassets.myskills.server.skill.SkillRequest;
-import io.knowledgeassets.myskills.server.skill.SkillResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -13,7 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Api(tags = "Priority UserSkillPriorityReport", description = "API allowing modifications of reports")
 @RestController
@@ -33,7 +31,7 @@ public class UserSkillPriorityReportCommandController {
 	})
 	@PreAuthorize("hasRole('USER')")
 	@PostMapping(path = "/reports",
-			consumes = MediaType.APPLICATION_JSON_VALUE,
+			consumes = MediaType.ALL_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<UserSkillPriorityReportResponse> createReport() {
 		UserSkillPriorityReport userSkillPriorityReport = userSkillPriorityReportCommandService.createPriorityReport();
@@ -43,5 +41,4 @@ public class UserSkillPriorityReportCommandController {
 				.skillCount(userSkillPriorityReport.getUserSkillPriorityAggregationReports().size())
 				.build());
 	}
-
 }

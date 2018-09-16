@@ -2,6 +2,7 @@ package io.knowledgeassets.myskills.server.report;
 
 import io.knowledgeassets.myskills.server.MySkillsServerApplicationTests;
 import io.knowledgeassets.myskills.server.common.Neo4jSessionFactoryConfiguration;
+import io.knowledgeassets.myskills.server.exception.BusinessException;
 import io.knowledgeassets.myskills.server.report.userskillpriorityaggregationreport.UserSkillPriorityAggregationReport;
 import io.knowledgeassets.myskills.server.report.userskillpriorityaggregationreport.query.UserSkillPriorityAggregationReportQueryService;
 import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReport;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class UserSkillPriorityReportCommandServiceTests extends MySkillsServerApplicationTests {
 
@@ -63,9 +65,14 @@ public class UserSkillPriorityReportCommandServiceTests extends MySkillsServerAp
 
 		assertEquals(1, userSkillPriorityReportRepository.count());
 
-		List<UserSkillPriorityAggregationReport> userSkillPriorityAggregationReports =
-				userSkillPriorityAggregationReportQueryService.getUserSkillPriorityAggregationReportsByReportId(report.getId())
-						.collect(Collectors.toList());
+		List<UserSkillPriorityAggregationReport> userSkillPriorityAggregationReports = null;
+		try {
+			userSkillPriorityAggregationReports = userSkillPriorityAggregationReportQueryService
+					.getUserSkillPriorityAggregationReportsByReportId(report.getId())
+					.collect(Collectors.toList());
+		} catch (BusinessException e) {
+			fail(e);
+		}
 
 		assertEquals(3, userSkillPriorityAggregationReports.size());
 		UserSkillPriorityAggregationReport angular = userSkillPriorityAggregationReports.stream()
