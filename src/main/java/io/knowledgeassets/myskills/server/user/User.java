@@ -26,6 +26,8 @@ public class User {
 	private String lastName;
 	@Property(name = "email")
 	private String email;
+	@Property(name = "coach")
+	private Boolean coach;
 
 	@EqualsAndHashCode.Exclude
 	@Relationship(type = "RELATED_TO", direction = Relationship.UNDIRECTED)

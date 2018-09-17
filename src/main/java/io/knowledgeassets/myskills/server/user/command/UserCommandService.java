@@ -18,11 +18,15 @@ public class UserCommandService {
 		this.userRepository = userRepository;
 	}
 
-	@Transactional
-	public User createUser(String userName) {
-		return createUser(userName, null, null, null);
-	}
-
+	/**
+	 * The default value of coach field for newly created users (created during login) must be "do not show as coach".
+	 *
+	 * @param userName
+	 * @param firstName
+	 * @param lastName
+	 * @param email
+	 * @return
+	 */
 	@Transactional
 	public User createUser(String userName, String firstName, String lastName, String email) {
 		userRepository.findByUserName(userName).ifPresent(user -> {
@@ -34,17 +38,23 @@ public class UserCommandService {
 				.firstName(firstName)
 				.lastName(lastName)
 				.email(email)
+				.coach(false)
 				.build());
 	}
 
+	/**
+	 * The "userName", "firstName", "lastName" and "email" properties are read-only,
+	 * because these values are obtained from the OAuth2 identity token. So we only update other fields.
+	 *
+	 * @param id
+	 * @param userRequest
+	 * @return
+	 */
 	@Transactional
 	public User updateUser(String id, UserRequest userRequest) {
 		User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(
 				format("User with ID '%s' not found", id)));
-		user.setUserName(userRequest.getUserName());
-		user.setFirstName(userRequest.getFirstName());
-		user.setLastName(userRequest.getLastName());
-		user.setEmail(userRequest.getEmail());
+		user.setCoach(userRequest.getCoach());
 		return userRepository.save(user);
 	}
 

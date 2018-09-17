@@ -42,6 +42,7 @@ public class UserQueryController {
 						.firstName(user.getFirstName())
 						.lastName(user.getLastName())
 						.email(user.getEmail())
+						.coach(user.getCoach())
 						.build())
 				.collect(toList());
 	}
@@ -64,6 +65,7 @@ public class UserQueryController {
 						.firstName(user.getFirstName())
 						.lastName(user.getLastName())
 						.email(user.getEmail())
+						.coach(user.getCoach())
 						.build())
 				.orElseThrow(() -> new IllegalArgumentException(format("User with ID '%s' not found", userId)));
 	}
