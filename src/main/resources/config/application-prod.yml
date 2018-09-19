@@ -9,5 +9,3 @@ logging:
         security: ERROR
         web: ERROR
     root: WARN
-server:
-  port: 80

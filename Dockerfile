@@ -6,4 +6,4 @@ VOLUME /myskills/config
 VOLUME /myskills/tmp
 EXPOSE 8080
 WORKDIR /myskills
-ENTRYPOINT ["java", "-jar", "myskills-server.jar"]
+ENTRYPOINT ["java", "-jar", "-Dspring.profiles.active=prod", "myskills-server.jar"]
