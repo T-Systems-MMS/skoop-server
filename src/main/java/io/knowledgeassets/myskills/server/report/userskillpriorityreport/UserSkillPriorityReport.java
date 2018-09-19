@@ -24,8 +24,8 @@ public class UserSkillPriorityReport {
 	@Id
 	@Property(name = "id")
 	private String id;
-	@Property(name = "date")
 
+	@Property(name = "date")
 	@Index(unique = true)
 	private LocalDateTime date;
 

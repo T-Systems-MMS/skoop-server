@@ -38,7 +38,7 @@ public class UserSkillPriorityReportQueryService {
 	 */
 	@Transactional(readOnly = true)
 	public Stream<UserSkillPriorityAggregationReportResult> getPrioritizedSkillsToCreateReport() {
-		return StreamSupport.stream(userSkillQueryService.findPrioritizedSkillsToCreateReport().spliterator(), false);
+		return userSkillQueryService.findPrioritizedSkillsToCreateReport();
 	}
 
 	@Transactional(readOnly = true)

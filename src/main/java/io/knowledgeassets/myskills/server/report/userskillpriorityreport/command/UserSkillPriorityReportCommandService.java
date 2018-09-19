@@ -99,8 +99,7 @@ public class UserSkillPriorityReportCommandService {
 				.build();
 
 		userSkillPriorityReport.setUserSkillPriorityAggregationReports(userSkillPriorityAggregationReports);
-		userSkillPriorityReportRepository.save(userSkillPriorityReport);
-		return userSkillPriorityReport;
+		return userSkillPriorityReportRepository.save(userSkillPriorityReport);
 	}
 
 	@Transactional
