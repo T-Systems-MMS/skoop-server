@@ -10,7 +10,8 @@ import java.util.Optional;
 @Repository
 public interface SkillRepository extends Neo4jRepository<Skill, String> {
 
-	Optional<Skill> findByNameIgnoreCase(String name);
+	@Query("MATCH (skill:Skill) WHERE TOLOWER(skill.name) = TOLOWER({name}) RETURN skill")
+	Optional<Skill> findByNameIgnoreCase(@Param("name") String name);
 
 	@Query("MATCH (skill:Skill) WHERE TOLOWER(skill.name) = TOLOWER({search}) RETURN count(skill) > 0")
 	Boolean isSkillExistByNameIgnoreCase(@Param("search") String search);

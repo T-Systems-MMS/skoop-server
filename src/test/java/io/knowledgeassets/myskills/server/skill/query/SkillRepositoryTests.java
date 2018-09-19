@@ -36,9 +36,9 @@ class SkillRepositoryTests {
 
 	@Test
 	@DisplayName("Provides the existing skill queried by its name ignoring case")
-	@Disabled("SDN 5.0.x does not support 'IgnoreCase' in finder methods yet. " +
-			"This will be implemented with SDN 5.1, " +
-			"see https://docs.spring.io/spring-data/neo4j/docs/5.1.0.RC2/reference/html/#_query_methods")
+//	@Disabled("SDN 5.0.x does not support 'IgnoreCase' in finder methods yet. " +
+//			"This will be implemented with SDN 5.1, " +
+//			"see https://docs.spring.io/spring-data/neo4j/docs/5.1.0.RC2/reference/html/#_query_methods")
 	void providesSkillByNameIgnoringCase() {
 		// Given
 		skillRepository.save(Skill.builder().id("123").name("Angular").description("JavaScript Framework").build());
