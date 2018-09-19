@@ -1,0 +1,13 @@
+logging:
+  level:
+    io:
+      knowledgeassets:
+        myskills:
+          server: WARN
+    org:
+      springframework:
+        security: ERROR
+        web: ERROR
+    root: WARN
+server:
+  port: 80
