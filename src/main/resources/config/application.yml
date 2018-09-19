@@ -9,6 +9,10 @@ spring:
     job:
       # Prevent Spring Boot to trigger the Spring Batch Job automatically
       enabled: false
+  data:
+    neo4j:
+      # Default is None but in Production use VALIDATE
+      auto-index: Update # Update creates all indexes and constraints. Use this only in development
 
 security:
   oauth2:

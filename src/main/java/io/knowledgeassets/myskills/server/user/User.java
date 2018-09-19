@@ -2,10 +2,7 @@ package io.knowledgeassets.myskills.server.user;
 
 import io.knowledgeassets.myskills.server.userskill.UserSkill;
 import lombok.*;
-import org.neo4j.ogm.annotation.Id;
-import org.neo4j.ogm.annotation.NodeEntity;
-import org.neo4j.ogm.annotation.Property;
-import org.neo4j.ogm.annotation.Relationship;
+import org.neo4j.ogm.annotation.*;
 
 import java.util.List;
 
@@ -15,10 +12,13 @@ import java.util.List;
 @AllArgsConstructor
 @NodeEntity
 public class User {
+
 	@Id
 	@Property(name = "id")
 	private String id;
+
 	@Property(name = "userName")
+	@Index(unique = true)
 	private String userName;
 	@Property(name = "firstName")
 	private String firstName;

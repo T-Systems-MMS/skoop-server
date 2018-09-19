@@ -4,6 +4,7 @@ import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.user.command.UserCommandService;
 import io.knowledgeassets.myskills.server.user.query.UserQueryService;
 import lombok.extern.slf4j.Slf4j;
+import org.neo4j.driver.v1.exceptions.ClientException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -11,10 +12,7 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.oauth2.provider.token.DefaultUserAuthenticationConverter;
 import org.springframework.util.StringUtils;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 public class UserCreatingUserAuthenticationConverter extends DefaultUserAuthenticationConverter {
@@ -40,10 +38,18 @@ public class UserCreatingUserAuthenticationConverter extends DefaultUserAuthenti
 		if (forCreate == null) return null;
 
 		Collection<? extends GrantedAuthority> authorities = getAuthorities(map);
-		// TODO: 9/14/2018 Problem in below method. sometimes it return two records.
-		User user = userQueryService.getByUserName(forCreate.getUserName())
-				.orElseGet(() -> userCommandService.createUser(forCreate.getUserName(), forCreate.getFirstName(), forCreate.getLastName(), forCreate.getEmail()));
-
+		User user;
+		try {
+			user = userQueryService.getByUserName(forCreate.getUserName())
+					.orElseGet(() -> userCommandService.createUser(forCreate.getUserName(), forCreate.getFirstName(), forCreate.getLastName(), forCreate.getEmail()));
+		} catch (ClientException e) {
+			Optional<User> byUserName = userQueryService.getByUserName(forCreate.getUserName());
+			if (byUserName.isPresent()) {
+				user = byUserName.get();
+			} else {
+				return null;
+			}
+		}
 		UserIdentity principal = new UserIdentity(user.getId(), user.getUserName(), user.getFirstName(),
 				user.getLastName(), user.getEmail(), "N/A", true, true,
 				true, true, authorities);
