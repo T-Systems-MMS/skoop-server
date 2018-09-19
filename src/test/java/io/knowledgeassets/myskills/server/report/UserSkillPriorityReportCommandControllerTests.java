@@ -3,9 +3,11 @@ package io.knowledgeassets.myskills.server.report;
 import io.knowledgeassets.myskills.server.common.Neo4jSessionFactoryConfiguration;
 import io.knowledgeassets.myskills.server.report.userskillpriorityaggregationreport.UserSkillPriorityAggregationReport;
 import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReport;
+import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReportResponse;
 import io.knowledgeassets.myskills.server.report.userskillpriorityreport.command.UserSkillPriorityReportCommandController;
 import io.knowledgeassets.myskills.server.report.userskillpriorityreport.command.UserSkillPriorityReportCommandService;
 import io.knowledgeassets.myskills.server.report.userskillreport.UserSkillReport;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +17,14 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
@@ -28,17 +33,25 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import static org.hamcrest.Matchers.containsString;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(UserSkillPriorityReportCommandController.class)
 // Additional configuration is required to workaround missing SessionFactory issue!
 @Import(Neo4jSessionFactoryConfiguration.class)
-public class UserSkillPriorityReportCommandServiceMockTests {
+public class UserSkillPriorityReportCommandControllerTests {
+
 	@Autowired
 	private MockMvc mockMvc;
+	@Autowired
+	private ObjectMapper objectMapper;
 	@MockBean
 	private UserSkillPriorityReportCommandService userSkillPriorityReportCommandService;
 
 	@Test
+	@DisplayName("Creates a report")
 	public void createReport() throws Exception {
 		LocalDateTime now = LocalDateTime.now();
 		given(userSkillPriorityReportCommandService.createPriorityReport()).willReturn(
@@ -74,14 +87,24 @@ public class UserSkillPriorityReportCommandServiceMockTests {
 						)
 						.build()
 		);
-		mockMvc.perform(post("/reports")
+
+		MvcResult mvcResult = mockMvc.perform(post("/reports")
 				.accept(MediaType.APPLICATION_JSON)
 				.with(csrf())
 				.with(user("tester").password("123").roles("USER")))
 				.andExpect(status().isCreated())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.id", is(equalTo("8f5634b8-783f-4503-b40f-ca93d8db7e72"))))
-				.andExpect(jsonPath("$.skillCount", is(equalTo(1))));
-		// TODO: Add assertion for "date" property.
+				.andExpect(content().string(containsString(now.truncatedTo(ChronoUnit.SECONDS).toString())))
+				.andExpect(jsonPath("$.skillCount", is(equalTo(1))))
+				.andReturn();
+
+		String responseJson = mvcResult.getResponse().getContentAsString();
+
+		UserSkillPriorityReportResponse userSkillPriorityReportResponse = objectMapper.readValue(responseJson,
+				UserSkillPriorityReportResponse.class);
+		assertThat(userSkillPriorityReportResponse.getDate().truncatedTo(ChronoUnit.SECONDS))
+				.isEqualTo(now.truncatedTo(ChronoUnit.SECONDS));
+
 	}
 }

@@ -1,98 +1,147 @@
 package io.knowledgeassets.myskills.server.report;
 
-import io.knowledgeassets.myskills.server.MySkillsServerApplicationTests;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.knowledgeassets.myskills.server.common.Neo4jSessionFactoryConfiguration;
-import io.knowledgeassets.myskills.server.exception.BusinessException;
 import io.knowledgeassets.myskills.server.report.userskillpriorityaggregationreport.UserSkillPriorityAggregationReport;
-import io.knowledgeassets.myskills.server.report.userskillpriorityaggregationreport.query.UserSkillPriorityAggregationReportQueryService;
 import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReport;
 import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReportRepository;
+import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReportResponse;
+import io.knowledgeassets.myskills.server.report.userskillpriorityreport.command.UserSkillPriorityReportCommandController;
 import io.knowledgeassets.myskills.server.report.userskillpriorityreport.command.UserSkillPriorityReportCommandService;
 import io.knowledgeassets.myskills.server.report.userskillpriorityreport.query.UserSkillPriorityReportQueryService;
 import io.knowledgeassets.myskills.server.report.userskillreport.UserSkillReport;
+import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.skill.SkillRepository;
-import io.knowledgeassets.myskills.server.skill.query.SkillQueryController;
-import io.knowledgeassets.myskills.server.user.UserRepository;
-
-import io.knowledgeassets.myskills.server.userskill.UserSkillRepository;
+import io.knowledgeassets.myskills.server.skill.query.SkillQueryService;
+import io.knowledgeassets.myskills.server.user.User;
+import io.knowledgeassets.myskills.server.userskill.UserSkill;
+import io.knowledgeassets.myskills.server.userskill.query.UserSkillQueryService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import org.springframework.data.domain.Sort;
+
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
+import java.util.stream.StreamSupport;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.BDDMockito.given;
 
-public class UserSkillPriorityReportCommandServiceTests extends MySkillsServerApplicationTests {
+@ExtendWith(MockitoExtension.class)
+public class UserSkillPriorityReportCommandServiceTests {
 
-	@Autowired
-	private UserRepository userRepository;
-	@Autowired
-	private SkillRepository skillRepository;
-	@Autowired
-	private UserSkillRepository userSkillRepository;
-	@Autowired
+	@Mock
 	private UserSkillPriorityReportRepository userSkillPriorityReportRepository;
-	@Autowired
+	@Mock
+	private UserSkillQueryService userSkillQueryService;
+	@Mock
 	private UserSkillPriorityReportQueryService userSkillPriorityReportQueryService;
-	@Autowired
-	private UserSkillPriorityReportCommandService userSkillPriorityReportCommandService;
-	@Autowired
-	private UserSkillPriorityAggregationReportQueryService userSkillPriorityAggregationReportQueryService;
-	@Autowired
-	private InitializeDataForReport initializeDataForReport;
 
-	private UserSkillPriorityReport report;
+	UserSkillPriorityReportCommandService userSkillPriorityReportCommandService;
 
 	@BeforeEach
-	void init() {
-		initializeDataForReport.createData();
-		report = userSkillPriorityReportCommandService.createPriorityReport();
+	void setUp() {
+		userSkillPriorityReportCommandService = new UserSkillPriorityReportCommandService(
+				userSkillPriorityReportRepository, userSkillQueryService, userSkillPriorityReportQueryService);
 	}
 
 	@Test
+	@DisplayName("Creates a report")
 	public void createReport() {
-		assertEquals(2, userRepository.count());
-		assertEquals(4, skillRepository.count());
-		assertEquals(7, userSkillRepository.count());
+		LocalDateTime now = LocalDateTime.now();
 
-		assertEquals(1, userSkillPriorityReportRepository.count());
+		given(userSkillPriorityReportQueryService.getPrioritizedSkillsToCreateReport())
+				.willReturn(StreamSupport.stream((
+								List.of(UserSkillPriorityAggregationReportResult.builder()
+										.averagePriority(3.5)
+										.maximumPriority(4.0)
+										.userCount(2)
+										.skill(Skill.builder()
+												.id("89fdda90-8f17-4f5b-8077-63b0dbebcfa1")
+												.name("Maven")
+												.build())
+										.users(List.of(
+												User.builder()
+														.id("9a2d807d-9fe1-41a4-a6f3-2851a163523a")
+														.userName("tester")
+														.coach(true)
+														.build()
+												, User.builder()
+														.id("11c8265e-e582-4700-a3c0-647d70046dc6")
+														.userName("tester2")
+														.build())
+										)
+										.build())
+						).spliterator(), false)
+				);
 
-		List<UserSkillPriorityAggregationReport> userSkillPriorityAggregationReports = null;
-		try {
-			userSkillPriorityAggregationReports = userSkillPriorityAggregationReportQueryService
-					.getUserSkillPriorityAggregationReportsByReportId(report.getId())
-					.collect(Collectors.toList());
-		} catch (BusinessException e) {
-			fail(e);
-		}
+		given(userSkillQueryService.findByUserIdAndSkillName(ArgumentMatchers.any(String.class), ArgumentMatchers.any(String.class)))
+				.willReturn(Optional.of(UserSkill.builder()
+						.id("6ga0dc67-f217-41e2-862d-efd372614410")
+						.currentLevel(2)
+						.desiredLevel(4)
+						.priority(4)
+						.build())
+				);
 
-		assertEquals(3, userSkillPriorityAggregationReports.size());
-		UserSkillPriorityAggregationReport angular = userSkillPriorityAggregationReports.stream()
-				.filter(userSkillPriorityAggregationReport ->
-						userSkillPriorityAggregationReport.getSkillName().equals("Angular")
-				).collect(Collectors.toList()).get(0);
+		given(userSkillPriorityReportRepository.save(ArgumentMatchers.any(UserSkillPriorityReport.class)))
+				.willReturn(
+						UserSkillPriorityReport.builder()
+								.id("8f5634b8-783f-4503-b40f-ca93d8db7e72")
+								.date(now)
+								.userSkillPriorityAggregationReports(singletonList(
+										UserSkillPriorityAggregationReport.builder()
+												.id("123")
+												.skillName("Neo4j")
+												.userCount(2)
+												.averagePriority(3D)
+												.maximumPriority(4D)
+												.userSkillReports(asList(
+														UserSkillReport.builder()
+																.skillName("Neo4j")
+																.userName("tester")
+																.currentLevel(2)
+																.desiredLevel(4)
+																.priority(2)
+																.build(),
+														UserSkillReport.builder()
+																.skillName("Neo4j")
+																.userName("tester2")
+																.currentLevel(1)
+																.desiredLevel(3)
+																.priority(4)
+																.build()
+														)
+												)
+												.build()
+										)
+								)
+								.build());
 
-		assertThat(angular.getAveragePriority()).isEqualTo(1.5);
-		assertThat(angular.getMaximumPriority()).isEqualTo(2);
-		assertThat(angular.getUserCount()).isEqualTo(2);
+		UserSkillPriorityReport userSkillPriorityReport = userSkillPriorityReportCommandService.createPriorityReport();
+		assertThat(userSkillPriorityReport).isNotNull();
+		assertThat(userSkillPriorityReport.getId()).isEqualTo("8f5634b8-783f-4503-b40f-ca93d8db7e72");
+		assertThat(userSkillPriorityReport.getDate().truncatedTo(ChronoUnit.SECONDS))
+				.isEqualTo(now.truncatedTo(ChronoUnit.SECONDS));
+		assertThat(userSkillPriorityReport.getUserSkillPriorityAggregationReports().size()).isEqualTo(1);
+		List<UserSkillReport> userSkillReports = userSkillPriorityReport.getUserSkillPriorityAggregationReports().get(0).getUserSkillReports();
+		assertThat(userSkillPriorityReport.getUserSkillPriorityAggregationReports().get(0).getSkillDescription()).isNull();
+		assertThat(userSkillReports.size()).isEqualTo(2);
+		assertThat(userSkillReports.get(1).getSkillName()).isEqualTo("Neo4j");
+		assertThat(userSkillReports.get(1).getUserName()).isEqualTo("tester2");
+		assertThat(userSkillReports.get(1).getCurrentLevel()).isEqualTo(1);
+		assertThat(userSkillReports.get(1).getDesiredLevel()).isEqualTo(3);
+		assertThat(userSkillReports.get(1).getPriority()).isEqualTo(4);
 
-		List<UserSkillReport> userSkillReports = angular.getUserSkillReports();
-		UserSkillReport tester2 = userSkillReports.stream()
-				.filter(userSkillReport ->
-						userSkillReport.getUserName().equals("tester2")
-				).collect(Collectors.toList()).get(0);;
-
-		assertThat(tester2.getCurrentLevel()).isEqualTo(2);
-		assertThat(tester2.getDesiredLevel()).isEqualTo(4);
-		assertThat(tester2.getPriority()).isEqualTo(1);
 	}
-
 }
