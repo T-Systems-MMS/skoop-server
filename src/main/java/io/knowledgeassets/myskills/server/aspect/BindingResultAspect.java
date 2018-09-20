@@ -43,7 +43,6 @@ public class BindingResultAspect {
                 continue;
             BindingResult bindingResult = (BindingResult) arg;
             if (bindingResult.hasErrors()) {
-                log.error("Input data is corrupted.");
                 throw MethodArgumentNotValidException.builder()
                         .bindingResult(bindingResult)
                         .build();

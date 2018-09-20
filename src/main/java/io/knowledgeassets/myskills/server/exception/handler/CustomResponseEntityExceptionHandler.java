@@ -2,6 +2,7 @@ package io.knowledgeassets.myskills.server.exception.handler;
 
 import io.knowledgeassets.myskills.server.exception.domain.ResponseError;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
@@ -24,54 +25,62 @@ import static org.springframework.http.HttpStatus.UNSUPPORTED_MEDIA_TYPE;
 @Slf4j
 public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptionHandler implements IExceptionHandler {
 
-    /**
-     * Handle MissingServletRequestParameterException. Triggered when a 'required' request parameter is missing.
-     *
-     * @param ex      MissingServletRequestParameterException
-     * @param headers HttpHeaders
-     * @param status  HttpStatus
-     * @param request WebRequest
-     * @return the ApiError object
-     */
-    @Override
-    protected ResponseEntity<Object> handleMissingServletRequestParameter(
+	/**
+	 * Handle MissingServletRequestParameterException. Triggered when a 'required' request parameter is missing.
+	 *
+	 * @param ex      MissingServletRequestParameterException
+	 * @param headers HttpHeaders
+	 * @param status  HttpStatus
+	 * @param request WebRequest
+	 * @return the ApiError object
+	 */
+	@Override
+	protected ResponseEntity<Object> handleMissingServletRequestParameter(
 			MissingServletRequestParameterException ex, HttpHeaders headers,
 			HttpStatus status, WebRequest request) {
-        String error = ex.getParameterName() + " parameter is missing";
+		String logMessage = String.format("%s parameter is missing", ex.getParameterName());
+		doLog(logMessage);
 
-        ResponseError responseError = new ResponseError(BAD_REQUEST);
-        responseError.setMessage(error);
-        responseError.setDebugMessage(ex.getLocalizedMessage());
+		ResponseError responseError = new ResponseError(BAD_REQUEST);
+		responseError.setMessage(logMessage);
+		responseError.setDebugMessage(ex.getLocalizedMessage());
 
-        return buildResponseEntity(ex, responseError);
-    }
+		return buildResponseEntity(ex, responseError);
+	}
 
-    /**
-     * Handle HttpMediaTypeNotSupportedException. This one triggers when JSON is invalid as well.
-     *
-     * @param ex      HttpMediaTypeNotSupportedException
-     * @param headers HttpHeaders
-     * @param status  HttpStatus
-     * @param request WebRequest
-     * @return the ApiError object
-     */
-    @Override
-    protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(
-            HttpMediaTypeNotSupportedException ex,
-            HttpHeaders headers,
-            HttpStatus status,
-            WebRequest request) {
+	/**
+	 * Handle HttpMediaTypeNotSupportedException. This one triggers when JSON is invalid as well.
+	 *
+	 * @param ex      HttpMediaTypeNotSupportedException
+	 * @param headers HttpHeaders
+	 * @param status  HttpStatus
+	 * @param request WebRequest
+	 * @return the ApiError object
+	 */
+	@Override
+	protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(
+			HttpMediaTypeNotSupportedException ex,
+			HttpHeaders headers,
+			HttpStatus status,
+			WebRequest request) {
 
-        StringBuilder builder = new StringBuilder();
-        builder.append(ex.getContentType());
-        builder.append(" media type is not supported. Supported media types are ");
-        ex.getSupportedMediaTypes().forEach(t -> builder.append(t).append(", "));
+		StringBuilder builder = new StringBuilder();
+		builder.append(ex.getContentType());
+		builder.append(" media type is not supported. Supported media types are ");
+		ex.getSupportedMediaTypes().forEach(t -> builder.append(t).append(", "));
 
-        ResponseError responseError = new ResponseError(UNSUPPORTED_MEDIA_TYPE);
-        responseError.setMessage(builder.substring(0, builder.length() - 2));
-        responseError.setDebugMessage(ex.getLocalizedMessage());
+		String logMessage = builder.substring(0, builder.length() - 2);
+		doLog(logMessage);
 
-        return buildResponseEntity(ex, responseError);
-    }
+		ResponseError responseError = new ResponseError(UNSUPPORTED_MEDIA_TYPE);
+		responseError.setMessage(logMessage);
+		responseError.setDebugMessage(ex.getLocalizedMessage());
 
+		return buildResponseEntity(ex, responseError);
+	}
+
+	@Override
+	public Logger getLogger() {
+		return log;
+	}
 }

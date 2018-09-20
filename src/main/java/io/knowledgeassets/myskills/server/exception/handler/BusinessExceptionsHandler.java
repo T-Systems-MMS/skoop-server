@@ -4,14 +4,20 @@ import io.knowledgeassets.myskills.server.exception.DuplicateResourceException;
 import io.knowledgeassets.myskills.server.exception.MethodArgumentNotValidException;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.exception.domain.ResponseError;
+import io.knowledgeassets.myskills.server.exception.domain.ResponseValidationError;
+import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import java.util.Collections;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -25,42 +31,61 @@ import static org.springframework.http.HttpStatus.*;
 @Slf4j
 public class BusinessExceptionsHandler extends ResponseEntityExceptionHandler implements IExceptionHandler {
 
-    /**
-     * when a resource(like a entity) already exists, we throw this exception.
-     */
-    @ExceptionHandler({DuplicateResourceException.class})
-    protected ResponseEntity<Object> handleDuplicateResource(DuplicateResourceException ex, WebRequest request) {
-        log.error("The resource already exists! {}", ex.getLocalizedMessage());
+	/**
+	 * when a resource(like a entity) already exists, we throw this exception.
+	 */
+	@ExceptionHandler({DuplicateResourceException.class})
+	protected ResponseEntity<Object> handleDuplicateResource(DuplicateResourceException ex, WebRequest request) {
+		String logMessage = String.format("The resource already exists! %s", ex.getLocalizedMessage());
+		doLog(ex, logMessage);
 
-        ResponseError responseError = new ResponseError(CONFLICT);
-        responseError.setMessage(ex.getLocalizedMessage());
-        return buildResponseEntity(ex, responseError);
-    }
+		ResponseError responseError = new ResponseError(CONFLICT);
+		responseError.setMessage(ex.getLocalizedMessage());
+		return buildResponseEntity(ex, responseError);
+	}
 
-    /**
-     * Handles NoSuchResourceException.
-     * If a resource (like entity) not found, we throw this exception.
-     */
-    @ExceptionHandler(NoSuchResourceException.class)
-    protected ResponseEntity<Object> handleNoSuchResource(
-            NoSuchResourceException ex) {
-        log.error("The resource doesn't exist! {}", ex.getLocalizedMessage());
+	/**
+	 * Handles NoSuchResourceException.
+	 * If a resource (like entity) not found, we throw this exception.
+	 */
+	@ExceptionHandler(NoSuchResourceException.class)
+	protected ResponseEntity<Object> handleNoSuchResource(
+			NoSuchResourceException ex) {
+		String logMessage = String.format("The resource doesn't exist! %s", ex.getLocalizedMessage());
+		doLog(ex, logMessage);
 
-        ResponseError responseError = new ResponseError(NOT_FOUND);
-        responseError.setMessage(ex.getLocalizedMessage());
-        return buildResponseEntity(ex, responseError);
-    }
+		ResponseError responseError = new ResponseError(NOT_FOUND);
+		responseError.setMessage(ex.getLocalizedMessage());
+		return buildResponseEntity(ex, responseError);
+	}
 
-    /**
-     * Handle MethodArgumentNotValidException. Triggered when an object fails @Valid validation.
-     */
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
-        ResponseError responseError = new ResponseError(BAD_REQUEST);
-        responseError.setMessage("Validation error");
-        responseError.addValidationErrors(ex.getBindingResult().getFieldErrors());
-        responseError.addValidationError(ex.getBindingResult().getGlobalErrors());
-        return buildResponseEntity(ex, responseError);
-    }
+	/**
+	 * Handle MethodArgumentNotValidException. Triggered when an object fails @Valid validation.
+	 */
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
+		ResponseError responseError = new ResponseError(BAD_REQUEST);
+		responseError.setMessage("Validation error");
+		responseError.addValidationErrors(ex.getBindingResult().getFieldErrors());
+		responseError.addValidationError(ex.getBindingResult().getGlobalErrors());
 
+		String logMessage = null;
+		if (!CollectionUtils.isEmpty(responseError.getSubErrors())) {
+			StringBuilder errorDetails = new StringBuilder("Error Details: ");
+			for (ResponseValidationError subError : responseError.getSubErrors()) {
+				errorDetails.append(subError.getField()).append(" ").append(subError.getMessage());
+			}
+			logMessage = String.format("Validation error - %s", errorDetails.toString());
+		} else {
+			logMessage = "Validation error";
+		}
+		doLog(ex, logMessage);
+
+		return buildResponseEntity(ex, responseError);
+	}
+
+	@Override
+	public Logger getLogger() {
+		return log;
+	}
 }

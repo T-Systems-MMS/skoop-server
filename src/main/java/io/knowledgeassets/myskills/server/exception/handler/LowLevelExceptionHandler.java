@@ -3,6 +3,7 @@ package io.knowledgeassets.myskills.server.exception.handler;
 import io.knowledgeassets.myskills.server.exception.BusinessException;
 import io.knowledgeassets.myskills.server.exception.domain.ResponseError;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +34,8 @@ public class LowLevelExceptionHandler extends ResponseEntityExceptionHandler imp
 	 */
 	@ExceptionHandler({BusinessException.class})
 	protected ResponseEntity<Object> handleBusinessException(BusinessException ex) {
-		log.error("Business Exception {}", ex.getLocalizedMessage());
+		String logMessage = String.format("Business Exception %s", ex.getLocalizedMessage());
+		doLog(ex, logMessage);
 
 		ResponseError responseError = new ResponseError(HttpStatus.INTERNAL_SERVER_ERROR);
 		responseError.setMessage(ex.getLocalizedMessage());
@@ -42,11 +44,17 @@ public class LowLevelExceptionHandler extends ResponseEntityExceptionHandler imp
 
 	@ExceptionHandler({Exception.class})
 	protected ResponseEntity<Object> unexpectedException(Exception ex, WebRequest request) {
-		log.error("Unexpected Exception! {}", ex);
+		String logMessage = String.format("Unexpected Exception! %s", ex.getLocalizedMessage());
+		doLog(logMessage);
 
 		ResponseError responseError = new ResponseError(HttpStatus.INTERNAL_SERVER_ERROR);
 		responseError.setMessage(ex.getLocalizedMessage());
 
 		return buildResponseEntity(ex, responseError);
+	}
+
+	@Override
+	public Logger getLogger() {
+		return log;
 	}
 }

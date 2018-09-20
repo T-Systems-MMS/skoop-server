@@ -1,6 +1,7 @@
 package io.knowledgeassets.myskills.server.userskill.query;
 
 import io.knowledgeassets.myskills.server.exception.BusinessException;
+import io.knowledgeassets.myskills.server.exception.DuplicateResourceException;
 import io.knowledgeassets.myskills.server.exception.EmptyInputException;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.exception.enums.Model;
@@ -91,7 +92,6 @@ public class UserSkillQueryService {
 					.searchParamsMap(searchParamsMap)
 					.build();
 		}
-
 		return StreamSupport.stream(userSkillRepository.findSkillSuggestionsByUserId(userId, search)
 				.spliterator(), false);
 	}

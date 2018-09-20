@@ -42,6 +42,12 @@ public class UserSkillSuggestionController {
 	@GetMapping(path = "/users/{userId}/skill-suggestions", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<String> getUserSkillSuggestions(@PathVariable("userId") String userId,
 												@RequestParam("search") String search) throws BusinessException {
-		return userSkillQueryService.getUserSkillSuggestions(userId, search).map(Skill::getName).collect(toList());
+		try {
+			return userSkillQueryService.getUserSkillSuggestions(userId, search).map(Skill::getName).collect(toList());
+		} catch (BusinessException e) {
+			e.setDebugMessage("An exception has occurred in getting skill suggestions for a specific user!");
+			e.setSuggestion("Check userId isn't null or make sure that user with this userId already exists in DB!");
+			throw e;
+		}
 	}
 }

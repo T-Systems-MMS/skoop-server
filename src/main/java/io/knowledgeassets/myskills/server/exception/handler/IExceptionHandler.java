@@ -1,15 +1,37 @@
 package io.knowledgeassets.myskills.server.exception.handler;
 
+import io.knowledgeassets.myskills.server.exception.GeneralException;
 import io.knowledgeassets.myskills.server.exception.domain.ResponseError;
-import org.springframework.http.HttpStatus;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
 import org.springframework.http.ResponseEntity;
 
 interface IExceptionHandler {
 
-    default ResponseEntity<Object> buildResponseEntity(Exception ex, ResponseError responseError) {
-        if (ex.getCause() != null) {
-            responseError.setDebugMessage(ex.getCause().getLocalizedMessage());
-        }
-        return new ResponseEntity<>(responseError, responseError.getStatus());
-    }
+	Logger getLogger();
+
+	default ResponseEntity<Object> buildResponseEntity(Exception ex, ResponseError responseError) {
+		if (ex.getCause() != null) {
+			responseError.setDebugMessage(ex.getCause().getLocalizedMessage());
+		}
+		return new ResponseEntity<>(responseError, responseError.getStatus());
+	}
+
+	default void doLog(GeneralException ex, String message) {
+		if (ex.getDebugMessage() != null) {
+			getLogger().error(ex.getDebugMessage());
+		}
+		if (message != null) {
+			getLogger().error(message);
+		}
+		if (ex.getSuggestion() != null) {
+			getLogger().error(ex.getSuggestion());
+		}
+	}
+
+	default void doLog(String message) {
+		if (message != null) {
+			getLogger().error(message);
+		}
+	}
 } 

@@ -1,6 +1,7 @@
 package io.knowledgeassets.myskills.server.skill.command;
 
 import io.knowledgeassets.myskills.server.aspect.CheckBindingResult;
+import io.knowledgeassets.myskills.server.exception.BusinessException;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.skill.SkillRequest;
 import io.knowledgeassets.myskills.server.skill.SkillResponse;
@@ -41,7 +42,14 @@ public class SkillCommandController {
 	@CheckBindingResult
 	public ResponseEntity<SkillResponse> createSkill(@Valid @RequestBody SkillRequest request,
 													 BindingResult bindingResult) {
-		Skill skill = skillCommandService.createSkill(request.getName(), request.getDescription());
+		Skill skill = null;
+		try {
+			skill = skillCommandService.createSkill(request.getName(), request.getDescription());
+		} catch (BusinessException e) {
+			e.setDebugMessage("An exception has occurred in creating a skill!");
+			e.setSuggestion("Make sure that skill with the given name doesn't already exists!");
+			throw e;
+		}
 		return ResponseEntity.status(HttpStatus.CREATED).body(SkillResponse.builder()
 				.id(skill.getId())
 				.name(skill.getName())

@@ -75,12 +75,12 @@ public class ResponseError implements Serializable {
 		fieldErrors.forEach(this::addValidationError);
 	}
 
-	private void addValidationError(ObjectError objectError) {
-		this.addValidationError(objectError.getDefaultMessage());
-	}
-
 	public void addValidationError(List<ObjectError> globalErrors) {
 		globalErrors.forEach(this::addValidationError);
+	}
+
+	private void addValidationError(ObjectError objectError) {
+		this.addValidationError(objectError.getDefaultMessage());
 	}
 
 }
