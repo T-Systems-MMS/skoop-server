@@ -12,9 +12,8 @@ public class MethodArgumentNotValidException extends BusinessException {
 	private BindingResult bindingResult;
 
 	@Builder
-	private MethodArgumentNotValidException(Long code, BindingResult bindingResult) {
+	private MethodArgumentNotValidException( BindingResult bindingResult) {
 		super();
-		this.setCode(code);
 		this.bindingResult = bindingResult;
 	}
 

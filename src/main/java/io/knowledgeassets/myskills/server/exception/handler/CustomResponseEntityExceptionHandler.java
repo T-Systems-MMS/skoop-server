@@ -42,7 +42,6 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
         ResponseError responseError = new ResponseError(BAD_REQUEST);
         responseError.setMessage(error);
         responseError.setDebugMessage(ex.getLocalizedMessage());
-        responseError.setErrorCode(10002L);
 
         return buildResponseEntity(ex, responseError);
     }
@@ -71,7 +70,6 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
         ResponseError responseError = new ResponseError(UNSUPPORTED_MEDIA_TYPE);
         responseError.setMessage(builder.substring(0, builder.length() - 2));
         responseError.setDebugMessage(ex.getLocalizedMessage());
-        responseError.setErrorCode(10001L);
 
         return buildResponseEntity(ex, responseError);
     }

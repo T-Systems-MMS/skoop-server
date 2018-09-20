@@ -34,7 +34,6 @@ public class BusinessExceptionsHandler extends ResponseEntityExceptionHandler im
 
         ResponseError responseError = new ResponseError(CONFLICT);
         responseError.setMessage(ex.getLocalizedMessage());
-        responseError.setErrorCode(ex.getCode());
         return buildResponseEntity(ex, responseError);
     }
 
@@ -49,7 +48,6 @@ public class BusinessExceptionsHandler extends ResponseEntityExceptionHandler im
 
         ResponseError responseError = new ResponseError(NOT_FOUND);
         responseError.setMessage(ex.getLocalizedMessage());
-        responseError.setErrorCode(ex.getCode());
         return buildResponseEntity(ex, responseError);
     }
 
@@ -60,7 +58,6 @@ public class BusinessExceptionsHandler extends ResponseEntityExceptionHandler im
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
         ResponseError responseError = new ResponseError(BAD_REQUEST);
         responseError.setMessage("Validation error");
-        responseError.setErrorCode(ex.getCode());
         responseError.addValidationErrors(ex.getBindingResult().getFieldErrors());
         responseError.addValidationError(ex.getBindingResult().getGlobalErrors());
         return buildResponseEntity(ex, responseError);

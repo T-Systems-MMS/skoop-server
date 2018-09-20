@@ -29,7 +29,6 @@ public class UserSkillPriorityAggregationReportQueryService {
 	public Stream<UserSkillPriorityAggregationReport> getUserSkillPriorityAggregationReportsByReportId(String reportId) throws BusinessException {
 		if (reportId == null) {
 			throw EmptyInputException.builder()
-					.code(10010L)
 					.message("reportId is null")
 					.build();
 		}
@@ -37,7 +36,6 @@ public class UserSkillPriorityAggregationReportQueryService {
 			String[] searchParamsMap = {"id", reportId};
 			throw NoSuchResourceException.builder()
 					.model(Model.UserSkillPriorityReport)
-					.code(10011L)
 					.searchParamsMap(searchParamsMap)
 					.build();
 		}
@@ -59,7 +57,6 @@ public class UserSkillPriorityAggregationReportQueryService {
 			String[] searchParamsMap = {"id", userSkillPriorityAggregationReportId};
 			throw NoSuchResourceException.builder()
 					.model(Model.UserSkillPriorityAggregationReport)
-					.code(111111L)
 					.searchParamsMap(searchParamsMap)
 					.build();
 		}
@@ -69,7 +66,6 @@ public class UserSkillPriorityAggregationReportQueryService {
 	public boolean exists(String userSkillPriorityAggregationReportId) throws EmptyInputException {
 		if (userSkillPriorityAggregationReportId == null) {
 			throw EmptyInputException.builder()
-					.code(111111L)
 					.message("userSkillPriorityAggregationReportId is null.")
 					.build();
 		}

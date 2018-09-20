@@ -65,7 +65,6 @@ public class UserSkillPriorityReportQueryService {
 			String[] searchParamsMap = {"id", userSkillPriorityReportId};
 			throw NoSuchResourceException.builder()
 					.model(Model.UserSkillPriorityReport)
-					.code(111111L)
 					.searchParamsMap(searchParamsMap)
 					.build();
 		}
@@ -75,7 +74,6 @@ public class UserSkillPriorityReportQueryService {
 	public boolean exists(String userSkillPriorityReportId) throws EmptyInputException {
 		if (userSkillPriorityReportId == null) {
 			throw EmptyInputException.builder()
-					.code(111111L)
 					.message("userSkillPriorityReportId is null.")
 					.build();
 		}

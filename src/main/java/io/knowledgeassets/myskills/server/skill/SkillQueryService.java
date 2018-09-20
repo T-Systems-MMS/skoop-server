@@ -43,7 +43,6 @@ public class SkillQueryService {
 	public boolean exists(String skillId) throws EmptyInputException {
 		if (skillId == null) {
 			throw EmptyInputException.builder()
-					.code(111111L)
 					.message("skillId is null.")
 					.build();
 		}

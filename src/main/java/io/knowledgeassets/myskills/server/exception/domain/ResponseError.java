@@ -1,8 +1,6 @@
 package io.knowledgeassets.myskills.server.exception.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.jsontype.impl.TypeIdResolverBase;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
@@ -26,7 +24,11 @@ public class ResponseError implements Serializable {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
 	private LocalDateTime timestamp;
 	private String message;
-	private Long errorCode;
+
+	/**
+	 * This debugMessage is used for logging purpose.
+	 * It elaborates more details that are good for developers and we save it in log files.
+	 */
 	private String debugMessage;
 
 	/**
@@ -81,21 +83,4 @@ public class ResponseError implements Serializable {
 		globalErrors.forEach(this::addValidationError);
 	}
 
-	class LowerCaseClassNameResolver extends TypeIdResolverBase {
-
-		@Override
-		public String idFromValue(Object value) {
-			return value.getClass().getSimpleName().toLowerCase();
-		}
-
-		@Override
-		public String idFromValueAndType(Object value, Class<?> suggestedType) {
-			return idFromValue(value);
-		}
-
-		@Override
-		public JsonTypeInfo.Id getMechanism() {
-			return JsonTypeInfo.Id.CUSTOM;
-		}
-	}
 }

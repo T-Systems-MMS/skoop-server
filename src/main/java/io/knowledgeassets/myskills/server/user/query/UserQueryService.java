@@ -38,7 +38,6 @@ public class UserQueryService {
 	public boolean exists(String userId) throws EmptyInputException {
 		if (userId == null) {
 			throw EmptyInputException.builder()
-					.code(111111L)
 					.message("userId is null.")
 					.build();
 		}

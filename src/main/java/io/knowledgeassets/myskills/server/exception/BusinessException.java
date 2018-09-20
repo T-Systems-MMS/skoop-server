@@ -12,7 +12,7 @@ public abstract class BusinessException
         super();
     }
 
-    public BusinessException(String message, Long code) {
-        super(message, code);
+    public BusinessException(String message) {
+        super(message);
     }
 }

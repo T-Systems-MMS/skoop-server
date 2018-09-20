@@ -60,7 +60,6 @@ public class UserSkillQueryService {
 			String[] searchParamsMap = {"id", skillId};
 			throw NoSuchResourceException.builder()
 					.model(Model.SKILL)
-					.code(111111L)
 					.searchParamsMap(searchParamsMap)
 					.build();
 		}
@@ -89,7 +88,6 @@ public class UserSkillQueryService {
 			String[] searchParamsMap = {"id", userId};
 			throw NoSuchResourceException.builder()
 					.model(Model.USER)
-					.code(111111L)
 					.searchParamsMap(searchParamsMap)
 					.build();
 		}

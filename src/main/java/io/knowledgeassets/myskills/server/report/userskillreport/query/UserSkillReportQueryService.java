@@ -40,7 +40,6 @@ public class UserSkillReportQueryService {
 			String[] searchParamsMap = {"id", userSkillPriorityAggregationReportId};
 			throw NoSuchResourceException.builder()
 					.model(Model.UserSkillPriorityAggregationReport)
-					.code(10015L)
 					.searchParamsMap(searchParamsMap)
 					.build();
 		}
@@ -62,7 +61,6 @@ public class UserSkillReportQueryService {
 			String[] searchParamsMap = {"id", userSkillReportId};
 			throw NoSuchResourceException.builder()
 					.model(Model.UserSkillReport)
-					.code(10013L)
 					.searchParamsMap(searchParamsMap)
 					.build();
 		}
@@ -72,7 +70,6 @@ public class UserSkillReportQueryService {
 	public boolean exists(String userSkillReportId) throws EmptyInputException {
 		if (userSkillReportId == null) {
 			throw EmptyInputException.builder()
-					.code(10014L)
 					.message("userSkillReportId is null.")
 					.build();
 		}

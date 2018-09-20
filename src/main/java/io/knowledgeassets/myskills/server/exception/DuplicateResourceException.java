@@ -10,8 +10,8 @@ import lombok.Builder;
 public class DuplicateResourceException extends BusinessException {
 
     @Builder
-    public DuplicateResourceException(String message, Long code) {
-        super(message, code);
+    public DuplicateResourceException(String message) {
+        super(message);
     }
 
 }

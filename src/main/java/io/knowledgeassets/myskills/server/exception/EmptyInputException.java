@@ -10,7 +10,7 @@ import lombok.Builder;
 public class EmptyInputException extends BusinessException {
 
 	@Builder
-	public EmptyInputException(String message, Long code) {
-		super(message, code);
+	public EmptyInputException(String message) {
+		super(message);
 	}
 }

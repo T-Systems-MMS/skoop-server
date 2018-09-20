@@ -14,9 +14,8 @@ import java.util.stream.IntStream;
 public class NoSuchResourceException extends BusinessException {
 
     @Builder
-    private NoSuchResourceException(Model model, Long code, String... searchParamsMap) {
-        super(NoSuchResourceException.generateMessage(model.toValue(), toMap(String.class, String.class, searchParamsMap)),
-                code);
+    private NoSuchResourceException(Model model,String... searchParamsMap) {
+        super(NoSuchResourceException.generateMessage(model.toValue(), toMap(String.class, String.class, searchParamsMap)));
     }
 
     private static String generateMessage(String entity, Map<String, String> searchParams) {
