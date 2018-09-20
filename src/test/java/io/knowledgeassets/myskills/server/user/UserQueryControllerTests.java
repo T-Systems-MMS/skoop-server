@@ -1,7 +1,8 @@
-package io.knowledgeassets.myskills.server.skill.query;
+package io.knowledgeassets.myskills.server.user;
 
 import io.knowledgeassets.myskills.server.common.Neo4jSessionFactoryConfiguration;
-import io.knowledgeassets.myskills.server.skill.Skill;
+import io.knowledgeassets.myskills.server.user.query.UserQueryController;
+import io.knowledgeassets.myskills.server.user.query.UserQueryService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,47 +25,47 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(SkillQueryController.class)
+@WebMvcTest(UserQueryController.class)
 // Additional configuration is required to workaround missing SessionFactory issue!
 @Import(Neo4jSessionFactoryConfiguration.class)
-class SkillQueryControllerTests {
+class UserQueryControllerTests {
 	@Autowired
 	private MockMvc mockMvc;
 
 	@MockBean
-	private SkillQueryService skillQueryService;
+	private UserQueryService userQueryService;
 
 	@Test
-	@DisplayName("Responds with the list of skills provided by the internal service")
-	void respondsWithListOfSkills() throws Exception {
-		given(skillQueryService.getSkills()).willReturn(Stream.of(
-				Skill.builder().id("123").name("Angular").description("JavaScript Framework").build(),
-				Skill.builder().id("456").name("Spring Boot").description("Java Framework").build()
+	@DisplayName("Responds with the list of users provided by the internal service")
+	void respondsWithListOfUsers() throws Exception {
+		given(userQueryService.getUsers()).willReturn(Stream.of(
+				User.builder().id("123").userName("tester1").firstName("firstTester").email("tester1@gmail.com").build(),
+				User.builder().id("456").userName("tester2").firstName("secondTester").email("tester2@gmail.com").build()
 		));
-		mockMvc.perform(get("/skills").accept(MediaType.APPLICATION_JSON)
+		mockMvc.perform(get("/users").accept(MediaType.APPLICATION_JSON)
 				.with(user("tester").password("123").roles("USER")))
 				.andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.length()", is(equalTo(2))))
 				.andExpect(jsonPath("$[0].id", is(equalTo("123"))))
-				.andExpect(jsonPath("$[0].name", is(equalTo("Angular"))))
-				.andExpect(jsonPath("$[0].description", is(equalTo("JavaScript Framework"))))
+				.andExpect(jsonPath("$[0].userName", is(equalTo("tester1"))))
+				.andExpect(jsonPath("$[0].email", is(equalTo("tester1@gmail.com"))))
 				.andExpect(jsonPath("$[1].id", is(equalTo("456"))))
-				.andExpect(jsonPath("$[1].name", is(equalTo("Spring Boot"))))
-				.andExpect(jsonPath("$[1].description", is(equalTo("Java Framework"))));
+				.andExpect(jsonPath("$[1].userName", is(equalTo("tester2"))))
+				.andExpect(jsonPath("$[1].lastName", is(equalTo(null))));
 	}
 
 	@Test
-	@DisplayName("Responds with the single skill provided by the internal service")
-	void respondsWithRequestedSkill() throws Exception {
-		given(skillQueryService.getSkillById("123")).willReturn(Optional.of(
-				Skill.builder().id("123").name("Angular").description("JavaScript Framework").build()));
-		mockMvc.perform(get("/skills/123").accept(MediaType.APPLICATION_JSON)
+	@DisplayName("Responds with the single user provided by the internal service")
+	void respondsWithRequestedUser() throws Exception {
+		given(userQueryService.getUserById("123")).willReturn(Optional.of(
+				User.builder().id("123").userName("tester1").firstName("firstTester").email("tester1@gmail.com").build()));
+		mockMvc.perform(get("/users/123").accept(MediaType.APPLICATION_JSON)
 				.with(user("tester").password("123").roles("USER")))
 				.andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.id", is(equalTo("123"))))
-				.andExpect(jsonPath("$.name", is(equalTo("Angular"))))
-				.andExpect(jsonPath("$.description", is(equalTo("JavaScript Framework"))));
+				.andExpect(jsonPath("$.userName", is(equalTo("tester1"))))
+				.andExpect(jsonPath("$.email", is(equalTo("tester1@gmail.com"))));
 	}
 }

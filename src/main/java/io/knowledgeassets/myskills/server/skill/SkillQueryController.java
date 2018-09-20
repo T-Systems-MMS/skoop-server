@@ -1,7 +1,6 @@
-package io.knowledgeassets.myskills.server.skill.query;
+package io.knowledgeassets.myskills.server.skill;
 
 import io.knowledgeassets.myskills.server.exception.BusinessException;
-import io.knowledgeassets.myskills.server.skill.SkillResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;

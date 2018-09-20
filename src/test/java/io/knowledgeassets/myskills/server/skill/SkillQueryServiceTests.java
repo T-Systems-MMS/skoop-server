@@ -1,7 +1,5 @@
-package io.knowledgeassets.myskills.server.skill.query;
+package io.knowledgeassets.myskills.server.skill;
 
-import io.knowledgeassets.myskills.server.skill.Skill;
-import io.knowledgeassets.myskills.server.skill.SkillRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

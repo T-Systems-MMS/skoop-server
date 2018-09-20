@@ -6,7 +6,7 @@ import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.exception.enums.Model;
 import io.knowledgeassets.myskills.server.report.UserSkillPriorityAggregationReportResult;
 import io.knowledgeassets.myskills.server.skill.Skill;
-import io.knowledgeassets.myskills.server.skill.query.SkillQueryService;
+import io.knowledgeassets.myskills.server.skill.SkillQueryService;
 import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.user.query.UserQueryService;
 import io.knowledgeassets.myskills.server.userskill.UserSkill;

@@ -13,7 +13,7 @@
 //import io.knowledgeassets.myskills.server.report.userskillreport.UserSkillReport;
 //import io.knowledgeassets.myskills.server.skill.Skill;
 //import io.knowledgeassets.myskills.server.skill.SkillRepository;
-//import io.knowledgeassets.myskills.server.skill.query.SkillQueryController;
+//import SkillQueryController;
 //import io.knowledgeassets.myskills.server.user.UserRepository;
 //
 //import io.knowledgeassets.myskills.server.userskill.UserSkillRepository;

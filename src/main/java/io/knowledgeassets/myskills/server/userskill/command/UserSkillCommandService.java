@@ -2,7 +2,7 @@ package io.knowledgeassets.myskills.server.userskill.command;
 
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.skill.command.SkillCommandService;
-import io.knowledgeassets.myskills.server.skill.query.SkillQueryService;
+import io.knowledgeassets.myskills.server.skill.SkillQueryService;
 import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.user.query.UserQueryService;
 import io.knowledgeassets.myskills.server.userskill.UserSkill;

@@ -1,18 +1,12 @@
 package io.knowledgeassets.myskills.server.report;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.knowledgeassets.myskills.server.common.Neo4jSessionFactoryConfiguration;
 import io.knowledgeassets.myskills.server.report.userskillpriorityaggregationreport.UserSkillPriorityAggregationReport;
 import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReport;
 import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReportRepository;
-import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReportResponse;
-import io.knowledgeassets.myskills.server.report.userskillpriorityreport.command.UserSkillPriorityReportCommandController;
 import io.knowledgeassets.myskills.server.report.userskillpriorityreport.command.UserSkillPriorityReportCommandService;
 import io.knowledgeassets.myskills.server.report.userskillpriorityreport.query.UserSkillPriorityReportQueryService;
 import io.knowledgeassets.myskills.server.report.userskillreport.UserSkillReport;
 import io.knowledgeassets.myskills.server.skill.Skill;
-import io.knowledgeassets.myskills.server.skill.SkillRepository;
-import io.knowledgeassets.myskills.server.skill.query.SkillQueryService;
 import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.userskill.UserSkill;
 import io.knowledgeassets.myskills.server.userskill.query.UserSkillQueryService;
@@ -23,8 +17,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import org.springframework.data.domain.Sort;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
