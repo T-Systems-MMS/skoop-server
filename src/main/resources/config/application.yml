@@ -46,6 +46,7 @@ logging:
       springframework: WARN
     root: INFO
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    console: "request #%X{RequestId}: %d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "request #%X{RequestId}: %d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
   file: logs/myskills-server.log
