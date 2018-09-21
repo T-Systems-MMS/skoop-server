@@ -1,16 +1,12 @@
 package io.knowledgeassets.myskills.server.report.userskillpriorityaggregationreport.query;
 
 import io.knowledgeassets.myskills.server.exception.BusinessException;
-import io.knowledgeassets.myskills.server.exception.EmptyInputException;
-import io.knowledgeassets.myskills.server.report.userskillpriorityaggregationreport.UserSkillPriorityAggregationReport;
 import io.knowledgeassets.myskills.server.report.userskillpriorityaggregationreport.UserSkillPriorityReportDetailsResponse;
-import io.knowledgeassets.myskills.server.report.userskillpriorityreport.query.UserSkillPriorityReportQueryService;
 import io.knowledgeassets.myskills.server.skill.SkillResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.codehaus.jackson.map.util.JSONPObject;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,9 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static java.lang.String.format;
-
-@Api(tags = "Priority UserSkillPriorityAggregationReport", description = "API allowing queries details of a specific report")
+@Api(tags = "Reports", description = "API allowing queries details of a specific report")
 @RestController
 public class UserSkillPriorityAggregationReportQueryController {
 
@@ -32,7 +26,7 @@ public class UserSkillPriorityAggregationReportQueryController {
 		this.userSkillPriorityAggregationReportQueryService = userSkillPriorityAggregationReportQueryService;
 	}
 
-	@ApiOperation(value = "Get details of a a specific report",
+	@ApiOperation(value = "Get details of a specific report",
 			notes = "Get details of a a specific report, currently stored in the system.")
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "Successful execution"),
@@ -59,9 +53,10 @@ public class UserSkillPriorityAggregationReportQueryController {
 	}
 
 	@PreAuthorize("hasRole('USER')")
+	@ApiOperation(value = "Get name of skill for a specific report details")
 	@GetMapping(path = "/reports/userskillpriorityaggregationreport/{id}",
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	public String getById(@PathVariable("id") String userSkillPriorityAggregationReportId) throws BusinessException {
-		return userSkillPriorityAggregationReportQueryService.getById(userSkillPriorityAggregationReportId ).getSkillName();
+		return userSkillPriorityAggregationReportQueryService.getById(userSkillPriorityAggregationReportId).getSkillName();
 	}
 }

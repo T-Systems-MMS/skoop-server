@@ -18,7 +18,7 @@ import java.util.List;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 
-@Api(tags = "Priority UserSkillPriorityReport", description = "API allowing queries of user skill report")
+@Api(tags = "Reports", description = "API allowing queries of user skill report")
 @RestController
 public class UserSkillReportQueryController {
 	private UserSkillReportQueryService userSkillReportQueryService;
@@ -27,7 +27,7 @@ public class UserSkillReportQueryController {
 		this.userSkillReportQueryService = userSkillReportQueryService;
 	}
 
-	@ApiOperation(value = "Get a specific userSkillPriorityAggregationReportId",
+	@ApiOperation(value = "Get all users for a specific report skill",
 			notes = "Get the list of users along with user skill information.")
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "Successful execution"),

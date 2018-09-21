@@ -15,7 +15,7 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-@Api(tags = "Priority UserSkillPriorityReport", description = "API allowing queries of reports")
+@Api(tags = "Reports", description = "API allowing queries of reports")
 @RestController
 public class UserSkillPriorityReportQueryController {
 	private UserSkillPriorityReportQueryService userSkillPriorityReportQueryService;

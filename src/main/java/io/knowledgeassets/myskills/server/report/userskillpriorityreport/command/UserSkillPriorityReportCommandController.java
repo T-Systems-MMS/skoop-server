@@ -13,7 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Api(tags = "Priority UserSkillPriorityReport", description = "API allowing modifications of reports")
+@Api(tags = "Reports", description = "API allowing modifications of reports")
 @RestController
 public class UserSkillPriorityReportCommandController {
 	private UserSkillPriorityReportCommandService userSkillPriorityReportCommandService;

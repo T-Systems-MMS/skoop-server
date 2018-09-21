@@ -14,10 +14,10 @@ import lombok.Data;
 public class UserSkillResponse {
 	@ApiModelProperty("Details of the related skill")
 	private SkillResponse skill;
-	@ApiModelProperty("Current skill level of the user (range: 0-4 where 0 = no knowledge at all, 4 = expert")
+	@ApiModelProperty("Current skill level of the user (range: 0-4 where 0 = no knowledge at all, 4 = expert)")
 	private Integer currentLevel;
-	@ApiModelProperty("Desired skill level of the user (range: 0-4 where 0 = no knowledge at all, 4 = expert")
+	@ApiModelProperty("Desired skill level of the user (range: 0-4 where 0 = no knowledge at all, 4 = expert)")
 	private Integer desiredLevel;
-	@ApiModelProperty("Priority to reach the desired level (range: 0-4 where 0 = no action needed, 4 = urgent")
+	@ApiModelProperty("Priority to reach the desired level (range: 0-4 where 0 = no action needed, 4 = urgent)")
 	private Integer priority;
 }
