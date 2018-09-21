@@ -1,6 +1,8 @@
 package io.knowledgeassets.myskills.server.skill;
 
 import io.knowledgeassets.myskills.server.exception.BusinessException;
+import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
+import io.knowledgeassets.myskills.server.exception.enums.Model;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -62,7 +64,13 @@ public class SkillQueryController {
 						.name(skill.getName())
 						.description(skill.getDescription())
 						.build())
-				.orElseThrow(() -> new IllegalArgumentException(format("Skill with ID '%s' not found", skillId)));
+				.orElseThrow(() -> {
+					String[] searchParamsMap = {"id", skillId};
+					return NoSuchResourceException.builder()
+							.model(Model.SKILL)
+							.searchParamsMap(searchParamsMap)
+							.build();
+				});
 	}
 
 	@ApiOperation(value = "If a skill with the specific skillName exists it return true, otherwise false.")

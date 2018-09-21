@@ -2,7 +2,6 @@ package io.knowledgeassets.myskills.server.exception.handler;
 
 import io.knowledgeassets.myskills.server.exception.GeneralException;
 import io.knowledgeassets.myskills.server.exception.domain.ResponseError;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.springframework.http.ResponseEntity;
 
@@ -22,16 +21,16 @@ interface IExceptionHandler {
 			getLogger().error(ex.getDebugMessage());
 		}
 		if (message != null) {
-			getLogger().error(message);
+			getLogger().error(message, ex);
 		}
 		if (ex.getSuggestion() != null) {
 			getLogger().error(ex.getSuggestion());
 		}
 	}
 
-	default void doLog(String message) {
+	default void doLog(Exception ex, String message) {
 		if (message != null) {
-			getLogger().error(message);
+			getLogger().error(message, ex);
 		}
 	}
 } 

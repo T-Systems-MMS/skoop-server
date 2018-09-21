@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+
 /**
  * This Handler is the last puzzle of all handlers(Minimum order).
  * If none of the other handlers get the error, this class will run.
@@ -34,20 +37,20 @@ public class LowLevelExceptionHandler extends ResponseEntityExceptionHandler imp
 	 */
 	@ExceptionHandler({BusinessException.class})
 	protected ResponseEntity<Object> handleBusinessException(BusinessException ex) {
-		String logMessage = String.format("Business Exception %s", ex.getLocalizedMessage());
+		String logMessage = String.format("{%s} Business Exception! %s", INTERNAL_SERVER_ERROR.value() + " " + INTERNAL_SERVER_ERROR.getReasonPhrase(), ex.getLocalizedMessage());
 		doLog(ex, logMessage);
 
-		ResponseError responseError = new ResponseError(HttpStatus.INTERNAL_SERVER_ERROR);
+		ResponseError responseError = new ResponseError(INTERNAL_SERVER_ERROR);
 		responseError.setMessage(ex.getLocalizedMessage());
 		return buildResponseEntity(ex, responseError);
 	}
 
 	@ExceptionHandler({Exception.class})
 	protected ResponseEntity<Object> unexpectedException(Exception ex, WebRequest request) {
-		String logMessage = String.format("Unexpected Exception! %s", ex.getLocalizedMessage());
-		doLog(logMessage);
+		String logMessage = String.format("{%s} Unexpected Exception! %s", INTERNAL_SERVER_ERROR.value() + " " + INTERNAL_SERVER_ERROR.getReasonPhrase(), ex.getLocalizedMessage());
+		doLog(ex, logMessage);
 
-		ResponseError responseError = new ResponseError(HttpStatus.INTERNAL_SERVER_ERROR);
+		ResponseError responseError = new ResponseError(INTERNAL_SERVER_ERROR);
 		responseError.setMessage(ex.getLocalizedMessage());
 
 		return buildResponseEntity(ex, responseError);

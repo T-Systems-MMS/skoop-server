@@ -1,8 +1,6 @@
 package io.knowledgeassets.myskills.server.userskill.query;
 
 import io.knowledgeassets.myskills.server.exception.BusinessException;
-import io.knowledgeassets.myskills.server.exception.EmptyInputException;
-import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

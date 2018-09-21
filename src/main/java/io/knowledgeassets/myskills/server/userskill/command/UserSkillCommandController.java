@@ -1,6 +1,7 @@
 package io.knowledgeassets.myskills.server.userskill.command;
 
 import io.knowledgeassets.myskills.server.aspect.CheckBindingResult;
+import io.knowledgeassets.myskills.server.exception.EmptyInputException;
 import io.knowledgeassets.myskills.server.skill.SkillResponse;
 import io.knowledgeassets.myskills.server.userskill.UserSkill;
 import io.knowledgeassets.myskills.server.userskill.UserSkillResponse;
@@ -56,7 +57,9 @@ public class UserSkillCommandController {
 			userSkill = userSkillCommandService.createUserSkillBySkillName(userId, request.getSkillName(),
 					request.getCurrentLevel(), request.getDesiredLevel(), request.getPriority());
 		} else {
-			throw new IllegalArgumentException("Either the property 'skillId' or 'skillName' is required!");
+			throw EmptyInputException.builder()
+					.message("Either the property 'skillId' or 'skillName' is required!")
+					.build();
 		}
 		return ResponseEntity.status(HttpStatus.CREATED).body(UserSkillResponse.builder()
 				.skill(SkillResponse.builder()

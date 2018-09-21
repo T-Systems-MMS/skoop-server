@@ -2,6 +2,8 @@ package io.knowledgeassets.myskills.server.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.knowledgeassets.myskills.server.common.Neo4jSessionFactoryConfiguration;
+import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
+import io.knowledgeassets.myskills.server.exception.enums.Model;
 import io.knowledgeassets.myskills.server.user.command.UserCommandController;
 import io.knowledgeassets.myskills.server.user.command.UserCommandService;
 import org.junit.jupiter.api.DisplayName;
@@ -75,7 +77,7 @@ public class UserCommandControllerTests {
 				.willReturn(User.builder().id("123").userName("tester1").firstName("firstTester").email("tester1@gmail.com").coach(true).build());
 
 		String userId = "123";
-		mockMvc.perform(put("/users/" + userId )
+		mockMvc.perform(put("/users/" + userId)
 				.contentType(MediaType.APPLICATION_JSON_UTF8)
 				.content(userRequestAsString)
 				.with(csrf())
@@ -107,20 +109,22 @@ public class UserCommandControllerTests {
 	@DisplayName("Delete User that does not exist")
 	public void deleteUser_ThrowsException() throws Exception {
 
-		doThrow(new IllegalArgumentException("User with ID 123 not found")).when(userCommandService).deleteUser("123");
+		doThrow(NoSuchResourceException.builder()
+				.model(Model.USER).searchParamsMap(new String[]{"id", "123"}).build()
+		).when(userCommandService).deleteUser("123");
 
 		String userId = "123";
 		MvcResult mvcResult = mockMvc.perform(delete("/users/" + userId)
 				.contentType(MediaType.APPLICATION_JSON_UTF8)
 				.with(csrf())
 				.with(user("tester").password("123").roles("USER")))
-				.andExpect(status().isInternalServerError())
+				.andExpect(status().isNotFound())
 				.andReturn();
 
 		String responseJson = mvcResult.getResponse().getContentAsString();
 
-		IllegalArgumentException exception = objectMapper.readValue(responseJson, IllegalArgumentException.class);
-		assertThat(exception.getMessage()).isEqualTo("User with ID 123 not found");
+		Exception exception = objectMapper.readValue(responseJson, Exception.class);
+		assertThat(exception.getMessage()).isEqualTo("User was not found for parameters {id=123}");
 	}
 
 }

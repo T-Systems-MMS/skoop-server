@@ -1,5 +1,7 @@
 package io.knowledgeassets.myskills.server.user.query;
 
+import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
+import io.knowledgeassets.myskills.server.exception.enums.Model;
 import io.knowledgeassets.myskills.server.user.UserResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -67,6 +69,12 @@ public class UserQueryController {
 						.email(user.getEmail())
 						.coach(user.getCoach())
 						.build())
-				.orElseThrow(() -> new IllegalArgumentException(format("User with ID '%s' not found", userId)));
+				.orElseThrow(() -> {
+					String[] searchParamsMap = {"id", userId};
+					return NoSuchResourceException.builder()
+							.model(Model.USER)
+							.searchParamsMap(searchParamsMap)
+							.build();
+				});
 	}
 }

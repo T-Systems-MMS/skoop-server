@@ -39,7 +39,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 			MissingServletRequestParameterException ex, HttpHeaders headers,
 			HttpStatus status, WebRequest request) {
 		String logMessage = String.format("%s parameter is missing", ex.getParameterName());
-		doLog(logMessage);
+		doLog(ex, logMessage);
 
 		ResponseError responseError = new ResponseError(BAD_REQUEST);
 		responseError.setMessage(logMessage);
@@ -70,7 +70,7 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
 		ex.getSupportedMediaTypes().forEach(t -> builder.append(t).append(", "));
 
 		String logMessage = builder.substring(0, builder.length() - 2);
-		doLog(logMessage);
+		doLog(ex, logMessage);
 
 		ResponseError responseError = new ResponseError(UNSUPPORTED_MEDIA_TYPE);
 		responseError.setMessage(logMessage);

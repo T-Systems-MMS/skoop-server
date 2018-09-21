@@ -1,5 +1,8 @@
 package io.knowledgeassets.myskills.server.userskill.command;
 
+import io.knowledgeassets.myskills.server.exception.DuplicateResourceException;
+import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
+import io.knowledgeassets.myskills.server.exception.enums.Model;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.skill.command.SkillCommandService;
 import io.knowledgeassets.myskills.server.skill.SkillQueryService;
@@ -41,13 +44,24 @@ public class UserSkillCommandService {
 	public UserSkill createUserSkillBySkillId(String userId, String skillId, Integer currentLevel, Integer desiredLevel,
 											  Integer priority) {
 		userSkillRepository.findByUserIdAndSkillId(userId, skillId).ifPresent(userSkill -> {
-			throw new IllegalArgumentException(format("User with ID '%s' is already related to skill with ID '%s'",
-					userId, skillId));
+			throw DuplicateResourceException.builder()
+					.message(format("User with ID '%s' is already related to skill with ID '%s'", userId, skillId))
+					.build();
 		});
-		User user = userQueryService.getUserById(userId).orElseThrow(() -> new IllegalArgumentException(
-				format("User with ID '%s' not found", userId)));
-		Skill skill = skillQueryService.getSkillById(skillId).orElseThrow(() -> new IllegalArgumentException(
-				format("Skill with ID '%s' not found", skillId)));
+		User user = userQueryService.getUserById(userId).orElseThrow(() -> {
+			String[] searchParamsMap = {"id", userId};
+			return NoSuchResourceException.builder()
+					.model(Model.USER)
+					.searchParamsMap(searchParamsMap)
+					.build();
+		});
+		Skill skill = skillQueryService.getSkillById(skillId).orElseThrow(() -> {
+			String[] searchParamsMap = {"id", skillId};
+			return NoSuchResourceException.builder()
+					.model(Model.SKILL)
+					.searchParamsMap(searchParamsMap)
+					.build();
+		});
 		return userSkillRepository.save(UserSkill.builder()
 				.id(userId + ';' + skillId)
 				.user(user)
@@ -83,6 +97,7 @@ public class UserSkillCommandService {
 		UserSkill userSkill = userSkillRepository.findByUserIdAndSkillId(userId, skillId)
 				.orElseThrow(() -> new IllegalArgumentException(
 						format("User with ID '%s' is not related to skill with ID '%s'", userId, skillId)));
+
 		userSkill.setCurrentLevel(currentLevel);
 		userSkill.setDesiredLevel(desiredLevel);
 		userSkill.setPriority(priority);

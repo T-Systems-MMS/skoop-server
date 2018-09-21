@@ -1,5 +1,9 @@
 package io.knowledgeassets.myskills.server.skill.command;
 
+import io.knowledgeassets.myskills.server.exception.DuplicateResourceException;
+import io.knowledgeassets.myskills.server.exception.EmptyInputException;
+import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
+import io.knowledgeassets.myskills.server.exception.enums.Model;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.skill.SkillRepository;
 import org.springframework.stereotype.Service;
@@ -20,7 +24,9 @@ public class SkillCommandService {
 	@Transactional
 	public Skill createSkill(String name, String description) {
 		skillRepository.findByNameIgnoreCase(name).ifPresent(skill -> {
-			throw new IllegalArgumentException(format("Skill with name '%s' already exists", name));
+			throw DuplicateResourceException.builder()
+					.message(format("Skill with name '%s' already exists", name))
+					.build();
 		});
 		return skillRepository.save(Skill.builder()
 				.id(UUID.randomUUID().toString())
@@ -31,8 +37,13 @@ public class SkillCommandService {
 
 	@Transactional
 	public Skill updateSkill(String id, String name, String description) {
-		Skill skill = skillRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(
-				format("Skill with ID '%s' not found", id)));
+		Skill skill = skillRepository.findById(id).orElseThrow(() -> {
+			String[] searchParamsMap = {"id", id};
+			return NoSuchResourceException.builder()
+					.model(Model.SKILL)
+					.searchParamsMap(searchParamsMap)
+					.build();
+		});
 		skill.setName(name);
 		skill.setDescription(description);
 		return skillRepository.save(skill);
@@ -40,8 +51,13 @@ public class SkillCommandService {
 
 	@Transactional
 	public void deleteSkill(String id) {
-		Skill skill = skillRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(
-				format("Skill with ID '%s' not found", id)));
+		Skill skill = skillRepository.findById(id).orElseThrow(() -> {
+			String[] searchParamsMap = {"id", id};
+			return NoSuchResourceException.builder()
+					.model(Model.SKILL)
+					.searchParamsMap(searchParamsMap)
+					.build();
+		});
 		skillRepository.delete(skill);
 	}
 }

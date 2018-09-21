@@ -1,5 +1,8 @@
 package io.knowledgeassets.myskills.server.user.command;
 
+import io.knowledgeassets.myskills.server.exception.DuplicateResourceException;
+import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
+import io.knowledgeassets.myskills.server.exception.enums.Model;
 import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.user.UserRepository;
 import io.knowledgeassets.myskills.server.user.UserRequest;
@@ -30,7 +33,9 @@ public class UserCommandService {
 	@Transactional
 	public User createUser(String userName, String firstName, String lastName, String email) {
 		userRepository.findByUserName(userName).ifPresent(user -> {
-			throw new IllegalArgumentException(format("User with name '%s' already exists", userName));
+			throw DuplicateResourceException.builder()
+					.message(format("User with name '%s' already exists", userName))
+					.build();
 		});
 		return userRepository.save(User.builder()
 				.id(UUID.randomUUID().toString())
@@ -52,16 +57,26 @@ public class UserCommandService {
 	 */
 	@Transactional
 	public User updateUser(String id, UserRequest userRequest) {
-		User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(
-				format("User with ID '%s' not found", id)));
+		User user = userRepository.findById(id).orElseThrow(() -> {
+			String[] searchParamsMap = {"id", id};
+			return NoSuchResourceException.builder()
+					.model(Model.USER)
+					.searchParamsMap(searchParamsMap)
+					.build();
+		});
 		user.setCoach(userRequest.getCoach());
 		return userRepository.save(user);
 	}
 
 	@Transactional
 	public void deleteUser(String id) {
-		User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(
-				format("User with ID '%s' not found", id)));
+		User user = userRepository.findById(id).orElseThrow(() -> {
+			String[] searchParamsMap = {"id", id};
+			return NoSuchResourceException.builder()
+					.model(Model.USER)
+					.searchParamsMap(searchParamsMap)
+					.build();
+		});
 		userRepository.delete(user);
 	}
 

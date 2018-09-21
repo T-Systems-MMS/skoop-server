@@ -36,7 +36,7 @@ public class BusinessExceptionsHandler extends ResponseEntityExceptionHandler im
 	 */
 	@ExceptionHandler({DuplicateResourceException.class})
 	protected ResponseEntity<Object> handleDuplicateResource(DuplicateResourceException ex, WebRequest request) {
-		String logMessage = String.format("The resource already exists! %s", ex.getLocalizedMessage());
+		String logMessage = String.format("{%s} The resource already exists! %s", CONFLICT.value() + " " + CONFLICT.getReasonPhrase(), ex.getLocalizedMessage());
 		doLog(ex, logMessage);
 
 		ResponseError responseError = new ResponseError(CONFLICT);
@@ -51,7 +51,7 @@ public class BusinessExceptionsHandler extends ResponseEntityExceptionHandler im
 	@ExceptionHandler(NoSuchResourceException.class)
 	protected ResponseEntity<Object> handleNoSuchResource(
 			NoSuchResourceException ex) {
-		String logMessage = String.format("The resource doesn't exist! %s", ex.getLocalizedMessage());
+		String logMessage = String.format("{%s} The resource doesn't exist! %s", NOT_FOUND.value() + " " + NOT_FOUND.getReasonPhrase(), ex.getLocalizedMessage());
 		doLog(ex, logMessage);
 
 		ResponseError responseError = new ResponseError(NOT_FOUND);
@@ -65,7 +65,7 @@ public class BusinessExceptionsHandler extends ResponseEntityExceptionHandler im
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
 		ResponseError responseError = new ResponseError(BAD_REQUEST);
-		responseError.setMessage("Validation error");
+		responseError.setMessage("Validation error!");
 		responseError.addValidationErrors(ex.getBindingResult().getFieldErrors());
 		responseError.addValidationError(ex.getBindingResult().getGlobalErrors());
 
@@ -75,7 +75,7 @@ public class BusinessExceptionsHandler extends ResponseEntityExceptionHandler im
 			for (ResponseValidationError subError : responseError.getSubErrors()) {
 				errorDetails.append(subError.getField()).append(" ").append(subError.getMessage());
 			}
-			logMessage = String.format("Validation error - %s", errorDetails.toString());
+			logMessage = String.format("{%s} Validation error - %s", BAD_REQUEST.value() + " " + BAD_REQUEST.getReasonPhrase(), errorDetails.toString());
 		} else {
 			logMessage = "Validation error";
 		}

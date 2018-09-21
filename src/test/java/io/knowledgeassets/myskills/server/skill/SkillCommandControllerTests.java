@@ -2,6 +2,8 @@ package io.knowledgeassets.myskills.server.skill;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.knowledgeassets.myskills.server.common.Neo4jSessionFactoryConfiguration;
+import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
+import io.knowledgeassets.myskills.server.exception.enums.Model;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.skill.SkillRequest;
 import io.knowledgeassets.myskills.server.skill.command.SkillCommandController;
@@ -103,20 +105,23 @@ public class SkillCommandControllerTests {
 	@DisplayName("Delete Skill that does not exist")
 	public void deleteSkill_ThrowsException() throws Exception {
 
-		doThrow(new IllegalArgumentException("Skill with ID 123 not found")).when(skillCommandService).deleteSkill("123");
+		doThrow(NoSuchResourceException.builder()
+				.model(Model.SKILL)
+				.searchParamsMap(new String[]{"id", "123"})
+				.build()).when(skillCommandService).deleteSkill("123");
 
 		String skillId = "123";
 		MvcResult mvcResult = mockMvc.perform(delete("/skills/" + skillId)
 				.contentType(MediaType.APPLICATION_JSON_UTF8)
 				.with(csrf())
 				.with(user("tester").password("123").roles("USER")))
-				.andExpect(status().isInternalServerError())
+				.andExpect(status().isNotFound())
 				.andReturn();
 
 		String responseJson = mvcResult.getResponse().getContentAsString();
 
-		IllegalArgumentException exception = objectMapper.readValue(responseJson, IllegalArgumentException.class);
-		assertThat(exception.getMessage()).isEqualTo("Skill with ID 123 not found");
+		Exception exception = objectMapper.readValue(responseJson, Exception.class);
+		assertThat(exception.getMessage()).isEqualTo("Skill was not found for parameters {id=123}");
 	}
 
 }
