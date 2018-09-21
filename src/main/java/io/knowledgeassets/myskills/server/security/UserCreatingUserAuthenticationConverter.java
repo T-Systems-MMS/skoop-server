@@ -1,5 +1,6 @@
 package io.knowledgeassets.myskills.server.security;
 
+import io.knowledgeassets.myskills.server.exception.InvalidInputException;
 import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.user.command.UserCommandService;
 import io.knowledgeassets.myskills.server.user.query.UserQueryService;
@@ -90,6 +91,6 @@ public class UserCreatingUserAuthenticationConverter extends DefaultUserAuthenti
 			return AuthorityUtils.commaSeparatedStringToAuthorityList(StringUtils
 					.collectionToCommaDelimitedString((Collection<?>) authorities));
 		}
-		throw new IllegalArgumentException("Authorities must be either a String or a Collection");
+		throw InvalidInputException.builder().message("Authorities must be either a String or a Collection").build();
 	}
 }

@@ -1,5 +1,6 @@
 package io.knowledgeassets.myskills.server.user;
 
+import io.knowledgeassets.myskills.server.exception.DuplicateResourceException;
 import io.knowledgeassets.myskills.server.user.command.UserCommandService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -49,7 +50,7 @@ class UserCommandServiceTests {
 		given(userRepository.findByUserName("tester1")).willReturn(Optional.of(
 				User.builder().id("123").userName("tester1").firstName("firstTester").email("tester1@gmail.com").build()));
 
-		assertThrows(IllegalArgumentException.class, () -> {
+		assertThrows(DuplicateResourceException.class, () -> {
 			userCommandService.createUser("tester1", "firstTester", null, "tester1@gmail.com");
 		});
 	}

@@ -1,5 +1,6 @@
 package io.knowledgeassets.myskills.server.userskill.query;
 
+import io.knowledgeassets.myskills.server.exception.InvalidInputException;
 import io.knowledgeassets.myskills.server.skill.SkillResponse;
 import io.knowledgeassets.myskills.server.user.UserResponse;
 import io.knowledgeassets.myskills.server.userskill.UserSkillResponse;
@@ -77,8 +78,9 @@ public class UserSkillQueryController {
 						.desiredLevel(userSkill.getDesiredLevel())
 						.priority(userSkill.getPriority())
 						.build())
-				.orElseThrow(() -> new IllegalArgumentException(
-						format("User with ID '%s' not related to skill with ID '%s'", userId, skillId)));
+				.orElseThrow(() -> InvalidInputException.builder()
+						.message(format("User with ID '%s' is not related to skill with ID '%s'", userId, skillId))
+						.build());
 	}
 
 	@ApiOperation(value = "Get all coaches for a specific skill related to a specific user",

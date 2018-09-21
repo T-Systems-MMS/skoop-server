@@ -1,5 +1,6 @@
 package io.knowledgeassets.myskills.server.skill;
 
+import io.knowledgeassets.myskills.server.exception.DuplicateResourceException;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.skill.SkillRepository;
 import io.knowledgeassets.myskills.server.skill.command.SkillCommandService;
@@ -49,7 +50,7 @@ class SkillCommandServiceTests {
 		given(skillRepository.findByNameIgnoreCase("Java")).willReturn(Optional.of(
 				Skill.builder().id("34").name("Java").description("A programming language").build()));
 
-		assertThrows(IllegalArgumentException.class, () -> {
+		assertThrows(DuplicateResourceException.class, () -> {
 			skillCommandService.createSkill("Java", "A programming language");
 		});
 	}

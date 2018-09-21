@@ -1,6 +1,7 @@
 package io.knowledgeassets.myskills.server.userskill.command;
 
 import io.knowledgeassets.myskills.server.aspect.CheckBindingResult;
+import io.knowledgeassets.myskills.server.exception.BusinessException;
 import io.knowledgeassets.myskills.server.exception.EmptyInputException;
 import io.knowledgeassets.myskills.server.skill.SkillResponse;
 import io.knowledgeassets.myskills.server.userskill.UserSkill;
@@ -91,8 +92,15 @@ public class UserSkillCommandController {
 											 @PathVariable("skillId") String skillId,
 											 @Valid @RequestBody UpdateUserSkillRequest request,
 											 BindingResult bindingResult) {
-		UserSkill userSkill = userSkillCommandService.updateUserSkill(userId, skillId, request.getCurrentLevel(),
-				request.getDesiredLevel(), request.getPriority());
+		UserSkill userSkill = null;
+		try {
+			userSkill = userSkillCommandService.updateUserSkill(userId, skillId, request.getCurrentLevel(),
+					request.getDesiredLevel(), request.getPriority());
+		} catch (BusinessException e) {
+			e.setDebugMessage("An exception has occurred in updating a relationship between a user and a skill!");
+			e.setSuggestion("Make sure that the skill is related to the user!");
+			throw e;
+		}
 		return UserSkillResponse.builder()
 				.skill(SkillResponse.builder()
 						.id(userSkill.getSkill().getId())

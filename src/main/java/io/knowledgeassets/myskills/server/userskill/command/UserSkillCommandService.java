@@ -1,6 +1,7 @@
 package io.knowledgeassets.myskills.server.userskill.command;
 
 import io.knowledgeassets.myskills.server.exception.DuplicateResourceException;
+import io.knowledgeassets.myskills.server.exception.InvalidInputException;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.exception.enums.Model;
 import io.knowledgeassets.myskills.server.skill.Skill;
@@ -95,8 +96,8 @@ public class UserSkillCommandService {
 	public UserSkill updateUserSkill(String userId, String skillId, Integer currentLevel, Integer desiredLevel,
 									 Integer priority) {
 		UserSkill userSkill = userSkillRepository.findByUserIdAndSkillId(userId, skillId)
-				.orElseThrow(() -> new IllegalArgumentException(
-						format("User with ID '%s' is not related to skill with ID '%s'", userId, skillId)));
+				.orElseThrow(() -> InvalidInputException.builder().message(
+						format("User with ID '%s' is not related to skill with ID '%s'", userId, skillId)).build());
 
 		userSkill.setCurrentLevel(currentLevel);
 		userSkill.setDesiredLevel(desiredLevel);
@@ -107,8 +108,8 @@ public class UserSkillCommandService {
 	@Transactional
 	public void deleteUserSkill(String userId, String skillId) {
 		UserSkill userSkill = userSkillRepository.findByUserIdAndSkillId(userId, skillId)
-				.orElseThrow(() -> new IllegalArgumentException(
-						format("User with ID '%s' is not related to skill with ID '%s'", userId, skillId)));
+				.orElseThrow(() -> InvalidInputException.builder().message(
+						format("User with ID '%s' is not related to skill with ID '%s'", userId, skillId)).build());
 		userSkillRepository.delete(userSkill);
 	}
 }

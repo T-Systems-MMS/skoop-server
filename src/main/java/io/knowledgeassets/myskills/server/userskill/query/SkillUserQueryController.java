@@ -2,6 +2,7 @@ package io.knowledgeassets.myskills.server.userskill.query;
 
 import io.knowledgeassets.myskills.server.exception.BusinessException;
 import io.knowledgeassets.myskills.server.exception.EmptyInputException;
+import io.knowledgeassets.myskills.server.exception.InvalidInputException;
 import io.knowledgeassets.myskills.server.user.UserResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -85,7 +86,7 @@ public class SkillUserQueryController {
 						.desiredLevel(userSkill.getDesiredLevel())
 						.priority(userSkill.getPriority())
 						.build())
-				.orElseThrow(() -> new IllegalArgumentException(
-						format("Skill with ID '%s' not related to user with ID '%s'", skillId, userId)));
+				.orElseThrow(() -> InvalidInputException.builder().message(
+						format("Skill with ID '%s' is not related to user with ID '%s'", skillId, userId)).build());
 	}
 }
