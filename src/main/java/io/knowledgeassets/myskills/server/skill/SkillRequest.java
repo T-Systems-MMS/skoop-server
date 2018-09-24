@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @Data
 @AllArgsConstructor
@@ -20,6 +21,7 @@ public class SkillRequest {
 
 	@ApiModelProperty("Name of a skill. It cannot be blank.")
 	@NotBlank
+	@Size(min = 3, max = 64)
 	private String name;
 
 	@ApiModelProperty("Description of a skill.")

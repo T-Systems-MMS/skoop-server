@@ -20,7 +20,7 @@ public class Skill {
 	private String id;
 
 	@NotBlank
-	@Size(max = 64)
+	@Size(min = 3, max = 64)
 	@Property(name = "name")
 	@Index(unique = true)
 	private String name;

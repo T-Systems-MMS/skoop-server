@@ -22,7 +22,7 @@ public class CreateUserSkillRequest {
 	private String skillId;
 
 	@ApiModelProperty("Skill name")
-	@Size(max = 64)
+	@Size(min = 3, max = 64)
 	private String skillName;
 
 	@ApiModelProperty("Current skill level of the user (range: 0-4 where 0 = no knowledge at all, 4 = expert")
