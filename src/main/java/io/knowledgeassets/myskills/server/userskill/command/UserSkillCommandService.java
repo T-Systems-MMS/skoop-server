@@ -6,11 +6,13 @@ import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.exception.enums.Model;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.skill.command.SkillCommandService;
-import io.knowledgeassets.myskills.server.skill.SkillQueryService;
+import io.knowledgeassets.myskills.server.skill.query.SkillQueryService;
 import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.user.query.UserQueryService;
 import io.knowledgeassets.myskills.server.userskill.UserSkill;
 import io.knowledgeassets.myskills.server.userskill.UserSkillRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -92,13 +94,17 @@ public class UserSkillCommandService {
 		return createUserSkillBySkillId(userId, skill.getId(), currentLevel, desiredLevel, priority);
 	}
 
+	/**
+	 * this authentication.userAuthentication.Principal returns the UserIdentity object.
+	 * We can use any of below codes to make sure that only owner or Admin users can change the userSkill records.
+	 *
+	 * @PreAuthorize("#userSkill.user.id.equals(authentication.userAuthentication.Principal.userId)")
+	 * @PreAuthorize("#userSkill.user.userName.equals(authentication.userAuthentication.Principal.userName)")
+	 * @PreAuthorize("#userSkill.user.userName == authentication.name")
+	 */
 	@Transactional
-	public UserSkill updateUserSkill(String userId, String skillId, Integer currentLevel, Integer desiredLevel,
-									 Integer priority) {
-		UserSkill userSkill = userSkillRepository.findByUserIdAndSkillId(userId, skillId)
-				.orElseThrow(() -> InvalidInputException.builder().message(
-						format("User with ID '%s' is not related to skill with ID '%s'", userId, skillId)).build());
-
+	@PreAuthorize("#userSkill.user.userName.equals(authentication.userAuthentication.Principal.userName) || hasRole('ADMIN')")
+	public UserSkill updateUserSkill(Integer currentLevel, Integer desiredLevel, Integer priority, UserSkill userSkill) {
 		userSkill.setCurrentLevel(currentLevel);
 		userSkill.setDesiredLevel(desiredLevel);
 		userSkill.setPriority(priority);
@@ -106,10 +112,14 @@ public class UserSkillCommandService {
 	}
 
 	@Transactional
-	public void deleteUserSkill(String userId, String skillId) {
-		UserSkill userSkill = userSkillRepository.findByUserIdAndSkillId(userId, skillId)
+	public void deleteUserSkill(UserSkill userSkill) {
+		userSkillRepository.delete(userSkill);
+	}
+
+	@Transactional(readOnly = true)
+	public UserSkill getUserSkill(String userId, String skillId) {
+		return userSkillRepository.findByUserIdAndSkillId(userId, skillId)
 				.orElseThrow(() -> InvalidInputException.builder().message(
 						format("User with ID '%s' is not related to skill with ID '%s'", userId, skillId)).build());
-		userSkillRepository.delete(userSkill);
 	}
 }

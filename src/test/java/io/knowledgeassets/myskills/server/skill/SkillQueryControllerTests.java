@@ -1,6 +1,8 @@
 package io.knowledgeassets.myskills.server.skill;
 
 import io.knowledgeassets.myskills.server.common.Neo4jSessionFactoryConfiguration;
+import io.knowledgeassets.myskills.server.skill.query.SkillQueryController;
+import io.knowledgeassets.myskills.server.skill.query.SkillQueryService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

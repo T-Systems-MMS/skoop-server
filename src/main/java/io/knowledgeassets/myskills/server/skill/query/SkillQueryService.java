@@ -1,4 +1,4 @@
-package io.knowledgeassets.myskills.server.skill;
+package io.knowledgeassets.myskills.server.skill.query;
 
 import io.knowledgeassets.myskills.server.exception.EmptyInputException;
 import io.knowledgeassets.myskills.server.skill.Skill;

@@ -2,8 +2,10 @@ package io.knowledgeassets.myskills.server.userskill.command;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.*;
 
@@ -12,6 +14,8 @@ import javax.validation.constraints.*;
 @ApiModel(value = "CreateUserSkillRequest"
 		, description = "Request object for Creating a new relationship between a user and a skill. " +
 		"UserId will be provided by PathVariable in Controller")
+@NoArgsConstructor
+@AllArgsConstructor
 public class CreateUserSkillRequest {
 
 	@ApiModelProperty("Skill id")

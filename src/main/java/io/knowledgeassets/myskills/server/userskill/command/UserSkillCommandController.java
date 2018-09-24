@@ -94,8 +94,9 @@ public class UserSkillCommandController {
 											 BindingResult bindingResult) {
 		UserSkill userSkill = null;
 		try {
-			userSkill = userSkillCommandService.updateUserSkill(userId, skillId, request.getCurrentLevel(),
-					request.getDesiredLevel(), request.getPriority());
+			userSkill = userSkillCommandService.getUserSkill(userId, skillId);
+			userSkill = userSkillCommandService.updateUserSkill(request.getCurrentLevel(),
+					request.getDesiredLevel(), request.getPriority(), userSkill);
 		} catch (BusinessException e) {
 			e.setDebugMessage("An exception has occurred in updating a relationship between a user and a skill!");
 			e.setSuggestion("Make sure that the skill is related to the user!");
@@ -125,7 +126,7 @@ public class UserSkillCommandController {
 	@DeleteMapping(path = "/users/{userId}/skills/{skillId}")
 	public ResponseEntity<Void> deleteUserSkill(@PathVariable("userId") String userId,
 												@PathVariable("skillId") String skillId) {
-		userSkillCommandService.deleteUserSkill(userId, skillId);
+		userSkillCommandService.deleteUserSkill(userSkillCommandService.getUserSkill(userId, skillId));
 		return ResponseEntity.noContent().build();
 	}
 }

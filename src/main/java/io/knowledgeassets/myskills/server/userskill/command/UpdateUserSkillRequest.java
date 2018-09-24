@@ -2,8 +2,10 @@ package io.knowledgeassets.myskills.server.userskill.command;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -12,6 +14,8 @@ import javax.validation.constraints.Min;
 @Builder
 @ApiModel(value = "UpdateUserSkillRequest",
 		description = "Request object for updating a relationship between a user and a skill.")
+@NoArgsConstructor
+@AllArgsConstructor
 public class UpdateUserSkillRequest {
 
 	@ApiModelProperty("Current skill level of the user (range: 0-4 where 0 = no knowledge at all, 4 = expert")

@@ -1,8 +1,9 @@
-package io.knowledgeassets.myskills.server.skill;
+package io.knowledgeassets.myskills.server.skill.query;
 
 import io.knowledgeassets.myskills.server.exception.BusinessException;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.exception.enums.Model;
+import io.knowledgeassets.myskills.server.skill.SkillResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
