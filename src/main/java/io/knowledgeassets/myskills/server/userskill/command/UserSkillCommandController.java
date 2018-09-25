@@ -42,7 +42,7 @@ public class UserSkillCommandController {
 			@ApiResponse(code = 404, message = "Resource not found"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("hasRole('USER')")
+	@PreAuthorize("(hasRole('USER') && #userId.equals(authentication.userAuthentication.Principal.userId)) || hasRole('ADMIN')")
 	@PostMapping(path = "/users/{userId}/skills",
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE)
