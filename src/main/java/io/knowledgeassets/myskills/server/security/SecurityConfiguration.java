@@ -2,6 +2,7 @@ package io.knowledgeassets.myskills.server.security;
 
 import io.knowledgeassets.myskills.server.user.command.UserCommandService;
 import io.knowledgeassets.myskills.server.user.query.UserQueryService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,11 +26,14 @@ import java.util.Set;
 public class SecurityConfiguration extends ResourceServerConfigurerAdapter {
 	private final ResourceServerProperties resourceServerProperties;
 	private final MySkillsProperties mySkillsProperties;
+	private final String apiSpecPath;
 
 	public SecurityConfiguration(ResourceServerProperties resourceServerProperties,
-								 MySkillsProperties mySkillsProperties) {
+								 MySkillsProperties mySkillsProperties,
+								 @Value("${springfox.documentation.swagger.v2.path}") String apiSpecPath) {
 		this.resourceServerProperties = resourceServerProperties;
 		this.mySkillsProperties = mySkillsProperties;
+		this.apiSpecPath = apiSpecPath;
 	}
 
 	@Bean
@@ -68,7 +72,7 @@ public class SecurityConfiguration extends ResourceServerConfigurerAdapter {
 				"/swagger-ui.html",
 				"/webjars/**",
 				"/swagger-resources/**",
-				"/api-spec").permitAll()
+				apiSpecPath).permitAll()
 				.anyRequest().authenticated()
 				// TODO: Use cookie-based CSRF token repository for production
 //				.and().csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())

@@ -1,11 +1,6 @@
 logging:
   level:
-    io:
-      knowledgeassets:
-        myskills:
-          server: WARN
-    org:
-      springframework:
-        security: ERROR
-        web: ERROR
+    # Set overall log level to warning by default.
     root: WARN
+  # Default log file name.
+  file: logs/myskills-server.log
