@@ -1,7 +1,6 @@
 package io.knowledgeassets.myskills.server.userskill;
 
-import io.knowledgeassets.myskills.server.report.UserSkillPriorityAggregationReportResult;
-import io.knowledgeassets.myskills.server.report.userskillpriorityaggregationreport.UserSkillPriorityAggregationReport;
+import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityAggregationReportResult;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.user.User;
 import org.springframework.data.neo4j.annotation.Query;
@@ -36,14 +35,14 @@ public interface UserSkillRepository extends Neo4jRepository<UserSkill, String> 
 			"MAX(userSkill.priority) AS maximumPriority, COUNT(*) AS userCount " +
 			"ORDER BY AVG(userSkill.priority) DESC, COUNT(*) DESC, MAX(userSkill.priority) DESC " +
 			"LIMIT 10")
-	Iterable<UserSkillPriorityAggregation> findTop10PrioritizedSkills();
+	Iterable<UserSkillPriorityAggregationResult> findTop10PrioritizedSkills();
 
 	@Query("MATCH (skill:Skill)-[userSkill:RELATED_TO]-(user:User) " +
 			"WHERE userSkill.priority > 0 " +
 			"RETURN skill AS skill, AVG(userSkill.priority) AS averagePriority, " +
-			"MAX(userSkill.priority) AS maximumPriority, COUNT(*) AS userCount, collect (user) AS users  " +
+			"MAX(userSkill.priority) AS maximumPriority, COUNT(*) AS userCount, COLLECT(user) AS users " +
 			"ORDER BY AVG(userSkill.priority) DESC, COUNT(*) DESC, MAX(userSkill.priority) DESC ")
-	Iterable<UserSkillPriorityAggregationReportResult> findPrioritizedSkillsToCreateReport();
+	Iterable<UserSkillPriorityAggregationReportResult> findAllPrioritizedSkills();
 
 	@Query("MATCH (skill:Skill) " +
 			"WHERE NOT EXISTS((skill)-[:RELATED_TO]-(:User {id:{userId}})) " +

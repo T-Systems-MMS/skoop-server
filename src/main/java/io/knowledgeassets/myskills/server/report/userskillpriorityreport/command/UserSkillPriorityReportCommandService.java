@@ -1,109 +1,98 @@
 package io.knowledgeassets.myskills.server.report.userskillpriorityreport.command;
 
-import io.knowledgeassets.myskills.server.report.UserSkillPriorityAggregationReportResult;
-import io.knowledgeassets.myskills.server.report.userskillpriorityaggregationreport.UserSkillPriorityAggregationReport;
+import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityAggregationReportResult;
+import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityAggregationReport;
 import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReport;
 import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReportRepository;
-import io.knowledgeassets.myskills.server.report.userskillpriorityreport.query.UserSkillPriorityReportQueryService;
 import io.knowledgeassets.myskills.server.report.userskillreport.UserSkillReport;
-import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.userskill.UserSkill;
-import io.knowledgeassets.myskills.server.userskill.UserSkillRepository;
 import io.knowledgeassets.myskills.server.userskill.query.UserSkillQueryService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Stream;
+
+import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
 
 @Service
 public class UserSkillPriorityReportCommandService {
-
 	private UserSkillPriorityReportRepository userSkillPriorityReportRepository;
 	private UserSkillQueryService userSkillQueryService;
-	private UserSkillPriorityReportQueryService userSkillPriorityReportQueryService;
 
 	public UserSkillPriorityReportCommandService(UserSkillPriorityReportRepository userSkillPriorityReportRepository,
-												 UserSkillQueryService userSkillQueryService,
-												 UserSkillPriorityReportQueryService userSkillPriorityReportQueryService) {
+												 UserSkillQueryService userSkillQueryService) {
 		this.userSkillPriorityReportRepository = userSkillPriorityReportRepository;
 		this.userSkillQueryService = userSkillQueryService;
-		this.userSkillPriorityReportQueryService = userSkillPriorityReportQueryService;
 	}
 
 	/**
-	 * Create a report
-	 * for creating a report we need to do below steps:
-	 * 1- read data from existing data.
-	 * 2- convert it to List<UserSkillPriorityAggregationReport> and after that assign it to a UserSkillPriorityReport object.
-	 * 3- save the UserSkillPriorityReport object.
+	 * Creates a new user skill priority report.
 	 *
-	 * @return
+	 * @return Created report.
 	 */
 	@Transactional
-	public UserSkillPriorityReport createPriorityReport() {
-//		deleteAllPriorityReports();
-		Stream<UserSkillPriorityAggregationReportResult> prioritizedSkillsForReport = read();
-		List<UserSkillPriorityAggregationReport> userSkillPriorityAggregationReports = convert(prioritizedSkillsForReport);
-		return saveReport(userSkillPriorityAggregationReports);
+	public UserSkillPriorityReport createUserSkillPriorityReport() {
+		Stream<UserSkillPriorityAggregationReportResult> aggregationResults =
+				userSkillQueryService.getAllUserSkillPriorityAggregationResults();
+		List<UserSkillPriorityAggregationReport> aggregationReports = convertToAggregationReports(aggregationResults);
+		return saveReport(aggregationReports);
 	}
 
-	private Stream<UserSkillPriorityAggregationReportResult> read() {
-		return userSkillPriorityReportQueryService.getPrioritizedSkillsToCreateReport();
+	/**
+	 * Creates an aggregation report for each aggregation result in the given stream.
+	 *
+	 * @param aggregationResults Stream of results to create aggregation reports from.
+	 * @return Aggregation reports for the given stream of results.
+	 */
+	private List<UserSkillPriorityAggregationReport> convertToAggregationReports(
+			Stream<UserSkillPriorityAggregationReportResult> aggregationResults) {
+		return aggregationResults.map(aggregationResult -> UserSkillPriorityAggregationReport.builder()
+				.id(UUID.randomUUID().toString())
+				.averagePriority(aggregationResult.getAveragePriority())
+				.maximumPriority(aggregationResult.getMaximumPriority())
+				.userCount(aggregationResult.getUserCount())
+				.skillName(aggregationResult.getSkill().getName())
+				.skillDescription(aggregationResult.getSkill().getDescription())
+				.userSkillReports(convertToUserSkillReports(aggregationResult))
+				.build()
+		).collect(toList());
 	}
 
-	private List<UserSkillPriorityAggregationReport> convert(Stream<UserSkillPriorityAggregationReportResult> userSkillPriorityAggregationReportStream) {
-		List<UserSkillPriorityAggregationReport> userSkillPriorityAggregationReports = new ArrayList<>();
-		userSkillPriorityAggregationReportStream.forEach(userSkillPriorityAggregationReport -> {
-					userSkillPriorityAggregationReports.add(UserSkillPriorityAggregationReport.builder()
-							.id(UUID.randomUUID().toString())
-							.averagePriority(userSkillPriorityAggregationReport.getAveragePriority())
-							.maximumPriority(userSkillPriorityAggregationReport.getMaximumPriority())
-							.userCount(userSkillPriorityAggregationReport.getUserCount())
-							.skillName(userSkillPriorityAggregationReport.getSkill().getName())
-							.skillDescription(userSkillPriorityAggregationReport.getSkill().getDescription())
-							.userSkillReports(setUsers(userSkillPriorityAggregationReport))
-							.build());
-				}
-		);
-		return userSkillPriorityAggregationReports;
-	}
-
-	private List<UserSkillReport> setUsers(UserSkillPriorityAggregationReportResult userSkillPriorityAggregationReport) {
-		List<UserSkillReport> userSkillReports = new ArrayList<>();
-		for (User user : userSkillPriorityAggregationReport.getUsers()) {
-			Optional<UserSkill> byUserIdAndSkillName = userSkillQueryService
-					.findByUserIdAndSkillName(user.getId(), userSkillPriorityAggregationReport.getSkill().getName());
-
-			// because creating a report will be done by ourselves (by system), so we are sure that
-			// byUserIdAndSkillName.get() method always returns an object.
-			UserSkill userSkill = byUserIdAndSkillName.get();
-			userSkillReports.add(UserSkillReport.builder()
+	/**
+	 * Creates a user skill report for each user assigned to the skill represented by the given aggregation result.
+	 *
+	 * @param aggregationResult Aggregation result to create user skill reports from.
+	 * @return User skill reports for the users given in the aggregation result.
+	 */
+	private List<UserSkillReport> convertToUserSkillReports(UserSkillPriorityAggregationReportResult aggregationResult) {
+		return aggregationResult.getUsers().stream().map(user -> {
+			Optional<UserSkill> userSkillResult = userSkillQueryService
+					.getUserSkillByUserIdAndSkillId(user.getId(), aggregationResult.getSkill().getId());
+			UserSkill userSkill = userSkillResult.orElseThrow(() ->
+					new IllegalStateException(format("User with ID '%s' is not assigned to skill with ID '%s'",
+							user.getId(), aggregationResult.getSkill().getId())));
+			return UserSkillReport.builder()
 					.id(UUID.randomUUID().toString())
 					.currentLevel(userSkill.getCurrentLevel())
 					.desiredLevel(userSkill.getDesiredLevel())
 					.priority(userSkill.getPriority())
 					.userName(user.getUserName())
-					.skillName(userSkillPriorityAggregationReport.getSkill().getName())
-					.build()
-			);
-		}
-		return userSkillReports;
+					.skillName(aggregationResult.getSkill().getName())
+					.build();
+		}).collect(toList());
 	}
 
-	private UserSkillPriorityReport saveReport(List<UserSkillPriorityAggregationReport> userSkillPriorityAggregationReports) {
+	private UserSkillPriorityReport saveReport(List<UserSkillPriorityAggregationReport> aggregationReports) {
 		UserSkillPriorityReport userSkillPriorityReport = UserSkillPriorityReport.builder()
 				.id(UUID.randomUUID().toString())
 				.date(LocalDateTime.now())
+				.aggregationReports(aggregationReports)
 				.build();
-
-		userSkillPriorityReport.setUserSkillPriorityAggregationReports(userSkillPriorityAggregationReports);
 		return userSkillPriorityReportRepository.save(userSkillPriorityReport);
-	}
-
-	@Transactional
-	public void deleteAllPriorityReports() {
-		userSkillPriorityReportRepository.deleteAll();
 	}
 }

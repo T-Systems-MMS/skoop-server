@@ -14,7 +14,6 @@ import java.util.List;
 @AllArgsConstructor
 @NodeEntity
 public class Skill {
-
 	@Id
 	@Property(name = "id")
 	private String id;
@@ -27,8 +26,8 @@ public class Skill {
 
 	@Property(name = "description")
 	private String description;
+
 	@EqualsAndHashCode.Exclude
 	@Relationship(type = "RELATED_TO", direction = Relationship.UNDIRECTED)
 	private List<UserSkill> userSkills;
-
 }

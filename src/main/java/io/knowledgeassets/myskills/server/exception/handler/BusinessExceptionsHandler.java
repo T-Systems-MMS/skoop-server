@@ -32,11 +32,11 @@ import static org.springframework.http.HttpStatus.*;
 public class BusinessExceptionsHandler extends ResponseEntityExceptionHandler implements IExceptionHandler {
 
 	/**
-	 * when a resource(like a entity) already exists, we throw this exception.
+	 * when a resource(like a entity) already existsReport, we throw this exception.
 	 */
 	@ExceptionHandler({DuplicateResourceException.class})
 	protected ResponseEntity<Object> handleDuplicateResource(DuplicateResourceException ex, WebRequest request) {
-		String logMessage = String.format("{%s} The resource already exists! %s", CONFLICT.value() + " " + CONFLICT.getReasonPhrase(), ex.getLocalizedMessage());
+		String logMessage = String.format("{%s} The resource already existsReport! %s", CONFLICT.value() + " " + CONFLICT.getReasonPhrase(), ex.getLocalizedMessage());
 		doLog(ex, logMessage);
 
 		ResponseError responseError = new ResponseError(CONFLICT);

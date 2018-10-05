@@ -5,5 +5,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UserSkillPriorityReportRepository extends Neo4jRepository<UserSkillPriorityReport, String> {
-
 }

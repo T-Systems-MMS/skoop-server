@@ -52,7 +52,7 @@ class SkillRepositoryTests {
 	}
 
 	@Test
-	@DisplayName("Indicates that the skill with a given name exists ignoring case")
+	@DisplayName("Indicates that the skill with a given name existsReport ignoring case")
 	void indicatesExistingSkillByNameIgnoringCase() {
 		// Given
 		skillRepository.save(Skill.builder().id("123").name("Angular").description("JavaScript Framework").build());

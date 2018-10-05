@@ -23,29 +23,31 @@ public class UserSkillStatisticsController {
 		this.userSkillQueryService = userSkillQueryService;
 	}
 
-	@ApiOperation(value = "Get top 10 prioritized skills",
+	@ApiOperation(
+			value = "Get top 10 prioritized skills",
 			notes = "Get the top 10 of those skills with the highest average priority based on user relationships. " +
-					"The list is sorted by average priority in descending order.")
+					"The list is sorted by average priority in descending order."
+	)
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "Successful execution"),
+			@ApiResponse(code = 401, message = "Invalid authentication"),
 			@ApiResponse(code = 403, message = "Insufficient privileges to access resource"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
 	@PreAuthorize("hasRole('USER')")
 	@GetMapping(path = "/statistics/skills/top-priority", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<UserSkillPriorityAggregationResponse> getTop10PrioritizedSkills() {
-		List<UserSkillPriorityAggregationResponse> collect = userSkillQueryService.getTop10PrioritizedSkills()
-				.map(aggregation -> UserSkillPriorityAggregationResponse.builder()
+		return userSkillQueryService.getTop10UserSkillPriorityAggregationResults()
+				.map(aggregationResult -> UserSkillPriorityAggregationResponse.builder()
 						.skill(SkillResponse.builder()
-								.id(aggregation.getSkill().getId())
-								.name(aggregation.getSkill().getName())
-								.description(aggregation.getSkill().getDescription())
+								.id(aggregationResult.getSkill().getId())
+								.name(aggregationResult.getSkill().getName())
+								.description(aggregationResult.getSkill().getDescription())
 								.build())
-						.averagePriority(aggregation.getAveragePriority())
-						.maximumPriority(aggregation.getMaximumPriority())
-						.userCount(aggregation.getUserCount())
+						.averagePriority(aggregationResult.getAveragePriority())
+						.maximumPriority(aggregationResult.getMaximumPriority())
+						.userCount(aggregationResult.getUserCount())
 						.build())
 				.collect(toList());
-		return  collect;
 	}
 }

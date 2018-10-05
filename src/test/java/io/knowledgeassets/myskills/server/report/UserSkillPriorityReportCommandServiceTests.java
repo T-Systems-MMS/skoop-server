@@ -1,6 +1,7 @@
 package io.knowledgeassets.myskills.server.report;
 
-import io.knowledgeassets.myskills.server.report.userskillpriorityaggregationreport.UserSkillPriorityAggregationReport;
+import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityAggregationReport;
+import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityAggregationReportResult;
 import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReport;
 import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReportRepository;
 import io.knowledgeassets.myskills.server.report.userskillpriorityreport.command.UserSkillPriorityReportCommandService;
@@ -44,7 +45,7 @@ public class UserSkillPriorityReportCommandServiceTests {
 	@BeforeEach
 	void setUp() {
 		userSkillPriorityReportCommandService = new UserSkillPriorityReportCommandService(
-				userSkillPriorityReportRepository, userSkillQueryService, userSkillPriorityReportQueryService);
+				userSkillPriorityReportRepository, userSkillQueryService);
 	}
 
 	@Test
@@ -52,7 +53,7 @@ public class UserSkillPriorityReportCommandServiceTests {
 	public void createReport() {
 		LocalDateTime now = LocalDateTime.now();
 
-		given(userSkillPriorityReportQueryService.getPrioritizedSkillsToCreateReport())
+		given(userSkillQueryService.getAllUserSkillPriorityAggregationResults())
 				.willReturn(StreamSupport.stream((
 								List.of(UserSkillPriorityAggregationReportResult.builder()
 										.averagePriority(3.5)
@@ -77,7 +78,7 @@ public class UserSkillPriorityReportCommandServiceTests {
 						).spliterator(), false)
 				);
 
-		given(userSkillQueryService.findByUserIdAndSkillName(ArgumentMatchers.any(String.class), ArgumentMatchers.any(String.class)))
+		given(userSkillQueryService.getUserSkillByUserIdAndSkillId(ArgumentMatchers.any(String.class), ArgumentMatchers.any(String.class)))
 				.willReturn(Optional.of(UserSkill.builder()
 						.id("6ga0dc67-f217-41e2-862d-efd372614410")
 						.currentLevel(2)
@@ -91,7 +92,7 @@ public class UserSkillPriorityReportCommandServiceTests {
 						UserSkillPriorityReport.builder()
 								.id("8f5634b8-783f-4503-b40f-ca93d8db7e72")
 								.date(now)
-								.userSkillPriorityAggregationReports(singletonList(
+								.aggregationReports(singletonList(
 										UserSkillPriorityAggregationReport.builder()
 												.id("123")
 												.skillName("Neo4j")
@@ -120,14 +121,14 @@ public class UserSkillPriorityReportCommandServiceTests {
 								)
 								.build());
 
-		UserSkillPriorityReport userSkillPriorityReport = userSkillPriorityReportCommandService.createPriorityReport();
+		UserSkillPriorityReport userSkillPriorityReport = userSkillPriorityReportCommandService.createUserSkillPriorityReport();
 		assertThat(userSkillPriorityReport).isNotNull();
 		assertThat(userSkillPriorityReport.getId()).isEqualTo("8f5634b8-783f-4503-b40f-ca93d8db7e72");
 		assertThat(userSkillPriorityReport.getDate().truncatedTo(ChronoUnit.SECONDS))
 				.isEqualTo(now.truncatedTo(ChronoUnit.SECONDS));
-		assertThat(userSkillPriorityReport.getUserSkillPriorityAggregationReports().size()).isEqualTo(1);
-		List<UserSkillReport> userSkillReports = userSkillPriorityReport.getUserSkillPriorityAggregationReports().get(0).getUserSkillReports();
-		assertThat(userSkillPriorityReport.getUserSkillPriorityAggregationReports().get(0).getSkillDescription()).isNull();
+		assertThat(userSkillPriorityReport.getAggregationReports().size()).isEqualTo(1);
+		List<UserSkillReport> userSkillReports = userSkillPriorityReport.getAggregationReports().get(0).getUserSkillReports();
+		assertThat(userSkillPriorityReport.getAggregationReports().get(0).getSkillDescription()).isNull();
 		assertThat(userSkillReports.size()).isEqualTo(2);
 		assertThat(userSkillReports.get(1).getSkillName()).isEqualTo("Neo4j");
 		assertThat(userSkillReports.get(1).getUserName()).isEqualTo("tester2");

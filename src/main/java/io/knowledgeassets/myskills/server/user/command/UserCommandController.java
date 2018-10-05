@@ -30,7 +30,7 @@ public class UserCommandController {
 			notes = "Create a new user in the system. The user name must not exist yet.")
 	@ApiResponses({
 			@ApiResponse(code = 201, message = "Successful execution"),
-			@ApiResponse(code = 400, message = "Invalid input data, e.g. missing mandatory data or user name exists"),
+			@ApiResponse(code = 400, message = "Invalid input data, e.g. missing mandatory data or user name existsReport"),
 			@ApiResponse(code = 403, message = "Insufficient privileges to perform this operation"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})

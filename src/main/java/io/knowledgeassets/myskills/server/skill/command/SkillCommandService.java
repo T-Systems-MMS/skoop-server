@@ -25,7 +25,7 @@ public class SkillCommandService {
 	public Skill createSkill(String name, String description) {
 		skillRepository.findByNameIgnoreCase(name).ifPresent(skill -> {
 			throw DuplicateResourceException.builder()
-					.message(format("Skill with name '%s' already exists", name))
+					.message(format("Skill with name '%s' already existsReport", name))
 					.build();
 		});
 		return skillRepository.save(Skill.builder()

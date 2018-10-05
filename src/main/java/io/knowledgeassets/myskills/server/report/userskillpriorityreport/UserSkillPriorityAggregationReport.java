@@ -1,8 +1,11 @@
-package io.knowledgeassets.myskills.server.report.userskillpriorityaggregationreport;
+package io.knowledgeassets.myskills.server.report.userskillpriorityreport;
 
 import io.knowledgeassets.myskills.server.report.userskillreport.UserSkillReport;
 import lombok.*;
-import org.neo4j.ogm.annotation.*;
+import org.neo4j.ogm.annotation.Id;
+import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Property;
+import org.neo4j.ogm.annotation.Relationship;
 
 import java.util.List;
 
@@ -12,7 +15,6 @@ import java.util.List;
 @AllArgsConstructor
 @NodeEntity
 public class UserSkillPriorityAggregationReport {
-
 	@Id
 	@Property(name = "id")
 	private String id;
@@ -26,8 +28,7 @@ public class UserSkillPriorityAggregationReport {
 	private String skillName;
 	@Property(name = "skillDescription")
 	private String skillDescription;
-
 	@EqualsAndHashCode.Exclude
+	@Relationship(type = "CONTAINS")
 	private List<UserSkillReport> userSkillReports;
-
 }

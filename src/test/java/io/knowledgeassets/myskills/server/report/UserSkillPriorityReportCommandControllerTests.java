@@ -1,9 +1,9 @@
 package io.knowledgeassets.myskills.server.report;
 
 import io.knowledgeassets.myskills.server.common.Neo4jSessionFactoryConfiguration;
-import io.knowledgeassets.myskills.server.report.userskillpriorityaggregationreport.UserSkillPriorityAggregationReport;
+import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityAggregationReport;
 import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReport;
-import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReportResponse;
+import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReportMetaDataResponse;
 import io.knowledgeassets.myskills.server.report.userskillpriorityreport.command.UserSkillPriorityReportCommandController;
 import io.knowledgeassets.myskills.server.report.userskillpriorityreport.command.UserSkillPriorityReportCommandService;
 import io.knowledgeassets.myskills.server.report.userskillreport.UserSkillReport;
@@ -54,11 +54,11 @@ public class UserSkillPriorityReportCommandControllerTests {
 	@DisplayName("Creates a report")
 	public void createReport() throws Exception {
 		LocalDateTime now = LocalDateTime.now();
-		given(userSkillPriorityReportCommandService.createPriorityReport()).willReturn(
+		given(userSkillPriorityReportCommandService.createUserSkillPriorityReport()).willReturn(
 				UserSkillPriorityReport.builder()
 						.id("8f5634b8-783f-4503-b40f-ca93d8db7e72")
 						.date(now)
-						.userSkillPriorityAggregationReports(singletonList(
+						.aggregationReports(singletonList(
 								UserSkillPriorityAggregationReport.builder()
 										.id("123")
 										.skillName("Neo4j")
@@ -88,7 +88,7 @@ public class UserSkillPriorityReportCommandControllerTests {
 						.build()
 		);
 
-		MvcResult mvcResult = mockMvc.perform(post("/reports")
+		MvcResult mvcResult = mockMvc.perform(post("/reports/skills/priority")
 				.accept(MediaType.APPLICATION_JSON)
 				.with(csrf())
 				.with(user("tester").password("123").roles("USER")))
@@ -101,9 +101,9 @@ public class UserSkillPriorityReportCommandControllerTests {
 
 		String responseJson = mvcResult.getResponse().getContentAsString();
 
-		UserSkillPriorityReportResponse userSkillPriorityReportResponse = objectMapper.readValue(responseJson,
-				UserSkillPriorityReportResponse.class);
-		assertThat(userSkillPriorityReportResponse.getDate().truncatedTo(ChronoUnit.SECONDS))
+		UserSkillPriorityReportMetaDataResponse userSkillPriorityReportMetaDataResponse = objectMapper.readValue(responseJson,
+				UserSkillPriorityReportMetaDataResponse.class);
+		assertThat(userSkillPriorityReportMetaDataResponse.getDate().truncatedTo(ChronoUnit.SECONDS))
 				.isEqualTo(now.truncatedTo(ChronoUnit.SECONDS));
 
 	}
