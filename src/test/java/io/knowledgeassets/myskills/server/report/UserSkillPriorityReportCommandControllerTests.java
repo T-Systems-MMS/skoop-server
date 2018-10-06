@@ -1,12 +1,12 @@
 package io.knowledgeassets.myskills.server.report;
 
 import io.knowledgeassets.myskills.server.common.Neo4jSessionFactoryConfiguration;
-import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityAggregationReport;
-import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReport;
-import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReportMetaDataResponse;
-import io.knowledgeassets.myskills.server.report.userskillpriorityreport.command.UserSkillPriorityReportCommandController;
-import io.knowledgeassets.myskills.server.report.userskillpriorityreport.command.UserSkillPriorityReportCommandService;
-import io.knowledgeassets.myskills.server.report.userskillreport.UserSkillReport;
+import io.knowledgeassets.myskills.server.report.userskillpriority.UserSkillPriorityAggregationReport;
+import io.knowledgeassets.myskills.server.report.userskillpriority.UserSkillPriorityReport;
+import io.knowledgeassets.myskills.server.report.userskillpriority.UserSkillPriorityReportSimpleResponse;
+import io.knowledgeassets.myskills.server.report.userskillpriority.command.UserSkillPriorityReportCommandController;
+import io.knowledgeassets.myskills.server.report.userskillpriority.command.UserSkillPriorityReportCommandService;
+import io.knowledgeassets.myskills.server.report.userskill.UserSkillReport;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -68,14 +68,20 @@ public class UserSkillPriorityReportCommandControllerTests {
 										.userSkillReports(asList(
 												UserSkillReport.builder()
 														.skillName("Neo4j")
+														.skillDescription("Graph database")
 														.userName("tester")
+														.userFirstName("Toni")
+														.userLastName("Tester")
 														.currentLevel(2)
 														.desiredLevel(4)
 														.priority(2)
 														.build(),
 												UserSkillReport.builder()
 														.skillName("Neo4j")
+														.skillDescription("Graph database")
 														.userName("tester2")
+														.userFirstName("Tina")
+														.userLastName("Testing")
 														.currentLevel(1)
 														.desiredLevel(3)
 														.priority(4)
@@ -101,9 +107,9 @@ public class UserSkillPriorityReportCommandControllerTests {
 
 		String responseJson = mvcResult.getResponse().getContentAsString();
 
-		UserSkillPriorityReportMetaDataResponse userSkillPriorityReportMetaDataResponse = objectMapper.readValue(responseJson,
-				UserSkillPriorityReportMetaDataResponse.class);
-		assertThat(userSkillPriorityReportMetaDataResponse.getDate().truncatedTo(ChronoUnit.SECONDS))
+		UserSkillPriorityReportSimpleResponse userSkillPriorityReportSimpleResponse = objectMapper.readValue(responseJson,
+				UserSkillPriorityReportSimpleResponse.class);
+		assertThat(userSkillPriorityReportSimpleResponse.getDate().truncatedTo(ChronoUnit.SECONDS))
 				.isEqualTo(now.truncatedTo(ChronoUnit.SECONDS));
 
 	}

@@ -1,10 +1,11 @@
-package io.knowledgeassets.myskills.server.report.userskillpriorityreport.command;
+package io.knowledgeassets.myskills.server.report.userskillpriority.command;
 
-import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityAggregationReportResult;
-import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityAggregationReport;
-import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReport;
-import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReportRepository;
-import io.knowledgeassets.myskills.server.report.userskillreport.UserSkillReport;
+import io.knowledgeassets.myskills.server.report.userskill.UserSkillReport;
+import io.knowledgeassets.myskills.server.report.userskillpriority.UserSkillPriorityAggregationReport;
+import io.knowledgeassets.myskills.server.report.userskillpriority.UserSkillPriorityAggregationReportResult;
+import io.knowledgeassets.myskills.server.report.userskillpriority.UserSkillPriorityReport;
+import io.knowledgeassets.myskills.server.report.userskillpriority.UserSkillPriorityReportRepository;
+import io.knowledgeassets.myskills.server.report.userskillpriority.query.UserSkillPriorityReportQueryService;
 import io.knowledgeassets.myskills.server.userskill.UserSkill;
 import io.knowledgeassets.myskills.server.userskill.query.UserSkillQueryService;
 import org.springframework.stereotype.Service;
@@ -22,11 +23,14 @@ import static java.util.stream.Collectors.toList;
 @Service
 public class UserSkillPriorityReportCommandService {
 	private UserSkillPriorityReportRepository userSkillPriorityReportRepository;
+	private UserSkillPriorityReportQueryService userSkillPriorityReportQueryService;
 	private UserSkillQueryService userSkillQueryService;
 
 	public UserSkillPriorityReportCommandService(UserSkillPriorityReportRepository userSkillPriorityReportRepository,
+												 UserSkillPriorityReportQueryService userSkillPriorityReportQueryService,
 												 UserSkillQueryService userSkillQueryService) {
 		this.userSkillPriorityReportRepository = userSkillPriorityReportRepository;
+		this.userSkillPriorityReportQueryService = userSkillPriorityReportQueryService;
 		this.userSkillQueryService = userSkillQueryService;
 	}
 
@@ -38,7 +42,7 @@ public class UserSkillPriorityReportCommandService {
 	@Transactional
 	public UserSkillPriorityReport createUserSkillPriorityReport() {
 		Stream<UserSkillPriorityAggregationReportResult> aggregationResults =
-				userSkillQueryService.getAllUserSkillPriorityAggregationResults();
+				userSkillPriorityReportQueryService.getAllUserSkillPriorityAggregationResults();
 		List<UserSkillPriorityAggregationReport> aggregationReports = convertToAggregationReports(aggregationResults);
 		return saveReport(aggregationReports);
 	}
@@ -82,7 +86,10 @@ public class UserSkillPriorityReportCommandService {
 					.desiredLevel(userSkill.getDesiredLevel())
 					.priority(userSkill.getPriority())
 					.userName(user.getUserName())
+					.userFirstName(user.getFirstName())
+					.userLastName(user.getLastName())
 					.skillName(aggregationResult.getSkill().getName())
+					.skillDescription(aggregationResult.getSkill().getDescription())
 					.build();
 		}).collect(toList());
 	}

@@ -1,13 +1,14 @@
-package io.knowledgeassets.myskills.server.report.userskillpriorityreport.query;
+package io.knowledgeassets.myskills.server.report.userskillpriority.query;
 
 import io.knowledgeassets.myskills.server.exception.BusinessException;
 import io.knowledgeassets.myskills.server.exception.EmptyInputException;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.exception.enums.Model;
-import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityAggregationReportRepository;
-import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReport;
-import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReportRepository;
-import io.knowledgeassets.myskills.server.report.userskillreport.UserSkillReport;
+import io.knowledgeassets.myskills.server.report.userskill.UserSkillReport;
+import io.knowledgeassets.myskills.server.report.userskillpriority.UserSkillPriorityAggregationReportRepository;
+import io.knowledgeassets.myskills.server.report.userskillpriority.UserSkillPriorityAggregationReportResult;
+import io.knowledgeassets.myskills.server.report.userskillpriority.UserSkillPriorityReport;
+import io.knowledgeassets.myskills.server.report.userskillpriority.UserSkillPriorityReportRepository;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -76,5 +77,10 @@ public class UserSkillPriorityReportQueryService {
 		}
 		return StreamSupport.stream(userSkillPriorityAggregationReportRepository
 				.findUserSkillReportsByAggregationReportId(aggregationReportId).spliterator(), false);
+	}
+
+	@Transactional(readOnly = true)
+	public Stream<UserSkillPriorityAggregationReportResult> getAllUserSkillPriorityAggregationResults() {
+		return StreamSupport.stream(userSkillPriorityAggregationReportRepository.findAllPrioritizedSkills().spliterator(), false);
 	}
 }

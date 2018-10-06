@@ -4,7 +4,6 @@ import io.knowledgeassets.myskills.server.exception.BusinessException;
 import io.knowledgeassets.myskills.server.exception.EmptyInputException;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.exception.enums.Model;
-import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityAggregationReportResult;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.skill.query.SkillQueryService;
 import io.knowledgeassets.myskills.server.user.User;
@@ -75,11 +74,6 @@ public class UserSkillQueryService {
 	@Transactional(readOnly = true)
 	public Stream<UserSkillPriorityAggregationResult> getTop10UserSkillPriorityAggregationResults() {
 		return StreamSupport.stream(userSkillRepository.findTop10PrioritizedSkills().spliterator(), false);
-	}
-
-	@Transactional(readOnly = true)
-	public Stream<UserSkillPriorityAggregationReportResult> getAllUserSkillPriorityAggregationResults() {
-		return StreamSupport.stream(userSkillRepository.findAllPrioritizedSkills().spliterator(), false);
 	}
 
 	@Transactional(readOnly = true)

@@ -1,4 +1,4 @@
-package io.knowledgeassets.myskills.server.report.userskillpriorityreport;
+package io.knowledgeassets.myskills.server.report.userskillpriority;
 
 import lombok.*;
 import org.neo4j.ogm.annotation.*;

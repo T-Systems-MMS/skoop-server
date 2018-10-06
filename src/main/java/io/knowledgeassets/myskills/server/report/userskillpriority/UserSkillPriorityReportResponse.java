@@ -1,4 +1,4 @@
-package io.knowledgeassets.myskills.server.report.userskillpriorityreport;
+package io.knowledgeassets.myskills.server.report.userskillpriority;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -11,14 +11,16 @@ import java.util.List;
 @Data
 @Builder
 @ApiModel(
-		value = "UserSkillPriorityReportMetaDataResponse",
-		description = "Meta data view of a user skill priority report."
+		value = "UserSkillPriorityReportResponse",
+		description = "Report of the aggregated priorities for all skills."
 )
 public class UserSkillPriorityReportResponse {
-	@ApiModelProperty("Report id")
+	@ApiModelProperty("Unique ID of the report")
 	private String id;
-	@ApiModelProperty("Report created date.")
+
+	@ApiModelProperty("Creation data of the report")
 	private LocalDateTime date;
-	@ApiModelProperty("Priority aggregation reports for all skills.")
+
+	@ApiModelProperty("Aggregation reports for all skills")
 	private List<UserSkillPriorityAggregationReportResponse> aggregationReports;
 }

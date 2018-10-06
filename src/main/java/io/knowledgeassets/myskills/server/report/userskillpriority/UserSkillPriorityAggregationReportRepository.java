@@ -1,6 +1,6 @@
-package io.knowledgeassets.myskills.server.report.userskillpriorityreport;
+package io.knowledgeassets.myskills.server.report.userskillpriority;
 
-import io.knowledgeassets.myskills.server.report.userskillreport.UserSkillReport;
+import io.knowledgeassets.myskills.server.report.userskill.UserSkillReport;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
@@ -12,4 +12,10 @@ public interface UserSkillPriorityAggregationReportRepository extends Neo4jRepos
 			"RETURN userSkillReport")
 	Iterable<UserSkillReport> findUserSkillReportsByAggregationReportId(@Param("aggregationReportId") String aggregationReportId);
 
+	@Query("MATCH (skill:Skill)-[userSkill:RELATED_TO]-(user:User) " +
+			"WHERE userSkill.priority > 0 " +
+			"RETURN skill AS skill, AVG(userSkill.priority) AS averagePriority, " +
+			"MAX(userSkill.priority) AS maximumPriority, COUNT(*) AS userCount, COLLECT(user) AS users " +
+			"ORDER BY AVG(userSkill.priority) DESC, COUNT(*) DESC, MAX(userSkill.priority) DESC ")
+	Iterable<UserSkillPriorityAggregationReportResult> findAllPrioritizedSkills();
 }

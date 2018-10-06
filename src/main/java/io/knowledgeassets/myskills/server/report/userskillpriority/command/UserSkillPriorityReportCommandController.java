@@ -1,7 +1,7 @@
-package io.knowledgeassets.myskills.server.report.userskillpriorityreport.command;
+package io.knowledgeassets.myskills.server.report.userskillpriority.command;
 
-import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReport;
-import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReportMetaDataResponse;
+import io.knowledgeassets.myskills.server.report.userskillpriority.UserSkillPriorityReport;
+import io.knowledgeassets.myskills.server.report.userskillpriority.UserSkillPriorityReportSimpleResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -38,9 +38,9 @@ public class UserSkillPriorityReportCommandController {
 			consumes = MediaType.ALL_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE
 	)
-	public ResponseEntity<UserSkillPriorityReportMetaDataResponse> createReport() {
+	public ResponseEntity<UserSkillPriorityReportSimpleResponse> createReport() {
 		UserSkillPriorityReport report = userSkillPriorityReportCommandService.createUserSkillPriorityReport();
-		return ResponseEntity.status(HttpStatus.CREATED).body(UserSkillPriorityReportMetaDataResponse.builder()
+		return ResponseEntity.status(HttpStatus.CREATED).body(UserSkillPriorityReportSimpleResponse.builder()
 				.id(report.getId())
 				.date(report.getDate())
 				.skillCount(report.getAggregationReports().size())

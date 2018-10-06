@@ -1,4 +1,4 @@
-package io.knowledgeassets.myskills.server.report.userskillpriorityreport;
+package io.knowledgeassets.myskills.server.report.userskillpriority;
 
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.user.User;

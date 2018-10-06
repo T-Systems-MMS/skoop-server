@@ -1,8 +1,10 @@
-package io.knowledgeassets.myskills.server.report.userskillpriorityreport.query;
+package io.knowledgeassets.myskills.server.report.userskillpriority.query;
 
 import io.knowledgeassets.myskills.server.exception.BusinessException;
-import io.knowledgeassets.myskills.server.report.userskillpriorityreport.*;
-import io.knowledgeassets.myskills.server.report.userskillreport.UserSkillReportResponse;
+import io.knowledgeassets.myskills.server.report.skill.SkillReportSimpleResponse;
+import io.knowledgeassets.myskills.server.report.user.UserReportSimpleResponse;
+import io.knowledgeassets.myskills.server.report.userskillpriority.*;
+import io.knowledgeassets.myskills.server.report.userskill.UserSkillReportResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -38,9 +40,9 @@ public class UserSkillPriorityReportQueryController {
 	})
 	@PreAuthorize("hasRole('USER')")
 	@GetMapping(path = "/reports/skills/priority", produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<UserSkillPriorityReportMetaDataResponse> getReports() {
+	public List<UserSkillPriorityReportSimpleResponse> getReports() {
 		return userSkillPriorityReportQueryService.getReports()
-				.map(report -> UserSkillPriorityReportMetaDataResponse.builder()
+				.map(report -> UserSkillPriorityReportSimpleResponse.builder()
 						.id(report.getId())
 						.date(report.getDate())
 						.skillCount(report.getAggregationReports().size())
@@ -53,7 +55,7 @@ public class UserSkillPriorityReportQueryController {
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "Successful execution"),
 			@ApiResponse(code = 401, message = "Invalid authentication"),
-			@ApiResponse(code = 403, message = "Insufficient privileges to access resource, e.g. foreign user data"),
+			@ApiResponse(code = 403, message = "Insufficient privileges to access resource"),
 			@ApiResponse(code = 404, message = "Resource not found"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
@@ -77,8 +79,10 @@ public class UserSkillPriorityReportQueryController {
 						.averagePriority(report.getAveragePriority())
 						.maximumPriority(report.getMaximumPriority())
 						.userCount(report.getUserCount())
-						.skillName(report.getSkillName())
-						.skillDescription(report.getSkillDescription())
+						.skill(SkillReportSimpleResponse.builder()
+								.name(report.getSkillName())
+								.description(report.getSkillDescription())
+								.build())
 						.build())
 				.collect(toList());
 	}
@@ -90,7 +94,7 @@ public class UserSkillPriorityReportQueryController {
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "Successful execution"),
 			@ApiResponse(code = 401, message = "Invalid authentication"),
-			@ApiResponse(code = 403, message = "Insufficient privileges to access resource, e.g. foreign user data"),
+			@ApiResponse(code = 403, message = "Insufficient privileges to access resource"),
 			@ApiResponse(code = 404, message = "Resource not found"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
@@ -107,8 +111,15 @@ public class UserSkillPriorityReportQueryController {
 						.currentLevel(report.getCurrentLevel())
 						.desiredLevel(report.getDesiredLevel())
 						.priority(report.getPriority())
-						.skillName(report.getSkillName())
-						.userName(report.getUserName())
+						.skill(SkillReportSimpleResponse.builder()
+								.name(report.getSkillName())
+								.description(report.getSkillDescription())
+								.build())
+						.user(UserReportSimpleResponse.builder()
+								.userName(report.getUserName())
+								.firstName(report.getUserFirstName())
+								.lastName(report.getUserLastName())
+								.build())
 						.build())
 				.collect(toList());
 	}
