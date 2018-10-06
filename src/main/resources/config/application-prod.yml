@@ -2,5 +2,7 @@ logging:
   level:
     # Set overall log level to warning by default.
     root: WARN
+    # Set MySkills log level to info by default.
+    io.knowledgeassets.myskills.server: INFO
   # Default log file name.
   file: logs/myskills-server.log
