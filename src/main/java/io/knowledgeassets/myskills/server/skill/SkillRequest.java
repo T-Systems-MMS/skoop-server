@@ -2,14 +2,13 @@ package io.knowledgeassets.myskills.server.skill;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -26,4 +25,7 @@ public class SkillRequest {
 
 	@ApiModelProperty("Description of a skill.")
 	private String description;
+
+	@EqualsAndHashCode.Exclude
+	private List<String> groups;
 }

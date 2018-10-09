@@ -4,6 +4,9 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+import java.util.List;
 
 @Data
 @Builder
@@ -19,4 +22,7 @@ public class SkillResponse {
 
 	@ApiModelProperty("Description of a skill.")
 	private String description;
+
+	@EqualsAndHashCode.Exclude
+	private List<String> groups;
 }

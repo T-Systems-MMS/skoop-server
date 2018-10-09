@@ -1,5 +1,6 @@
 package io.knowledgeassets.myskills.server.skill;
 
+import io.knowledgeassets.myskills.server.skillgroup.SkillGroup;
 import io.knowledgeassets.myskills.server.userskill.UserSkill;
 import lombok.*;
 import org.neo4j.ogm.annotation.*;
@@ -30,5 +31,8 @@ public class Skill {
 	@EqualsAndHashCode.Exclude
 	@Relationship(type = "RELATED_TO", direction = Relationship.UNDIRECTED)
 	private List<UserSkill> userSkills;
+
+	@EqualsAndHashCode.Exclude
+	private List<SkillGroup> skillGroups;
 
 }

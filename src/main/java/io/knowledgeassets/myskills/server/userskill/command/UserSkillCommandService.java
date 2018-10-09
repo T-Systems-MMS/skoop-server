@@ -12,7 +12,6 @@ import io.knowledgeassets.myskills.server.user.query.UserQueryService;
 import io.knowledgeassets.myskills.server.userskill.UserSkill;
 import io.knowledgeassets.myskills.server.userskill.UserSkillRepository;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -90,7 +89,7 @@ public class UserSkillCommandService {
 	public UserSkill createUserSkillBySkillName(String userId, String skillName, Integer currentLevel,
 												Integer desiredLevel, Integer priority) {
 		Skill skill = skillQueryService.findByNameIgnoreCase(skillName)
-				.orElseGet(() -> skillCommandService.createSkill(skillName, null));
+				.orElseGet(() -> skillCommandService.createSkill(skillName, null, null));
 		return createUserSkillBySkillId(userId, skill.getId(), currentLevel, desiredLevel, priority);
 	}
 

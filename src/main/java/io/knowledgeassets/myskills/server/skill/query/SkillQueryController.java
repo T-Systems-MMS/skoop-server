@@ -3,13 +3,17 @@ package io.knowledgeassets.myskills.server.skill.query;
 import io.knowledgeassets.myskills.server.exception.BusinessException;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.exception.enums.Model;
+import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.skill.SkillResponse;
+import io.knowledgeassets.myskills.server.skillgroup.SkillGroup;
+import io.knowledgeassets.myskills.server.skillgroup.query.SkillGroupQueryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -44,8 +48,17 @@ public class SkillQueryController {
 						.id(skill.getId())
 						.name(skill.getName())
 						.description(skill.getDescription())
+						.groups(getGroups(skill.getSkillGroups()))
 						.build())
 				.collect(toList());
+	}
+
+	private List<String> getGroups(List<SkillGroup> skillGroups) {
+		if (!CollectionUtils.isEmpty(skillGroups)) {
+			return skillGroups.stream().map(SkillGroup::getName).collect(toList());
+		} else {
+			return null;
+		}
 	}
 
 	@ApiOperation(value = "Get a specific skill",

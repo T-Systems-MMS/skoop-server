@@ -44,7 +44,7 @@ public class SkillCommandController {
 													 BindingResult bindingResult) {
 		Skill skill = null;
 		try {
-			skill = skillCommandService.createSkill(request.getName(), request.getDescription());
+			skill = skillCommandService.createSkill(request.getName(), request.getDescription(), request.getGroups());
 		} catch (BusinessException e) {
 			e.setDebugMessage("An exception has occurred in creating a skill!");
 			e.setSuggestion("Make sure that skill with the given name doesn't already exists!");
