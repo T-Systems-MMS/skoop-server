@@ -14,19 +14,22 @@ import org.neo4j.ogm.annotation.*;
 @AllArgsConstructor
 @RelationshipEntity(type = "RELATED_TO")
 public class UserSkill {
-
 	@Id
 	@Property(name = "id")
 	private String id;
+
 	@Property(name = "currentLevel")
 	private Integer currentLevel;
+
 	@Property(name = "desiredLevel")
 	private Integer desiredLevel;
+
 	@Property(name = "priority")
 	private Integer priority;
 
 	@StartNode
 	private User user;
+
 	@EndNode
 	private Skill skill;
 }

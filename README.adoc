@@ -1,6 +1,6 @@
 = MySkills Server
 Georg Wittberger <georg.wittberger@gmail.com>
-v0.0.1, 2018-09-09
+v0.0.1, 2018-10-01
 
 image:https://travis-ci.org/KnowledgeAssets/myskills-server.svg?branch=master["Build Status", link="https://travis-ci.org/KnowledgeAssets/myskills-server"]
 image:https://img.shields.io/github/issues-raw/KnowledgeAssets/myskills-server.svg["GitHub issues",link="https://github.com/KnowledgeAssets/myskills-server/issues"]
@@ -23,7 +23,7 @@ MySkills Server is a Java web application implementing the backend of the MySkil
 For running the application using the executable JAR file:
 
 * Java Runtime Environment 10 (version 11 not tested so far)
-* Neo4j Community Edition 3.3.x
+* Neo4j Community Edition 3.4.x
 
 For running the application as a Docker container:
 
@@ -33,7 +33,7 @@ For running the application as a Docker container:
 For development:
 
 * Java Development Kit 10 (version 11 not tested so far)
-* Neo4j Community Edition 3.3.x
+* Neo4j Community Edition 3.4.x
 * _Optional:_ Docker 18.06 (or higher), useful for setting up a Neo4j database
 
 === Building the application from source
@@ -44,8 +44,9 @@ The project uses https://gradle.org/[Gradle] as the build tool. Run the followin
 
 The final executable JAR file is produced in the `build/libs` directory.
 
-*Tip:* If you are using a proxy you should create a gradle.properties in your home directory ($HOME), and set below properties:
-```
+TIP: If you are using a proxy server you should create a `gradle.properties` file in your user home directory (`$HOME`), and set these configuration properties:
+
+----
 systemProp.http.proxyHost=hostname
 systemProp.http.proxyPort=8080
 systemProp.http.proxyUser=username
@@ -54,7 +55,7 @@ systemProp.https.proxyHost=hostname
 systemProp.https.proxyPort=8080
 systemProp.https.proxyUser=username
 systemProp.https.proxyPassword=xxx
-```
+----
 
 === Running the executable JAR file
 
@@ -66,11 +67,22 @@ After completing the Gradle build you can run the MySkills Server like a simple 
 
 We do not offer public Docker images at the moment but you can create your own after completing the Gradle build. Run the following command in the project root (mind the dot at the end):
 
-    docker build --tag myskills/server:latest --build-arg JAR_FILE=build/libs/myskills-server-0.0.1-SNAPSHOT.jar .
+----
+docker build \
+  -t myskills/server:latest \
+  --build-arg JAR_FILE=build/libs/myskills-server-0.0.1-SNAPSHOT.jar \
+  .
+----
 
 Then you can start the container as usual:
 
-    docker run --name myskills --rm -p 8080:8080 myskills/server:latest
+----
+docker run \
+  --name myskills \
+  --rm \
+  -p 8080:8080 \
+  myskills/server:latest
+----
 
 === Testing the setup
 
@@ -104,21 +116,40 @@ Option 1: You can download the database server https://neo4j.com/download-center
 
 Option 2: You can start Neo4j as a Docker container.
 
-* In windows:
+* On Windows:
++
+----
+docker run ^
+  --name neo4j ^
+  -d ^
+  -p 7474:7474 ^
+  -p 7687:7687 ^
+  -v C:\Develop\workspace\neo4j\data:/data ^
+  -e NEO4J_AUTH=none ^
+  neo4j:3.4
+----
 
-    docker run --name neo4j -d -p 7474:7474 -p 7687:7687 -v C:\Develop\workspace\neo4j\data:/data -e NEO4J_AUTH=none neo4j:3.3
-
-* In Linux:
-
-    docker run --name neo4j -d -p 7474:7474 -p 7687:7687 -v $HOME/neo4j/data:/data -e NEO4J_AUTH=none neo4j:3.3
+* On Unix/Mac:
++
+----
+docker run \
+  --name neo4j \
+  -d \
+  -p 7474:7474 \
+  -p 7687:7687 \
+  -v $HOME/neo4j/data:/data \
+  -e NEO4J_AUTH=none \
+  neo4j:3.4
+----
 
 This will create a container named `neo4j` which you start/stop simply like this:
 
-    docker start neo4j
+----
+docker start neo4j
+docker stop neo4j
+----
 
-    docker stop neo4j
-
-_Note: During development we can start the database without any authentication enabled. So, we do not have to provide credentials in our application configuration._
+Visit http://localhost:7474/ to view the Neo4j browser.
 
 === Configuring annotation processors
 
@@ -151,15 +182,39 @@ Option 1: You can download KeyCloak https://www.keycloak.org/downloads.html[dire
 
 Option 2: You can start KeyCloak as a Docker container.
 
-    docker run --name keycloak -d -p 9000:8080 -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=admin jboss/keycloak:4.3.0.Final
+* On Windows:
++
+----
+docker run ^
+  --name keycloak ^
+  -d ^
+  -p 9000:8080 ^
+  -e KEYCLOAK_USER=admin ^
+  -e KEYCLOAK_PASSWORD=admin ^
+  jboss/keycloak:4.5.0.Final
+----
+* On Unix/Mac:
++
+----
+docker run \
+  --name keycloak \
+  -d \
+  -p 9000:8080 \
+  -e KEYCLOAK_USER=admin \
+  -e KEYCLOAK_PASSWORD=admin \
+  jboss/keycloak:4.5.0.Final
+----
 
 This will create a container named `keycloak` which you start/stop simply like this:
 
-    docker start keycloak
+----
+docker start keycloak
+docker stop keycloak
+----
 
-    docker stop keycloak
+Visit http://localhost:9000/auth/ to configure the KeyCloak server.
 
-There is an export of a suitable test realm in `tools/keycloak/myskills-realm.json` which can be imported into the KeyCloak server. The realm comes with a preconfigured client for MySkills but contains no test users. You have to create users manually within the `MySkills` realm.
+There is an export of a suitable test realm in `tools/keycloak/myskills-realm.json` which can be imported into the KeyCloak server. The realm comes with a preconfigured client for MySkills but contains no test users. *You have to create users manually within the `MySkills` realm.*
 
 In order to obtain an ID token you must call the following URL in your browser (assuming that KeyCloak listens on port 9000):
 

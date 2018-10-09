@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.Set;
@@ -14,10 +13,11 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@ApiModel(value = "SkillRequest"
-		, description = "Request object for creating or updating a skill.")
+@ApiModel(
+		value = "SkillRequest",
+		description = "Request object for creating or updating a skill."
+)
 public class SkillRequest {
-
 	@ApiModelProperty("Name of a skill. It cannot be blank.")
 	@NotBlank
 	@Size(min = 3, max = 64)

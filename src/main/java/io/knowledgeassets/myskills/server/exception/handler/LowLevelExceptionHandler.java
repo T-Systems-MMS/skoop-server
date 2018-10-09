@@ -43,6 +43,8 @@ public class LowLevelExceptionHandler extends ResponseEntityExceptionHandler imp
 		return buildResponseEntity(ex, responseError);
 	}
 
+	// TODO: Handle AccessDeniedException and return status 403.
+
 	@ExceptionHandler({Exception.class})
 	protected ResponseEntity<Object> unexpectedException(Exception ex, WebRequest request) {
 		String logMessage = String.format("{%s} Unexpected Exception! %s", INTERNAL_SERVER_ERROR.value() + " " + INTERNAL_SERVER_ERROR.getReasonPhrase(), ex.getLocalizedMessage());

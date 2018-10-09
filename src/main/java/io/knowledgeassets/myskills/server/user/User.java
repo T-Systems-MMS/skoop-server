@@ -12,7 +12,6 @@ import java.util.List;
 @AllArgsConstructor
 @NodeEntity
 public class User {
-
 	@Id
 	@Property(name = "id")
 	private String id;
@@ -20,12 +19,16 @@ public class User {
 	@Property(name = "userName")
 	@Index(unique = true)
 	private String userName;
+
 	@Property(name = "firstName")
 	private String firstName;
+
 	@Property(name = "lastName")
 	private String lastName;
+
 	@Property(name = "email")
 	private String email;
+
 	@Property(name = "coach")
 	private Boolean coach;
 

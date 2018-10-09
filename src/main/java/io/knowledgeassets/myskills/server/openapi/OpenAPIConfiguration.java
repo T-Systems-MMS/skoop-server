@@ -11,6 +11,7 @@ import springfox.documentation.service.Contact;
 import springfox.documentation.service.Tag;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger.web.*;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import static java.util.Collections.emptyList;
 import static springfox.documentation.spi.DocumentationType.SWAGGER_2;
@@ -20,6 +21,7 @@ import static springfox.documentation.swagger.web.UiConfiguration.Constants.DEFA
  * Configuration for the generated Swagger UI providing the API documentation.
  */
 @Configuration
+@EnableSwagger2
 public class OpenAPIConfiguration {
 	// TODO: Extend Swagger UI configuration to offer OAuth 2.0 login
 

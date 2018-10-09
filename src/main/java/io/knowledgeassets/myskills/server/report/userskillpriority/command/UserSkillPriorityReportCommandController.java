@@ -1,7 +1,7 @@
-package io.knowledgeassets.myskills.server.report.userskillpriorityreport.command;
+package io.knowledgeassets.myskills.server.report.userskillpriority.command;
 
-import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReport;
-import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReportResponse;
+import io.knowledgeassets.myskills.server.report.userskillpriority.UserSkillPriorityReport;
+import io.knowledgeassets.myskills.server.report.userskillpriority.UserSkillPriorityReportSimpleResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -13,7 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Api(tags = "Reports", description = "API allowing modifications of reports")
+@Api(tags = "Reports", description = "API allowing creation of user skill priority reports")
 @RestController
 public class UserSkillPriorityReportCommandController {
 	private UserSkillPriorityReportCommandService userSkillPriorityReportCommandService;
@@ -22,23 +22,28 @@ public class UserSkillPriorityReportCommandController {
 		this.userSkillPriorityReportCommandService = userSkillPriorityReportCommandService;
 	}
 
-	@ApiOperation(value = "Create a new Report",
-			notes = "Create a new report in the system.")
+	@ApiOperation(
+			value = "Create a new user skill priority report",
+			notes = "Create a new user skill priority report based on the current data in the system."
+	)
 	@ApiResponses({
 			@ApiResponse(code = 201, message = "Successful execution"),
+			@ApiResponse(code = 401, message = "Invalid authentication"),
 			@ApiResponse(code = 403, message = "Insufficient privileges to perform this operation"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
 	@PreAuthorize("hasRole('USER')")
-	@PostMapping(path = "/reports",
+	@PostMapping(
+			path = "/reports/skills/priority",
 			consumes = MediaType.ALL_VALUE,
-			produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<UserSkillPriorityReportResponse> createReport() {
-		UserSkillPriorityReport userSkillPriorityReport = userSkillPriorityReportCommandService.createPriorityReport();
-		return ResponseEntity.status(HttpStatus.CREATED).body(UserSkillPriorityReportResponse.builder()
-				.id(userSkillPriorityReport.getId())
-				.date(userSkillPriorityReport.getDate())
-				.skillCount(userSkillPriorityReport.getUserSkillPriorityAggregationReports().size())
+			produces = MediaType.APPLICATION_JSON_VALUE
+	)
+	public ResponseEntity<UserSkillPriorityReportSimpleResponse> createReport() {
+		UserSkillPriorityReport report = userSkillPriorityReportCommandService.createUserSkillPriorityReport();
+		return ResponseEntity.status(HttpStatus.CREATED).body(UserSkillPriorityReportSimpleResponse.builder()
+				.id(report.getId())
+				.date(report.getDate())
+				.skillCount(report.getAggregationReports().size())
 				.build());
 	}
 }

@@ -11,7 +11,6 @@ import lombok.Data;
 @ApiModel(value = "Skill priority statistics",
 		description = "This holds the skills statistic like (averagePriority and maximumPriority).")
 public class UserSkillPriorityAggregationResponse {
-
 	@ApiModelProperty("Details of the skill")
 	private SkillResponse skill;
 	@ApiModelProperty("Average priority of the skill")

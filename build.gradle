@@ -1,5 +1,6 @@
 buildscript {
 	repositories {
+		mavenLocal()
 		mavenCentral()
 	}
 	dependencies {
@@ -36,10 +37,10 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-security')
 	compile("org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:${springSecurityOauth2AutoconfigureVersion}")
 	compile('org.springframework.boot:spring-boot-starter-web')
+	compile('org.springframework.boot:spring-boot-starter-aop')
 	compile("io.springfox:springfox-swagger2:${springfoxSwagger2Version}")
 	compile("org.apache.commons:commons-lang3:${commonsLang3Version}")
 	compileOnly('org.projectlombok:lombok')
-	compile('org.springframework.boot:spring-boot-starter-aop')
 
 	/*
 	 * Application runtime dependencies
@@ -50,13 +51,6 @@ dependencies {
 	runtime("com.sun.xml.bind:jaxb-core:${jaxbVersion}")
 	runtime("com.sun.xml.bind:jaxb-impl:${jaxbVersion}")
 	runtime("javax.activation:activation:${javaxActivationVersion}")
-
-	/*
-	 * Spring Batch Dependencies
-	 */
-//	compile("org.springframework.boot:spring-boot-starter-batch")
-//	runtime("com.h2database:h2")
-//	compile("org.springframework.batch:spring-batch-test")
 
 	/*
 	 * Annotation processors

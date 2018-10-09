@@ -3,14 +3,14 @@
 //import io.knowledgeassets.myskills.server.MySkillsServerApplicationTests;
 //import io.knowledgeassets.myskills.server.common.Neo4jSessionFactoryConfiguration;
 //import io.knowledgeassets.myskills.server.exception.BusinessException;
-//import io.knowledgeassets.myskills.server.report.userskillpriorityaggregationreport.UserSkillPriorityAggregationReport;
+//import io.knowledgeassets.myskills.server.report.userskillpriority.UserSkillPriorityAggregationReport;
 //import io.knowledgeassets.myskills.server.report.userskillpriorityaggregationreport.query.UserSkillPriorityAggregationReportQueryService;
-//import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReport;
-//import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReportRepository;
-//import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReportResponse;
-//import io.knowledgeassets.myskills.server.report.userskillpriorityreport.command.UserSkillPriorityReportCommandService;
-//import io.knowledgeassets.myskills.server.report.userskillpriorityreport.query.UserSkillPriorityReportQueryService;
-//import io.knowledgeassets.myskills.server.report.userskillreport.UserSkillReport;
+//import io.knowledgeassets.myskills.server.report.userskillpriority.UserSkillPriorityReport;
+//import io.knowledgeassets.myskills.server.report.userskillpriority.UserSkillPriorityReportRepository;
+//import io.knowledgeassets.myskills.server.report.userskillpriority.UserSkillPriorityReportResponse;
+//import io.knowledgeassets.myskills.server.report.userskillpriority.command.UserSkillPriorityReportCommandService;
+//import io.knowledgeassets.myskills.server.report.userskillpriority.query.UserSkillPriorityReportQueryService;
+//import io.knowledgeassets.myskills.server.report.userskill.UserSkillReport;
 //import io.knowledgeassets.myskills.server.skill.Skill;
 //import io.knowledgeassets.myskills.server.skill.SkillRepository;
 //import SkillQueryController;
@@ -153,17 +153,17 @@
 ////
 ////		assertEquals(1, userSkillPriorityReportRepository.count());
 ////
-////		List<UserSkillPriorityAggregationReport> userSkillPriorityAggregationReports = null;
+////		List<UserSkillPriorityAggregationReport> aggregationReports = null;
 ////		try {
-////			userSkillPriorityAggregationReports = userSkillPriorityAggregationReportQueryService
+////			aggregationReports = userSkillPriorityAggregationReportQueryService
 ////					.getUserSkillPriorityAggregationReportsByReportId(report.getId())
 ////					.collect(Collectors.toList());
 ////		} catch (BusinessException e) {
 ////			fail(e);
 ////		}
 ////
-////		assertEquals(3, userSkillPriorityAggregationReports.size());
-////		UserSkillPriorityAggregationReport angular = userSkillPriorityAggregationReports.stream()
+////		assertEquals(3, aggregationReports.size());
+////		UserSkillPriorityAggregationReport angular = aggregationReports.stream()
 ////				.filter(userSkillPriorityAggregationReport ->
 ////						userSkillPriorityAggregationReport.getSkillName().equals("Angular")
 ////				).collect(Collectors.toList()).get(0);

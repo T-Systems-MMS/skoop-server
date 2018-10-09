@@ -4,13 +4,12 @@ import io.knowledgeassets.myskills.server.exception.BusinessException;
 import io.knowledgeassets.myskills.server.exception.EmptyInputException;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.exception.enums.Model;
-import io.knowledgeassets.myskills.server.report.UserSkillPriorityAggregationReportResult;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.skill.query.SkillQueryService;
 import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.user.query.UserQueryService;
 import io.knowledgeassets.myskills.server.userskill.UserSkill;
-import io.knowledgeassets.myskills.server.userskill.UserSkillPriorityAggregation;
+import io.knowledgeassets.myskills.server.userskill.UserSkillPriorityAggregationResult;
 import io.knowledgeassets.myskills.server.userskill.UserSkillRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,13 +72,8 @@ public class UserSkillQueryService {
 	}
 
 	@Transactional(readOnly = true)
-	public Stream<UserSkillPriorityAggregation> getTop10PrioritizedSkills() {
+	public Stream<UserSkillPriorityAggregationResult> getTop10UserSkillPriorityAggregationResults() {
 		return StreamSupport.stream(userSkillRepository.findTop10PrioritizedSkills().spliterator(), false);
-	}
-
-	@Transactional(readOnly = true)
-	public Stream<UserSkillPriorityAggregationReportResult> findPrioritizedSkillsToCreateReport() {
-		return StreamSupport.stream(userSkillRepository.findPrioritizedSkillsToCreateReport().spliterator(), false);
 	}
 
 	@Transactional(readOnly = true)
@@ -93,9 +87,5 @@ public class UserSkillQueryService {
 		}
 		return StreamSupport.stream(userSkillRepository.findSkillSuggestionsByUserId(userId, search)
 				.spliterator(), false);
-	}
-
-	public Optional<UserSkill> findByUserIdAndSkillName(String userId, String skillName) {
-		return userSkillRepository.findByUserIdAndSkillName(userId, skillName);
 	}
 }

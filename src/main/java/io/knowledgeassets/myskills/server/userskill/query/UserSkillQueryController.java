@@ -104,6 +104,7 @@ public class UserSkillQueryController {
 						.firstName(coach.getFirstName())
 						.lastName(coach.getLastName())
 						.email(coach.getEmail())
+						.coach(coach.getCoach())
 						.build())
 				.collect(toList());
 	}

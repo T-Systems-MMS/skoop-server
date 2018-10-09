@@ -12,7 +12,7 @@ import org.springframework.data.neo4j.annotation.QueryResult;
 @NoArgsConstructor
 @AllArgsConstructor
 @QueryResult
-public class UserSkillPriorityAggregation {
+public class UserSkillPriorityAggregationResult {
 	private Skill skill;
 	private Double averagePriority;
 	private Double maximumPriority;

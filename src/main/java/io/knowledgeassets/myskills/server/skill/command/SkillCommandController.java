@@ -31,7 +31,7 @@ public class SkillCommandController {
 			notes = "Create a new skill in the system. The skill name must not exist yet.")
 	@ApiResponses({
 			@ApiResponse(code = 201, message = "Successful execution"),
-			@ApiResponse(code = 400, message = "Invalid input data, e.g. missing mandatory data or skill name exists"),
+			@ApiResponse(code = 400, message = "Invalid input data, e.g. missing mandatory data or skill name existsReport"),
 			@ApiResponse(code = 403, message = "Insufficient privileges to perform this operation"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
@@ -47,7 +47,7 @@ public class SkillCommandController {
 			skill = skillCommandService.createSkill(request.getName(), request.getDescription(), request.getSkillGroups());
 		} catch (BusinessException e) {
 			e.setDebugMessage("An exception has occurred in creating a skill!");
-			e.setSuggestion("Make sure that skill with the given name doesn't already exists!");
+			e.setSuggestion("Make sure that skill with the given name doesn't already existsReport!");
 			throw e;
 		}
 		return ResponseEntity.status(HttpStatus.CREATED).body(SkillResponse.builder()

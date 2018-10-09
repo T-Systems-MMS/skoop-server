@@ -10,10 +10,11 @@ import java.util.List;
 
 @Data
 @Builder
-@ApiModel(value = "SkillResponse"
-		, description = "This holds information of a skill. It will be used for sending skill information to client.")
+@ApiModel(
+		value = "SkillResponse",
+		description = "This holds information of a skill. It will be used for sending skill information to client."
+)
 public class SkillResponse {
-
 	@ApiModelProperty("Skill id")
 	private String id;
 

@@ -1,12 +1,12 @@
 package io.knowledgeassets.myskills.server.report;
 
 import io.knowledgeassets.myskills.server.common.Neo4jSessionFactoryConfiguration;
-import io.knowledgeassets.myskills.server.report.userskillpriorityaggregationreport.UserSkillPriorityAggregationReport;
-import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReport;
-import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReportResponse;
-import io.knowledgeassets.myskills.server.report.userskillpriorityreport.command.UserSkillPriorityReportCommandController;
-import io.knowledgeassets.myskills.server.report.userskillpriorityreport.command.UserSkillPriorityReportCommandService;
-import io.knowledgeassets.myskills.server.report.userskillreport.UserSkillReport;
+import io.knowledgeassets.myskills.server.report.userskillpriority.UserSkillPriorityAggregationReport;
+import io.knowledgeassets.myskills.server.report.userskillpriority.UserSkillPriorityReport;
+import io.knowledgeassets.myskills.server.report.userskillpriority.UserSkillPriorityReportSimpleResponse;
+import io.knowledgeassets.myskills.server.report.userskillpriority.command.UserSkillPriorityReportCommandController;
+import io.knowledgeassets.myskills.server.report.userskillpriority.command.UserSkillPriorityReportCommandService;
+import io.knowledgeassets.myskills.server.report.userskill.UserSkillReport;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,11 +54,11 @@ public class UserSkillPriorityReportCommandControllerTests {
 	@DisplayName("Creates a report")
 	public void createReport() throws Exception {
 		LocalDateTime now = LocalDateTime.now();
-		given(userSkillPriorityReportCommandService.createPriorityReport()).willReturn(
+		given(userSkillPriorityReportCommandService.createUserSkillPriorityReport()).willReturn(
 				UserSkillPriorityReport.builder()
 						.id("8f5634b8-783f-4503-b40f-ca93d8db7e72")
 						.date(now)
-						.userSkillPriorityAggregationReports(singletonList(
+						.aggregationReports(singletonList(
 								UserSkillPriorityAggregationReport.builder()
 										.id("123")
 										.skillName("Neo4j")
@@ -68,14 +68,20 @@ public class UserSkillPriorityReportCommandControllerTests {
 										.userSkillReports(asList(
 												UserSkillReport.builder()
 														.skillName("Neo4j")
+														.skillDescription("Graph database")
 														.userName("tester")
+														.userFirstName("Toni")
+														.userLastName("Tester")
 														.currentLevel(2)
 														.desiredLevel(4)
 														.priority(2)
 														.build(),
 												UserSkillReport.builder()
 														.skillName("Neo4j")
+														.skillDescription("Graph database")
 														.userName("tester2")
+														.userFirstName("Tina")
+														.userLastName("Testing")
 														.currentLevel(1)
 														.desiredLevel(3)
 														.priority(4)
@@ -88,7 +94,7 @@ public class UserSkillPriorityReportCommandControllerTests {
 						.build()
 		);
 
-		MvcResult mvcResult = mockMvc.perform(post("/reports")
+		MvcResult mvcResult = mockMvc.perform(post("/reports/skills/priority")
 				.accept(MediaType.APPLICATION_JSON)
 				.with(csrf())
 				.with(user("tester").password("123").roles("USER")))
@@ -101,9 +107,9 @@ public class UserSkillPriorityReportCommandControllerTests {
 
 		String responseJson = mvcResult.getResponse().getContentAsString();
 
-		UserSkillPriorityReportResponse userSkillPriorityReportResponse = objectMapper.readValue(responseJson,
-				UserSkillPriorityReportResponse.class);
-		assertThat(userSkillPriorityReportResponse.getDate().truncatedTo(ChronoUnit.SECONDS))
+		UserSkillPriorityReportSimpleResponse userSkillPriorityReportSimpleResponse = objectMapper.readValue(responseJson,
+				UserSkillPriorityReportSimpleResponse.class);
+		assertThat(userSkillPriorityReportSimpleResponse.getDate().truncatedTo(ChronoUnit.SECONDS))
 				.isEqualTo(now.truncatedTo(ChronoUnit.SECONDS));
 
 	}

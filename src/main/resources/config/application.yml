@@ -1,52 +1,33 @@
-server:
-  port: 8080
 spring:
   profiles:
-    active: "dev"
-    main:
-      banner-mode: "off"
-  batch:
-    job:
-      # Prevent Spring Boot to trigger the Spring Batch Job automatically
-      enabled: false
-  data:
-    neo4j:
-      # Default is None but in Production use VALIDATE
-      auto-index: Update # Update creates all indexes and constraints. Use this only in development
+    # Enable "dev" profile by default.
+    active: dev
+  main:
+    # Disable banner by default.
+    banner-mode: 'off'
 
 security:
   oauth2:
     resource:
-      # Client ID to be used to identify this application in the authorization server
+      # Default client ID to be used to identify this application in the authorization server.
       id: myskills
-      jwk:
-        # URL to retrieve the public key for ID token validation from
-        key-set-uri: http://localhost:9000/auth/realms/MySkills/protocol/openid-connect/certs
       service-id: myskills
 
 springfox:
   documentation:
     swagger:
       v2:
+        # Default path to generated OpenAPI specification.
         path: /api-spec
 
 myskills:
   security:
-    # Roles granted to users by default
+    # List of roles granted to all users by default.
     default-roles:
-    - ROLE_USER
+      - ROLE_USER
 
 logging:
-  level:
-    io:
-      knowledgeassets:
-        myskills:
-          server: DEBUG
-    org:
-      springframework: WARN
-    root: INFO
+  # Default logging patterns.
   pattern:
-    console: "request #%X{RequestId}: %d{yyyy-MM-dd HH:mm:ss} - %msg%n"
-    file: "request #%X{RequestId}: %d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-
-  file: logs/myskills-server.log
+    console: '%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} Request:%X{RequestId} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx'
+    file: '%d{yyyy-MM-dd HH:mm:ss.SSS} %5p ${PID:- } --- Request:%X{RequestId} [%t] %-40.40logger{39} : %m%n%wEx'
