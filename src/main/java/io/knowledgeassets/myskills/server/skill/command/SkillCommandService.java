@@ -61,7 +61,7 @@ public class SkillCommandService {
 	}
 
 	@Transactional
-	public Skill updateSkill(String id, String name, String description) {
+	public Skill updateSkill(String id, String name, String description, List<String> groups) {
 		Skill skill = skillRepository.findById(id).orElseThrow(() -> {
 			String[] searchParamsMap = {"id", id};
 			return NoSuchResourceException.builder()
@@ -69,8 +69,25 @@ public class SkillCommandService {
 					.searchParamsMap(searchParamsMap)
 					.build();
 		});
+
+		List<SkillGroup> skillGroups = new ArrayList<>();
+		if (!CollectionUtils.isEmpty(groups)) {
+			groups.forEach(groupName -> {
+				SkillGroup skillGroup = skillGroupQueryService.findByNameIgnoreCase(groupName)
+						.orElseThrow(() -> {
+							String[] searchParamsMap = {"name", groupName};
+							return NoSuchResourceException.builder()
+									.model(Model.SKILL_GROUP)
+									.searchParamsMap(searchParamsMap)
+									.build();
+						});
+				skillGroups.add(skillGroup);
+			});
+		}
+		skill.setSkillGroups(skillGroups);
 		skill.setName(name);
 		skill.setDescription(description);
+
 		return skillRepository.save(skill);
 	}
 
