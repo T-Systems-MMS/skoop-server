@@ -5,17 +5,13 @@ import io.knowledgeassets.myskills.server.exception.EmptyInputException;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.exception.enums.Model;
 import io.knowledgeassets.myskills.server.report.UserSkillPriorityAggregationReportResult;
-import io.knowledgeassets.myskills.server.report.userskillpriorityaggregationreport.UserSkillPriorityAggregationReport;
 import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReport;
 import io.knowledgeassets.myskills.server.report.userskillpriorityreport.UserSkillPriorityReportRepository;
-import io.knowledgeassets.myskills.server.report.userskillreport.UserSkillReport;
-import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.userskill.query.UserSkillQueryService;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -64,7 +60,7 @@ public class UserSkillPriorityReportQueryService {
 		} else {
 			String[] searchParamsMap = {"id", userSkillPriorityReportId};
 			throw NoSuchResourceException.builder()
-					.model(Model.UserSkillPriorityReport)
+					.model(Model.USER_SKILL_PRIORITY_REPORT)
 					.searchParamsMap(searchParamsMap)
 					.build();
 		}

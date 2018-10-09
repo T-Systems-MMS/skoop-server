@@ -35,7 +35,7 @@ public class UserSkillPriorityAggregationReportQueryService {
 		if (!userSkillPriorityReportQueryService.exists(reportId)) {
 			String[] searchParamsMap = {"id", reportId};
 			throw NoSuchResourceException.builder()
-					.model(Model.UserSkillPriorityReport)
+					.model(Model.USER_SKILL_PRIORITY_REPORT)
 					.searchParamsMap(searchParamsMap)
 					.build();
 		}
@@ -56,7 +56,7 @@ public class UserSkillPriorityAggregationReportQueryService {
 		} else {
 			String[] searchParamsMap = {"id", userSkillPriorityAggregationReportId};
 			throw NoSuchResourceException.builder()
-					.model(Model.UserSkillPriorityAggregationReport)
+					.model(Model.USER_SKILL_PRIORITY_AGGREGATION_REPORT)
 					.searchParamsMap(searchParamsMap)
 					.build();
 		}

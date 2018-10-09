@@ -9,11 +9,12 @@ public enum Model {
 
 	USER("user"),
 	SKILL("skill"),
-	USERSKILL("user skill"),
+	SKILL_GROUP("skill group"),
+	USER_SKILL("user skill"),
 
-	UserSkillPriorityReport("user skill priority report"),
-	UserSkillPriorityAggregationReport("user skill priority aggregation report"),
-	UserSkillReport("user skill report"),
+	USER_SKILL_PRIORITY_REPORT("user skill priority report"),
+	USER_SKILL_PRIORITY_AGGREGATION_REPORT("user skill priority aggregation report"),
+	USER_SKILL_REPORT("user skill report"),
 	;
 
 	public final String value;

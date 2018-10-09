@@ -4,15 +4,12 @@ import io.knowledgeassets.myskills.server.exception.BusinessException;
 import io.knowledgeassets.myskills.server.exception.EmptyInputException;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.exception.enums.Model;
-import io.knowledgeassets.myskills.server.report.userskillpriorityaggregationreport.UserSkillPriorityAggregationReport;
-import io.knowledgeassets.myskills.server.report.userskillpriorityaggregationreport.UserSkillPriorityAggregationReportRepository;
 import io.knowledgeassets.myskills.server.report.userskillpriorityaggregationreport.query.UserSkillPriorityAggregationReportQueryService;
 import io.knowledgeassets.myskills.server.report.userskillreport.UserSkillReport;
 import io.knowledgeassets.myskills.server.report.userskillreport.UserSkillReportRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -39,7 +36,7 @@ public class UserSkillReportQueryService {
 		if (!userSkillPriorityAggregationReportQueryService.exists(userSkillPriorityAggregationReportId)) {
 			String[] searchParamsMap = {"id", userSkillPriorityAggregationReportId};
 			throw NoSuchResourceException.builder()
-					.model(Model.UserSkillPriorityAggregationReport)
+					.model(Model.USER_SKILL_PRIORITY_AGGREGATION_REPORT)
 					.searchParamsMap(searchParamsMap)
 					.build();
 		}
@@ -60,7 +57,7 @@ public class UserSkillReportQueryService {
 		} else {
 			String[] searchParamsMap = {"id", userSkillReportId};
 			throw NoSuchResourceException.builder()
-					.model(Model.UserSkillReport)
+					.model(Model.USER_SKILL_REPORT)
 					.searchParamsMap(searchParamsMap)
 					.build();
 		}
