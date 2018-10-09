@@ -44,7 +44,7 @@ public class SkillCommandController {
 													 BindingResult bindingResult) {
 		Skill skill = null;
 		try {
-			skill = skillCommandService.createSkill(request.getName(), request.getDescription(), request.getGroups());
+			skill = skillCommandService.createSkill(request.getName(), request.getDescription(), request.getSkillGroups());
 		} catch (BusinessException e) {
 			e.setDebugMessage("An exception has occurred in creating a skill!");
 			e.setSuggestion("Make sure that skill with the given name doesn't already exists!");
@@ -73,7 +73,7 @@ public class SkillCommandController {
 	@CheckBindingResult
 	public SkillResponse updateSkill(@PathVariable("skillId") String skillId, @Valid @RequestBody SkillRequest request,
 									 BindingResult bindingResult) {
-		Skill skill = skillCommandService.updateSkill(skillId, request.getName(), request.getDescription());
+		Skill skill = skillCommandService.updateSkill(skillId, request.getName(), request.getDescription(), request.getSkillGroups());
 		return SkillResponse.builder()
 				.id(skill.getId())
 				.name(skill.getName())

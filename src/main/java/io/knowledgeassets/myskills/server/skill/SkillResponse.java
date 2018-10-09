@@ -24,5 +24,5 @@ public class SkillResponse {
 	private String description;
 
 	@EqualsAndHashCode.Exclude
-	private List<String> groups;
+	private List<String> skillGroups;
 }

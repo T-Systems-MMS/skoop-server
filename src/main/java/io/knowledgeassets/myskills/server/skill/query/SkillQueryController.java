@@ -48,7 +48,7 @@ public class SkillQueryController {
 						.id(skill.getId())
 						.name(skill.getName())
 						.description(skill.getDescription())
-						.groups(getGroups(skill.getSkillGroups()))
+						.skillGroups(getGroups(skill.getSkillGroups()))
 						.build())
 				.collect(toList());
 	}
