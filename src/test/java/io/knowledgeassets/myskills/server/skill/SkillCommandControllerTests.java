@@ -19,6 +19,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 import static org.hamcrest.Matchers.*;
@@ -49,7 +52,7 @@ public class SkillCommandControllerTests {
 		SkillRequest skillRequest = SkillRequest.builder().name("Java").description("A Programming language").build();
 		String skillRequestAsString = objectMapper.writeValueAsString(skillRequest);
 
-		given(skillCommandService.createSkill("Java", "A Programming language"))
+		given(skillCommandService.createSkill("Java", "A Programming language", null)) // TODO: 10/9/2018 add skill groups
 				.willReturn(Skill.builder().id("123").name("Java").description("A Programming language").build());
 
 		mockMvc.perform(post("/skills")
@@ -69,7 +72,7 @@ public class SkillCommandControllerTests {
 	@DisplayName("Update Skill")
 	void updateSkill() throws Exception {
 
-		given(skillCommandService.updateSkill("123", "Java", "A Programming language"))
+		given(skillCommandService.updateSkill("123", "Java", "A Programming language", List.of()))// TODO: 10/9/2018 add skill groups
 				.willReturn(Skill.builder().id("123").name("Java").description("A Programming language").build());
 
 		SkillRequest skillRequest = SkillRequest.builder().name("Java").description("A Programming language").build();
