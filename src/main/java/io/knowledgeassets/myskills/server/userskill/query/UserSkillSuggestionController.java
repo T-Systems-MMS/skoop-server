@@ -44,7 +44,7 @@ public class UserSkillSuggestionController {
 			return userSkillQueryService.getUserSkillSuggestions(userId, search).map(Skill::getName).collect(toList());
 		} catch (BusinessException e) {
 			e.setDebugMessage("An exception has occurred in getting skill suggestions for a specific user!");
-			e.setSuggestion("Check userId isn't null or make sure that user with this userId already existsReport in DB!");
+			e.setSuggestion("Check userId isn't null or make sure that user with this userId already exists in DB!");
 			throw e;
 		}
 	}

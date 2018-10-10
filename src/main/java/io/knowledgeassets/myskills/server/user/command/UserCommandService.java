@@ -34,7 +34,7 @@ public class UserCommandService {
 	public User createUser(String userName, String firstName, String lastName, String email) {
 		userRepository.findByUserName(userName).ifPresent(user -> {
 			throw DuplicateResourceException.builder()
-					.message(format("User with name '%s' already existsReport", userName))
+					.message(format("User with name '%s' already exists", userName))
 					.build();
 		});
 		return userRepository.save(User.builder()

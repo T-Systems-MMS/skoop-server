@@ -20,7 +20,7 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-@Api(tags = "Groups", description = "API allowing queries of skill groups")
+@Api(tags = "SkillGroups", description = "API allowing queries of skill groups")
 @RestController
 public class SkillGroupQueryController {
 	private SkillGroupQueryService skillGroupQueryService;
@@ -39,7 +39,7 @@ public class SkillGroupQueryController {
 	@PreAuthorize("hasRole('USER')")
 	@GetMapping(path = "/groups", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<SkillResponse> getGroups() {
-		return skillGroupQueryService.getGroups()
+		return skillGroupQueryService.getSkillGroups()
 				.map(skillGroup -> SkillResponse.builder()
 						.id(skillGroup.getId())
 						.name(skillGroup.getName())
@@ -59,7 +59,7 @@ public class SkillGroupQueryController {
 	@PreAuthorize("hasRole('USER')")
 	@GetMapping(path = "/groups/{groupId}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public SkillGroupResponse getSkill(@PathVariable("groupId") String groupId) {
-		return skillGroupQueryService.getGroupById(groupId)
+		return skillGroupQueryService.getSkillGroupById(groupId)
 				.map(skillGroup -> SkillGroupResponse.builder()
 						.id(skillGroup.getId())
 						.name(skillGroup.getName())
@@ -84,6 +84,6 @@ public class SkillGroupQueryController {
 	@PreAuthorize("hasRole('USER')")
 	@GetMapping(path = "/groups/group-existence", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Boolean isGroupExist(@RequestParam("search") String skillName) throws BusinessException {
-		return skillGroupQueryService.isGroupExist(skillName);
+		return skillGroupQueryService.isSkillGroupExist(skillName);
 	}
 }

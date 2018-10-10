@@ -14,20 +14,20 @@ import static java.lang.String.format;
 
 @Service
 public class SkillGroupCommandService {
-	private SkillGroupRepository groupRepository;
+	private SkillGroupRepository skillGroupRepository;
 
-	public SkillGroupCommandService(SkillGroupRepository groupRepository) {
-		this.groupRepository = groupRepository;
+	public SkillGroupCommandService(SkillGroupRepository skillGroupRepository) {
+		this.skillGroupRepository = skillGroupRepository;
 	}
 
 	@Transactional
 	public SkillGroup createGroup(String name, String description) {
-		groupRepository.findByNameIgnoreCase(name).ifPresent(skillGroup -> {
+		skillGroupRepository.findByNameIgnoreCase(name).ifPresent(skillGroup -> {
 			throw DuplicateResourceException.builder()
 					.message(format("Skill group with name '%s' already exists", name))
 					.build();
 		});
-		return groupRepository.save(SkillGroup.builder()
+		return skillGroupRepository.save(SkillGroup.builder()
 				.id(UUID.randomUUID().toString())
 				.name(name)
 				.description(description)
@@ -36,7 +36,7 @@ public class SkillGroupCommandService {
 
 	@Transactional
 	public SkillGroup updateGroup(String id, String name, String description) {
-		SkillGroup skillGroup = groupRepository.findById(id).orElseThrow(() -> {
+		SkillGroup skillGroup = skillGroupRepository.findById(id).orElseThrow(() -> {
 			String[] searchParamsMap = {"id", id};
 			return NoSuchResourceException.builder()
 					.model(Model.SKILL_GROUP)
@@ -45,18 +45,18 @@ public class SkillGroupCommandService {
 		});
 		skillGroup.setName(name);
 		skillGroup.setDescription(description);
-		return groupRepository.save(skillGroup);
+		return skillGroupRepository.save(skillGroup);
 	}
 
 	@Transactional
 	public void deleteGroup(String id) {
-		SkillGroup skillGroup = groupRepository.findById(id).orElseThrow(() -> {
+		SkillGroup skillGroup = skillGroupRepository.findById(id).orElseThrow(() -> {
 			String[] searchParamsMap = {"id", id};
 			return NoSuchResourceException.builder()
 					.model(Model.SKILL_GROUP)
 					.searchParamsMap(searchParamsMap)
 					.build();
 		});
-		groupRepository.delete(skillGroup);
+		skillGroupRepository.delete(skillGroup);
 	}
 }

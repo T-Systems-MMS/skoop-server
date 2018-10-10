@@ -37,29 +37,6 @@ public class SkillGroupSuggestionController {
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
 	@PreAuthorize("hasRole('USER')")
-	@GetMapping(path = "/skills/{skillId}/group-suggestions", produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<String> getSkillGroupSuggestionsBySkillId(@PathVariable("skillId") String skillId,
-												@RequestParam("search") String search) throws BusinessException {
-		try {
-			return skillGroupQueryService.getSkillGroupSuggestionsBySkillId(skillId, search).map(SkillGroup::getName).collect(toList());
-		} catch (BusinessException e) {
-			e.setDebugMessage("An exception has occurred in getting skill group suggestions for a specific user!");
-			e.setSuggestion("Check skillId isn't null or make sure that skill with this skillId already exists in DB!");
-			throw e;
-		}
-	}
-
-	@ApiOperation(value = "Get skill group suggestions for a specific skill",
-			notes = "Get skill group suggestions for the specific skill and the given search term. Returns only the names " +
-					"of skill groups which contain the search term (case insensitive comparison) and are not related to " +
-					"the skill yet. The list is sorted in alphabetical order.")
-	@ApiResponses({
-			@ApiResponse(code = 200, message = "Successful execution"),
-			@ApiResponse(code = 403, message = "Insufficient privileges to access resource, e.g. foreign user data"),
-			@ApiResponse(code = 404, message = "Resource not found"),
-			@ApiResponse(code = 500, message = "Error during execution")
-	})
-	@PreAuthorize("hasRole('USER')")
 	@GetMapping(path = "/group-suggestions", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<String> getSkillGroupSuggestions(@RequestParam("search") String search) throws BusinessException {
 		try {

@@ -2,7 +2,6 @@ package io.knowledgeassets.myskills.server.skillgroup.query;
 
 import io.knowledgeassets.myskills.server.exception.EmptyInputException;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
-import io.knowledgeassets.myskills.server.exception.enums.Model;
 import io.knowledgeassets.myskills.server.skill.query.SkillQueryService;
 import io.knowledgeassets.myskills.server.skillgroup.SkillGroup;
 import io.knowledgeassets.myskills.server.skillgroup.SkillGroupRepository;
@@ -16,20 +15,18 @@ import java.util.stream.StreamSupport;
 @Service
 public class SkillGroupQueryService {
 	private SkillGroupRepository skillGroupRepository;
-	private SkillQueryService skillQueryService;
 
-	public SkillGroupQueryService(SkillGroupRepository skillGroupRepository, SkillQueryService skillQueryService) {
+	public SkillGroupQueryService(SkillGroupRepository skillGroupRepository) {
 		this.skillGroupRepository = skillGroupRepository;
-		this.skillQueryService = skillQueryService;
 	}
 
 	@Transactional(readOnly = true)
-	public Stream<SkillGroup> getGroups() {
+	public Stream<SkillGroup> getSkillGroups() {
 		return StreamSupport.stream(skillGroupRepository.findAll().spliterator(), false);
 	}
 
 	@Transactional(readOnly = true)
-	public Optional<SkillGroup> getGroupById(String skillGroupId) {
+	public Optional<SkillGroup> getSkillGroupById(String skillGroupId) {
 		return skillGroupRepository.findById(skillGroupId);
 	}
 
@@ -54,26 +51,13 @@ public class SkillGroupQueryService {
 		return skillGroupRepository.existsById(skillGroupId);
 	}
 
-	public Boolean isGroupExist(String search) {
-		return skillGroupRepository.isGroupExistByNameIgnoreCase(search);
-	}
-
-	@Transactional(readOnly = true)
-	public Stream<SkillGroup> getSkillGroupSuggestionsBySkillId(String skillId, String search) throws EmptyInputException, NoSuchResourceException {
-		if (!skillQueryService.exists(skillId)) {
-			String[] searchParamsMap = {"id", skillId};
-			throw NoSuchResourceException.builder()
-					.model(Model.SKILL)
-					.searchParamsMap(searchParamsMap)
-					.build();
-		}
-		return StreamSupport.stream(skillGroupRepository.findGroupSuggestionsBySkillId(skillId, search)
-				.spliterator(), false);
+	public Boolean isSkillGroupExist(String search) {
+		return skillGroupRepository.isSkillGroupExistByNameIgnoreCase(search);
 	}
 
 	@Transactional(readOnly = true)
 	public Stream<SkillGroup> getSkillGroupSuggestions(String search) throws EmptyInputException, NoSuchResourceException {
-		return StreamSupport.stream(skillGroupRepository.findGroupSuggestions(search)
+		return StreamSupport.stream(skillGroupRepository.findSkillGroupSuggestions(search)
 				.spliterator(), false);
 	}
 }

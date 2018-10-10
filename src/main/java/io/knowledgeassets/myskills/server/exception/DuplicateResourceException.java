@@ -3,7 +3,7 @@ package io.knowledgeassets.myskills.server.exception;
 import lombok.Builder;
 
 /**
- * When a resource(like a entity) already existsReport, we throw this exception.
+ * When a resource(like a entity) already exists, we throw this exception.
  *
  * @author hadi
  */

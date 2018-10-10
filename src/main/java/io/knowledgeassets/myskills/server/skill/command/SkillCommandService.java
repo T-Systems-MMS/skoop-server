@@ -33,7 +33,7 @@ public class SkillCommandService {
 	public Skill createSkill(String name, String description, List<String> groups) {
 		skillRepository.findByNameIgnoreCase(name).ifPresent(skill -> {
 			throw DuplicateResourceException.builder()
-					.message(format("Skill with name '%s' already existsReport", name))
+					.message(format("Skill with name '%s' already exists", name))
 					.build();
 		});
 

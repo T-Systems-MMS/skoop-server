@@ -80,7 +80,7 @@ public class SkillQueryController {
 				});
 	}
 
-	@ApiOperation(value = "If a skill with the specific skillName existsReport it return true, otherwise false.")
+	@ApiOperation(value = "If a skill with the specific skillName exists it return true, otherwise false.")
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "Successful execution"),
 			@ApiResponse(code = 403, message = "Insufficient privileges to access resource, e.g. foreign user data"),

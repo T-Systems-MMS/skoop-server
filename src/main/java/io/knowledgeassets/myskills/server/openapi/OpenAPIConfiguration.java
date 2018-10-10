@@ -50,7 +50,9 @@ public class OpenAPIConfiguration {
 						new Tag("Statistics",
 								"API allowing queries of various statistics"),
 						new Tag("Reports",
-								"API allowing queries and creation of reports"));
+								"API allowing queries and creation of reports"),
+						new Tag("SkillGroups",
+								"API allowing queries and creation of skill groups"));
 	}
 
 	@Bean

@@ -75,7 +75,7 @@ public class UserSkillCommandService {
 	}
 
 	/**
-	 * Relates the existing user with the given ID to the skill with the given name. If the skill name already existsReport
+	 * Relates the existing user with the given ID to the skill with the given name. If the skill name already exists
 	 * the user is related to the existing skill, otherwise a new skill with the given name is created.
 	 *
 	 * @param userId       ID of the existing user.
