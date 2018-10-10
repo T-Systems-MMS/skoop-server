@@ -2,6 +2,7 @@ package io.knowledgeassets.myskills.server.security;
 
 import io.knowledgeassets.myskills.server.user.command.UserCommandService;
 import io.knowledgeassets.myskills.server.user.query.UserQueryService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
 import org.springframework.context.annotation.Bean;
@@ -79,4 +80,5 @@ public class SecurityConfiguration extends ResourceServerConfigurerAdapter {
 				.and().csrf().disable()
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 	}
+
 }

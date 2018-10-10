@@ -15,7 +15,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.Collections;
 
@@ -29,9 +28,10 @@ import static org.springframework.http.HttpStatus.*;
 @ControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @Slf4j
-public class BusinessExceptionsHandler extends ResponseEntityExceptionHandler implements IExceptionHandler {
+public class BusinessExceptionsHandler implements IExceptionHandler {
 
 	/**
+	 * // TODO: 10/9/2018 @Wittberger: this handler belongs to all the resources, It should not have Report text in logMessage
 	 * when a resource(like a entity) already existsReport, we throw this exception.
 	 */
 	@ExceptionHandler({DuplicateResourceException.class})

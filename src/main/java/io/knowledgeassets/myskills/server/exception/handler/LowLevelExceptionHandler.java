@@ -6,11 +6,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.servlet.http.HttpServletRequest;
+
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 /**
@@ -22,7 +25,7 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 @ControllerAdvice
 @Order
 @Slf4j
-public class LowLevelExceptionHandler extends ResponseEntityExceptionHandler implements IExceptionHandler {
+public class LowLevelExceptionHandler implements IExceptionHandler {
 
 	/**
 	 * We catch all business exception that we want to send HttpStatus.INTERNAL_SERVER_ERROR.
@@ -43,7 +46,26 @@ public class LowLevelExceptionHandler extends ResponseEntityExceptionHandler imp
 		return buildResponseEntity(ex, responseError);
 	}
 
-	// TODO: Handle AccessDeniedException and return status 403.
+	/**
+	 * It handles AccessDeniedException and return status 403.
+	 *
+	 * @param ex
+	 * @param request
+	 * @return
+	 */
+	@ExceptionHandler({AccessDeniedException.class})
+	public ResponseEntity<Object> handleAccessDeniedException(Exception ex, WebRequest request, HttpServletRequest httpServletRequest) {
+		String logMessage = String.format("Access denied. The user %s can not do %s HTTP method for following uri(%s).",
+				httpServletRequest.getUserPrincipal() != null ? httpServletRequest.getUserPrincipal().getName() : "",
+				httpServletRequest.getMethod(),
+				httpServletRequest.getRequestURL());
+		doLog(ex, logMessage);
+
+		ResponseError responseError = new ResponseError(FORBIDDEN);
+		responseError.setMessage("Access denied");
+
+		return buildResponseEntity(ex, responseError);
+	}
 
 	@ExceptionHandler({Exception.class})
 	protected ResponseEntity<Object> unexpectedException(Exception ex, WebRequest request) {
