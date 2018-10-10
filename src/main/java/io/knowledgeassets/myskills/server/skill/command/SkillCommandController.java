@@ -5,6 +5,7 @@ import io.knowledgeassets.myskills.server.exception.BusinessException;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.skill.SkillRequest;
 import io.knowledgeassets.myskills.server.skill.SkillResponse;
+import io.knowledgeassets.myskills.server.skillgroup.SkillGroup;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -13,10 +14,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @Api(tags = "Skills", description = "API allowing modifications of skills")
 @RestController
@@ -54,6 +59,7 @@ public class SkillCommandController {
 				.id(skill.getId())
 				.name(skill.getName())
 				.description(skill.getDescription())
+				.skillGroups(getGroups(skill.getSkillGroups()))
 				.build());
 	}
 
@@ -78,6 +84,7 @@ public class SkillCommandController {
 				.id(skill.getId())
 				.name(skill.getName())
 				.description(skill.getDescription())
+				.skillGroups(getGroups(skill.getSkillGroups()))
 				.build();
 	}
 
@@ -94,5 +101,13 @@ public class SkillCommandController {
 	public ResponseEntity<Void> deleteSkill(@PathVariable("skillId") String skillId) {
 		skillCommandService.deleteSkill(skillId);
 		return ResponseEntity.noContent().build();
+	}
+
+	private List<String> getGroups(List<SkillGroup> skillGroups) {
+		if (!CollectionUtils.isEmpty(skillGroups)) {
+			return skillGroups.stream().map(SkillGroup::getName).collect(toList());
+		} else {
+			return null;
+		}
 	}
 }

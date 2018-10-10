@@ -53,14 +53,6 @@ public class SkillQueryController {
 				.collect(toList());
 	}
 
-	private List<String> getGroups(List<SkillGroup> skillGroups) {
-		if (!CollectionUtils.isEmpty(skillGroups)) {
-			return skillGroups.stream().map(SkillGroup::getName).collect(toList());
-		} else {
-			return null;
-		}
-	}
-
 	@ApiOperation(value = "Get a specific skill",
 			notes = "Get a specific skill currently stored in the system.")
 	@ApiResponses({
@@ -77,6 +69,7 @@ public class SkillQueryController {
 						.id(skill.getId())
 						.name(skill.getName())
 						.description(skill.getDescription())
+						.skillGroups(getGroups(skill.getSkillGroups()))
 						.build())
 				.orElseThrow(() -> {
 					String[] searchParamsMap = {"id", skillId};
@@ -98,5 +91,13 @@ public class SkillQueryController {
 	@GetMapping(path = "/skills/skill-existence", produces = MediaType.APPLICATION_JSON_VALUE)
 	public Boolean isSkillExist(@RequestParam("search") String skillName) throws BusinessException {
 		return skillQueryService.isSkillExist(skillName);
+	}
+
+	private List<String> getGroups(List<SkillGroup> skillGroups) {
+		if (!CollectionUtils.isEmpty(skillGroups)) {
+			return skillGroups.stream().map(SkillGroup::getName).collect(toList());
+		} else {
+			return null;
+		}
 	}
 }
