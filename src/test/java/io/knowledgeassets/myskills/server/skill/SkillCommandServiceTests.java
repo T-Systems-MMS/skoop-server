@@ -4,6 +4,7 @@ import io.knowledgeassets.myskills.server.exception.DuplicateResourceException;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.skill.SkillRepository;
 import io.knowledgeassets.myskills.server.skill.command.SkillCommandService;
+import io.knowledgeassets.myskills.server.skillgroup.SkillGroup;
 import io.knowledgeassets.myskills.server.skillgroup.query.SkillGroupQueryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,13 +34,13 @@ class SkillCommandServiceTests {
 	}
 
 	@Test
-	@DisplayName("Create Skill")
-	void createSkill() {
+	@DisplayName("Create Skill without skill group")
+	void createSkillWithoutSkillGroup() {
 		given(skillRepository.findByNameIgnoreCase("Java")).willReturn(Optional.empty());
 		given(skillRepository.save(ArgumentMatchers.isA(Skill.class)))
 				.willReturn(Skill.builder().id("34").name("Java").description("A programming language").build());
 
-		Skill skill = skillCommandService.createSkill("Java", "A programming language", List.of()); // TODO: 10/9/2018 add skill groups
+		Skill skill = skillCommandService.createSkill("Java", "A programming language", List.of());
 
 		assertThat(skill).isNotNull();
 		assertThat(skill.getId()).isNotNull();
@@ -55,7 +56,7 @@ class SkillCommandServiceTests {
 				Skill.builder().id("34").name("Java").description("A programming language").build()));
 
 		assertThrows(DuplicateResourceException.class, () -> {
-			skillCommandService.createSkill("Java", "A programming language", List.of());// TODO: 10/9/2018 add skill groups
+			skillCommandService.createSkill("Java", "A programming language", List.of());
 		});
 	}
 
@@ -67,7 +68,7 @@ class SkillCommandServiceTests {
 		given(skillRepository.save(ArgumentMatchers.any(Skill.class)))
 				.willReturn(Skill.builder().id("123").name("Spring Boot").description("Java Application Framework").build());
 
-		Skill skill = skillCommandService.updateSkill("123", "Spring Boot", "Java Application Framework" , List.of());// TODO: 10/9/2018 add skill groups
+		Skill skill = skillCommandService.updateSkill("123", "Spring Boot", "Java Application Framework", List.of());
 
 		assertThat(skill).isNotNull();
 		assertThat(skill.getId()).isNotNull();
