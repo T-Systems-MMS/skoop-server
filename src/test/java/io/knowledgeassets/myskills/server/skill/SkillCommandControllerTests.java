@@ -109,7 +109,7 @@ public class SkillCommandControllerTests {
 	@DisplayName("Update Skill")
 	void updateSkill() throws Exception {
 
-		given(skillCommandService.updateSkill("123", "Java", "A Programming language", List.of()))
+		given(skillCommandService.updateSkill("123", "Java", "A Programming language", null))
 				.willReturn(Skill.builder().id("123").name("Java").description("A Programming language").build());
 
 		SkillRequest skillRequest = SkillRequest.builder().name("Java").description("A Programming language").build();
