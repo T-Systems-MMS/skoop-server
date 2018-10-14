@@ -27,6 +27,7 @@ public class Skill {
 	@Property(name = "description")
 	private String description;
 
+	@ToString.Exclude
 	@EqualsAndHashCode.Exclude
 	@Relationship(type = "RELATED_TO", direction = Relationship.UNDIRECTED)
 	private List<UserSkill> userSkills;
