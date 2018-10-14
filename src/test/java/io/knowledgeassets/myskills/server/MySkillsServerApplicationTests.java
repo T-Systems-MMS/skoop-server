@@ -10,7 +10,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-public class MySkillsServerApplicationTests {
+class MySkillsServerApplicationTests {
 	@Test
 	@DisplayName("Application context loads successfully")
 	void contextLoads() {

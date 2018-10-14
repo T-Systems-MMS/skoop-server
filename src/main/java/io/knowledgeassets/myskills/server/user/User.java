@@ -32,6 +32,7 @@ public class User {
 	@Property(name = "coach")
 	private Boolean coach;
 
+	@ToString.Exclude
 	@EqualsAndHashCode.Exclude
 	@Relationship(type = "RELATED_TO", direction = Relationship.UNDIRECTED)
 	private List<UserSkill> userSkills;
