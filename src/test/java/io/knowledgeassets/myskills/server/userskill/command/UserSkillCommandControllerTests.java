@@ -26,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(UserSkillCommandController.class)
 // Additional configuration is required to workaround missing SessionFactory issue!
+// TODO: Add class SecurityConfiguration to enable real security in the test.
 @Import(Neo4jSessionFactoryConfiguration.class)
 class UserSkillCommandControllerTests {
 	@Autowired
@@ -35,10 +36,8 @@ class UserSkillCommandControllerTests {
 	private UserSkillCommandService userSkillCommandService;
 
 	@Test
-	// TODO: Create additional test configuration which imports SecurityConfiguration class to enable real security test.
-	// Must use @WithUserDetails and create a mock UserIdentity as Principal for this test to work with @PreAuthorize
-	@WithMockUser(username = "tester", password = "secret", roles = {"USER"})
-	@DisplayName("Creates new relationship between given user and skill with given levels and priority")
+	@WithMockUser("tester")
+	@DisplayName("Creates new relationship between given user and skill using skill ID")
 	void createsAndReturnsNewRelationshipForGivenUserIdAndSkillId() throws Exception {
 		given(userSkillCommandService.createUserSkillBySkillId("123", "ABC", 2, 3, 4))
 				.willReturn(UserSkill.builder()
@@ -58,6 +57,7 @@ class UserSkillCommandControllerTests {
 		mockMvc.perform(post("/users/123/skills")
 				.accept(MediaType.APPLICATION_JSON)
 				.with(csrf())
+				// TODO: Generate valid JWT and add it as bearer token to "Authorization" header. Remove mock user.
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("{\"skillId\":\"ABC\",\"currentLevel\":2,\"desiredLevel\":3,\"priority\":4}"))
 				.andExpect(status().isCreated())
@@ -68,5 +68,54 @@ class UserSkillCommandControllerTests {
 				.andExpect(jsonPath("$.currentLevel", is(equalTo(2))))
 				.andExpect(jsonPath("$.desiredLevel", is(equalTo(3))))
 				.andExpect(jsonPath("$.priority", is(equalTo(4))));
+	}
+
+	@Test
+	@WithMockUser("tester")
+	@DisplayName("Creates new relationship between given user and skill using skill name")
+	void createsAndReturnsNewRelationshipForGivenUserIdAndSkillName() throws Exception {
+		given(userSkillCommandService.createUserSkillBySkillName("123", "Angular", 2, 3, 4))
+				.willReturn(UserSkill.builder()
+						.user(User.builder()
+								.id("123")
+								.userName("tester")
+								.build())
+						.skill(Skill.builder()
+								.id("ABC")
+								.name("Angular")
+								.description("JavaScript Framework")
+								.build())
+						.currentLevel(2)
+						.desiredLevel(3)
+						.priority(4)
+						.build());
+		mockMvc.perform(post("/users/123/skills")
+				.accept(MediaType.APPLICATION_JSON)
+				.with(csrf())
+				// TODO: Generate valid JWT and add it as bearer token to "Authorization" header. Remove mock user.
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"skillName\":\"Angular\",\"currentLevel\":2,\"desiredLevel\":3,\"priority\":4}"))
+				.andExpect(status().isCreated())
+				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+				.andExpect(jsonPath("$.skill.id", is(equalTo("ABC"))))
+				.andExpect(jsonPath("$.skill.name", is(equalTo("Angular"))))
+				.andExpect(jsonPath("$.skill.description", is(equalTo("JavaScript Framework"))))
+				.andExpect(jsonPath("$.currentLevel", is(equalTo(2))))
+				.andExpect(jsonPath("$.desiredLevel", is(equalTo(3))))
+				.andExpect(jsonPath("$.priority", is(equalTo(4))));
+	}
+
+	@Test
+	@WithMockUser("tester")
+	@DisplayName("Responds with status 400 if both the skill ID and skill name are not given")
+	void yieldsBadRequestOnMissingSkillIdAndSkillName() throws Exception {
+		mockMvc.perform(post("/users/123/skills")
+				.accept(MediaType.APPLICATION_JSON)
+				.with(csrf())
+				// TODO: Generate valid JWT and add it as bearer token to "Authorization" header. Remove mock user.
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"currentLevel\":2,\"desiredLevel\":3,\"priority\":4}"))
+				.andExpect(status().isBadRequest())
+				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
 	}
 }

@@ -1,11 +1,11 @@
 package io.knowledgeassets.myskills.server.exception.handler;
 
 import io.knowledgeassets.myskills.server.exception.DuplicateResourceException;
+import io.knowledgeassets.myskills.server.exception.EmptyInputException;
 import io.knowledgeassets.myskills.server.exception.MethodArgumentNotValidException;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.exception.domain.ResponseError;
 import io.knowledgeassets.myskills.server.exception.domain.ResponseValidationError;
-import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.springframework.core.Ordered;
@@ -15,8 +15,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
-
-import java.util.Collections;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -44,8 +42,7 @@ public class BusinessExceptionsHandler implements IExceptionHandler {
 	}
 
 	/**
-	 * Handles NoSuchResourceException.
-	 * If a resource (like entity) not found, we throw this exception.
+	 * Handles NoSuchResourceException. If a resource (like entity) not found, we throw this exception.
 	 */
 	@ExceptionHandler(NoSuchResourceException.class)
 	protected ResponseEntity<Object> handleNoSuchResource(
@@ -80,6 +77,20 @@ public class BusinessExceptionsHandler implements IExceptionHandler {
 		}
 		doLog(ex, logMessage);
 
+		return buildResponseEntity(ex, responseError);
+	}
+
+	/**
+	 * Handles EmptyInputException. If some mandatory input parameter is missing or empty we throw this exception.
+	 */
+	@ExceptionHandler(EmptyInputException.class)
+	protected ResponseEntity<Object> handleEmptyInput(EmptyInputException ex) {
+		String logMessage = String.format("{%s} Some mandatory input was missing! %s",
+				BAD_REQUEST.value() + " " + BAD_REQUEST.getReasonPhrase(), ex.getLocalizedMessage());
+		doLog(ex, logMessage);
+
+		ResponseError responseError = new ResponseError(BAD_REQUEST);
+		responseError.setMessage(ex.getLocalizedMessage());
 		return buildResponseEntity(ex, responseError);
 	}
 
