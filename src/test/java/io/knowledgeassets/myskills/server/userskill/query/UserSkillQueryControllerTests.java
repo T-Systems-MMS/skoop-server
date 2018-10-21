@@ -123,6 +123,17 @@ class UserSkillQueryControllerTests {
 	}
 
 	@Test
+	@DisplayName("Responds with status 404 if requested relationship between user and skill does not exist")
+	void yieldsNotFoundForNonExistingRelationshipForGivenUserIdAndSkillId() throws Exception {
+		given(userSkillQueryService.getUserSkillByUserIdAndSkillId("123", "ABC")).willReturn(Optional.empty());
+		mockMvc.perform(get("/users/123/skills/ABC")
+				.accept(MediaType.APPLICATION_JSON)
+				.with(user("tester").password("secret").roles("USER")))
+				.andExpect(status().isNotFound())
+				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+	}
+
+	@Test
 	@DisplayName("Responds with the list of coaches for the given user and skill")
 	void providesCoachesForGivenUserIdAndSkillId() throws Exception {
 		given(userSkillQueryService.getCoachesByUserIdAndSkillId("123", "ABC")).willReturn(Stream.of(

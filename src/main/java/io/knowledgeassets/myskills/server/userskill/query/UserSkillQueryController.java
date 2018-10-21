@@ -1,6 +1,7 @@
 package io.knowledgeassets.myskills.server.userskill.query;
 
-import io.knowledgeassets.myskills.server.exception.InvalidInputException;
+import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
+import io.knowledgeassets.myskills.server.exception.enums.Model;
 import io.knowledgeassets.myskills.server.skill.SkillResponse;
 import io.knowledgeassets.myskills.server.user.UserResponse;
 import io.knowledgeassets.myskills.server.userskill.UserSkillResponse;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 
 @Api(tags = "UserSkills", description = "API allowing queries of relationships from users to skills")
@@ -78,8 +78,9 @@ public class UserSkillQueryController {
 						.desiredLevel(userSkill.getDesiredLevel())
 						.priority(userSkill.getPriority())
 						.build())
-				.orElseThrow(() -> InvalidInputException.builder()
-						.message(format("User with ID '%s' is not related to skill with ID '%s'", userId, skillId))
+				.orElseThrow(() -> NoSuchResourceException.builder()
+						.model(Model.USER_SKILL)
+						.searchParamsMap(new String[]{"userId", userId, "skillId", skillId})
 						.build());
 	}
 
