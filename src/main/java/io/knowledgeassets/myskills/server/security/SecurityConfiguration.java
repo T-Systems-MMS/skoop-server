@@ -2,12 +2,10 @@ package io.knowledgeassets.myskills.server.security;
 
 import io.knowledgeassets.myskills.server.user.command.UserCommandService;
 import io.knowledgeassets.myskills.server.user.query.UserQueryService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
@@ -23,7 +21,6 @@ import java.util.Set;
 
 @Configuration
 @EnableResourceServer
-@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfiguration extends ResourceServerConfigurerAdapter {
 	private final ResourceServerProperties resourceServerProperties;
 	private final MySkillsProperties mySkillsProperties;

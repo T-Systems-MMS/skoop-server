@@ -35,7 +35,7 @@ public class UserPermissionQueryController {
 			@ApiResponse(code = 404, message = "Resource not found"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("hasRole('USER')")
+	@PreAuthorize("isPrincipalUserId(#userId)")
 	@GetMapping(path = "/users/{userId}/permissions", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<UserPermissionResponse> getUserPermissions(@PathVariable("userId") String userId) {
 		return userPermissionQueryService.getUserPermissionsByOwnerId(userId)

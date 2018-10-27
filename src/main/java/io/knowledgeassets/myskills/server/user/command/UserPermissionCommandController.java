@@ -42,7 +42,7 @@ public class UserPermissionCommandController {
 			@ApiResponse(code = 404, message = "Resource not found"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("hasRole('USER')")
+	@PreAuthorize("isPrincipalUserId(#userId)")
 	@PutMapping(path = "/users/{userId}/permissions",
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE)
