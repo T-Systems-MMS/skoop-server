@@ -6,6 +6,8 @@ import org.neo4j.ogm.annotation.*;
 
 import java.util.List;
 
+import static org.neo4j.ogm.annotation.Relationship.UNDIRECTED;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -34,6 +36,11 @@ public class User {
 
 	@ToString.Exclude
 	@EqualsAndHashCode.Exclude
-	@Relationship(type = "RELATED_TO", direction = Relationship.UNDIRECTED)
+	@Relationship(type = "RELATED_TO", direction = UNDIRECTED)
 	private List<UserSkill> userSkills;
+
+	@ToString.Exclude
+	@EqualsAndHashCode.Exclude
+	@Relationship(type = "HAS_GRANTED")
+	private List<UserPermission> userPermissions;
 }

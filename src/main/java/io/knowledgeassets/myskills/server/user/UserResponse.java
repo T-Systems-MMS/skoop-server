@@ -29,4 +29,15 @@ public class UserResponse {
 
 	@ApiModelProperty("Show as coach?")
 	private Boolean coach;
+
+	public static UserResponse of(User user) {
+		return UserResponse.builder()
+				.id(user.getId())
+				.userName(user.getUserName())
+				.firstName(user.getFirstName())
+				.lastName(user.getLastName())
+				.email(user.getEmail())
+				.coach(user.getCoach())
+				.build();
+	}
 }
