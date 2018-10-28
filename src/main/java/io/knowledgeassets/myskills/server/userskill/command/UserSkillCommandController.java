@@ -38,11 +38,12 @@ public class UserSkillCommandController {
 	@ApiResponses({
 			@ApiResponse(code = 201, message = "Successful execution"),
 			@ApiResponse(code = 400, message = "Invalid input data, e.g. missing mandatory data"),
+			@ApiResponse(code = 401, message = "Invalid authentication"),
 			@ApiResponse(code = 403, message = "Insufficient privileges to perform this operation"),
 			@ApiResponse(code = 404, message = "Resource not found"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("(hasRole('USER') && #userId.equals(authentication.userAuthentication.Principal.userId)) || hasRole('ADMIN')")
+	@PreAuthorize("isPrincipalUserId(#userId)")
 	@PostMapping(path = "/users/{userId}/skills",
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE)
@@ -79,11 +80,12 @@ public class UserSkillCommandController {
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "Successful execution"),
 			@ApiResponse(code = 400, message = "Invalid input data, e.g. missing mandatory data"),
+			@ApiResponse(code = 401, message = "Invalid authentication"),
 			@ApiResponse(code = 403, message = "Insufficient privileges to perform this operation"),
 			@ApiResponse(code = 404, message = "Resource not found, e.g. user does not exist or skill not assigned"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("hasRole('USER')")
+	@PreAuthorize("isPrincipalUserId(#userId)")
 	@PutMapping(path = "/users/{userId}/skills/{skillId}",
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE)
@@ -118,11 +120,12 @@ public class UserSkillCommandController {
 			notes = "Delete an existing relationship between a specific user and a specific skill.")
 	@ApiResponses({
 			@ApiResponse(code = 204, message = "Successful execution"),
+			@ApiResponse(code = 401, message = "Invalid authentication"),
 			@ApiResponse(code = 403, message = "Insufficient privileges to perform this operation"),
 			@ApiResponse(code = 404, message = "Resource not found, e.g. user does not exist or skill not assigned"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("hasRole('USER')")
+	@PreAuthorize("isPrincipalUserId(#userId)")
 	@DeleteMapping(path = "/users/{userId}/skills/{skillId}")
 	public ResponseEntity<Void> deleteUserSkill(@PathVariable("userId") String userId,
 												@PathVariable("skillId") String skillId) {

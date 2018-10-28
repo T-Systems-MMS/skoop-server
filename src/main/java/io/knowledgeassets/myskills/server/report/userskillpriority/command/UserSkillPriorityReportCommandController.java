@@ -32,7 +32,7 @@ public class UserSkillPriorityReportCommandController {
 			@ApiResponse(code = 403, message = "Insufficient privileges to perform this operation"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("hasRole('USER')")
+	@PreAuthorize("isAuthenticated()")
 	@PostMapping(
 			path = "/reports/skills/priority",
 			consumes = MediaType.ALL_VALUE,

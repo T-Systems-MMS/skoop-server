@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 
 @Api(tags = "Users", description = "API allowing queries of users")
@@ -27,14 +26,17 @@ public class UserQueryController {
 		this.userQueryService = userQueryService;
 	}
 
-	@ApiOperation(value = "Get all users",
-			notes = "Get all users currently stored in the system. The list is unsorted.")
+	@ApiOperation(
+			value = "Get all users",
+			notes = "Get all users currently stored in the system. The list is unsorted."
+	)
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "Successful execution"),
+			@ApiResponse(code = 401, message = "Invalid authentication"),
 			@ApiResponse(code = 403, message = "Insufficient privileges to access resource"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("hasRole('USER')")
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping(path = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<UserResponse> getUsers() {
 		return userQueryService.getUsers()
@@ -49,15 +51,18 @@ public class UserQueryController {
 				.collect(toList());
 	}
 
-	@ApiOperation(value = "Get a specific user",
-			notes = "Get a specific user currently stored in the system.")
+	@ApiOperation(
+			value = "Get a specific user",
+			notes = "Get a specific user currently stored in the system."
+	)
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "Successful execution"),
+			@ApiResponse(code = 401, message = "Invalid authentication"),
 			@ApiResponse(code = 403, message = "Insufficient privileges to access resource, e.g. foreign user data"),
 			@ApiResponse(code = 404, message = "Resource not found"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("hasRole('USER')")
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping(path = "/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public UserResponse getUserById(@PathVariable("userId") String userId) {
 		return userQueryService.getUserById(userId)

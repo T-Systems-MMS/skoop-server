@@ -31,10 +31,11 @@ public class UserCommandController {
 	@ApiResponses({
 			@ApiResponse(code = 201, message = "Successful execution"),
 			@ApiResponse(code = 400, message = "Invalid input data, e.g. missing mandatory data or user name exists"),
+			@ApiResponse(code = 401, message = "Invalid authentication"),
 			@ApiResponse(code = 403, message = "Insufficient privileges to perform this operation"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("hasRole('USER')")
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping(path = "/users",
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE)
@@ -58,17 +59,19 @@ public class UserCommandController {
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "Successful execution"),
 			@ApiResponse(code = 400, message = "Invalid input data, e.g. missing mandatory data"),
+			@ApiResponse(code = 401, message = "Invalid authentication"),
 			@ApiResponse(code = 403, message = "Insufficient privileges to perform this operation"),
 			@ApiResponse(code = 404, message = "Resource not found"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("hasRole('USER')")
+	@PreAuthorize("isPrincipalUserId(#userId)")
 	@PutMapping(path = "/users/{userId}",
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	@CheckBindingResult
 	public UserResponse updateUser(@PathVariable("userId") String userId, @Valid @RequestBody UserRequest userRequest,
 								   BindingResult bindingResult) {
+		// TODO: Pass a command object to the service instead of API-related request object.
 		User user = userCommandService.updateUser(userId, userRequest);
 		return UserResponse.builder()
 				.id(user.getId())
@@ -84,6 +87,7 @@ public class UserCommandController {
 			notes = "Delete an existing user from the system. All relationships with skills will be discarded!")
 	@ApiResponses({
 			@ApiResponse(code = 204, message = "Successful execution"),
+			@ApiResponse(code = 401, message = "Invalid authentication"),
 			@ApiResponse(code = 403, message = "Insufficient privileges to perform this operation"),
 			@ApiResponse(code = 404, message = "Resource not found"),
 			@ApiResponse(code = 500, message = "Error during execution")

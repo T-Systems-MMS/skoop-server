@@ -2,6 +2,7 @@ package io.knowledgeassets.myskills.server.user.query;
 
 import io.knowledgeassets.myskills.server.user.UserPermission;
 import io.knowledgeassets.myskills.server.user.UserPermissionRepository;
+import io.knowledgeassets.myskills.server.user.UserPermissionScope;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,5 +20,10 @@ public class UserPermissionQueryService {
 	@Transactional(readOnly = true)
 	public Stream<UserPermission> getUserPermissionsByOwnerId(String ownerId) {
 		return StreamSupport.stream(userPermissionRepository.findByOwnerId(ownerId).spliterator(), false);
+	}
+
+	@Transactional(readOnly = true)
+	public boolean hasUserPermission(String ownerId, String authorizedUserId, UserPermissionScope scope) {
+		return userPermissionRepository.hasUserPermission(ownerId, authorizedUserId, scope);
 	}
 }

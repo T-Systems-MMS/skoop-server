@@ -33,11 +33,12 @@ public class UserSkillQueryController {
 					"level, desired skill level and priority to reach the desired level. The list is unsorted.")
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "Successful execution"),
+			@ApiResponse(code = 401, message = "Invalid authentication"),
 			@ApiResponse(code = 403, message = "Insufficient privileges to access resource, e.g. foreign user data"),
 			@ApiResponse(code = 404, message = "Resource not found"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("hasRole('USER')")
+	@PreAuthorize("isPrincipalUserId(#userId) or hasUserPermission(#userId, 'READ_USER_SKILLS')")
 	@GetMapping(path = "/users/{userId}/skills", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<UserSkillResponse> getUserSkills(@PathVariable("userId") String userId) {
 		return userSkillQueryService.getUserSkillsByUserId(userId)
@@ -59,11 +60,12 @@ public class UserSkillQueryController {
 					"level, desired skill level and priority to reach the desired level.")
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "Successful execution"),
+			@ApiResponse(code = 401, message = "Invalid authentication"),
 			@ApiResponse(code = 403, message = "Insufficient privileges to access resource, e.g. foreign user data"),
 			@ApiResponse(code = 404, message = "Resource not found, e.g. user does not exist or skill not assigned"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("hasRole('USER')")
+	@PreAuthorize("isPrincipalUserId(#userId) or hasUserPermission(#userId, 'READ_USER_SKILLS')")
 	@GetMapping(path = "/users/{userId}/skills/{skillId}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public UserSkillResponse getUserSkill(@PathVariable("userId") String userId,
 										  @PathVariable("skillId") String skillId) {
@@ -90,11 +92,12 @@ public class UserSkillQueryController {
 					"the given user.")
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "Successful execution"),
+			@ApiResponse(code = 401, message = "Invalid authentication"),
 			@ApiResponse(code = 403, message = "Insufficient privileges to access resource, e.g. foreign user data"),
 			@ApiResponse(code = 404, message = "Resource not found, e.g. user does not exist or skill not assigned"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("hasRole('USER')")
+	@PreAuthorize("isPrincipalUserId(#userId)")
 	@GetMapping(path = "/users/{userId}/skills/{skillId}/coaches", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<UserResponse> getUserSkillCoaches(@PathVariable("userId") String userId,
 												  @PathVariable("skillId") String skillId) {

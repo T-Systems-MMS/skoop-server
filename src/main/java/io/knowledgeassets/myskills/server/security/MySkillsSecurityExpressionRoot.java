@@ -1,5 +1,7 @@
 package io.knowledgeassets.myskills.server.security;
 
+import io.knowledgeassets.myskills.server.user.UserPermissionScope;
+import io.knowledgeassets.myskills.server.user.query.UserPermissionQueryService;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
 import org.springframework.security.core.Authentication;
@@ -8,13 +10,17 @@ public class MySkillsSecurityExpressionRoot extends SecurityExpressionRoot imple
 	private Object filterObject;
 	private Object returnObject;
 	private Object target;
+	private UserPermissionQueryService userPermissionQueryService;
 
-	public MySkillsSecurityExpressionRoot(Authentication authentication) {
+	public MySkillsSecurityExpressionRoot(Authentication authentication, UserPermissionQueryService userPermissionQueryService) {
 		super(authentication);
+		this.userPermissionQueryService = userPermissionQueryService;
 	}
 
 	/**
 	 * Checks whether the given user ID equals the user ID of the authenticated principal.
+	 * <p>Usage example assuming a method with a parameter named "userId":</p>
+	 * <p>@PreAuthorize("isPrincipalUserId(#userId)")</p>
 	 *
 	 * @param userId User ID to check against the principal.
 	 * @return <code>true</code> if the given user ID equals the user ID of the authenticated principal.
@@ -23,6 +29,26 @@ public class MySkillsSecurityExpressionRoot extends SecurityExpressionRoot imple
 		Object principal = getPrincipal();
 		if (principal instanceof UserIdentity) {
 			return ((UserIdentity) principal).getUserId().equals(userId);
+		}
+		return false;
+	}
+
+	/**
+	 * Checks whether the user referenced by the owner ID has granted the user permission with the given scope to the
+	 * authenticated principal.
+	 * <p>Usage example assuming a method with a parameter named "userId":</p>
+	 * <p>@PreAuthorize("hasUserPermission(#userId, 'READ_USER_SKILLS')")</p>
+	 *
+	 * @param ownerId ID of the user who owns the protected resource.
+	 * @param scope   Scope of the user permission to check. See {@link UserPermissionScope}
+	 * @return <code>true</code> if the user referenced by owner ID has granted the user permission with the given scope
+	 * to the authenticated principal.
+	 */
+	public boolean hasUserPermission(String ownerId, String scope) {
+		Object principal = getPrincipal();
+		if (principal instanceof UserIdentity) {
+			return userPermissionQueryService.hasUserPermission(ownerId, ((UserIdentity) principal).getUserId(),
+					UserPermissionScope.valueOf(scope));
 		}
 		return false;
 	}

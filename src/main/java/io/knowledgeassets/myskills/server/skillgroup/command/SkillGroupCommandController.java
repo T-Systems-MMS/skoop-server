@@ -32,10 +32,12 @@ public class SkillGroupCommandController {
 	@ApiResponses({
 			@ApiResponse(code = 201, message = "Successful execution"),
 			@ApiResponse(code = 400, message = "Invalid input data, e.g. missing mandatory data or skill name exists"),
+			@ApiResponse(code = 401, message = "Invalid authentication"),
 			@ApiResponse(code = 403, message = "Insufficient privileges to perform this operation"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("hasRole('USER')")
+	@PreAuthorize("isAuthenticated()")
+	// TODO: Change API path to qualified name "/skill-groups"
 	@PostMapping(path = "/groups",
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE)
@@ -62,11 +64,13 @@ public class SkillGroupCommandController {
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "Successful execution"),
 			@ApiResponse(code = 400, message = "Invalid input data, e.g. missing mandatory data"),
+			@ApiResponse(code = 401, message = "Invalid authentication"),
 			@ApiResponse(code = 403, message = "Insufficient privileges to perform this operation"),
 			@ApiResponse(code = 404, message = "Resource not found"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("hasRole('USER')")
+	@PreAuthorize("isAuthenticated()")
+	// TODO: Change API path to qualified name "/skill-groups"
 	@PutMapping(path = "/groups/{skillGroupId}",
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE)
@@ -85,11 +89,13 @@ public class SkillGroupCommandController {
 			notes = "Delete an existing skill group from the system. All relationships with skills will be discarded!")
 	@ApiResponses({
 			@ApiResponse(code = 204, message = "Successful execution"),
+			@ApiResponse(code = 401, message = "Invalid authentication"),
 			@ApiResponse(code = 403, message = "Insufficient privileges to perform this operation"),
 			@ApiResponse(code = 404, message = "Resource not found"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
 	@PreAuthorize("hasRole('ADMIN')")
+	// TODO: Change API path to qualified name "/skill-groups"
 	@DeleteMapping(path = "/groups/{skillGroupId}")
 	public ResponseEntity<Void> deleteSkill(@PathVariable("skillGroupId") String skillGroupId) {
 		skillGroupCommandService.deleteGroup(skillGroupId);

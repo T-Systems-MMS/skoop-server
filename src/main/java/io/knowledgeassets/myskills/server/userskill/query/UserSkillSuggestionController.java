@@ -32,11 +32,12 @@ public class UserSkillSuggestionController {
 					"the user yet. The list is sorted in alphabetical order.")
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "Successful execution"),
+			@ApiResponse(code = 401, message = "Invalid authentication"),
 			@ApiResponse(code = 403, message = "Insufficient privileges to access resource, e.g. foreign user data"),
 			@ApiResponse(code = 404, message = "Resource not found"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("hasRole('USER')")
+	@PreAuthorize("isPrincipalUserId(#userId)")
 	@GetMapping(path = "/users/{userId}/skill-suggestions", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<String> getUserSkillSuggestions(@PathVariable("userId") String userId,
 												@RequestParam("search") String search) throws BusinessException {

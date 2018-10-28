@@ -38,7 +38,7 @@ public class UserSkillPriorityReportQueryController {
 			@ApiResponse(code = 403, message = "Insufficient privileges to access resource"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("hasRole('USER')")
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping(path = "/reports/skills/priority", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<UserSkillPriorityReportSimpleResponse> getReports() {
 		return userSkillPriorityReportQueryService.getReports()
@@ -59,7 +59,7 @@ public class UserSkillPriorityReportQueryController {
 			@ApiResponse(code = 404, message = "Resource not found"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("hasRole('USER')")
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping(path = "/reports/skills/priority/{reportId}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public UserSkillPriorityReportResponse getReportById(@PathVariable("reportId") String reportId) throws BusinessException {
 		UserSkillPriorityReport report = userSkillPriorityReportQueryService.getReportById(reportId);
@@ -98,13 +98,14 @@ public class UserSkillPriorityReportQueryController {
 			@ApiResponse(code = 404, message = "Resource not found"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("hasRole('USER')")
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping(
 			path = "/reports/skills/priority/{reportId}/aggregations/{aggregationReportId}/users",
 			produces = MediaType.APPLICATION_JSON_VALUE
 	)
 	public List<UserSkillReportResponse> getUserSkillReportsByAggregationReportId(
 			@PathVariable("aggregationReportId") String aggregationReportId) throws BusinessException {
+		// TODO: Filter user skills to include only those users who have granted permission to the principal.
 		return userSkillPriorityReportQueryService.getUserSkillReportsByAggregationReportId(aggregationReportId)
 				.map(report -> UserSkillReportResponse.builder()
 						.id(report.getId())

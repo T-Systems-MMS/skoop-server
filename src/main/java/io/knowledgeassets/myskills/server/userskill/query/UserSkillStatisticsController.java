@@ -34,7 +34,7 @@ public class UserSkillStatisticsController {
 			@ApiResponse(code = 403, message = "Insufficient privileges to access resource"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("hasRole('USER')")
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping(path = "/statistics/skills/top-priority", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<UserSkillPriorityAggregationResponse> getTop10PrioritizedSkills() {
 		return userSkillQueryService.getTop10UserSkillPriorityAggregationResults()

@@ -1,7 +1,6 @@
 package io.knowledgeassets.myskills.server.userskill.query;
 
 import io.knowledgeassets.myskills.server.exception.BusinessException;
-import io.knowledgeassets.myskills.server.exception.EmptyInputException;
 import io.knowledgeassets.myskills.server.exception.InvalidInputException;
 import io.knowledgeassets.myskills.server.user.UserResponse;
 import io.swagger.annotations.Api;
@@ -35,15 +34,17 @@ public class SkillUserQueryController {
 					"Optionally allows to specify a minimum priority to retrieve a filtered result.")
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "Successful execution"),
+			@ApiResponse(code = 401, message = "Invalid authentication"),
 			@ApiResponse(code = 403, message = "Insufficient privileges to access resource"),
 			@ApiResponse(code = 404, message = "Resource not found"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("hasRole('USER')")
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping(path = "/skills/{skillId}/users", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<SkillUserResponse> getSkillUsers(@PathVariable("skillId") String skillId,
 												 @RequestParam(value = "minPriority", required = false)
 														 Integer minPriority) throws BusinessException {
+		// TODO: Filter user skills to include only those users who have granted permission to the principal.
 		return userSkillQueryService.getBySkillId(skillId, minPriority)
 				.map(userSkill -> SkillUserResponse.builder()
 						.user(UserResponse.builder()
@@ -66,11 +67,12 @@ public class SkillUserQueryController {
 					"level, desired skill level and priority to reach the desired level.")
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "Successful execution"),
+			@ApiResponse(code = 401, message = "Invalid authentication"),
 			@ApiResponse(code = 403, message = "Insufficient privileges to access resource, e.g. foreign user data"),
 			@ApiResponse(code = 404, message = "Resource not found, e.g. skill does not exist or user not assigned"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("hasRole('USER')")
+	@PreAuthorize("isPrincipalUserId(#userId) or hasUserPermission(#userId, 'READ_USER_SKILLS')")
 	@GetMapping(path = "/skills/{skillId}/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public SkillUserResponse getSkillUsers(@PathVariable("skillId") String skillId,
 										   @PathVariable("userId") String userId) {

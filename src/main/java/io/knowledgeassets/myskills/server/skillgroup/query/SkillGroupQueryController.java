@@ -33,10 +33,12 @@ public class SkillGroupQueryController {
 			notes = "Get all skill groups currently stored in the system. The list is unsorted.")
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "Successful execution"),
+			@ApiResponse(code = 401, message = "Invalid authentication"),
 			@ApiResponse(code = 403, message = "Insufficient privileges to access resource"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("hasRole('USER')")
+	@PreAuthorize("isAuthenticated()")
+	// TODO: Change API path to qualified name "/skill-groups"
 	@GetMapping(path = "/groups", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<SkillResponse> getGroups() {
 		return skillGroupQueryService.getSkillGroups()
@@ -52,11 +54,13 @@ public class SkillGroupQueryController {
 			notes = "Get a specific skill group currently stored in the system.")
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "Successful execution"),
+			@ApiResponse(code = 401, message = "Invalid authentication"),
 			@ApiResponse(code = 403, message = "Insufficient privileges to access resource"),
 			@ApiResponse(code = 404, message = "Resource not found"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("hasRole('USER')")
+	@PreAuthorize("isAuthenticated()")
+	// TODO: Change API path to qualified name "/skill-groups"
 	@GetMapping(path = "/groups/{groupId}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public SkillGroupResponse getSkill(@PathVariable("groupId") String groupId) {
 		return skillGroupQueryService.getSkillGroupById(groupId)
@@ -77,12 +81,14 @@ public class SkillGroupQueryController {
 	@ApiOperation(value = "If a skill group with the specific name exists it return true, otherwise false.")
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "Successful execution"),
+			@ApiResponse(code = 401, message = "Invalid authentication"),
 			@ApiResponse(code = 403, message = "Insufficient privileges to access resource, e.g. foreign user data"),
 			@ApiResponse(code = 404, message = "Resource not found"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("hasRole('USER')")
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping(path = "/groups/group-existence", produces = MediaType.APPLICATION_JSON_VALUE)
+	// TODO: Replace this method by adding a filter parameter to the "GET /groups" endpoint to search for group name.
 	public Boolean isGroupExist(@RequestParam("search") String skillName) throws BusinessException {
 		return skillGroupQueryService.isSkillGroupExist(skillName);
 	}
