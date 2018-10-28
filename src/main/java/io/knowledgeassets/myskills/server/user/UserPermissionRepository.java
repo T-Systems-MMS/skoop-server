@@ -15,4 +15,9 @@ public interface UserPermissionRepository extends Neo4jRepository<UserPermission
 			"RETURN COUNT(authorizedUser) > 0")
 	Boolean hasUserPermission(@Param("ownerId") String ownerId, @Param("authorizedUserId") String authorizedUserId,
 							  @Param("scope") UserPermissionScope scope);
+
+	@Query("MATCH (:User {id:{authorizedUserId}})<-[:AUTHORIZES]-(:UserPermission {scope:{scope}})<-[:HAS_GRANTED]-(user:User) " +
+			"RETURN user")
+	Iterable<User> findUsersWhoGrantedPermission(@Param("authorizedUserId") String authorizedUserId,
+												 @Param("scope") UserPermissionScope scope);
 }

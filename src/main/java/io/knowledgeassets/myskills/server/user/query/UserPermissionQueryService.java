@@ -1,5 +1,6 @@
 package io.knowledgeassets.myskills.server.user.query;
 
+import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.user.UserPermission;
 import io.knowledgeassets.myskills.server.user.UserPermissionRepository;
 import io.knowledgeassets.myskills.server.user.UserPermissionScope;
@@ -20,6 +21,12 @@ public class UserPermissionQueryService {
 	@Transactional(readOnly = true)
 	public Stream<UserPermission> getUserPermissionsByOwnerId(String ownerId) {
 		return StreamSupport.stream(userPermissionRepository.findByOwnerId(ownerId).spliterator(), false);
+	}
+
+	@Transactional(readOnly = true)
+	public Stream<User> getUsersWhoGrantedPermission(String authorizedUserId, UserPermissionScope scope) {
+		return StreamSupport.stream(userPermissionRepository.findUsersWhoGrantedPermission(authorizedUserId, scope)
+				.spliterator(), false);
 	}
 
 	@Transactional(readOnly = true)

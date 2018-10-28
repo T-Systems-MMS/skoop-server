@@ -2,30 +2,41 @@ package io.knowledgeassets.myskills.server.userskill.query;
 
 import io.knowledgeassets.myskills.server.exception.BusinessException;
 import io.knowledgeassets.myskills.server.exception.InvalidInputException;
+import io.knowledgeassets.myskills.server.security.UserIdentity;
+import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.user.UserResponse;
+import io.knowledgeassets.myskills.server.user.query.UserPermissionQueryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
+import java.util.Set;
 
+import static io.knowledgeassets.myskills.server.user.UserPermissionScope.READ_USER_SKILLS;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 @Api(tags = "SkillUsers", description = "API allowing queries of relationships from skills to users")
 @RestController
 public class SkillUserQueryController {
 	private UserSkillQueryService userSkillQueryService;
+	private UserPermissionQueryService userPermissionQueryService;
 
-	public SkillUserQueryController(UserSkillQueryService userSkillQueryService) {
+	public SkillUserQueryController(UserSkillQueryService userSkillQueryService,
+									UserPermissionQueryService userPermissionQueryService) {
 		this.userSkillQueryService = userSkillQueryService;
+		this.userPermissionQueryService = userPermissionQueryService;
 	}
 
 	@ApiOperation(value = "Get all users related to a specific skill",
@@ -43,9 +54,16 @@ public class SkillUserQueryController {
 	@GetMapping(path = "/skills/{skillId}/users", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<SkillUserResponse> getSkillUsers(@PathVariable("skillId") String skillId,
 												 @RequestParam(value = "minPriority", required = false)
-														 Integer minPriority) throws BusinessException {
-		// TODO: Filter user skills to include only those users who have granted permission to the principal.
+														 Integer minPriority,
+												 @ApiIgnore @AuthenticationPrincipal UserIdentity userIdentity)
+			throws BusinessException {
+		// Create a whitelist of those user IDs who allowed the principal read access to their skill relationships.
+		Set<String> allowedUserIds = userPermissionQueryService.getUsersWhoGrantedPermission(
+				userIdentity.getUserId(), READ_USER_SKILLS).map(User::getId).collect(toSet());
+		allowedUserIds.add(userIdentity.getUserId());
+
 		return userSkillQueryService.getBySkillId(skillId, minPriority)
+				.filter(userSkill -> allowedUserIds.contains(userSkill.getUser().getId()))
 				.map(userSkill -> SkillUserResponse.builder()
 						.user(UserResponse.builder()
 								.id(userSkill.getUser().getId())
