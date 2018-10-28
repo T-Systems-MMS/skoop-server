@@ -24,14 +24,23 @@ import java.util.Set;
 public class SecurityConfiguration extends ResourceServerConfigurerAdapter {
 	private final ResourceServerProperties resourceServerProperties;
 	private final MySkillsProperties mySkillsProperties;
-	private final String apiSpecPath;
+	private final String[] publicResourcesPatterns;
 
 	public SecurityConfiguration(ResourceServerProperties resourceServerProperties,
 								 MySkillsProperties mySkillsProperties,
 								 @Value("${springfox.documentation.swagger.v2.path}") String apiSpecPath) {
 		this.resourceServerProperties = resourceServerProperties;
 		this.mySkillsProperties = mySkillsProperties;
-		this.apiSpecPath = apiSpecPath;
+		this.publicResourcesPatterns = new String[]{
+				"/",
+				"/favicon.ico",
+				"/csrf",
+				"/error",
+				"/swagger-ui.html",
+				"/webjars/**",
+				"/swagger-resources/**",
+				apiSpecPath
+		};
 	}
 
 	@Bean
@@ -62,15 +71,8 @@ public class SecurityConfiguration extends ResourceServerConfigurerAdapter {
 
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests().antMatchers(
-				"/",
-				"/favicon.ico",
-				"/csrf",
-				"/error",
-				"/swagger-ui.html",
-				"/webjars/**",
-				"/swagger-resources/**",
-				apiSpecPath).permitAll()
+		http.authorizeRequests()
+				.antMatchers(publicResourcesPatterns).permitAll()
 				.anyRequest().authenticated()
 				// TODO: Use cookie-based CSRF token repository for production
 //				.and().csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
