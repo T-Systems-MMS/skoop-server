@@ -7,6 +7,7 @@ import lombok.Data;
 
 import java.util.List;
 
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 
 @Data
@@ -30,9 +31,11 @@ public class UserPermissionResponse {
 		return UserPermissionResponse.builder()
 				.owner(UserResponse.of(userPermission.getOwner()))
 				.scope(userPermission.getScope())
-				.authorizedUsers(userPermission.getAuthorizedUsers().stream()
-						.map(UserResponse::of)
-						.collect(toList()))
+				.authorizedUsers(userPermission.getAuthorizedUsers() != null ?
+						userPermission.getAuthorizedUsers().stream()
+								.map(UserResponse::of)
+								.collect(toList()) :
+						emptyList())
 				.build();
 	}
 }
