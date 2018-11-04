@@ -1,8 +1,10 @@
 package io.knowledgeassets.myskills.server.userskill.command;
 
 import io.knowledgeassets.myskills.server.common.Neo4jSessionFactoryConfiguration;
+import io.knowledgeassets.myskills.server.security.MethodSecurityConfiguration;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.user.User;
+import io.knowledgeassets.myskills.server.user.query.UserPermissionQueryService;
 import io.knowledgeassets.myskills.server.userskill.UserSkill;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,41 +14,46 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static io.knowledgeassets.myskills.server.common.UserIdentityAuthenticationFactory.withUser;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(UserSkillCommandController.class)
-// Additional configuration is required to workaround missing SessionFactory issue!
-// TODO: Add class SecurityConfiguration to enable real security in the test.
-@Import(Neo4jSessionFactoryConfiguration.class)
+// Additional Neo4j configuration is required to workaround missing SessionFactory issue!
+@Import({Neo4jSessionFactoryConfiguration.class, MethodSecurityConfiguration.class})
 class UserSkillCommandControllerTests {
 	@Autowired
 	private MockMvc mockMvc;
 
 	@MockBean
 	private UserSkillCommandService userSkillCommandService;
+	@MockBean
+	private UserPermissionQueryService userPermissionQueryService;
 
 	@Test
-	@WithMockUser("tester")
 	@DisplayName("Creates new relationship between given user and skill using skill ID")
 	void createsAndReturnsNewRelationshipForGivenUserIdAndSkillId() throws Exception {
-		given(userSkillCommandService.createUserSkillBySkillId("123", "ABC", 2, 3, 4))
+		User owner = User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build();
+		given(userSkillCommandService.createUserSkillBySkillId(
+				"1f37fb2a-b4d0-4119-9113-4677beb20ae2", "cbf3a2f7-b5b8-46a8-85bf-aaa75a142a11",
+				2, 3, 4))
 				.willReturn(UserSkill.builder()
-						.user(User.builder()
-								.id("123")
-								.userName("tester")
-								.build())
+						.user(owner)
 						.skill(Skill.builder()
-								.id("ABC")
+								.id("cbf3a2f7-b5b8-46a8-85bf-aaa75a142a11")
 								.name("Angular")
 								.description("JavaScript Framework")
 								.build())
@@ -54,15 +61,23 @@ class UserSkillCommandControllerTests {
 						.desiredLevel(3)
 						.priority(4)
 						.build());
-		mockMvc.perform(post("/users/123/skills")
+
+		String requestContent = "{" +
+				"\"skillId\":\"cbf3a2f7-b5b8-46a8-85bf-aaa75a142a11\"," +
+				"\"currentLevel\":2," +
+				"\"desiredLevel\":3," +
+				"\"priority\":4" +
+				"}";
+
+		mockMvc.perform(post("/users/1f37fb2a-b4d0-4119-9113-4677beb20ae2/skills")
 				.accept(MediaType.APPLICATION_JSON)
+				.with(authentication(withUser(owner, "ROLE_USER")))
 				.with(csrf())
-				// TODO: Generate valid JWT and add it as bearer token to "Authorization" header. Remove mock user.
 				.contentType(MediaType.APPLICATION_JSON)
-				.content("{\"skillId\":\"ABC\",\"currentLevel\":2,\"desiredLevel\":3,\"priority\":4}"))
+				.content(requestContent))
 				.andExpect(status().isCreated())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-				.andExpect(jsonPath("$.skill.id", is(equalTo("ABC"))))
+				.andExpect(jsonPath("$.skill.id", is(equalTo("cbf3a2f7-b5b8-46a8-85bf-aaa75a142a11"))))
 				.andExpect(jsonPath("$.skill.name", is(equalTo("Angular"))))
 				.andExpect(jsonPath("$.skill.description", is(equalTo("JavaScript Framework"))))
 				.andExpect(jsonPath("$.currentLevel", is(equalTo(2))))
@@ -71,17 +86,18 @@ class UserSkillCommandControllerTests {
 	}
 
 	@Test
-	@WithMockUser("tester")
 	@DisplayName("Creates new relationship between given user and skill using skill name")
 	void createsAndReturnsNewRelationshipForGivenUserIdAndSkillName() throws Exception {
-		given(userSkillCommandService.createUserSkillBySkillName("123", "Angular", 2, 3, 4))
+		User owner = User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build();
+		given(userSkillCommandService.createUserSkillBySkillName(
+				"1f37fb2a-b4d0-4119-9113-4677beb20ae2", "Angular", 2, 3, 4))
 				.willReturn(UserSkill.builder()
-						.user(User.builder()
-								.id("123")
-								.userName("tester")
-								.build())
+						.user(owner)
 						.skill(Skill.builder()
-								.id("ABC")
+								.id("cbf3a2f7-b5b8-46a8-85bf-aaa75a142a11")
 								.name("Angular")
 								.description("JavaScript Framework")
 								.build())
@@ -89,15 +105,23 @@ class UserSkillCommandControllerTests {
 						.desiredLevel(3)
 						.priority(4)
 						.build());
-		mockMvc.perform(post("/users/123/skills")
+
+		String requestContent = "{" +
+				"\"skillName\":\"Angular\"," +
+				"\"currentLevel\":2," +
+				"\"desiredLevel\":3," +
+				"\"priority\":4" +
+				"}";
+
+		mockMvc.perform(post("/users/1f37fb2a-b4d0-4119-9113-4677beb20ae2/skills")
 				.accept(MediaType.APPLICATION_JSON)
+				.with(authentication(withUser(owner, "ROLE_USER")))
 				.with(csrf())
-				// TODO: Generate valid JWT and add it as bearer token to "Authorization" header. Remove mock user.
 				.contentType(MediaType.APPLICATION_JSON)
-				.content("{\"skillName\":\"Angular\",\"currentLevel\":2,\"desiredLevel\":3,\"priority\":4}"))
+				.content(requestContent))
 				.andExpect(status().isCreated())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-				.andExpect(jsonPath("$.skill.id", is(equalTo("ABC"))))
+				.andExpect(jsonPath("$.skill.id", is(equalTo("cbf3a2f7-b5b8-46a8-85bf-aaa75a142a11"))))
 				.andExpect(jsonPath("$.skill.name", is(equalTo("Angular"))))
 				.andExpect(jsonPath("$.skill.description", is(equalTo("JavaScript Framework"))))
 				.andExpect(jsonPath("$.currentLevel", is(equalTo(2))))
@@ -106,16 +130,57 @@ class UserSkillCommandControllerTests {
 	}
 
 	@Test
-	@WithMockUser("tester")
-	@DisplayName("Responds with status 400 if both the skill ID and skill name are not given")
+	@DisplayName("Responds with status 400 if both the skill ID and skill name are missing in request")
 	void yieldsBadRequestOnMissingSkillIdAndSkillName() throws Exception {
-		mockMvc.perform(post("/users/123/skills")
+		User owner = User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build();
+
+		String requestContent = "{" +
+				"\"currentLevel\":2," +
+				"\"desiredLevel\":3," +
+				"\"priority\":4" +
+				"}";
+
+		mockMvc.perform(post("/users/1f37fb2a-b4d0-4119-9113-4677beb20ae2/skills")
 				.accept(MediaType.APPLICATION_JSON)
+				.with(authentication(withUser(owner, "ROLE_USER")))
 				.with(csrf())
-				// TODO: Generate valid JWT and add it as bearer token to "Authorization" header. Remove mock user.
 				.contentType(MediaType.APPLICATION_JSON)
-				.content("{\"currentLevel\":2,\"desiredLevel\":3,\"priority\":4}"))
+				.content(requestContent))
 				.andExpect(status().isBadRequest())
-				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+				.andDo(result -> {
+					then(userSkillCommandService).shouldHaveZeroInteractions();
+				});
+	}
+
+	@Test
+	@DisplayName("Responds with status 403 if foreign user attempts to create new relationship")
+	void yieldsForbiddenOnForeignUserAuthentication() throws Exception {
+		User foreigner = User.builder()
+				.id("00969526-a93c-4190-975c-bb05a379ee63")
+				.userName("testing")
+				.build();
+
+		String requestContent = "{" +
+				"\"skillId\":\"cbf3a2f7-b5b8-46a8-85bf-aaa75a142a11\"," +
+				"\"currentLevel\":2," +
+				"\"desiredLevel\":3," +
+				"\"priority\":4" +
+				"}";
+
+		mockMvc.perform(post("/users/1f37fb2a-b4d0-4119-9113-4677beb20ae2/skills")
+				.accept(MediaType.APPLICATION_JSON)
+				.with(authentication(withUser(foreigner, "ROLE_USER")))
+				.with(csrf())
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(requestContent))
+				.andExpect(status().isForbidden())
+				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+				.andDo(result -> {
+					then(userSkillCommandService).shouldHaveZeroInteractions();
+				});
 	}
 }

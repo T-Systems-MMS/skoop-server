@@ -42,6 +42,7 @@ public class UserSkillCommandService {
 	 * @param priority     Priority to reach the desired skill level.
 	 * @return Newly created user skill relationship.
 	 */
+	// TODO: Use a command object instead of multiple method parameters.
 	@Transactional
 	public UserSkill createUserSkillBySkillId(String userId, String skillId, Integer currentLevel, Integer desiredLevel,
 											  Integer priority) {

@@ -13,16 +13,20 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.oauth2.provider.token.DefaultUserAuthenticationConverter;
 import org.springframework.util.StringUtils;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
+
+import static java.lang.String.format;
 
 @Slf4j
 public class UserCreatingUserAuthenticationConverter extends DefaultUserAuthenticationConverter {
 	private final UserQueryService userQueryService;
 	private final UserCommandService userCommandService;
 	private final Collection<? extends GrantedAuthority> defaultAuthorities;
-	private final String EMAIL = "email";
-	private final String FIRST_NAME = "given_name";
-	private final String LAST_NAME = "family_name";
+	private final String CLAIM_EMAIL = "email";
+	private final String CLAIM_FIRST_NAME = "given_name";
+	private final String CLAIM_LAST_NAME = "family_name";
 
 	public UserCreatingUserAuthenticationConverter(UserQueryService userQueryService,
 												   UserCommandService userCommandService,
@@ -34,30 +38,26 @@ public class UserCreatingUserAuthenticationConverter extends DefaultUserAuthenti
 
 	@Override
 	public Authentication extractAuthentication(Map<String, ?> map) {
-
-		User forCreate = getUserDataFromOAuth2IdentityToken(map);
-		if (forCreate == null) return null;
+		User userToCreate = createUserFromTokenClaims(map);
+		if (userToCreate == null) return null;
 
 		Collection<? extends GrantedAuthority> authorities = getAuthorities(map);
 		User user;
 		try {
-			user = userQueryService.getByUserName(forCreate.getUserName())
-					.orElseGet(() -> userCommandService.createUser(forCreate.getUserName(), forCreate.getFirstName(), forCreate.getLastName(), forCreate.getEmail()));
+			user = userQueryService.getByUserName(userToCreate.getUserName())
+					.orElseGet(() -> userCommandService.createUser(userToCreate.getUserName(),
+							userToCreate.getFirstName(), userToCreate.getLastName(), userToCreate.getEmail()));
 		} catch (ClientException e) {
-			Optional<User> byUserName = userQueryService.getByUserName(forCreate.getUserName());
-			if (byUserName.isPresent()) {
-				user = byUserName.get();
-			} else {
-				return null;
-			}
+			// Retry user lookup since creation my have failed due to concurrent creation by another request.
+			user = userQueryService.getByUserName(userToCreate.getUserName())
+					.orElseThrow(() -> new IllegalStateException(format(
+							"User with user name '%s' was not found after retry", userToCreate.getUserName())));
 		}
-		UserIdentity principal = new UserIdentity(user.getId(), user.getUserName(), user.getFirstName(),
-				user.getLastName(), user.getEmail(), "N/A", true, true,
-				true, true, authorities);
+		UserIdentity principal = UserIdentity.of(user, authorities);
 		return new UsernamePasswordAuthenticationToken(principal, "N/A", authorities);
 	}
 
-	private User getUserDataFromOAuth2IdentityToken(Map<String, ?> map) {
+	private User createUserFromTokenClaims(Map<String, ?> map) {
 		if (!map.containsKey(USERNAME)) {
 			log.warn("Claim '{}' not found in token", USERNAME);
 			return null;
@@ -67,9 +67,9 @@ public class UserCreatingUserAuthenticationConverter extends DefaultUserAuthenti
 			return null;
 		}
 		String userName = (String) map.get(USERNAME);
-		String email = (String) map.get(EMAIL);
-		String firstName = (String) map.get(FIRST_NAME);
-		String lastName = (String) map.get(LAST_NAME);
+		String email = (String) map.get(CLAIM_EMAIL);
+		String firstName = (String) map.get(CLAIM_FIRST_NAME);
+		String lastName = (String) map.get(CLAIM_LAST_NAME);
 
 		return User.builder()
 				.userName(userName)

@@ -43,4 +43,11 @@ public class UserIdentity extends User {
 	public String getEmail() {
 		return email;
 	}
+
+	public static UserIdentity of(io.knowledgeassets.myskills.server.user.User user,
+								  Collection<? extends GrantedAuthority> authorities) {
+		return new UserIdentity(user.getId(), user.getUserName(), user.getFirstName(),
+				user.getLastName(), user.getEmail(), "N/A", true, true,
+				true, true, authorities);
+	}
 }
