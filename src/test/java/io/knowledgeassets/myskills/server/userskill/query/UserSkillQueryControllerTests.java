@@ -1,8 +1,9 @@
 package io.knowledgeassets.myskills.server.userskill.query;
 
-import io.knowledgeassets.myskills.server.common.Neo4jSessionFactoryConfiguration;
+import io.knowledgeassets.myskills.server.common.AbstractControllerTests;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.user.User;
+import io.knowledgeassets.myskills.server.user.UserPermissionScope;
 import io.knowledgeassets.myskills.server.userskill.UserSkill;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,7 +11,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -18,18 +18,18 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static io.knowledgeassets.myskills.server.common.UserIdentityAuthenticationFactory.withUser;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.mockito.BDDMockito.then;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(UserSkillQueryController.class)
-// Additional configuration is required to workaround missing SessionFactory issue!
-@Import(Neo4jSessionFactoryConfiguration.class)
-class UserSkillQueryControllerTests {
+class UserSkillQueryControllerTests extends AbstractControllerTests {
 	@Autowired
 	private MockMvc mockMvc;
 
@@ -37,18 +37,19 @@ class UserSkillQueryControllerTests {
 	private UserSkillQueryService userSkillQueryService;
 
 	@Test
-	@DisplayName("Responds with the list of skills related to the given user")
+	@DisplayName("Responds with the list of skill relationships for the given user")
 	void providesSkillRelationshipsForGivenUserId() throws Exception {
-		User user = User.builder()
-				.id("123")
+		User owner = User.builder()
+				.id("bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6")
 				.userName("tester")
 				.build();
-		given(userSkillQueryService.getUserSkillsByUserId("123")).willReturn(Stream.of(
+
+		given(userSkillQueryService.getUserSkillsByUserId("bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6")).willReturn(Stream.of(
 				UserSkill.builder()
-						.id("123;ABC")
-						.user(user)
+						.id("bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6;e441613b-319f-4698-917d-6a4037c8e330")
+						.user(owner)
 						.skill(Skill.builder()
-								.id("ABC")
+								.id("e441613b-319f-4698-917d-6a4037c8e330")
 								.name("Angular")
 								.description("JavaScript Framework")
 								.build())
@@ -57,10 +58,10 @@ class UserSkillQueryControllerTests {
 						.priority(4)
 						.build(),
 				UserSkill.builder()
-						.id("123;DEF")
-						.user(user)
+						.id("bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6;3d4236c9-d84a-420a-baee-27b263118a28")
+						.user(owner)
 						.skill(Skill.builder()
-								.id("DEF")
+								.id("3d4236c9-d84a-420a-baee-27b263118a28")
 								.name("Spring Boot")
 								.description("Java Framework")
 								.build())
@@ -69,19 +70,20 @@ class UserSkillQueryControllerTests {
 						.priority(3)
 						.build()
 		));
-		mockMvc.perform(get("/users/123/skills")
+
+		mockMvc.perform(get("/users/bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6/skills")
 				.accept(MediaType.APPLICATION_JSON)
-				.with(user("tester").password("secret").roles("USER")))
+				.with(authentication(withUser(owner, "ROLE_USER"))))
 				.andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.length()", is(equalTo(2))))
-				.andExpect(jsonPath("$[0].skill.id", is(equalTo("ABC"))))
+				.andExpect(jsonPath("$[0].skill.id", is(equalTo("e441613b-319f-4698-917d-6a4037c8e330"))))
 				.andExpect(jsonPath("$[0].skill.name", is(equalTo("Angular"))))
 				.andExpect(jsonPath("$[0].skill.description", is(equalTo("JavaScript Framework"))))
 				.andExpect(jsonPath("$[0].currentLevel", is(equalTo(2))))
 				.andExpect(jsonPath("$[0].desiredLevel", is(equalTo(3))))
 				.andExpect(jsonPath("$[0].priority", is(equalTo(4))))
-				.andExpect(jsonPath("$[1].skill.id", is(equalTo("DEF"))))
+				.andExpect(jsonPath("$[1].skill.id", is(equalTo("3d4236c9-d84a-420a-baee-27b263118a28"))))
 				.andExpect(jsonPath("$[1].skill.name", is(equalTo("Spring Boot"))))
 				.andExpect(jsonPath("$[1].skill.description", is(equalTo("Java Framework"))))
 				.andExpect(jsonPath("$[1].currentLevel", is(equalTo(1))))
@@ -92,15 +94,18 @@ class UserSkillQueryControllerTests {
 	@Test
 	@DisplayName("Responds with the existing relationship between the given user and skill")
 	void providesRelationshipForGivenUserIdAndSkillId() throws Exception {
-		given(userSkillQueryService.getUserSkillByUserIdAndSkillId("123", "ABC")).willReturn(Optional.of(
-				UserSkill.builder()
-						.id("123;ABC")
-						.user(User.builder()
-								.id("123")
-								.userName("tester")
-								.build())
+		User owner = User.builder()
+				.id("bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6")
+				.userName("tester")
+				.build();
+
+		given(userSkillQueryService.getUserSkillByUserIdAndSkillId(
+				"bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6", "e441613b-319f-4698-917d-6a4037c8e330"))
+				.willReturn(Optional.of(UserSkill.builder()
+						.id("bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6;e441613b-319f-4698-917d-6a4037c8e330")
+						.user(owner)
 						.skill(Skill.builder()
-								.id("ABC")
+								.id("e441613b-319f-4698-917d-6a4037c8e330")
 								.name("Angular")
 								.description("JavaScript Framework")
 								.build())
@@ -108,13 +113,14 @@ class UserSkillQueryControllerTests {
 						.desiredLevel(3)
 						.priority(4)
 						.build()
-		));
-		mockMvc.perform(get("/users/123/skills/ABC")
+				));
+
+		mockMvc.perform(get("/users/bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6/skills/e441613b-319f-4698-917d-6a4037c8e330")
 				.accept(MediaType.APPLICATION_JSON)
-				.with(user("tester").password("secret").roles("USER")))
+				.with(authentication(withUser(owner, "ROLE_USER"))))
 				.andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-				.andExpect(jsonPath("$.skill.id", is(equalTo("ABC"))))
+				.andExpect(jsonPath("$.skill.id", is(equalTo("e441613b-319f-4698-917d-6a4037c8e330"))))
 				.andExpect(jsonPath("$.skill.name", is(equalTo("Angular"))))
 				.andExpect(jsonPath("$.skill.description", is(equalTo("JavaScript Framework"))))
 				.andExpect(jsonPath("$.currentLevel", is(equalTo(2))))
@@ -125,10 +131,18 @@ class UserSkillQueryControllerTests {
 	@Test
 	@DisplayName("Responds with status 404 if requested relationship between user and skill does not exist")
 	void yieldsNotFoundForNonExistingRelationshipForGivenUserIdAndSkillId() throws Exception {
-		given(userSkillQueryService.getUserSkillByUserIdAndSkillId("123", "ABC")).willReturn(Optional.empty());
-		mockMvc.perform(get("/users/123/skills/ABC")
+		User owner = User.builder()
+				.id("bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6")
+				.userName("tester")
+				.build();
+
+		given(userSkillQueryService.getUserSkillByUserIdAndSkillId(
+				"bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6", "e441613b-319f-4698-917d-6a4037c8e330"))
+				.willReturn(Optional.empty());
+
+		mockMvc.perform(get("/users/bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6/skills/e441613b-319f-4698-917d-6a4037c8e330")
 				.accept(MediaType.APPLICATION_JSON)
-				.with(user("tester").password("secret").roles("USER")))
+				.with(authentication(withUser(owner, "ROLE_USER"))))
 				.andExpect(status().isNotFound())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
 	}
@@ -136,41 +150,112 @@ class UserSkillQueryControllerTests {
 	@Test
 	@DisplayName("Responds with the list of coaches for the given user and skill")
 	void providesCoachesForGivenUserIdAndSkillId() throws Exception {
-		given(userSkillQueryService.getCoachesByUserIdAndSkillId("123", "ABC")).willReturn(Stream.of(
-				User.builder()
-						.id("234")
-						.userName("toni")
-						.firstName("Toni")
-						.lastName("Tester")
-						.email("toni.tester@myskills.io")
-						.coach(true)
-						.build(),
-				User.builder()
-						.id("345")
-						.userName("tina")
-						.firstName("Tina")
-						.lastName("Testing")
-						.email("tina.testing@myskills.io")
-						.coach(true)
-						.build()
-		));
-		mockMvc.perform(get("/users/123/skills/ABC/coaches")
+		User owner = User.builder()
+				.id("bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6")
+				.userName("tester")
+				.build();
+
+		given(userSkillQueryService.getCoachesByUserIdAndSkillId(
+				"bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6", "e441613b-319f-4698-917d-6a4037c8e330"))
+				.willReturn(Stream.of(
+						User.builder()
+								.id("c749d708-6ef4-4ce8-9a86-220a70065326")
+								.userName("testing")
+								.firstName("Tina")
+								.lastName("Testing")
+								.email("tina.testing@myskills.io")
+								.coach(true)
+								.build(),
+						User.builder()
+								.id("e8a4f522-e662-4ead-b3ce-b004f3bdcde5")
+								.userName("testbed")
+								.firstName("Tabia")
+								.lastName("Testbed")
+								.email("tabia.testbed@myskills.io")
+								.coach(true)
+								.build()
+				));
+
+		mockMvc.perform(get("/users/bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6/skills/e441613b-319f-4698-917d-6a4037c8e330/coaches")
 				.accept(MediaType.APPLICATION_JSON)
-				.with(user("tester").password("secret").roles("USER")))
+				.with(authentication(withUser(owner, "ROLE_USER"))))
 				.andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.length()", is(equalTo(2))))
-				.andExpect(jsonPath("$[0].id", is(equalTo("234"))))
-				.andExpect(jsonPath("$[0].userName", is(equalTo("toni"))))
-				.andExpect(jsonPath("$[0].firstName", is(equalTo("Toni"))))
-				.andExpect(jsonPath("$[0].lastName", is(equalTo("Tester"))))
-				.andExpect(jsonPath("$[0].email", is(equalTo("toni.tester@myskills.io"))))
+				.andExpect(jsonPath("$[0].id", is(equalTo("c749d708-6ef4-4ce8-9a86-220a70065326"))))
+				.andExpect(jsonPath("$[0].userName", is(equalTo("testing"))))
+				.andExpect(jsonPath("$[0].firstName", is(equalTo("Tina"))))
+				.andExpect(jsonPath("$[0].lastName", is(equalTo("Testing"))))
+				.andExpect(jsonPath("$[0].email", is(equalTo("tina.testing@myskills.io"))))
 				.andExpect(jsonPath("$[0].coach", is(equalTo(true))))
-				.andExpect(jsonPath("$[1].id", is(equalTo("345"))))
-				.andExpect(jsonPath("$[1].userName", is(equalTo("tina"))))
-				.andExpect(jsonPath("$[1].firstName", is(equalTo("Tina"))))
-				.andExpect(jsonPath("$[1].lastName", is(equalTo("Testing"))))
-				.andExpect(jsonPath("$[1].email", is(equalTo("tina.testing@myskills.io"))))
+				.andExpect(jsonPath("$[1].id", is(equalTo("e8a4f522-e662-4ead-b3ce-b004f3bdcde5"))))
+				.andExpect(jsonPath("$[1].userName", is(equalTo("testbed"))))
+				.andExpect(jsonPath("$[1].firstName", is(equalTo("Tabia"))))
+				.andExpect(jsonPath("$[1].lastName", is(equalTo("Testbed"))))
+				.andExpect(jsonPath("$[1].email", is(equalTo("tabia.testbed@myskills.io"))))
 				.andExpect(jsonPath("$[1].coach", is(equalTo(true))));
+	}
+
+	@Test
+	@DisplayName("Responds with the list of skill relationships for the given user and authorized principal")
+	void providesSkillRelationshipsToAuthorizedForeignUser() throws Exception {
+		User owner = User.builder()
+				.id("bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6")
+				.userName("tester")
+				.build();
+		User foreigner = User.builder()
+				.id("c749d708-6ef4-4ce8-9a86-220a70065326")
+				.userName("testing")
+				.build();
+
+		given(userSkillQueryService.getUserSkillsByUserId("bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6")).willReturn(Stream.of(
+				UserSkill.builder()
+						.id("bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6;e441613b-319f-4698-917d-6a4037c8e330")
+						.user(owner)
+						.skill(Skill.builder()
+								.id("e441613b-319f-4698-917d-6a4037c8e330")
+								.name("Angular")
+								.description("JavaScript Framework")
+								.build())
+						.currentLevel(2)
+						.desiredLevel(3)
+						.priority(4)
+						.build()
+		));
+
+		givenUser(owner.getId())
+				.hasAuthorizedUsers(foreigner.getId())
+				.forScopes(UserPermissionScope.READ_USER_SKILLS);
+
+		mockMvc.perform(get("/users/bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6/skills")
+				.accept(MediaType.APPLICATION_JSON)
+				.with(authentication(withUser(foreigner, "ROLE_USER"))))
+				.andExpect(status().isOk())
+				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+				.andExpect(jsonPath("$.length()", is(equalTo(1))))
+				.andExpect(jsonPath("$[0].skill.id", is(equalTo("e441613b-319f-4698-917d-6a4037c8e330"))))
+				.andExpect(jsonPath("$[0].skill.name", is(equalTo("Angular"))))
+				.andExpect(jsonPath("$[0].skill.description", is(equalTo("JavaScript Framework"))))
+				.andExpect(jsonPath("$[0].currentLevel", is(equalTo(2))))
+				.andExpect(jsonPath("$[0].desiredLevel", is(equalTo(3))))
+				.andExpect(jsonPath("$[0].priority", is(equalTo(4))));
+	}
+
+	@Test
+	@DisplayName("Responds with status 403 if principal is not authorized to read the skill relationships")
+	void yieldsForbiddenOnNonAuthorizedAccessToSkillRelationships() throws Exception {
+		User foreigner = User.builder()
+				.id("c749d708-6ef4-4ce8-9a86-220a70065326")
+				.userName("testing")
+				.build();
+
+		mockMvc.perform(get("/users/bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6/skills")
+				.accept(MediaType.APPLICATION_JSON)
+				.with(authentication(withUser(foreigner, "ROLE_USER"))))
+				.andExpect(status().isForbidden())
+				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+				.andDo(result -> {
+					then(userSkillQueryService).shouldHaveZeroInteractions();
+				});
 	}
 }

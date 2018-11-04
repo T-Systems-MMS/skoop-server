@@ -1,6 +1,6 @@
 package io.knowledgeassets.myskills.server.skill;
 
-import io.knowledgeassets.myskills.server.common.Neo4jSessionFactoryConfiguration;
+import io.knowledgeassets.myskills.server.common.AbstractControllerTests;
 import io.knowledgeassets.myskills.server.skill.query.SkillQueryController;
 import io.knowledgeassets.myskills.server.skill.query.SkillQueryService;
 import org.junit.jupiter.api.DisplayName;
@@ -9,7 +9,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,9 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(SkillQueryController.class)
-// Additional configuration is required to workaround missing SessionFactory issue!
-@Import(Neo4jSessionFactoryConfiguration.class)
-class SkillQueryControllerTests {
+class SkillQueryControllerTests extends AbstractControllerTests {
 	@Autowired
 	private MockMvc mockMvc;
 
@@ -42,8 +39,10 @@ class SkillQueryControllerTests {
 				Skill.builder().id("123").name("Angular").description("JavaScript Framework").build(),
 				Skill.builder().id("456").name("Spring Boot").description("Java Framework").build()
 		));
-		mockMvc.perform(get("/skills").accept(MediaType.APPLICATION_JSON)
-				.with(user("tester").password("123").roles("USER")))
+
+		mockMvc.perform(get("/skills")
+				.accept(MediaType.APPLICATION_JSON)
+				.with(user("tester").roles("USER")))
 				.andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.length()", is(equalTo(2))))
@@ -60,8 +59,10 @@ class SkillQueryControllerTests {
 	void respondsWithRequestedSkill() throws Exception {
 		given(skillQueryService.getSkillById("123")).willReturn(Optional.of(
 				Skill.builder().id("123").name("Angular").description("JavaScript Framework").build()));
-		mockMvc.perform(get("/skills/123").accept(MediaType.APPLICATION_JSON)
-				.with(user("tester").password("123").roles("USER")))
+
+		mockMvc.perform(get("/skills/123")
+				.accept(MediaType.APPLICATION_JSON)
+				.with(user("tester").roles("USER")))
 				.andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.id", is(equalTo("123"))))

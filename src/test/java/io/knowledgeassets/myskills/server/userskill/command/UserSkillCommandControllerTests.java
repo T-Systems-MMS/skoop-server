@@ -1,10 +1,8 @@
 package io.knowledgeassets.myskills.server.userskill.command;
 
-import io.knowledgeassets.myskills.server.common.Neo4jSessionFactoryConfiguration;
-import io.knowledgeassets.myskills.server.security.MethodSecurityConfiguration;
+import io.knowledgeassets.myskills.server.common.AbstractControllerTests;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.user.User;
-import io.knowledgeassets.myskills.server.user.query.UserPermissionQueryService;
 import io.knowledgeassets.myskills.server.userskill.UserSkill;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,7 +10,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -29,16 +26,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(UserSkillCommandController.class)
-// Additional Neo4j configuration is required to workaround missing SessionFactory issue!
-@Import({Neo4jSessionFactoryConfiguration.class, MethodSecurityConfiguration.class})
-class UserSkillCommandControllerTests {
+class UserSkillCommandControllerTests extends AbstractControllerTests {
 	@Autowired
 	private MockMvc mockMvc;
 
 	@MockBean
 	private UserSkillCommandService userSkillCommandService;
-	@MockBean
-	private UserPermissionQueryService userPermissionQueryService;
 
 	@Test
 	@DisplayName("Creates new relationship between given user and skill using skill ID")
@@ -47,6 +40,7 @@ class UserSkillCommandControllerTests {
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
 				.build();
+
 		given(userSkillCommandService.createUserSkillBySkillId(
 				"1f37fb2a-b4d0-4119-9113-4677beb20ae2", "cbf3a2f7-b5b8-46a8-85bf-aaa75a142a11",
 				2, 3, 4))
@@ -71,10 +65,10 @@ class UserSkillCommandControllerTests {
 
 		mockMvc.perform(post("/users/1f37fb2a-b4d0-4119-9113-4677beb20ae2/skills")
 				.accept(MediaType.APPLICATION_JSON)
-				.with(authentication(withUser(owner, "ROLE_USER")))
-				.with(csrf())
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(requestContent))
+				.content(requestContent)
+				.with(authentication(withUser(owner, "ROLE_USER")))
+				.with(csrf()))
 				.andExpect(status().isCreated())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.skill.id", is(equalTo("cbf3a2f7-b5b8-46a8-85bf-aaa75a142a11"))))
@@ -92,6 +86,7 @@ class UserSkillCommandControllerTests {
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
 				.build();
+
 		given(userSkillCommandService.createUserSkillBySkillName(
 				"1f37fb2a-b4d0-4119-9113-4677beb20ae2", "Angular", 2, 3, 4))
 				.willReturn(UserSkill.builder()
@@ -115,10 +110,10 @@ class UserSkillCommandControllerTests {
 
 		mockMvc.perform(post("/users/1f37fb2a-b4d0-4119-9113-4677beb20ae2/skills")
 				.accept(MediaType.APPLICATION_JSON)
-				.with(authentication(withUser(owner, "ROLE_USER")))
-				.with(csrf())
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(requestContent))
+				.content(requestContent)
+				.with(authentication(withUser(owner, "ROLE_USER")))
+				.with(csrf()))
 				.andExpect(status().isCreated())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.skill.id", is(equalTo("cbf3a2f7-b5b8-46a8-85bf-aaa75a142a11"))))
@@ -145,10 +140,10 @@ class UserSkillCommandControllerTests {
 
 		mockMvc.perform(post("/users/1f37fb2a-b4d0-4119-9113-4677beb20ae2/skills")
 				.accept(MediaType.APPLICATION_JSON)
-				.with(authentication(withUser(owner, "ROLE_USER")))
-				.with(csrf())
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(requestContent))
+				.content(requestContent)
+				.with(authentication(withUser(owner, "ROLE_USER")))
+				.with(csrf()))
 				.andExpect(status().isBadRequest())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andDo(result -> {
@@ -173,10 +168,10 @@ class UserSkillCommandControllerTests {
 
 		mockMvc.perform(post("/users/1f37fb2a-b4d0-4119-9113-4677beb20ae2/skills")
 				.accept(MediaType.APPLICATION_JSON)
-				.with(authentication(withUser(foreigner, "ROLE_USER")))
-				.with(csrf())
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(requestContent))
+				.content(requestContent)
+				.with(authentication(withUser(foreigner, "ROLE_USER")))
+				.with(csrf()))
 				.andExpect(status().isForbidden())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andDo(result -> {

@@ -1,6 +1,6 @@
 package io.knowledgeassets.myskills.server.user.command;
 
-import io.knowledgeassets.myskills.server.common.Neo4jSessionFactoryConfiguration;
+import io.knowledgeassets.myskills.server.common.AbstractControllerTests;
 import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.user.UserPermission;
 import io.knowledgeassets.myskills.server.user.UserPermissionScope;
@@ -10,38 +10,45 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.stream.Stream;
 
+import static io.knowledgeassets.myskills.server.common.UserIdentityAuthenticationFactory.withUser;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.willReturn;
 import static org.mockito.BDDMockito.willThrow;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(UserPermissionCommandController.class)
-// Additional configuration is required to workaround missing SessionFactory issue!
-@Import(Neo4jSessionFactoryConfiguration.class)
-class UserPermissionCommandControllerTests {
+class UserPermissionCommandControllerTests extends AbstractControllerTests {
 	@Autowired
 	private MockMvc mockMvc;
+
 	@MockBean
 	private UserPermissionCommandService userPermissionCommandService;
 
 	@Test
 	@DisplayName("Stores and returns the given list of user permissions")
-	@WithMockUser("tester")
 	void storesAndReturnsListOfUserPermissions() throws Exception {
+		User owner = User.builder()
+				.id("db87d46a-e4ca-451a-903b-e8533e0b924b")
+				.userName("tester")
+				.firstName("Toni")
+				.lastName("Tester")
+				.email("toni.tester@myskills.io")
+				.coach(true)
+				.build();
+
 		ReplaceUserPermissionListCommand expectedCommand = ReplaceUserPermissionListCommand.builder()
 				.ownerId("db87d46a-e4ca-451a-903b-e8533e0b924b")
 				.userPermissions(singletonList(ReplaceUserPermissionListCommand.UserPermissionEntry.builder()
@@ -57,14 +64,7 @@ class UserPermissionCommandControllerTests {
 				.given(userPermissionCommandService).replaceUserPermissions(any());
 		willReturn(Stream.of(UserPermission.builder()
 				.scope(UserPermissionScope.READ_USER_SKILLS)
-				.owner(User.builder()
-						.id("db87d46a-e4ca-451a-903b-e8533e0b924b")
-						.userName("tester")
-						.firstName("Toni")
-						.lastName("Tester")
-						.email("toni.tester@myskills.io")
-						.coach(true)
-						.build())
+				.owner(owner)
 				.authorizedUsers(asList(
 						User.builder()
 								.id("6aa4e666-6f40-4443-bf79-806472725b28")
@@ -98,6 +98,7 @@ class UserPermissionCommandControllerTests {
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(requestContent)
+				.with(authentication(withUser(owner, "ROLE_USER")))
 				.with(csrf()))
 				.andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -123,5 +124,30 @@ class UserPermissionCommandControllerTests {
 				.andExpect(jsonPath("$[0].authorizedUsers[1].lastName", is(equalTo("Testbed"))))
 				.andExpect(jsonPath("$[0].authorizedUsers[1].email", is(equalTo("tabia.testbed@myskills.io"))))
 				.andExpect(jsonPath("$[0].authorizedUsers[1].coach", is(equalTo(true))));
+	}
+
+	@Test
+	@DisplayName("Responds with status 403 if foreign user attempts to set permissions")
+	void yieldsForbiddenOnForeignUserAuthentication() throws Exception {
+		User foreigner = User.builder()
+				.id("6aa4e666-6f40-4443-bf79-806472725b28")
+				.userName("testing")
+				.build();
+
+		String requestContent = "[{" +
+				"\"scope\":\"READ_USER_SKILLS\"," +
+				"\"authorizedUserIds\":[" +
+				"\"e156c6e5-8bf2-4c7b-98c1-f3d9b63318fc\"" +
+				"]" +
+				"}]";
+
+		mockMvc.perform(put("/users/db87d46a-e4ca-451a-903b-e8533e0b924b/permissions")
+				.accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(requestContent)
+				.with(authentication(withUser(foreigner, "ROLE_USER")))
+				.with(csrf()))
+				.andExpect(status().isForbidden())
+				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
 	}
 }
