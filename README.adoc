@@ -22,7 +22,7 @@ MySkills Server is a Java web application implementing the backend of the MySkil
 
 For running the application using the executable JAR file:
 
-* Java Runtime Environment 10 (version 11 not tested so far)
+* Java Runtime Environment 10 or 11
 * Neo4j Community Edition 3.4.x
 
 For running the application as a Docker container:
@@ -32,7 +32,7 @@ For running the application as a Docker container:
 
 For development:
 
-* Java Development Kit 10 (version 11 not tested so far)
+* Java Development Kit 10 or 11
 * Neo4j Community Edition 3.4.x
 * _Optional:_ Docker 18.06 (or higher), useful for setting up a Neo4j database
 
@@ -62,6 +62,14 @@ systemProp.https.proxyPassword=xxx
 After completing the Gradle build you can run the MySkills Server like a simple Java application:
 
     java -jar build/libs/myskills-server-0.0.1-SNAPSHOT.jar
+
+Configuration properties to set the database and authorization server locations can be passed as command line arguments:
+
+----
+java -jar build/libs/myskills-server-0.0.1-SNAPSHOT.jar ^
+  --spring.data.neo4j.uri=bolt://192.168.99.100:7687 ^
+  --security.oauth2.resource.jwk.key-set-uri=http://192.168.99.100:9000/auth/realms/MySkills/protocol/openid-connect/certs
+----
 
 === Running as Docker container
 
@@ -165,6 +173,8 @@ For IntelliJ IDEA:
 You can run the application by using the Java class `io.knowledgeassets.myskills.server.MySkillsServerApplication` as main class in a usual Java launch configuration.
 
 For example, in IntelliJ IDEA right-click on this class and select `Run 'MySkillsServer....main()'` from the context menu.
+
+For Visual Studio Code a launch configuration is already included in the repository.
 
 === Configuring a different HTTP port
 
