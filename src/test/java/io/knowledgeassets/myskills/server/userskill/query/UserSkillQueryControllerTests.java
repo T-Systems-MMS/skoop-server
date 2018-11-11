@@ -46,7 +46,7 @@ class UserSkillQueryControllerTests extends AbstractControllerTests {
 
 		given(userSkillQueryService.getUserSkillsByUserId("bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6")).willReturn(Stream.of(
 				UserSkill.builder()
-						.id("bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6;e441613b-319f-4698-917d-6a4037c8e330")
+						.id(1L)
 						.user(owner)
 						.skill(Skill.builder()
 								.id("e441613b-319f-4698-917d-6a4037c8e330")
@@ -58,7 +58,7 @@ class UserSkillQueryControllerTests extends AbstractControllerTests {
 						.priority(4)
 						.build(),
 				UserSkill.builder()
-						.id("bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6;3d4236c9-d84a-420a-baee-27b263118a28")
+						.id(2L)
 						.user(owner)
 						.skill(Skill.builder()
 								.id("3d4236c9-d84a-420a-baee-27b263118a28")
@@ -102,7 +102,7 @@ class UserSkillQueryControllerTests extends AbstractControllerTests {
 		given(userSkillQueryService.getUserSkillByUserIdAndSkillId(
 				"bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6", "e441613b-319f-4698-917d-6a4037c8e330"))
 				.willReturn(Optional.of(UserSkill.builder()
-						.id("bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6;e441613b-319f-4698-917d-6a4037c8e330")
+						.id(1L)
 						.user(owner)
 						.skill(Skill.builder()
 								.id("e441613b-319f-4698-917d-6a4037c8e330")
@@ -210,7 +210,7 @@ class UserSkillQueryControllerTests extends AbstractControllerTests {
 
 		given(userSkillQueryService.getUserSkillsByUserId("bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6")).willReturn(Stream.of(
 				UserSkill.builder()
-						.id("bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6;e441613b-319f-4698-917d-6a4037c8e330")
+						.id(1L)
 						.user(owner)
 						.skill(Skill.builder()
 								.id("e441613b-319f-4698-917d-6a4037c8e330")

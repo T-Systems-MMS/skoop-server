@@ -66,7 +66,6 @@ public class UserSkillCommandService {
 					.build();
 		});
 		return userSkillRepository.save(UserSkill.builder()
-				.id(userId + ';' + skillId)
 				.user(user)
 				.skill(skill)
 				.currentLevel(currentLevel)

@@ -44,13 +44,13 @@ public class InitializeDataForReport {
 		userRepository.save(user);
 
 		List<UserSkill> userSkills = new ArrayList<>();
-		userSkills.add(UserSkill.builder().id("123;12").user(user).skill(angular)
+		userSkills.add(UserSkill.builder().user(user).skill(angular)
 				.currentLevel(1).desiredLevel(3).priority(2).build()
 		);
-		userSkills.add(UserSkill.builder().id("123;34").user(user).skill(springBoot)
+		userSkills.add(UserSkill.builder().user(user).skill(springBoot)
 				.currentLevel(2).desiredLevel(3).priority(4).build()
 		);
-		userSkills.add(UserSkill.builder().id("123;56").user(user).skill(springSecurity)
+		userSkills.add(UserSkill.builder().user(user).skill(springSecurity)
 				.currentLevel(2).desiredLevel(4).priority(0).build()
 		);
 		userSkillRepository.saveAll(userSkills);
@@ -61,16 +61,16 @@ public class InitializeDataForReport {
 		userRepository.save(user);
 
 		List<UserSkill> userSkills = new ArrayList<>();
-		userSkills.add(UserSkill.builder().id("456;12").user(user).skill(angular)
+		userSkills.add(UserSkill.builder().user(user).skill(angular)
 				.currentLevel(2).desiredLevel(4).priority(1).build()
 		);
-		userSkills.add(UserSkill.builder().id("456;34").user(user).skill(springBoot)
+		userSkills.add(UserSkill.builder().user(user).skill(springBoot)
 				.currentLevel(1).desiredLevel(3).priority(4).build()
 		);
-		userSkills.add(UserSkill.builder().id("456;56").user(user).skill(springSecurity)
+		userSkills.add(UserSkill.builder().user(user).skill(springSecurity)
 				.currentLevel(3).desiredLevel(4).priority(2).build()
 		);
-		userSkills.add(UserSkill.builder().id("456;78").user(user).skill(springData)
+		userSkills.add(UserSkill.builder().user(user).skill(springData)
 				.currentLevel(3).desiredLevel(3).priority(0).build()
 		);
 		userSkillRepository.saveAll(userSkills);

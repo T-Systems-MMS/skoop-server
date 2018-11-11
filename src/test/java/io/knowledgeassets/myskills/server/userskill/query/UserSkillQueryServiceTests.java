@@ -44,7 +44,7 @@ class UserSkillQueryServiceTests {
 				.userName("tester")
 				.build();
 		UserSkill testerAngular = UserSkill.builder()
-				.id("123;ABC")
+				.id(1L)
 				.user(tester)
 				.skill(Skill.builder()
 						.id("ABC")
@@ -56,7 +56,7 @@ class UserSkillQueryServiceTests {
 				.priority(3)
 				.build();
 		UserSkill testerSpringBoot = UserSkill.builder()
-				.id("123;DEF")
+				.id(2L)
 				.user(tester)
 				.skill(Skill.builder()
 						.id("DEF")
@@ -78,7 +78,7 @@ class UserSkillQueryServiceTests {
 	@DisplayName("Provides the existing relationship for the given user ID and skill ID")
 	void providesRelationshipForGivenUserIdAndSkillId() {
 		UserSkill testerAngular = UserSkill.builder()
-				.id("123;ABC")
+				.id(1L)
 				.user(User.builder()
 						.id("123")
 						.userName("tester")

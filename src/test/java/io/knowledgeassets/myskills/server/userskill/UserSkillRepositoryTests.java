@@ -58,7 +58,6 @@ class UserSkillRepositoryTests {
 		other = userRepository.save(other);
 
 		UserSkill testerAngular = UserSkill.builder()
-				.id("1;A")
 				.user(tester)
 				.skill(angular)
 				.currentLevel(1)
@@ -67,7 +66,6 @@ class UserSkillRepositoryTests {
 				.build();
 		userSkillRepository.save(testerAngular);
 		UserSkill testerSpringBoot = UserSkill.builder()
-				.id("1;B")
 				.user(tester)
 				.skill(springBoot)
 				.currentLevel(2)
@@ -76,7 +74,6 @@ class UserSkillRepositoryTests {
 				.build();
 		userSkillRepository.save(testerSpringBoot);
 		userSkillRepository.save(UserSkill.builder()
-				.id("2;B")
 				.user(other)
 				.skill(springBoot)
 				.currentLevel(1)
@@ -84,7 +81,6 @@ class UserSkillRepositoryTests {
 				.priority(3)
 				.build());
 		userSkillRepository.save(UserSkill.builder()
-				.id("2;C")
 				.user(other)
 				.skill(springSecurity)
 				.currentLevel(2)
@@ -134,7 +130,6 @@ class UserSkillRepositoryTests {
 		springBoot = skillRepository.save(springBoot);
 
 		UserSkill angularDeveloper = UserSkill.builder()
-				.id("1;A")
 				.user(developer)
 				.skill(angular)
 				.currentLevel(2)
@@ -143,7 +138,6 @@ class UserSkillRepositoryTests {
 				.build();
 		userSkillRepository.save(angularDeveloper);
 		UserSkill angularTester = UserSkill.builder()
-				.id("2;A")
 				.user(tester)
 				.skill(angular)
 				.currentLevel(1)
@@ -152,7 +146,6 @@ class UserSkillRepositoryTests {
 				.build();
 		userSkillRepository.save(angularTester);
 		userSkillRepository.save(UserSkill.builder()
-				.id("1;B")
 				.user(developer)
 				.skill(springBoot)
 				.currentLevel(1)
@@ -160,7 +153,6 @@ class UserSkillRepositoryTests {
 				.priority(3)
 				.build());
 		userSkillRepository.save(UserSkill.builder()
-				.id("3;B")
 				.user(other)
 				.skill(springBoot)
 				.currentLevel(2)
@@ -205,7 +197,6 @@ class UserSkillRepositoryTests {
 		springBoot = skillRepository.save(springBoot);
 
 		UserSkill angularDeveloper = UserSkill.builder()
-				.id("1;A")
 				.user(developer)
 				.skill(angular)
 				.currentLevel(2)
@@ -214,7 +205,6 @@ class UserSkillRepositoryTests {
 				.build();
 		userSkillRepository.save(angularDeveloper);
 		UserSkill angularTester = UserSkill.builder()
-				.id("2;A")
 				.user(tester)
 				.skill(angular)
 				.currentLevel(2)
@@ -223,7 +213,6 @@ class UserSkillRepositoryTests {
 				.build();
 		userSkillRepository.save(angularTester);
 		userSkillRepository.save(UserSkill.builder()
-				.id("1;B")
 				.user(developer)
 				.skill(springBoot)
 				.currentLevel(1)
@@ -274,7 +263,6 @@ class UserSkillRepositoryTests {
 		angular = skillRepository.save(angular);
 
 		userSkillRepository.save(UserSkill.builder()
-				.id("1;A")
 				.user(developer)
 				.skill(angular)
 				.currentLevel(2)
@@ -282,7 +270,6 @@ class UserSkillRepositoryTests {
 				.priority(4)
 				.build());
 		userSkillRepository.save(UserSkill.builder()
-				.id("2;A")
 				.user(tester)
 				.skill(angular)
 				.currentLevel(2)
@@ -290,7 +277,6 @@ class UserSkillRepositoryTests {
 				.priority(1)
 				.build());
 		userSkillRepository.save(UserSkill.builder()
-				.id("3;A")
 				.user(coach)
 				.skill(angular)
 				.currentLevel(3)
@@ -298,7 +284,6 @@ class UserSkillRepositoryTests {
 				.priority(0)
 				.build());
 		userSkillRepository.save(UserSkill.builder()
-				.id("4;A")
 				.user(noCoach)
 				.skill(angular)
 				.currentLevel(3)
@@ -354,7 +339,6 @@ class UserSkillRepositoryTests {
 		scrum = skillRepository.save(scrum);
 
 		userSkillRepository.save(UserSkill.builder()
-				.id("1;A")
 				.user(developer)
 				.skill(angular)
 				.currentLevel(2)
@@ -362,7 +346,6 @@ class UserSkillRepositoryTests {
 				.priority(4)
 				.build());
 		userSkillRepository.save(UserSkill.builder()
-				.id("2;A")
 				.user(tester)
 				.skill(angular)
 				.currentLevel(1)
@@ -370,7 +353,6 @@ class UserSkillRepositoryTests {
 				.priority(3)
 				.build());
 		userSkillRepository.save(UserSkill.builder()
-				.id("1;B")
 				.user(developer)
 				.skill(springBoot)
 				.currentLevel(3)
@@ -378,7 +360,6 @@ class UserSkillRepositoryTests {
 				.priority(0)
 				.build());
 		userSkillRepository.save(UserSkill.builder()
-				.id("2;B")
 				.user(tester)
 				.skill(springBoot)
 				.currentLevel(2)
@@ -386,7 +367,6 @@ class UserSkillRepositoryTests {
 				.priority(0)
 				.build());
 		userSkillRepository.save(UserSkill.builder()
-				.id("1;C")
 				.user(developer)
 				.skill(scrum)
 				.currentLevel(2)
@@ -394,7 +374,6 @@ class UserSkillRepositoryTests {
 				.priority(1)
 				.build());
 		userSkillRepository.save(UserSkill.builder()
-				.id("2;C")
 				.user(tester)
 				.skill(scrum)
 				.currentLevel(2)
@@ -402,7 +381,6 @@ class UserSkillRepositoryTests {
 				.priority(2)
 				.build());
 		userSkillRepository.save(UserSkill.builder()
-				.id("3;C")
 				.user(consultant)
 				.skill(scrum)
 				.currentLevel(3)
@@ -467,7 +445,6 @@ class UserSkillRepositoryTests {
 		tester = userRepository.save(tester);
 
 		userSkillRepository.save(UserSkill.builder()
-				.id("1;B")
 				.user(tester)
 				.skill(springBoot)
 				.currentLevel(2)

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface UserSkillRepository extends Neo4jRepository<UserSkill, String> {
+public interface UserSkillRepository extends Neo4jRepository<UserSkill, Long> {
 	Iterable<UserSkill> findByUserId(String userId);
 
 	Iterable<UserSkill> findBySkillId(String skillId);

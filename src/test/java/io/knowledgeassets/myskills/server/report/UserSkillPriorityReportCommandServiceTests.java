@@ -84,7 +84,7 @@ public class UserSkillPriorityReportCommandServiceTests {
 
 		given(userSkillQueryService.getUserSkillByUserIdAndSkillId(any(String.class), any(String.class)))
 				.willReturn(Optional.of(UserSkill.builder()
-						.id("6ga0dc67-f217-41e2-862d-efd372614410")
+						.id(1L)
 						.currentLevel(2)
 						.desiredLevel(4)
 						.priority(4)
