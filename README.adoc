@@ -1,6 +1,6 @@
 = MySkills Server
 Georg Wittberger <georg.wittberger@gmail.com>
-v0.0.1, 2018-10-01
+v0.0.1, 2018-11-11
 
 image:https://travis-ci.org/KnowledgeAssets/myskills-server.svg?branch=master["Build Status", link="https://travis-ci.org/KnowledgeAssets/myskills-server"]
 image:https://img.shields.io/github/issues-raw/KnowledgeAssets/myskills-server.svg["GitHub issues",link="https://github.com/KnowledgeAssets/myskills-server/issues"]
@@ -66,8 +66,8 @@ After completing the Gradle build you can run the MySkills Server like a simple 
 Configuration properties to set the database and authorization server locations can be passed as command line arguments:
 
 ----
-java -jar build/libs/myskills-server-0.0.1-SNAPSHOT.jar ^
-  --spring.data.neo4j.uri=bolt://192.168.99.100:7687 ^
+java -jar build/libs/myskills-server-0.0.1-SNAPSHOT.jar \
+  --spring.data.neo4j.uri=bolt://192.168.99.100:7687 \
   --security.oauth2.resource.jwk.key-set-uri=http://192.168.99.100:9000/auth/realms/MySkills/protocol/openid-connect/certs
 ----
 
@@ -168,11 +168,15 @@ For IntelliJ IDEA:
 * Install the https://plugins.jetbrains.com/plugin/6317-lombok-plugin[Lombok Plugin]
 * Open the project settings, navigate to `Build, Execution, Deployment > Compiler > Annotation Processors` and activate the checkbox `Enable annotation processing`.
 
+For Visual Studio Code:
+
+Install the https://marketplace.visualstudio.com/items?itemName=GabrielBB.vscode-lombok[Lombok Annotations Support] before opening the project workspace.
+
 === Running the application from the IDE
 
 You can run the application by using the Java class `io.knowledgeassets.myskills.server.MySkillsServerApplication` as main class in a usual Java launch configuration.
 
-For example, in IntelliJ IDEA right-click on this class and select `Run 'MySkillsServer....main()'` from the context menu.
+For IntelliJ IDEA right-click on this class and select `Run 'MySkillsServer....main()'` from the context menu.
 
 For Visual Studio Code a launch configuration is already included in the repository.
 
