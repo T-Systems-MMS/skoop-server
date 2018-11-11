@@ -1,0 +1,30 @@
+{
+	"run": {
+		"default": "",
+		"items": [
+			{
+				"name": "myskills-server",
+				"projectName": "myskills-server",
+				"workingDirectory": "${workspaceFolder}",
+				"args": [],
+				"vmargs": [],
+				"env": {},
+				"preLaunchTask": ""
+			}
+		]
+	},
+	"debug": {
+		"default": "",
+		"items": [
+			{
+				"name": "myskills-server",
+				"projectName": "myskills-server",
+				"workingDirectory": "${workspaceFolder}",
+				"args": [],
+				"vmargs": [],
+				"env": {},
+				"preLaunchTask": ""
+			}
+		]
+	}
+}
