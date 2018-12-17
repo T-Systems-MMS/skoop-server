@@ -6,6 +6,7 @@ import io.knowledgeassets.myskills.server.user.query.UserPermissionQueryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 
 import java.util.Collection;
 
@@ -16,6 +17,8 @@ import static org.mockito.BDDMockito.willReturn;
 // Additional Neo4j configuration is required to workaround missing SessionFactory issue!
 @Import({Neo4jSessionFactoryConfiguration.class, MethodSecurityConfiguration.class})
 public abstract class AbstractControllerTests {
+	@MockBean
+	protected JwtDecoder jwtDecoder;
 	@MockBean
 	protected UserPermissionQueryService userPermissionQueryService;
 

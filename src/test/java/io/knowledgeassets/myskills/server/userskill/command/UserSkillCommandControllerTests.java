@@ -14,7 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static io.knowledgeassets.myskills.server.common.UserIdentityAuthenticationFactory.withUser;
+import static io.knowledgeassets.myskills.server.common.JwtAuthenticationFactory.withUser;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
@@ -67,7 +67,7 @@ class UserSkillCommandControllerTests extends AbstractControllerTests {
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(requestContent)
-				.with(authentication(withUser(owner, "ROLE_USER")))
+				.with(authentication(withUser(owner)))
 				.with(csrf()))
 				.andExpect(status().isCreated())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -112,7 +112,7 @@ class UserSkillCommandControllerTests extends AbstractControllerTests {
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(requestContent)
-				.with(authentication(withUser(owner, "ROLE_USER")))
+				.with(authentication(withUser(owner)))
 				.with(csrf()))
 				.andExpect(status().isCreated())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -142,7 +142,7 @@ class UserSkillCommandControllerTests extends AbstractControllerTests {
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(requestContent)
-				.with(authentication(withUser(owner, "ROLE_USER")))
+				.with(authentication(withUser(owner)))
 				.with(csrf()))
 				.andExpect(status().isBadRequest())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -170,7 +170,7 @@ class UserSkillCommandControllerTests extends AbstractControllerTests {
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(requestContent)
-				.with(authentication(withUser(foreigner, "ROLE_USER")))
+				.with(authentication(withUser(foreigner)))
 				.with(csrf()))
 				.andExpect(status().isForbidden())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))

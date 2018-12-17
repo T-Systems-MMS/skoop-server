@@ -16,7 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.stream.Stream;
 
-import static io.knowledgeassets.myskills.server.common.UserIdentityAuthenticationFactory.withUser;
+import static io.knowledgeassets.myskills.server.common.JwtAuthenticationFactory.withUser;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.*;
@@ -98,7 +98,7 @@ class UserPermissionCommandControllerTests extends AbstractControllerTests {
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(requestContent)
-				.with(authentication(withUser(owner, "ROLE_USER")))
+				.with(authentication(withUser(owner)))
 				.with(csrf()))
 				.andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -145,7 +145,7 @@ class UserPermissionCommandControllerTests extends AbstractControllerTests {
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(requestContent)
-				.with(authentication(withUser(foreigner, "ROLE_USER")))
+				.with(authentication(withUser(foreigner)))
 				.with(csrf()))
 				.andExpect(status().isForbidden())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));

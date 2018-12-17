@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static io.knowledgeassets.myskills.server.common.UserIdentityAuthenticationFactory.withUser;
+import static io.knowledgeassets.myskills.server.common.JwtAuthenticationFactory.withUser;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
@@ -73,7 +73,7 @@ class UserSkillQueryControllerTests extends AbstractControllerTests {
 
 		mockMvc.perform(get("/users/bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6/skills")
 				.accept(MediaType.APPLICATION_JSON)
-				.with(authentication(withUser(owner, "ROLE_USER"))))
+				.with(authentication(withUser(owner))))
 				.andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.length()", is(equalTo(2))))
@@ -117,7 +117,7 @@ class UserSkillQueryControllerTests extends AbstractControllerTests {
 
 		mockMvc.perform(get("/users/bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6/skills/e441613b-319f-4698-917d-6a4037c8e330")
 				.accept(MediaType.APPLICATION_JSON)
-				.with(authentication(withUser(owner, "ROLE_USER"))))
+				.with(authentication(withUser(owner))))
 				.andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.skill.id", is(equalTo("e441613b-319f-4698-917d-6a4037c8e330"))))
@@ -142,7 +142,7 @@ class UserSkillQueryControllerTests extends AbstractControllerTests {
 
 		mockMvc.perform(get("/users/bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6/skills/e441613b-319f-4698-917d-6a4037c8e330")
 				.accept(MediaType.APPLICATION_JSON)
-				.with(authentication(withUser(owner, "ROLE_USER"))))
+				.with(authentication(withUser(owner))))
 				.andExpect(status().isNotFound())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
 	}
@@ -178,7 +178,7 @@ class UserSkillQueryControllerTests extends AbstractControllerTests {
 
 		mockMvc.perform(get("/users/bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6/skills/e441613b-319f-4698-917d-6a4037c8e330/coaches")
 				.accept(MediaType.APPLICATION_JSON)
-				.with(authentication(withUser(owner, "ROLE_USER"))))
+				.with(authentication(withUser(owner))))
 				.andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.length()", is(equalTo(2))))
@@ -229,7 +229,7 @@ class UserSkillQueryControllerTests extends AbstractControllerTests {
 
 		mockMvc.perform(get("/users/bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6/skills")
 				.accept(MediaType.APPLICATION_JSON)
-				.with(authentication(withUser(foreigner, "ROLE_USER"))))
+				.with(authentication(withUser(foreigner))))
 				.andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.length()", is(equalTo(1))))
@@ -251,7 +251,7 @@ class UserSkillQueryControllerTests extends AbstractControllerTests {
 
 		mockMvc.perform(get("/users/bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6/skills")
 				.accept(MediaType.APPLICATION_JSON)
-				.with(authentication(withUser(foreigner, "ROLE_USER"))))
+				.with(authentication(withUser(foreigner))))
 				.andExpect(status().isForbidden())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andDo(result -> {

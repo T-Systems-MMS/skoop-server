@@ -17,7 +17,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import static io.knowledgeassets.myskills.server.common.UserIdentityAuthenticationFactory.withUser;
+import static io.knowledgeassets.myskills.server.common.JwtAuthenticationFactory.withUser;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -83,7 +83,7 @@ public class UserCommandControllerTests extends AbstractControllerTests {
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(userRequestAsString)
-				.with(authentication(withUser(owner, "ROLE_USER")))
+				.with(authentication(withUser(owner)))
 				.with(csrf()))
 				.andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
