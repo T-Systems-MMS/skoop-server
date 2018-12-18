@@ -2,7 +2,6 @@ package io.knowledgeassets.myskills.server.userskill.query;
 
 import io.knowledgeassets.myskills.server.exception.BusinessException;
 import io.knowledgeassets.myskills.server.exception.InvalidInputException;
-import io.knowledgeassets.myskills.server.security.UserIdentity;
 import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.user.UserResponse;
 import io.knowledgeassets.myskills.server.user.query.UserPermissionQueryService;
@@ -13,6 +12,7 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,6 +22,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import java.util.List;
 import java.util.Set;
 
+import static io.knowledgeassets.myskills.server.security.JwtClaims.MYSKILLS_USER_ID;
 import static io.knowledgeassets.myskills.server.user.UserPermissionScope.READ_USER_SKILLS;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
@@ -55,12 +56,12 @@ public class SkillUserQueryController {
 	public List<SkillUserResponse> getSkillUsers(@PathVariable("skillId") String skillId,
 												 @RequestParam(value = "minPriority", required = false)
 														 Integer minPriority,
-												 @ApiIgnore @AuthenticationPrincipal UserIdentity userIdentity)
+												 @ApiIgnore @AuthenticationPrincipal Jwt jwt)
 			throws BusinessException {
 		// Create a whitelist of those user IDs who allowed the principal read access to their skill relationships.
 		Set<String> allowedUserIds = userPermissionQueryService.getUsersWhoGrantedPermission(
-				userIdentity.getUserId(), READ_USER_SKILLS).map(User::getId).collect(toSet());
-		allowedUserIds.add(userIdentity.getUserId());
+				jwt.getClaimAsString(MYSKILLS_USER_ID), READ_USER_SKILLS).map(User::getId).collect(toSet());
+		allowedUserIds.add(jwt.getClaimAsString(MYSKILLS_USER_ID));
 
 		return userSkillQueryService.getBySkillId(skillId, minPriority)
 				.filter(userSkill -> allowedUserIds.contains(userSkill.getUser().getId()))

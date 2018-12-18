@@ -1,8 +1,10 @@
 spring:
   data:
     neo4j:
-      # Auto-create indexes and constraints during development.
+      # Automatically create and update indexes and constraints.
       auto-index: update
+      # Set database URI to local server.
+      uri: 'bolt://docker.local:7687'
 
 logging:
   level:
@@ -13,4 +15,5 @@ security:
   oauth2:
     resourceserver:
       jwt:
-        issuer-uri: http://localhost:9000/auth/realms/MySkills
+        # Set issuer URI to local server.
+        issuer-uri: 'http://docker.local:9000/auth/realms/MySkills'
