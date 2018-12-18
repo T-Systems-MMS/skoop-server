@@ -6,17 +6,15 @@ import io.knowledgeassets.myskills.server.user.UserPermission;
 import io.knowledgeassets.myskills.server.user.UserPermissionScope;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.stream.Stream;
 
-import static io.knowledgeassets.myskills.server.common.UserIdentityAuthenticationFactory.withUser;
+import static io.knowledgeassets.myskills.server.common.JwtAuthenticationFactory.withUser;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.*;
@@ -28,7 +26,6 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ExtendWith(SpringExtension.class)
 @WebMvcTest(UserPermissionCommandController.class)
 class UserPermissionCommandControllerTests extends AbstractControllerTests {
 	@Autowired
@@ -98,7 +95,7 @@ class UserPermissionCommandControllerTests extends AbstractControllerTests {
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(requestContent)
-				.with(authentication(withUser(owner, "ROLE_USER")))
+				.with(authentication(withUser(owner)))
 				.with(csrf()))
 				.andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -145,7 +142,7 @@ class UserPermissionCommandControllerTests extends AbstractControllerTests {
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(requestContent)
-				.with(authentication(withUser(foreigner, "ROLE_USER")))
+				.with(authentication(withUser(foreigner)))
 				.with(csrf()))
 				.andExpect(status().isForbidden())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));

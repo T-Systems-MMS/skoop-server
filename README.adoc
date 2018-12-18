@@ -1,6 +1,6 @@
 = MySkills Server
 Georg Wittberger <georg.wittberger@gmail.com>
-v0.0.1, 2018-11-11
+v0.0.1, 2018-12-18
 
 image:https://travis-ci.org/KnowledgeAssets/myskills-server.svg?branch=master["Build Status", link="https://travis-ci.org/KnowledgeAssets/myskills-server"]
 image:https://img.shields.io/github/issues-raw/KnowledgeAssets/myskills-server.svg["GitHub issues",link="https://github.com/KnowledgeAssets/myskills-server/issues"]
@@ -22,7 +22,7 @@ MySkills Server is a Java web application implementing the backend of the MySkil
 
 For running the application using the executable JAR file:
 
-* Java Runtime Environment 10 or 11
+* Java Runtime Environment 11
 * Neo4j Community Edition 3.4.x
 
 For running the application as a Docker container:
@@ -32,53 +32,40 @@ For running the application as a Docker container:
 
 For development:
 
-* Java Development Kit 10 or 11
+* Java Development Kit 11
 * Neo4j Community Edition 3.4.x
 * _Optional:_ Docker 18.06 (or higher), useful for setting up a Neo4j database
 
 === Building the application from source
 
-The project uses https://gradle.org/[Gradle] as the build tool. Run the following command in the project root to build the application:
+The project uses https://maven.apache.org/[Maven] as the build tool. Run the following command in the project root to build the application:
 
-    gradlew build
+    mvnw package
 
-The final executable JAR file is produced in the `build/libs` directory.
-
-TIP: If you are using a proxy server you should create a `gradle.properties` file in your user home directory (`$HOME`), and set these configuration properties:
-
-----
-systemProp.http.proxyHost=hostname
-systemProp.http.proxyPort=8080
-systemProp.http.proxyUser=username
-systemProp.http.proxyPassword=xxx
-systemProp.https.proxyHost=hostname
-systemProp.https.proxyPort=8080
-systemProp.https.proxyUser=username
-systemProp.https.proxyPassword=xxx
-----
+The final executable JAR file is produced in the `target` subdirectory.
 
 === Running the executable JAR file
 
-After completing the Gradle build you can run the MySkills Server like a simple Java application:
+After completing the Maven build you can run the MySkills Server like a simple Java application:
 
-    java -jar build/libs/myskills-server-0.0.1-SNAPSHOT.jar
+    java -jar target/myskills-server-0.0.1-SNAPSHOT.jar
 
-Configuration properties to set the database and authorization server locations can be passed as command line arguments:
+Configuration properties to customize the URIs of database and authorization server can be passed as command line arguments:
 
 ----
-java -jar build/libs/myskills-server-0.0.1-SNAPSHOT.jar \
+java -jar target/myskills-server-0.0.1-SNAPSHOT.jar \
   --spring.data.neo4j.uri=bolt://192.168.99.100:7687 \
-  --security.oauth2.resource.jwk.key-set-uri=http://192.168.99.100:9000/auth/realms/MySkills/protocol/openid-connect/certs
+  --security.oauth2.resourceserver.jwt.issuer-uri=http://192.168.99.100:9000/auth/realms/MySkills
 ----
 
 === Running as Docker container
 
-We do not offer public Docker images at the moment but you can create your own after completing the Gradle build. Run the following command in the project root (mind the dot at the end):
+We do not offer public Docker images at the moment but you can create your own after completing the Maven build. Run the following command in the project root (mind the dot at the end):
 
 ----
 docker build \
   -t myskills/server:latest \
-  --build-arg JAR_FILE=build/libs/myskills-server-0.0.1-SNAPSHOT.jar \
+  --build-arg JAR_FILE=target/myskills-server-0.0.1-SNAPSHOT.jar \
   .
 ----
 
@@ -108,13 +95,27 @@ Interested? Contact georg.wittberger (at) gmail.com
 
 As described in the introduction the MySkills Server is a pure server application with no graphical user interface. The project makes use of the following noteworthy frameworks:
 
-* https://spring.io/projects/spring-boot[Spring Boot]: Provides the basis for the Java web application. Within the application itself it faciliates the configuration of the Spring application context. Furthermore, we use the Spring Boot Gradle plugin to build the executable JAR file including an embedded Tomcat server.
+* https://spring.io/projects/spring-boot[Spring Boot]: Provides the basis for the Java web application. Within the application itself it faciliates the configuration of the Spring application context. Furthermore, we use the Spring Boot Maven plugin to build the executable JAR file including an embedded Tomcat server.
 * https://spring.io/projects/spring-framework[Spring Web MVC]: The REST API provided by the application is implemented using Spring Web MVC controllers. We use that synchronous variant instead of WebFlux at the moment.
-* https://spring.io/projects/spring-security[Spring Security]: Provides the authentication and authorization, including access control for the REST endpoints.
+* https://spring.io/projects/spring-security[Spring Security]: Provides the authentication and authorization, including method security to implement access control for the REST endpoints.
 * https://neo4j.com/[Neo4j]: We use this graph database to store the current state of the domain model and to obtain insights in the network of relationships between users, skills and more domain objects. The Neo4j database is typically connected to the application by the Bolt driver which is auto-configured by Spring Boot. For test automation there is also the embedded driver in the project setup.
 * https://projects.spring.io/spring-data-neo4j/[Spring Data Neo4j]: The graph database is accessed via Spring Data repositories and Spring Transaction handles the transaction management. Most of this data access layer is also auto-configured by Spring Boot.
 * http://springfox.github.io/springfox/[Springfox]: Provides the auto-generated Swagger UI with the REST API documentation.
 * https://junit.org/junit5/[JUnit 5] and Spring Test support are used to implement automated tests for different slices of the application. Neo4j repository tests are supported by an embedded Neo4j database.
+
+=== Local Docker host name
+
+The recommended way of starting the additional server applications required by the MySkills Server is to spin them up as Docker containers. However, depending on the real host operating system there might be different URLs to address those containers. While on Unix they should be available at some published port on `localhost` it can be a specific IP address for Windows users who may have to leverage Docker Toolbox.
+
+Therefore, we recommend to map the IP address of the Docker host to a custom host name manually. The preset configuration properties for developers of the MySkills Server assume that the Docker host is available at `docker.local`.
+
+On Windows, you can adjust the mapping in `%SystemRoot%\system32\drivers\etc\hosts` by adding the following line:
+
+----
+192.168.99.100  docker.local  # Local Docker machine
+----
+
+After saving the file you must run `ipconfig /flushdns` as an administrator.
 
 === Setting up the Neo4j database
 
@@ -132,7 +133,6 @@ docker run ^
   -d ^
   -p 7474:7474 ^
   -p 7687:7687 ^
-  -v C:\Develop\workspace\neo4j\data:/data ^
   -e NEO4J_AUTH=none ^
   neo4j:3.4
 ----
@@ -145,7 +145,6 @@ docker run \
   -d \
   -p 7474:7474 \
   -p 7687:7687 \
-  -v $HOME/neo4j/data:/data \
   -e NEO4J_AUTH=none \
   neo4j:3.4
 ----
@@ -157,7 +156,7 @@ docker start neo4j
 docker stop neo4j
 ----
 
-Visit http://localhost:7474/ to view the Neo4j browser.
+Visit http://localhost:7474/ or http://docker.local:7474/ to view the Neo4j browser.
 
 === Configuring annotation processors
 
@@ -179,6 +178,8 @@ You can run the application by using the Java class `io.knowledgeassets.myskills
 For IntelliJ IDEA right-click on this class and select `Run 'MySkillsServer....main()'` from the context menu.
 
 For Visual Studio Code a launch configuration is already included in the repository.
+
+You should enable the Spring profile `dev` to activate some configuration properties suitable for a development environment. Open the launch configuration and add the following command line argument: `--spring.profiles.active=dev`.
 
 === Configuring a different HTTP port
 
@@ -226,33 +227,27 @@ docker start keycloak
 docker stop keycloak
 ----
 
-Visit http://localhost:9000/auth/ to configure the KeyCloak server.
+Visit http://localhost:9000/auth/ or http://docker.local:9000/auth/ to configure the KeyCloak server.
 
 There is an export of a suitable test realm in `tools/keycloak/myskills-realm.json` which can be imported into the KeyCloak server. The realm comes with a preconfigured client for MySkills but contains no test users. *You have to create users manually within the `MySkills` realm.*
 
 In order to obtain an ID token you must call the following URL in your browser (assuming that KeyCloak listens on port 9000):
 
-http://localhost:9000/auth/realms/MySkills/protocol/openid-connect/auth?client_id=myskills&response_type=id_token&scope=openid+profile&nonce=123&redirect_uri=http://localhost:4200/
+http://docker.local:9000/auth/realms/MySkills/protocol/openid-connect/auth?client_id=myskills&response_type=id_token&scope=openid+profile&nonce=123&redirect_uri=http://localhost:4200/
 
 After logging in you will be redirected to http://localhost:4200/ with the ID token passed in the `id_token` query parameter. You can copy this token and use it to authorize API requests by sending an `Authorization` header:
 
     Authorization: Bearer <ID token>
 
-_Note: The default configuration of MySkills Server assumes that the KeyCloak server is available at `localhost:9000` and contains a realm named `MySkills`._
+_Note: The development configuration of the MySkills Server assumes that the KeyCloak server is available at `docker.local:9000` and contains a realm named `MySkills`. Please note that the KeyCloak server must be running when starting the MySkills Server._
 
 === Testing the application
 
 In order to execute the automated tests run the following command in the project root:
 
-    gradlew test
+    mvnw test
 
-The test report can be found in the `/build/reports/tests/test` directory.
-
-The test coverage report can be generated by running this additional command:
-
-    gradlew jacocoTestReport
-
-The coverage report can be found in the `/build/reports/jacoco/test/html` directory.
+TODO: Describe how to generate test coverage report using JaCoCo Maven plugin.
 
 === Exploring the API
 

@@ -1,6 +1,5 @@
 security:
   oauth2:
-    resource:
-      jwk:
-        # Test URL to retrieve the public key for ID token validation.
-        key-set-uri: http://localhost:9000/auth/realms/MySkills/protocol/openid-connect/certs
+    resourceserver:
+      jwt:
+        jwk-set-uri: https://auth.example.com/.well-known/jwks.json

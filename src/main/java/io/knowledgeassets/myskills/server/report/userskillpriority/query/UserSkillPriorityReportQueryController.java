@@ -5,7 +5,6 @@ import io.knowledgeassets.myskills.server.report.skill.SkillReportSimpleResponse
 import io.knowledgeassets.myskills.server.report.user.UserReportSimpleResponse;
 import io.knowledgeassets.myskills.server.report.userskill.UserSkillReportResponse;
 import io.knowledgeassets.myskills.server.report.userskillpriority.*;
-import io.knowledgeassets.myskills.server.security.UserIdentity;
 import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.user.query.UserPermissionQueryService;
 import io.swagger.annotations.Api;
@@ -15,6 +14,7 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +23,8 @@ import springfox.documentation.annotations.ApiIgnore;
 import java.util.List;
 import java.util.Set;
 
+import static io.knowledgeassets.myskills.server.security.JwtClaims.MYSKILLS_USER_ID;
+import static io.knowledgeassets.myskills.server.security.JwtClaims.USER_NAME;
 import static io.knowledgeassets.myskills.server.user.UserPermissionScope.READ_USER_SKILLS;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -116,11 +118,11 @@ public class UserSkillPriorityReportQueryController {
 	)
 	public List<UserSkillReportResponse> getUserSkillReportsByAggregationReportId(
 			@PathVariable("aggregationReportId") String aggregationReportId,
-			@ApiIgnore @AuthenticationPrincipal UserIdentity userIdentity) throws BusinessException {
+			@ApiIgnore @AuthenticationPrincipal Jwt jwt) throws BusinessException {
 		// Create a whitelist of those user names who allowed the principal read access to their skill relationships.
 		Set<String> allowedUserNames = userPermissionQueryService.getUsersWhoGrantedPermission(
-				userIdentity.getUserId(), READ_USER_SKILLS).map(User::getUserName).collect(toSet());
-		allowedUserNames.add(userIdentity.getUserName());
+				jwt.getClaimAsString(MYSKILLS_USER_ID), READ_USER_SKILLS).map(User::getUserName).collect(toSet());
+		allowedUserNames.add(jwt.getClaimAsString(USER_NAME));
 
 		return userSkillPriorityReportQueryService.getUserSkillReportsByAggregationReportId(aggregationReportId)
 				.filter(userSkillReport -> allowedUserNames.contains(userSkillReport.getUserName()))

@@ -5,17 +5,15 @@ import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.user.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.stream.Stream;
 
-import static io.knowledgeassets.myskills.server.common.UserIdentityAuthenticationFactory.withUser;
+import static io.knowledgeassets.myskills.server.common.JwtAuthenticationFactory.withUser;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
@@ -24,7 +22,6 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ExtendWith(SpringExtension.class)
 @WebMvcTest(UserSkillSuggestionController.class)
 class UserSkillSuggestionControllerTests extends AbstractControllerTests {
 	@Autowired
@@ -58,7 +55,7 @@ class UserSkillSuggestionControllerTests extends AbstractControllerTests {
 		mockMvc.perform(get("/users/f5f7e332-04d9-4b2a-8fe0-d8c49d14f1d6/skill-suggestions")
 				.param("search", "spr")
 				.accept(MediaType.APPLICATION_JSON)
-				.with(authentication(withUser(owner, "ROLE_USER"))))
+				.with(authentication(withUser(owner))))
 				.andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.length()", is(equalTo(2))))
@@ -77,7 +74,7 @@ class UserSkillSuggestionControllerTests extends AbstractControllerTests {
 		mockMvc.perform(get("/users/f5f7e332-04d9-4b2a-8fe0-d8c49d14f1d6/skill-suggestions")
 				.param("search", "spr")
 				.accept(MediaType.APPLICATION_JSON)
-				.with(authentication(withUser(foreigner, "ROLE_USER"))))
+				.with(authentication(withUser(foreigner))))
 				.andExpect(status().isForbidden())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andDo(result -> {

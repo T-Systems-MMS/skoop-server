@@ -6,15 +6,13 @@ import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.userskill.UserSkill;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static io.knowledgeassets.myskills.server.common.UserIdentityAuthenticationFactory.withUser;
+import static io.knowledgeassets.myskills.server.common.JwtAuthenticationFactory.withUser;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
@@ -24,7 +22,6 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ExtendWith(SpringExtension.class)
 @WebMvcTest(UserSkillCommandController.class)
 class UserSkillCommandControllerTests extends AbstractControllerTests {
 	@Autowired
@@ -67,7 +64,7 @@ class UserSkillCommandControllerTests extends AbstractControllerTests {
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(requestContent)
-				.with(authentication(withUser(owner, "ROLE_USER")))
+				.with(authentication(withUser(owner)))
 				.with(csrf()))
 				.andExpect(status().isCreated())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -112,7 +109,7 @@ class UserSkillCommandControllerTests extends AbstractControllerTests {
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(requestContent)
-				.with(authentication(withUser(owner, "ROLE_USER")))
+				.with(authentication(withUser(owner)))
 				.with(csrf()))
 				.andExpect(status().isCreated())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -142,7 +139,7 @@ class UserSkillCommandControllerTests extends AbstractControllerTests {
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(requestContent)
-				.with(authentication(withUser(owner, "ROLE_USER")))
+				.with(authentication(withUser(owner)))
 				.with(csrf()))
 				.andExpect(status().isBadRequest())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -170,7 +167,7 @@ class UserSkillCommandControllerTests extends AbstractControllerTests {
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(requestContent)
-				.with(authentication(withUser(foreigner, "ROLE_USER")))
+				.with(authentication(withUser(foreigner)))
 				.with(csrf()))
 				.andExpect(status().isForbidden())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))

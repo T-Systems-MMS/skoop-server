@@ -5,6 +5,9 @@ import io.knowledgeassets.myskills.server.user.query.UserPermissionQueryService;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.jwt.Jwt;
+
+import static io.knowledgeassets.myskills.server.security.JwtClaims.MYSKILLS_USER_ID;
 
 public class MySkillsSecurityExpressionRoot extends SecurityExpressionRoot implements MethodSecurityExpressionOperations {
 	private Object filterObject;
@@ -27,8 +30,9 @@ public class MySkillsSecurityExpressionRoot extends SecurityExpressionRoot imple
 	 */
 	public boolean isPrincipalUserId(String userId) {
 		Object principal = getPrincipal();
-		if (principal instanceof UserIdentity) {
-			return ((UserIdentity) principal).getUserId().equals(userId);
+		if (principal instanceof Jwt) {
+			String userIdClaim = ((Jwt) principal).getClaimAsString(MYSKILLS_USER_ID);
+			return userId == null && userIdClaim == null || userId != null && userId.equals(userIdClaim);
 		}
 		return false;
 	}
@@ -46,8 +50,9 @@ public class MySkillsSecurityExpressionRoot extends SecurityExpressionRoot imple
 	 */
 	public boolean hasUserPermission(String ownerId, String scope) {
 		Object principal = getPrincipal();
-		if (principal instanceof UserIdentity) {
-			return userPermissionQueryService.hasUserPermission(ownerId, ((UserIdentity) principal).getUserId(),
+		if (principal instanceof Jwt) {
+			String userIdClaim = ((Jwt) principal).getClaimAsString(MYSKILLS_USER_ID);
+			return userPermissionQueryService.hasUserPermission(ownerId, userIdClaim,
 					UserPermissionScope.valueOf(scope));
 		}
 		return false;

@@ -2,19 +2,15 @@ package io.knowledgeassets.myskills.server.user;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.neo4j.DataNeo4jTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ExtendWith(SpringExtension.class)
 @DataNeo4jTest
 class UserRepositoryTests {
-
 	@Autowired
 	private UserRepository userRepository;
 
@@ -32,5 +28,4 @@ class UserRepositoryTests {
 		assertThat(user.get().getUserName()).isEqualTo("tester");
 		assertThat(user.get().getLastName()).isNull();
 	}
-
 }

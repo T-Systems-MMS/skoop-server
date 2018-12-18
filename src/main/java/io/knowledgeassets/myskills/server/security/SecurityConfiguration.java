@@ -2,35 +2,30 @@ package io.knowledgeassets.myskills.server.security;
 
 import io.knowledgeassets.myskills.server.user.command.UserCommandService;
 import io.knowledgeassets.myskills.server.user.query.UserQueryService;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
-import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
-import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
-import org.springframework.security.oauth2.provider.token.AccessTokenConverter;
-import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter;
-import org.springframework.security.oauth2.provider.token.TokenStore;
-import org.springframework.security.oauth2.provider.token.UserAuthenticationConverter;
-import org.springframework.security.oauth2.provider.token.store.jwk.JwkTokenStore;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtDecoders;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoderJwkSupport;
 
-import java.util.Set;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Configuration
-@EnableResourceServer
-public class SecurityConfiguration extends ResourceServerConfigurerAdapter {
-	private final ResourceServerProperties resourceServerProperties;
-	private final MySkillsProperties mySkillsProperties;
+public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+	private final String jwtIssuerUri;
+	private final String jwtJwkSetUri;
 	private final String[] publicResourcesPatterns;
 
-	public SecurityConfiguration(ResourceServerProperties resourceServerProperties,
-								 MySkillsProperties mySkillsProperties,
+	public SecurityConfiguration(@Value("${security.oauth2.resourceserver.jwt.issuer-uri:}") String jwtIssuerUri,
+								 @Value("${security.oauth2.resourceserver.jwt.jwk-set-uri:}") String jwtJwkSetUri,
 								 @Value("${springfox.documentation.swagger.v2.path}") String apiSpecPath) {
-		this.resourceServerProperties = resourceServerProperties;
-		this.mySkillsProperties = mySkillsProperties;
+		this.jwtIssuerUri = jwtIssuerUri;
+		this.jwtJwkSetUri = jwtJwkSetUri;
 		this.publicResourcesPatterns = new String[]{
 				"/",
 				"/favicon.ico",
@@ -44,29 +39,17 @@ public class SecurityConfiguration extends ResourceServerConfigurerAdapter {
 	}
 
 	@Bean
-	public UserAuthenticationConverter userAuthenticationConverter(UserQueryService userQueryService,
-																   UserCommandService userCommandService) {
-		return new UserCreatingUserAuthenticationConverter(userQueryService, userCommandService,
-				Set.copyOf(mySkillsProperties.getSecurity().getDefaultRoles()));
-	}
-
-	@Bean
-	public AccessTokenConverter accessTokenConverter(UserQueryService userQueryService,
-													 UserCommandService userCommandService) {
-		DefaultAccessTokenConverter accessTokenConverter = new DefaultAccessTokenConverter();
-		accessTokenConverter.setUserTokenConverter(userAuthenticationConverter(userQueryService, userCommandService));
-		return accessTokenConverter;
-	}
-
-	@Bean
-	public TokenStore tokenStore(UserQueryService userQueryService, UserCommandService userCommandService) {
-		return new JwkTokenStore(resourceServerProperties.getJwk().getKeySetUri(),
-				accessTokenConverter(userQueryService, userCommandService));
-	}
-
-	@Override
-	public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
-		resources.resourceId(resourceServerProperties.getResourceId());
+	public JwtDecoder jwtDecoder(UserQueryService userQueryService, UserCommandService userCommandService) {
+		NimbusJwtDecoderJwkSupport jwtDecoder;
+		if (isNotBlank(jwtIssuerUri)) {
+			jwtDecoder = (NimbusJwtDecoderJwkSupport) JwtDecoders.fromOidcIssuerLocation(jwtIssuerUri);
+		} else if (isNotBlank(jwtJwkSetUri)) {
+			jwtDecoder = new NimbusJwtDecoderJwkSupport(jwtJwkSetUri);
+		} else {
+			throw new BeanCreationException("Either a JWT issuer URI or a JWK set URI must be configured");
+		}
+		jwtDecoder.setClaimSetConverter(new UserClaimSetConverter(userQueryService, userCommandService));
+		return jwtDecoder;
 	}
 
 	@Override
@@ -77,7 +60,7 @@ public class SecurityConfiguration extends ResourceServerConfigurerAdapter {
 				// TODO: Use cookie-based CSRF token repository for production
 //				.and().csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
 				.and().csrf().disable()
-				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+				.and().oauth2ResourceServer().jwt();
 	}
-
 }
