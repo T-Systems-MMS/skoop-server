@@ -4,7 +4,7 @@ spring:
       # Automatically create and update indexes and constraints.
       auto-index: update
       # Set database URI to local server.
-      uri: 'bolt://docker.local:7687'
+      uri: 'bolt://localhost:7687'
 
 logging:
   level:
@@ -16,4 +16,4 @@ security:
     resourceserver:
       jwt:
         # Set issuer URI to local server.
-        issuer-uri: 'http://docker.local:9000/auth/realms/MySkills'
+        issuer-uri: 'http://localhost:9000/auth/realms/MySkills'

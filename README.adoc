@@ -1,6 +1,6 @@
 = MySkills Server
 Georg Wittberger <georg.wittberger@gmail.com>
-v0.0.1, 2018-12-18
+v0.0.1, 2018-12-23
 
 image:https://travis-ci.org/KnowledgeAssets/myskills-server.svg?branch=master["Build Status", link="https://travis-ci.org/KnowledgeAssets/myskills-server"]
 image:https://img.shields.io/github/issues-raw/KnowledgeAssets/myskills-server.svg["GitHub issues",link="https://github.com/KnowledgeAssets/myskills-server/issues"]
@@ -103,20 +103,6 @@ As described in the introduction the MySkills Server is a pure server applicatio
 * http://springfox.github.io/springfox/[Springfox]: Provides the auto-generated Swagger UI with the REST API documentation.
 * https://junit.org/junit5/[JUnit 5] and Spring Test support are used to implement automated tests for different slices of the application. Neo4j repository tests are supported by an embedded Neo4j database.
 
-=== Local Docker host name
-
-The recommended way of starting the additional server applications required by the MySkills Server is to spin them up as Docker containers. However, depending on the real host operating system there might be different URLs to address those containers. While on Unix they should be available at some published port on `localhost` it can be a specific IP address for Windows users who may have to leverage Docker Toolbox.
-
-Therefore, we recommend to map the IP address of the Docker host to a custom host name manually. The preset configuration properties for developers of the MySkills Server assume that the Docker host is available at `docker.local`.
-
-On Windows, you can adjust the mapping in `%SystemRoot%\system32\drivers\etc\hosts` by adding the following line:
-
-----
-192.168.99.100  docker.local  # Local Docker machine
-----
-
-After saving the file you must run `ipconfig /flushdns` as an administrator.
-
 === Setting up the Neo4j database
 
 MySkills Server requires a https://neo4j.com/[Neo4j] database for persistent storage.
@@ -156,7 +142,9 @@ docker start neo4j
 docker stop neo4j
 ----
 
-Visit http://localhost:7474/ or http://docker.local:7474/ to view the Neo4j browser.
+Visit http://localhost:7474/ to view the Neo4j browser.
+
+_Note: The `dev` profile of the MySkills Server assumes that the `bolt` endpoint of Neo4j is available at `localhost:7687`. The database server must be accessible when starting the MySkills Server._
 
 === Configuring annotation processors
 
@@ -179,19 +167,13 @@ For IntelliJ IDEA right-click on this class and select `Run 'MySkillsServer....m
 
 For Visual Studio Code a launch configuration is already included in the repository.
 
-You should enable the Spring profile `dev` to activate some configuration properties suitable for a development environment. Open the launch configuration and add the following command line argument: `--spring.profiles.active=dev`.
-
-=== Configuring a different HTTP port
-
-In case you should have to use another HTTP port than 8080 you can pass the following application argument in the launch configuration to specify a custom port:
-
-    --server.port=1234
+_Note: You should enable the Spring profile `dev` to activate some configuration properties suitable for a development environment. A general way to do this is to add the command line argument `--spring.profiles.active=dev` to the launch configuration._
 
 === Configuring test users
 
 MySkills Server requires an external OpenID Connect provider to generate ID token which can be used to authorize API requests.
 
-During development a local https://www.keycloak.org/[KeyCloak] server is recommended to manage test users and create ID token.
+During development a local https://www.keycloak.org/[KeyCloak] server is recommended to manage test users and create access token.
 
 Option 1: You can download KeyCloak https://www.keycloak.org/downloads.html[directly from the website] and install it on your system.
 
@@ -227,19 +209,13 @@ docker start keycloak
 docker stop keycloak
 ----
 
-Visit http://localhost:9000/auth/ or http://docker.local:9000/auth/ to configure the KeyCloak server.
+Visit http://localhost:9000/auth/ to configure the KeyCloak server.
 
-There is an export of a suitable test realm in `tools/keycloak/myskills-realm.json` which can be imported into the KeyCloak server. The realm comes with a preconfigured client for MySkills but contains no test users. *You have to create users manually within the `MySkills` realm.*
+There is an export of a suitable test realm in `tools/keycloak/myskills-realm.json` which can be imported into the KeyCloak server. Simply log in to the administration console, select "Add realm" and upload the JSON file.
 
-In order to obtain an ID token you must call the following URL in your browser (assuming that KeyCloak listens on port 9000):
+The test realm comes with a preconfigured client for MySkills but contains no test users. *You have to create users manually within the `MySkills` realm.*
 
-http://docker.local:9000/auth/realms/MySkills/protocol/openid-connect/auth?client_id=myskills&response_type=id_token&scope=openid+profile&nonce=123&redirect_uri=http://localhost:4200/
-
-After logging in you will be redirected to http://localhost:4200/ with the ID token passed in the `id_token` query parameter. You can copy this token and use it to authorize API requests by sending an `Authorization` header:
-
-    Authorization: Bearer <ID token>
-
-_Note: The development configuration of the MySkills Server assumes that the KeyCloak server is available at `docker.local:9000` and contains a realm named `MySkills`. Please note that the KeyCloak server must be running when starting the MySkills Server._
+_Note: The `dev` profile of the MySkills Server assumes that the KeyCloak server is available at `localhost:9000` and contains a realm named `MySkills`. The KeyCloak server must be accessible when starting the MySkills Server._
 
 === Testing the application
 
@@ -247,7 +223,7 @@ In order to execute the automated tests run the following command in the project
 
     mvnw test
 
-TODO: Describe how to generate test coverage report using JaCoCo Maven plugin.
+TODO: Describe how to generate test coverage report using JaCoCo Maven plugin as soon as it has been integrated.
 
 === Exploring the API
 
