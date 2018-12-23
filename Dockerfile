@@ -1,4 +1,4 @@
-FROM openjdk:10
+FROM openjdk:11
 LABEL maintainer="georg.wittberger@gmail.com"
 ARG JAR_FILE
 COPY $JAR_FILE /myskills/myskills-server.jar
