@@ -3,7 +3,7 @@ Georg Wittberger <georg.wittberger@gmail.com>
 v0.0.1, 2018-12-23
 
 image:https://travis-ci.org/KnowledgeAssets/myskills-server.svg?branch=master["Build Status", link="https://travis-ci.org/KnowledgeAssets/myskills-server"]
-image:https://codecov.io/gh/KnowledgeAssets/myskills-server/branch/master/graph/badge.svg["Code Coverage"]
+image:https://codecov.io/gh/KnowledgeAssets/myskills-server/branch/master/graph/badge.svg["Code Coverage", link="https://codecov.io/gh/KnowledgeAssets/myskills-server"]
 image:https://img.shields.io/github/issues-raw/KnowledgeAssets/myskills-server.svg["GitHub issues",link="https://github.com/KnowledgeAssets/myskills-server/issues"]
 image:https://img.shields.io/github/license/KnowledgeAssets/myskills-server.svg["MIT License"]
 
