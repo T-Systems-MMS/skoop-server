@@ -223,7 +223,15 @@ In order to execute the automated tests run the following command in the project
 
     mvnw test
 
-TODO: Describe how to generate test coverage report using JaCoCo Maven plugin as soon as it has been integrated.
+Project test coverage is reported by https://www.eclemma.org/jacoco/trunk/doc/maven.html[JaCoCo Maven plugin].
+
+To generate JaCoCo test coverage report it is necessary to run `prepare-package` maven build phase.
+
+    mvnw prepare-package
+
+After the phase has been completed JaCoCo test coverage report can be found in `target/site/jacoco/index.html`.
+
+Travis CI uploads JaCoCo test coverage reports to https://codecov.io[codecov.io]. Uploaded reports can be found here[https://codecov.io/gh/KnowledgeAssets/myskills-server].
 
 === Exploring the API
 
