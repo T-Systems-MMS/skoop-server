@@ -231,7 +231,7 @@ To generate JaCoCo test coverage report it is necessary to run `prepare-package`
 
 After the phase has been completed JaCoCo test coverage report can be found in `target/site/jacoco/index.html`.
 
-Travis CI uploads JaCoCo test coverage reports to https://codecov.io[codecov.io]. Uploaded reports can be found here[https://codecov.io/gh/KnowledgeAssets/myskills-server].
+Travis CI uploads JaCoCo test coverage reports to https://codecov.io[codecov.io]. Uploaded reports can be found https://codecov.io/gh/KnowledgeAssets/myskills-server[here].
 
 === Exploring the API
 
