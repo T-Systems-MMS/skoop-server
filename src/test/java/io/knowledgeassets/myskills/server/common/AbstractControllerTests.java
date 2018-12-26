@@ -28,7 +28,7 @@ public abstract class AbstractControllerTests {
 	@MockBean
 	private JwtDecoder jwtDecoder;
 	@MockBean
-	private UserPermissionQueryService userPermissionQueryService;
+	protected UserPermissionQueryService userPermissionQueryService;
 
 	@BeforeEach
 	void prepareUserPermissions() {

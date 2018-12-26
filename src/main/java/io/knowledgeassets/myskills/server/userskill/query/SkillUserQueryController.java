@@ -5,6 +5,7 @@ import io.knowledgeassets.myskills.server.exception.InvalidInputException;
 import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.user.UserResponse;
 import io.knowledgeassets.myskills.server.user.query.UserPermissionQueryService;
+import io.knowledgeassets.myskills.server.userskill.UserSkill;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -66,14 +67,7 @@ public class SkillUserQueryController {
 		return userSkillQueryService.getBySkillId(skillId, minPriority)
 				.filter(userSkill -> allowedUserIds.contains(userSkill.getUser().getId()))
 				.map(userSkill -> SkillUserResponse.builder()
-						.user(UserResponse.builder()
-								.id(userSkill.getUser().getId())
-								.userName(userSkill.getUser().getUserName())
-								.firstName(userSkill.getUser().getFirstName())
-								.lastName(userSkill.getUser().getLastName())
-								.email(userSkill.getUser().getEmail())
-								.coach(userSkill.getUser().getCoach())
-								.build())
+						.user(convertUserToUserResponse(userSkill.getUser()))
 						.currentLevel(userSkill.getCurrentLevel())
 						.desiredLevel(userSkill.getDesiredLevel())
 						.priority(userSkill.getPriority())
@@ -97,14 +91,7 @@ public class SkillUserQueryController {
 										   @PathVariable("userId") String userId) {
 		return userSkillQueryService.getUserSkillByUserIdAndSkillId(userId, skillId)
 				.map(userSkill -> SkillUserResponse.builder()
-						.user(UserResponse.builder()
-								.id(userSkill.getUser().getId())
-								.userName(userSkill.getUser().getUserName())
-								.firstName(userSkill.getUser().getFirstName())
-								.lastName(userSkill.getUser().getLastName())
-								.email(userSkill.getUser().getEmail())
-								.coach(userSkill.getUser().getCoach())
-								.build())
+						.user(convertUserToUserResponse(userSkill.getUser()))
 						.currentLevel(userSkill.getCurrentLevel())
 						.desiredLevel(userSkill.getDesiredLevel())
 						.priority(userSkill.getPriority())
@@ -112,4 +99,16 @@ public class SkillUserQueryController {
 				.orElseThrow(() -> InvalidInputException.builder().message(
 						format("Skill with ID '%s' is not related to user with ID '%s'", skillId, userId)).build());
 	}
+
+	private static UserResponse convertUserToUserResponse(User user) {
+		return UserResponse.builder()
+				.id(user.getId())
+				.userName(user.getUserName())
+				.firstName(user.getFirstName())
+				.lastName(user.getLastName())
+				.email(user.getEmail())
+				.coach(user.getCoach())
+				.build();
+	}
+
 }

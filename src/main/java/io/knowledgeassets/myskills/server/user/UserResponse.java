@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @Builder
 @ApiModel(
@@ -30,6 +32,27 @@ public class UserResponse {
 	@ApiModelProperty("Show as coach?")
 	private Boolean coach;
 
+	@ApiModelProperty("Academic degree of the user.")
+	private String academicDegree;
+
+	@ApiModelProperty("Position profile of the user.")
+	private String positionProfile;
+
+	@ApiModelProperty("Summary.")
+	private String summary;
+
+	@ApiModelProperty("Industry sectors the user works (worked) in.")
+	private List<String> industrySectors;
+
+	@ApiModelProperty("Specializations which the user has.")
+	private List<String> specializations;
+
+	@ApiModelProperty("Certificates which the user has.")
+	private List<String> certificates;
+
+	@ApiModelProperty("Languages which the user knows.")
+	private List<String> languages;
+
 	public static UserResponse of(User user) {
 		return UserResponse.builder()
 				.id(user.getId())
@@ -38,6 +61,13 @@ public class UserResponse {
 				.lastName(user.getLastName())
 				.email(user.getEmail())
 				.coach(user.getCoach())
+				.academicDegree(user.getAcademicDegree())
+				.positionProfile(user.getPositionProfile())
+				.summary(user.getSummary())
+				.industrySectors(user.getIndustrySectors())
+				.specializations(user.getSpecializations())
+				.certificates(user.getCertificates())
+				.languages(user.getLanguages())
 				.build();
 	}
 }

@@ -15,6 +15,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 import static io.knowledgeassets.myskills.server.common.JwtAuthenticationFactory.withUser;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -65,7 +68,15 @@ public class UserCommandControllerTests extends AbstractControllerTests {
 	@Test
 	@DisplayName("Updates and returns the given user")
 	void updateUser() throws Exception {
-		UserRequest userRequest = UserRequest.builder().userName("tester1").firstName("firstTester").email("tester1@gmail.com").coach(true).build();
+		UserRequest userRequest = UserRequest.builder().userName("tester1").firstName("firstTester").email("tester1@gmail.com").coach(true)
+				.academicDegree("Diplom-Wirtschaftsinformatiker")
+				.positionProfile("Software Architect")
+				.summary("Tester summary")
+				.industrySectors(Arrays.asList("Automotive", "Telecommunication"))
+				.specializations(Arrays.asList("IT Consulting", "Software Integration"))
+				.certificates(Collections.singletonList("Java Certified Programmer"))
+				.languages(Collections.singletonList("Deutsch"))
+				.build();
 		String userRequestAsString = objectMapper.writeValueAsString(userRequest);
 
 		User owner = User.builder()
@@ -74,7 +85,15 @@ public class UserCommandControllerTests extends AbstractControllerTests {
 				.build();
 
 		given(userCommandService.updateUser("123", userRequest))
-				.willReturn(User.builder().id("123").userName("tester1").firstName("firstTester").email("tester1@gmail.com").coach(true).build());
+				.willReturn(User.builder().id("123").userName("tester1").firstName("firstTester").email("tester1@gmail.com").coach(true)
+						.academicDegree("Diplom-Wirtschaftsinformatiker")
+						.positionProfile("Software Architect")
+						.summary("Tester summary")
+						.industrySectors(Arrays.asList("Automotive", "Telecommunication"))
+						.specializations(Arrays.asList("IT Consulting", "Software Integration"))
+						.certificates(Collections.singletonList("Java Certified Programmer"))
+						.languages(Collections.singletonList("Deutsch"))
+						.build());
 
 		mockMvc.perform(put("/users/123")
 				.accept(MediaType.APPLICATION_JSON)
@@ -88,7 +107,14 @@ public class UserCommandControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$.userName", is(equalTo("tester1"))))
 				.andExpect(jsonPath("$.lastName", is(equalTo(null))))
 				.andExpect(jsonPath("$.email", is(equalTo("tester1@gmail.com"))))
-				.andExpect(jsonPath("$.coach", is(true)));
+				.andExpect(jsonPath("$.coach", is(true)))
+				.andExpect(jsonPath("$.academicDegree", is("Diplom-Wirtschaftsinformatiker")))
+				.andExpect(jsonPath("$.positionProfile", is("Software Architect")))
+				.andExpect(jsonPath("$.summary", is("Tester summary")))
+				.andExpect(jsonPath("$.industrySectors", is(Arrays.asList("Automotive", "Telecommunication"))))
+				.andExpect(jsonPath("$.specializations", is(Arrays.asList("IT Consulting", "Software Integration"))))
+				.andExpect(jsonPath("$.certificates", is(Collections.singletonList("Java Certified Programmer"))))
+				.andExpect(jsonPath("$.languages", is(Collections.singletonList("Deutsch"))));
 	}
 
 	@Test
