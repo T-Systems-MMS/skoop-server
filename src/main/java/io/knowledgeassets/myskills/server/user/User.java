@@ -34,6 +34,27 @@ public class User {
 	@Property(name = "coach")
 	private Boolean coach;
 
+	@Property(name = "academicDegree")
+	private String academicDegree;
+
+	@Property(name = "positionProfile")
+	private String positionProfile;
+
+	@Property(name = "summary")
+	private String summary;
+
+	@Property(name = "industrySectors")
+	private List<String> industrySectors;
+
+	@Property(name = "specializations")
+	private List<String> specializations;
+
+	@Property(name = "certificates")
+	private List<String> certificates;
+
+	@Property(name = "languages")
+	private List<String> languages;
+
 	@ToString.Exclude
 	@EqualsAndHashCode.Exclude
 	@Relationship(type = "RELATED_TO", direction = UNDIRECTED)

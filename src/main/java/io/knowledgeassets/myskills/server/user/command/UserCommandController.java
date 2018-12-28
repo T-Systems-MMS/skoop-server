@@ -80,6 +80,13 @@ public class UserCommandController {
 				.lastName(user.getLastName())
 				.email(user.getEmail())
 				.coach(user.getCoach())
+				.academicDegree(user.getAcademicDegree())
+				.positionProfile(user.getPositionProfile())
+				.summary(user.getSummary())
+				.industrySectors(user.getIndustrySectors())
+				.specializations(user.getSpecializations())
+				.certificates(user.getCertificates())
+				.languages(user.getLanguages())
 				.build();
 	}
 

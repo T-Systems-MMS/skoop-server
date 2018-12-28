@@ -65,6 +65,13 @@ public class UserCommandService {
 					.build();
 		});
 		user.setCoach(userRequest.getCoach());
+		user.setAcademicDegree(userRequest.getAcademicDegree());
+		user.setPositionProfile(userRequest.getPositionProfile());
+		user.setSummary(userRequest.getSummary());
+		user.setIndustrySectors(userRequest.getIndustrySectors());
+		user.setSpecializations(userRequest.getSpecializations());
+		user.setCertificates(userRequest.getCertificates());
+		user.setLanguages(userRequest.getLanguages());
 		return userRepository.save(user);
 	}
 

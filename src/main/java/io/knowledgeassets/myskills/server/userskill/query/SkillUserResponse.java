@@ -1,6 +1,7 @@
 package io.knowledgeassets.myskills.server.userskill.query;
 
 import io.knowledgeassets.myskills.server.user.UserResponse;
+import io.knowledgeassets.myskills.server.user.UserSimpleResponse;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
@@ -15,7 +16,7 @@ import lombok.Data;
 )
 public class SkillUserResponse {
 	@ApiModelProperty("Details of the related user")
-	private UserResponse user;
+	private UserSimpleResponse user;
 
 	@ApiModelProperty("Current skill level of the user (range: 0-4 where 0 = no knowledge at all, 4 = expert)")
 	private Integer currentLevel;

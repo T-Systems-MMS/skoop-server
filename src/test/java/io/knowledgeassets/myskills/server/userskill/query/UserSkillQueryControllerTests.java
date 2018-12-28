@@ -19,6 +19,7 @@ import java.util.stream.Stream;
 import static io.knowledgeassets.myskills.server.common.JwtAuthenticationFactory.withUser;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
@@ -185,12 +186,26 @@ class UserSkillQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[0].lastName", is(equalTo("Testing"))))
 				.andExpect(jsonPath("$[0].email", is(equalTo("tina.testing@myskills.io"))))
 				.andExpect(jsonPath("$[0].coach", is(equalTo(true))))
+				.andExpect(jsonPath("$[0].academicDegree").doesNotExist())
+				.andExpect(jsonPath("$[0].positionProfile").doesNotExist())
+				.andExpect(jsonPath("$[0].summary").doesNotExist())
+				.andExpect(jsonPath("$[0].industrySectors").doesNotExist())
+				.andExpect(jsonPath("$[0].specializations").doesNotExist())
+				.andExpect(jsonPath("$[0].certificates").doesNotExist())
+				.andExpect(jsonPath("$[0].languages").doesNotExist())
 				.andExpect(jsonPath("$[1].id", is(equalTo("e8a4f522-e662-4ead-b3ce-b004f3bdcde5"))))
 				.andExpect(jsonPath("$[1].userName", is(equalTo("testbed"))))
 				.andExpect(jsonPath("$[1].firstName", is(equalTo("Tabia"))))
 				.andExpect(jsonPath("$[1].lastName", is(equalTo("Testbed"))))
 				.andExpect(jsonPath("$[1].email", is(equalTo("tabia.testbed@myskills.io"))))
-				.andExpect(jsonPath("$[1].coach", is(equalTo(true))));
+				.andExpect(jsonPath("$[1].coach", is(equalTo(true))))
+				.andExpect(jsonPath("$[1].academicDegree").doesNotExist())
+				.andExpect(jsonPath("$[1].positionProfile").doesNotExist())
+				.andExpect(jsonPath("$[1].summary").doesNotExist())
+				.andExpect(jsonPath("$[1].industrySectors").doesNotExist())
+				.andExpect(jsonPath("$[1].specializations").doesNotExist())
+				.andExpect(jsonPath("$[1].certificates").doesNotExist())
+				.andExpect(jsonPath("$[1].languages").doesNotExist());
 	}
 
 	@Test
