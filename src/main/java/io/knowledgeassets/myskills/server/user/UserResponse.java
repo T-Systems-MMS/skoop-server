@@ -11,7 +11,7 @@ import java.util.List;
 @Builder
 @ApiModel(
 		value = "UserResponse",
-		description = "This holds information of a user. It will be used for sending user information to client."
+		description = "This holds extended information of a user. It will be used for sending user information to client."
 )
 public class UserResponse {
 	@ApiModelProperty("User id")

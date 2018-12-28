@@ -19,21 +19,21 @@ import static java.util.stream.Collectors.toList;
 )
 public class UserPermissionResponse {
 	@ApiModelProperty("Owning user who grants the permission")
-	private UserResponse owner;
+	private UserSimpleResponse owner;
 
 	@ApiModelProperty("Scope of access allowed to the authorized users")
 	private UserPermissionScope scope;
 
 	@ApiModelProperty("Users who are granted access to the scope of user data")
-	private List<UserResponse> authorizedUsers;
+	private List<UserSimpleResponse> authorizedUsers;
 
 	public static UserPermissionResponse of(UserPermission userPermission) {
 		return UserPermissionResponse.builder()
-				.owner(UserResponse.of(userPermission.getOwner()))
+				.owner(UserSimpleResponse.of(userPermission.getOwner()))
 				.scope(userPermission.getScope())
 				.authorizedUsers(userPermission.getAuthorizedUsers() != null ?
 						userPermission.getAuthorizedUsers().stream()
-								.map(UserResponse::of)
+								.map(UserSimpleResponse::of)
 								.collect(toList()) :
 						emptyList())
 				.build();

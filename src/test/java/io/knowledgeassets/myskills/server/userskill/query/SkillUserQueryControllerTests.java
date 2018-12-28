@@ -21,7 +21,6 @@ import static io.knowledgeassets.myskills.server.common.JwtAuthenticationFactory
 import static io.knowledgeassets.myskills.server.user.UserPermissionScope.READ_USER_SKILLS;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -118,12 +117,12 @@ class SkillUserQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[0].user.lastName", is(equalTo("Doe"))))
 				.andExpect(jsonPath("$[0].user.email", is(equalTo("john.doe@mail.com"))))
 				.andExpect(jsonPath("$[0].user.coach", is(equalTo(false))))
-				.andExpect(jsonPath("$[0].user.academicDegree", nullValue()))
-				.andExpect(jsonPath("$[0].user.positionProfile", nullValue()))
-				.andExpect(jsonPath("$[0].user.summary", nullValue()))
-				.andExpect(jsonPath("$[0].user.specializations", nullValue()))
-				.andExpect(jsonPath("$[0].user.certificates", nullValue()))
-				.andExpect(jsonPath("$[0].user.languages", nullValue()));
+				.andExpect(jsonPath("$[0].user.academicDegree").doesNotExist())
+				.andExpect(jsonPath("$[0].user.positionProfile").doesNotExist())
+				.andExpect(jsonPath("$[0].user.summary").doesNotExist())
+				.andExpect(jsonPath("$[0].user.specializations").doesNotExist())
+				.andExpect(jsonPath("$[0].user.certificates").doesNotExist())
+				.andExpect(jsonPath("$[0].user.languages").doesNotExist());
 	}
 
 	@Test
@@ -210,12 +209,12 @@ class SkillUserQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[0].user.lastName", is(equalTo("Doe"))))
 				.andExpect(jsonPath("$[0].user.email", is(equalTo("john.doe@mail.com"))))
 				.andExpect(jsonPath("$[0].user.coach", is(equalTo(false))))
-				.andExpect(jsonPath("$[0].user.academicDegree", nullValue()))
-				.andExpect(jsonPath("$[0].user.positionProfile", nullValue()))
-				.andExpect(jsonPath("$[0].user.summary", nullValue()))
-				.andExpect(jsonPath("$[0].user.specializations", nullValue()))
-				.andExpect(jsonPath("$[0].user.certificates", nullValue()))
-				.andExpect(jsonPath("$[0].user.languages", nullValue()))
+				.andExpect(jsonPath("$[0].user.academicDegree").doesNotExist())
+				.andExpect(jsonPath("$[0].user.positionProfile").doesNotExist())
+				.andExpect(jsonPath("$[0].user.summary").doesNotExist())
+				.andExpect(jsonPath("$[0].user.specializations").doesNotExist())
+				.andExpect(jsonPath("$[0].user.certificates").doesNotExist())
+				.andExpect(jsonPath("$[0].user.languages").doesNotExist())
 				.andExpect(jsonPath("$[1].currentLevel", is(equalTo(2))))
 				.andExpect(jsonPath("$[1].desiredLevel", is(equalTo(3))))
 				.andExpect(jsonPath("$[1].priority", is(equalTo(1))))
@@ -225,12 +224,12 @@ class SkillUserQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[1].user.lastName", is(equalTo("Doe"))))
 				.andExpect(jsonPath("$[1].user.email", is(equalTo("mary.doe@mail.com"))))
 				.andExpect(jsonPath("$[1].user.coach", is(equalTo(false))))
-				.andExpect(jsonPath("$[1].user.academicDegree", nullValue()))
-				.andExpect(jsonPath("$[1].user.positionProfile", nullValue()))
-				.andExpect(jsonPath("$[1].user.summary", nullValue()))
-				.andExpect(jsonPath("$[1].user.specializations", nullValue()))
-				.andExpect(jsonPath("$[1].user.certificates", nullValue()))
-				.andExpect(jsonPath("$[1].user.languages", nullValue()));
+				.andExpect(jsonPath("$[1].user.academicDegree").doesNotExist())
+				.andExpect(jsonPath("$[1].user.positionProfile").doesNotExist())
+				.andExpect(jsonPath("$[1].user.summary").doesNotExist())
+				.andExpect(jsonPath("$[1].user.specializations").doesNotExist())
+				.andExpect(jsonPath("$[1].user.certificates").doesNotExist())
+				.andExpect(jsonPath("$[1].user.languages").doesNotExist());
 	}
 
 	@Test
@@ -287,12 +286,12 @@ class SkillUserQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$.user.lastName", is(equalTo("Doe"))))
 				.andExpect(jsonPath("$.user.email", is(equalTo("john.doe@mail.com"))))
 				.andExpect(jsonPath("$.user.coach", is(equalTo(false))))
-				.andExpect(jsonPath("$.user.academicDegree", nullValue()))
-				.andExpect(jsonPath("$.user.positionProfile", nullValue()))
-				.andExpect(jsonPath("$.user.summary", nullValue()))
-				.andExpect(jsonPath("$.user.specializations", nullValue()))
-				.andExpect(jsonPath("$.user.certificates", nullValue()))
-				.andExpect(jsonPath("$.user.languages", nullValue()));
+				.andExpect(jsonPath("$.user.academicDegree").doesNotExist())
+				.andExpect(jsonPath("$.user.positionProfile").doesNotExist())
+				.andExpect(jsonPath("$.user.summary").doesNotExist())
+				.andExpect(jsonPath("$.user.specializations").doesNotExist())
+				.andExpect(jsonPath("$.user.certificates").doesNotExist())
+				.andExpect(jsonPath("$.user.languages").doesNotExist());
 	}
 
 }

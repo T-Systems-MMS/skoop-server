@@ -12,6 +12,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.stream.Stream;
 
 import static io.knowledgeassets.myskills.server.common.JwtAuthenticationFactory.withUser;
@@ -44,6 +46,13 @@ class UserPermissionCommandControllerTests extends AbstractControllerTests {
 				.lastName("Tester")
 				.email("toni.tester@myskills.io")
 				.coach(true)
+				.academicDegree("Diplom-Wirtschaftsinformatiker")
+				.positionProfile("Software Architect")
+				.summary("Architect")
+				.industrySectors(Arrays.asList("Automotive", "Telecommunication"))
+				.specializations(Arrays.asList("IT Consulting", "Software Integration"))
+				.certificates(Collections.singletonList("Java Certified Programmer"))
+				.languages(Collections.singletonList("Deutsch"))
 				.build();
 
 		ReplaceUserPermissionListCommand expectedCommand = ReplaceUserPermissionListCommand.builder()
@@ -70,6 +79,13 @@ class UserPermissionCommandControllerTests extends AbstractControllerTests {
 								.lastName("Testing")
 								.email("tina.testing@myskills.io")
 								.coach(false)
+								.academicDegree("Diplom-Wirtschaftsinformatiker")
+								.positionProfile("Software Developer")
+								.summary("Developer")
+								.industrySectors(Arrays.asList("Automotive", "Telecommunication"))
+								.specializations(Arrays.asList("IT Consulting", "Software Integration"))
+								.certificates(Collections.singletonList("Scala Certified Programmer"))
+								.languages(Collections.singletonList("English"))
 								.build(),
 						User.builder()
 								.id("e156c6e5-8bf2-4c7b-98c1-f3d9b63318fc")
@@ -78,6 +94,13 @@ class UserPermissionCommandControllerTests extends AbstractControllerTests {
 								.lastName("Testbed")
 								.email("tabia.testbed@myskills.io")
 								.coach(true)
+								.academicDegree("Diplom-Wirtschaftsinformatiker")
+								.positionProfile("Software Designer")
+								.summary("Designer")
+								.industrySectors(Arrays.asList("Automotive", "Telecommunication"))
+								.specializations(Arrays.asList("IT Consulting", "Software Integration"))
+								.certificates(Collections.singletonList("Kotlin Certified Programmer"))
+								.languages(Collections.singletonList("Scottish"))
 								.build()
 				))
 				.build()))
@@ -107,6 +130,13 @@ class UserPermissionCommandControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[0].owner.lastName", is(equalTo("Tester"))))
 				.andExpect(jsonPath("$[0].owner.email", is(equalTo("toni.tester@myskills.io"))))
 				.andExpect(jsonPath("$[0].owner.coach", is(equalTo(true))))
+				.andExpect(jsonPath("$[0].owner.academicDegree").doesNotExist())
+				.andExpect(jsonPath("$[0].owner.positionProfile").doesNotExist())
+				.andExpect(jsonPath("$[0].owner.summary").doesNotExist())
+				.andExpect(jsonPath("$[0].owner.industrySectors").doesNotExist())
+				.andExpect(jsonPath("$[0].owner.specializations").doesNotExist())
+				.andExpect(jsonPath("$[0].owner.certificates").doesNotExist())
+				.andExpect(jsonPath("$[0].owner.languages").doesNotExist())
 				.andExpect(jsonPath("$[0].scope", is(equalTo("READ_USER_SKILLS"))))
 				.andExpect(jsonPath("$[0].authorizedUsers.length()", is(equalTo(2))))
 				.andExpect(jsonPath("$[0].authorizedUsers[0].id", is(equalTo("6aa4e666-6f40-4443-bf79-806472725b28"))))
@@ -115,12 +145,26 @@ class UserPermissionCommandControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[0].authorizedUsers[0].lastName", is(equalTo("Testing"))))
 				.andExpect(jsonPath("$[0].authorizedUsers[0].email", is(equalTo("tina.testing@myskills.io"))))
 				.andExpect(jsonPath("$[0].authorizedUsers[0].coach", is(equalTo(false))))
+				.andExpect(jsonPath("$[0].authorizedUsers[0].academicDegree").doesNotExist())
+				.andExpect(jsonPath("$[0].authorizedUsers[0].positionProfile").doesNotExist())
+				.andExpect(jsonPath("$[0].authorizedUsers[0].summary").doesNotExist())
+				.andExpect(jsonPath("$[0].authorizedUsers[0].industrySectors").doesNotExist())
+				.andExpect(jsonPath("$[0].authorizedUsers[0].specializations").doesNotExist())
+				.andExpect(jsonPath("$[0].authorizedUsers[0].certificates").doesNotExist())
+				.andExpect(jsonPath("$[0].authorizedUsers[0].languages").doesNotExist())
 				.andExpect(jsonPath("$[0].authorizedUsers[1].id", is(equalTo("e156c6e5-8bf2-4c7b-98c1-f3d9b63318fc"))))
 				.andExpect(jsonPath("$[0].authorizedUsers[1].userName", is(equalTo("testbed"))))
 				.andExpect(jsonPath("$[0].authorizedUsers[1].firstName", is(equalTo("Tabia"))))
 				.andExpect(jsonPath("$[0].authorizedUsers[1].lastName", is(equalTo("Testbed"))))
 				.andExpect(jsonPath("$[0].authorizedUsers[1].email", is(equalTo("tabia.testbed@myskills.io"))))
-				.andExpect(jsonPath("$[0].authorizedUsers[1].coach", is(equalTo(true))));
+				.andExpect(jsonPath("$[0].authorizedUsers[1].coach", is(equalTo(true))))
+				.andExpect(jsonPath("$[0].authorizedUsers[1].academicDegree").doesNotExist())
+				.andExpect(jsonPath("$[0].authorizedUsers[1].positionProfile").doesNotExist())
+				.andExpect(jsonPath("$[0].authorizedUsers[1].summary").doesNotExist())
+				.andExpect(jsonPath("$[0].authorizedUsers[1].industrySectors").doesNotExist())
+				.andExpect(jsonPath("$[0].authorizedUsers[1].specializations").doesNotExist())
+				.andExpect(jsonPath("$[0].authorizedUsers[1].certificates").doesNotExist())
+				.andExpect(jsonPath("$[0].authorizedUsers[1].languages").doesNotExist());
 	}
 
 	@Test

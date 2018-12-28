@@ -4,6 +4,7 @@ import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.exception.enums.Model;
 import io.knowledgeassets.myskills.server.skill.SkillResponse;
 import io.knowledgeassets.myskills.server.user.UserResponse;
+import io.knowledgeassets.myskills.server.user.UserSimpleResponse;
 import io.knowledgeassets.myskills.server.userskill.UserSkillResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -99,17 +100,10 @@ public class UserSkillQueryController {
 	})
 	@PreAuthorize("isPrincipalUserId(#userId)")
 	@GetMapping(path = "/users/{userId}/skills/{skillId}/coaches", produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<UserResponse> getUserSkillCoaches(@PathVariable("userId") String userId,
+	public List<UserSimpleResponse> getUserSkillCoaches(@PathVariable("userId") String userId,
 												  @PathVariable("skillId") String skillId) {
 		return userSkillQueryService.getCoachesByUserIdAndSkillId(userId, skillId)
-				.map(coach -> UserResponse.builder()
-						.id(coach.getId())
-						.userName(coach.getUserName())
-						.firstName(coach.getFirstName())
-						.lastName(coach.getLastName())
-						.email(coach.getEmail())
-						.coach(coach.getCoach())
-						.build())
+				.map(UserSimpleResponse::of)
 				.collect(toList());
 	}
 }
