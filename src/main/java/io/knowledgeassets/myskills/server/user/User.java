@@ -1,5 +1,6 @@
 package io.knowledgeassets.myskills.server.user;
 
+import io.knowledgeassets.myskills.server.userproject.UserProject;
 import io.knowledgeassets.myskills.server.userskill.UserSkill;
 import lombok.*;
 import org.neo4j.ogm.annotation.*;
@@ -59,6 +60,11 @@ public class User {
 	@EqualsAndHashCode.Exclude
 	@Relationship(type = "RELATED_TO", direction = UNDIRECTED)
 	private List<UserSkill> userSkills;
+
+	@ToString.Exclude
+	@EqualsAndHashCode.Exclude
+	@Relationship(type = "RELATED_TO_PROJECT", direction = UNDIRECTED)
+	private List<UserProject> userProjects;
 
 	@ToString.Exclude
 	@EqualsAndHashCode.Exclude
