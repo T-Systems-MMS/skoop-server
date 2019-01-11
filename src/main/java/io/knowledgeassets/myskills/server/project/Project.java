@@ -53,7 +53,7 @@ public class Project {
 
 	@ToString.Exclude
 	@EqualsAndHashCode.Exclude
-	@Relationship(type = "RELATED_TO_PROJECT", direction = Relationship.UNDIRECTED)
+	@Relationship(type = "USER_PROJECT", direction = Relationship.UNDIRECTED)
 	private List<UserProject> userProjects;
 
 }

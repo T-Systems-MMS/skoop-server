@@ -1,5 +1,6 @@
 package io.knowledgeassets.myskills.server.userproject.command;
 
+import io.knowledgeassets.myskills.server.exception.DuplicateResourceException;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.project.Project;
 import io.knowledgeassets.myskills.server.project.query.ProjectQueryService;
@@ -122,6 +123,43 @@ class UserProjectCommandServiceTests {
 		));
 		given(userQueryService.getUserById("123")).willReturn(Optional.empty());
 		assertThrows(NoSuchResourceException.class, () ->
+				userProjectCommandService.assignProjectToUser("ABC", "123", UserProject.builder()
+						.role("QA")
+						.tasks("testing")
+						.user(User.builder()
+								.id("123")
+								.userName("tester")
+								.build())
+						.project(Project.builder()
+								.id("ABC")
+								.name("Project")
+								.description("Project description")
+								.build())
+						.build()));
+	}
+
+	@Test
+	@DisplayName("Assign project to user throws an exception when there is already a relationship between a specified project and a specified user")
+	void assignProjectToUserThrowsExceptionWhenThereIsAlreadyRelationshipBetweenProjectAndUser() {
+		given(projectQueryService.getProjectById("ABC")).willReturn(Optional.of(
+				Project.builder()
+						.id("ABC")
+						.name("Project")
+						.description("Project description")
+						.build()
+		));
+		given(userQueryService.getUserById("123")).willReturn(Optional.of(
+				User.builder()
+						.id("123")
+						.userName("tester")
+						.build()
+		));
+		given(userProjectRepository.findByUserIdAndProjectId("123", "ABC")).willReturn(Optional.of(UserProject.builder()
+				.id(1L)
+				.role("developer")
+				.tasks("development")
+				.build()));
+		assertThrows(DuplicateResourceException.class, () ->
 				userProjectCommandService.assignProjectToUser("ABC", "123", UserProject.builder()
 						.role("QA")
 						.tasks("testing")

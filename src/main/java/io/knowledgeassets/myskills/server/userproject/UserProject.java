@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@RelationshipEntity(type = "RELATED_TO_PROJECT")
+@RelationshipEntity(type = "USER_PROJECT")
 public class UserProject {
 
 	@Id

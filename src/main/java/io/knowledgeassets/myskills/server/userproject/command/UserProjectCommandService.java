@@ -1,5 +1,6 @@
 package io.knowledgeassets.myskills.server.userproject.command;
 
+import io.knowledgeassets.myskills.server.exception.DuplicateResourceException;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.exception.enums.Model;
 import io.knowledgeassets.myskills.server.project.Project;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 
 import static io.knowledgeassets.myskills.server.exception.enums.Model.USER;
 import static io.knowledgeassets.myskills.server.exception.enums.Model.USER_PROJECT;
+import static java.lang.String.format;
 
 @Service
 public class UserProjectCommandService {
@@ -44,6 +46,11 @@ public class UserProjectCommandService {
 				.model(USER)
 				.searchParamsMap(new String[]{"id", userId})
 				.build());
+		userProjectRepository.findByUserIdAndProjectId(userId, projectId).ifPresent(up -> {
+			throw DuplicateResourceException.builder()
+					.message(format("User-project relationship with user id '%s' and project id '%s' already exists", userId, projectId))
+					.build();
+		});
 		userProject.setProject(project);
 		userProject.setUser(user);
 		return save(userProject);
