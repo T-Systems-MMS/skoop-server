@@ -55,7 +55,7 @@ public class UserProjectQueryController {
 	})
 	@PreAuthorize("isPrincipalUserId(#userId) or hasUserPermission(#userId, 'READ_USER_SKILLS')")
 	@GetMapping(path = "/users/{userId}/projects/{projectId}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<UserProjectResponse> getUserProjects(@PathVariable("userId") String userId,
+	public ResponseEntity<UserProjectResponse> getUserProject(@PathVariable("userId") String userId,
 																	 @PathVariable("projectId") String projectId) {
 		final UserProjectResponse userProject = userProjectQueryService.getUserProjectByUserIdAndProjectId(userId, projectId)
 				.map(UserProjectResponse::of)

@@ -363,4 +363,18 @@ class UserProjectQueryControllerTests extends AbstractControllerTests {
 				.andExpect(status().isUnauthorized());
 	}
 
+	@Test
+	@DisplayName("Not found status code is returned when there is no user-project relationship.")
+	void notFoundStatusCodeIsReturnedWhenThereIsNoUserProjectRelationship() throws Exception {
+		final User owner = User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build();
+		given(userProjectQueryService.getUserProjectByUserIdAndProjectId("1f37fb2a-b4d0-4119-9113-4677beb20ae2", "123"))
+				.willReturn(Optional.empty());
+		mockMvc.perform(get("/users/1f37fb2a-b4d0-4119-9113-4677beb20ae2/projects/123")
+				.with(authentication(withUser(owner))))
+				.andExpect(status().isNotFound());
+	}
+
 }
