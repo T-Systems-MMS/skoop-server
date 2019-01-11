@@ -1,0 +1,11 @@
+{
+	"azp": "myskills",
+	"resource_access": {
+		"myskills": {
+			"roles": ["ADMIN", "USER"]
+		}
+	},
+	"realm_access": {
+		"roles": ["REALM"]
+	}
+}
