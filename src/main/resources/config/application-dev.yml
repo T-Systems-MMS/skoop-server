@@ -1,8 +1,10 @@
 spring:
   data:
     neo4j:
-      # Automatically create and update indexes and constraints.
-      auto-index: update
+      # Dumps the generated constraints and indexes to a file
+      auto-index: dump
+      dump-dir: .
+      dump-filename: generated_indexes.cql
       # Set database URI to local server.
       uri: 'bolt://localhost:7687'
 
