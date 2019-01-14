@@ -97,12 +97,9 @@ public class UserSkillCommandService {
 	 * This authentication.userAuthentication.Principal returns the UserIdentity object.
 	 * This makes sure that only owner or Admin users can change the userSkill record.
 	 *
-	 * @PreAuthorize("#userSkill.user.id.equals(authentication.userAuthentication.Principal.userId)")
-	 * @PreAuthorize("#userSkill.user.userName.equals(authentication.userAuthentication.Principal.userName)")
-	 * @PreAuthorize("#userSkill.user.userName == authentication.name")
 	 */
 	@Transactional
-	@PreAuthorize("#userSkill.user.userName.equals(authentication.userAuthentication.Principal.userName) || hasRole('ADMIN')")
+	@PreAuthorize("isPrincipalUserId(#userSkill.user.id) || hasRole('ADMIN')")
 	public UserSkill updateUserSkill(Integer currentLevel, Integer desiredLevel, Integer priority, UserSkill userSkill) {
 		userSkill.setCurrentLevel(currentLevel);
 		userSkill.setDesiredLevel(desiredLevel);
@@ -116,7 +113,7 @@ public class UserSkillCommandService {
 	 * @param userSkill
 	 */
 	@Transactional
-	@PreAuthorize("#userSkill.user.userName.equals(authentication.userAuthentication.Principal.userName) || hasRole('ADMIN')")
+	@PreAuthorize("isPrincipalUserId(#userSkill.user.id) || hasRole('ADMIN')")
 	public void deleteUserSkill(UserSkill userSkill) {
 		userSkillRepository.delete(userSkill);
 	}
