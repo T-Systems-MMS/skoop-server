@@ -52,7 +52,7 @@ public enum IndexType {
 	},
 
 	/**
-	 *
+	 * Node key constraint
 	 */
 	NODE_KEY_CONSTRAINT {
 		@Override

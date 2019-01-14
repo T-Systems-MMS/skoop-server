@@ -7,8 +7,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
+import java.nio.file.NoSuchFileException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -28,11 +32,19 @@ public class IndexManagerTest {
 	}
 
 	@Test
+	public void testThrowNoSuchFileException() {
+		assertThrows(NoSuchFileException.class,
+				()-> new IndexManager(mockIndexService, "wrong/path/to/file", "wrong_filename.cql"));
+	}
+
+	@Test
 	public void testCreateNewIndexes() {
-		doReturn(Collections.emptyList()).when(mockIndexService).loadIndexesFromDB();
+		List<String> dbIndexes = new ArrayList<>(indexManager.getFileIndexes());
+		String newIndex = dbIndexes.remove(0);
+		doReturn(dbIndexes).when(mockIndexService).loadIndexesFromDB();
 		indexManager.createIndexes();
 
-		verify(mockIndexService).executeStatements(any());
+		verify(mockIndexService).executeStatements(Collections.singletonList(newIndex));
 	}
 
 	@Test

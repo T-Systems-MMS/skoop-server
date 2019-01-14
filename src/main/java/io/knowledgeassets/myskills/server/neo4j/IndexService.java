@@ -32,25 +32,28 @@ public class IndexService {
 
 	public List<String> loadIndexesFromDB() {
 		DefaultRequest indexRequests = buildProcedures();
-		List<String> dbIndexes = new ArrayList<>();
+		List<String> dbIndexCreateStatements = new ArrayList<>();
 		session.doInTransaction(() -> {
 			try (Response<RowModel> response = session.requestHandler().execute(indexRequests)) {
 				RowModel rowModel;
 				while ((rowModel = response.next()) != null) {
-					String index = parse((String) rowModel.getValues()[0]);
+					String index = parseIndexToCreateStatement((String) rowModel.getValues()[0]);
 					if (index != null) {
-						dbIndexes.add(index);
+						dbIndexCreateStatements.add(index);
 					}
 				}
 			}
 		}, READ_WRITE);
 
-		return dbIndexes;
+		return dbIndexCreateStatements;
 	}
 
-	public void executeStatements(List<Statement> statements) {
+	public void executeStatements(List<String> strStatements) {
+		List<Statement> createStatements = new ArrayList<>();
+		strStatements.forEach(s -> createStatements.add(new RowDataStatement(s, emptyMap())));
+
 		DefaultRequest request = new DefaultRequest();
-		request.setStatements(statements);
+		request.setStatements(createStatements);
 
 		session.doInTransaction(() -> {
 			try (Response<RowModel> response = session.requestHandler().execute(request)) {
@@ -70,8 +73,7 @@ public class IndexService {
 		return getIndexesRequest;
 	}
 
-	private String parse(String indexValue) {
-
+	String parseIndexToCreateStatement(String indexValue) {
 		Pattern pattern;
 		Matcher matcher;
 
@@ -83,8 +85,8 @@ public class IndexService {
 			for (int i = 0; i < properties.length; i++) {
 				properties[i] = properties[i].trim();
 			}
-			if (properties.length > 1) {
 
+			if (properties.length > 1) {
 				return COMPOSITE_INDEX.convertToCreateCommand(label, properties);
 			} else {
 				return SINGLE_INDEX.convertToCreateCommand(label, properties);
@@ -120,7 +122,7 @@ public class IndexService {
 		}
 
 		pattern = compile(
-				"CONSTRAINT ON \\(\\)-\\[\\s?(?<name>.*):(?<label>.*)\\s?\\]-\\(\\) ASSERT exists\\(?\\k<name>.(?<property>.*)\\)");
+				"CONSTRAINT ON \\(\\)-\\[\\s?(?<name>.*):(?<label>.*)\\s?]-\\(\\) ASSERT exists\\(?\\k<name>.(?<property>.*)\\)");
 		matcher = pattern.matcher(indexValue);
 		if (matcher.matches()) {
 			String label = matcher.group("label").trim();

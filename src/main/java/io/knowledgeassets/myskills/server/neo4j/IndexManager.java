@@ -1,7 +1,5 @@
 package io.knowledgeassets.myskills.server.neo4j;
 
-import org.neo4j.ogm.request.Statement;
-import org.neo4j.ogm.session.request.RowDataStatement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -13,8 +11,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import static java.util.Collections.emptyMap;
 
 @Component
 public class IndexManager {
@@ -33,10 +29,10 @@ public class IndexManager {
 	public void createIndexes() {
 		List<String> dbIndexes = indexService.loadIndexesFromDB();
 
-		List<Statement> createStatements = new ArrayList<>();
+		List<String> createStatements = new ArrayList<>();
 		for (String index : fileIndexes) {
 			if (!dbIndexes.contains(index)) {
-				createStatements.add(new RowDataStatement(index, emptyMap()));
+				createStatements.add(index);
 			}
 		}
 
