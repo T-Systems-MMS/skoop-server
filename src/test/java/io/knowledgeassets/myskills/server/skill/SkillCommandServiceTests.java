@@ -1,10 +1,7 @@
 package io.knowledgeassets.myskills.server.skill;
 
 import io.knowledgeassets.myskills.server.exception.DuplicateResourceException;
-import io.knowledgeassets.myskills.server.skill.Skill;
-import io.knowledgeassets.myskills.server.skill.SkillRepository;
 import io.knowledgeassets.myskills.server.skill.command.SkillCommandService;
-import io.knowledgeassets.myskills.server.skillgroup.SkillGroup;
 import io.knowledgeassets.myskills.server.skillgroup.query.SkillGroupQueryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -51,7 +48,7 @@ class SkillCommandServiceTests {
 
 	@Test
 	@DisplayName("Create Skill that has already exist")
-	void createSkill_ThrowsException() {
+	void createSkillThrowsException() {
 		given(skillRepository.findByNameIgnoreCase("Java")).willReturn(Optional.of(
 				Skill.builder().id("34").name("Java").description("A programming language").build()));
 

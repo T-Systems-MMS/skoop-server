@@ -6,9 +6,12 @@ import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoderJwkSupport;
@@ -52,6 +55,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		return jwtDecoder;
 	}
 
+	@Bean
+	public Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter() {
+		return new MySkillsJwtAuthenticationConverter();
+	}
+
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests()
@@ -61,6 +69,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 //				.and().csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
 				.and().csrf().disable()
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-				.and().oauth2ResourceServer().jwt();
+				.and().oauth2ResourceServer().jwt()
+				.jwtAuthenticationConverter(jwtAuthenticationConverter());
 	}
 }
