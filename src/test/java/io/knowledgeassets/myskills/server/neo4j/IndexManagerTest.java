@@ -1,36 +1,30 @@
 package io.knowledgeassets.myskills.server.neo4j;
 
-import io.knowledgeassets.myskills.server.common.Neo4jSessionFactoryConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.neo4j.ogm.session.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.io.IOException;
 import java.util.Collections;
 
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 @ExtendWith(SpringExtension.class)
-@Import({Neo4jSessionFactoryConfiguration.class})
 public class IndexManagerTest {
 
-	@Autowired
-	private SessionFactory sessionFactory;
 	@MockBean
 	private IndexService mockIndexService;
 
 	private IndexManager indexManager;
 
 	@BeforeEach
-	public void setUp() {
+	public void setUp() throws IOException {
 		initMocks(this);
 
-		indexManager = new IndexManager(sessionFactory, mockIndexService);
+		indexManager = new IndexManager(mockIndexService, "src/main/resources/migration", "generated_indexes.cql");
 	}
 
 	@Test
@@ -43,7 +37,7 @@ public class IndexManagerTest {
 
 	@Test
 	public void testDoNothingIfIndexesAlreadyExist() {
-		doReturn(indexManager.getIndexes()).when(mockIndexService).loadIndexesFromDB();
+		doReturn(indexManager.getFileIndexes()).when(mockIndexService).loadIndexesFromDB();
 		indexManager.createIndexes();
 
 		verify(mockIndexService, never()).executeStatements(any());

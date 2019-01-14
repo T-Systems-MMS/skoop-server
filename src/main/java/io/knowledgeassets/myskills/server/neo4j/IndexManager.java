@@ -1,37 +1,42 @@
 package io.knowledgeassets.myskills.server.neo4j;
 
-import org.neo4j.ogm.annotation.CompositeIndex;
-import org.neo4j.ogm.metadata.ClassInfo;
-import org.neo4j.ogm.metadata.FieldInfo;
-import org.neo4j.ogm.metadata.MetaData;
 import org.neo4j.ogm.request.Statement;
-import org.neo4j.ogm.session.SessionFactory;
+import org.neo4j.ogm.session.request.RowDataStatement;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static java.util.Collections.emptyMap;
+
 @Component
 public class IndexManager {
 
-	private final List<AutoIndex> indexes;
+	private final List<String> fileIndexes;
 	private final IndexService indexService;
 
 	@Autowired
-	public IndexManager(SessionFactory sessionFactory, IndexService indexService) {
-		indexes = initialiseAutoIndex(sessionFactory.metaData());
+	public IndexManager(IndexService indexService,
+						@Value("${spring.data.neo4j.dump-dir}") String dumpDirectory,
+						@Value("${spring.data.neo4j.dump-filename}") String dumpFileName) throws IOException {
+		fileIndexes = loadIndexesFromFile(dumpDirectory, dumpFileName);
 		this.indexService = indexService;
 	}
 
 	public void createIndexes() {
-		List<AutoIndex> dbIndexes = indexService.loadIndexesFromDB();
+		List<String> dbIndexes = indexService.loadIndexesFromDB();
 
 		List<Statement> createStatements = new ArrayList<>();
-		for (AutoIndex index : indexes) {
+		for (String index : fileIndexes) {
 			if (!dbIndexes.contains(index)) {
-				createStatements.add(index.getCreateStatement());
+				createStatements.add(new RowDataStatement(index, emptyMap()));
 			}
 		}
 
@@ -40,72 +45,13 @@ public class IndexManager {
 		}
 	}
 
-	public List<AutoIndex> getIndexes() {
-		return Collections.unmodifiableList(indexes);
+	public List<String> getFileIndexes() {
+		return Collections.unmodifiableList(fileIndexes);
 	}
 
-	private static List<AutoIndex> initialiseAutoIndex(MetaData metaData) {
-		List<AutoIndex> indexMetadata = new ArrayList<>();
-		for (ClassInfo classInfo : metaData.persistentEntities()) {
-
-			final String owningType = classInfo.neo4jName();
-
-			if (needsToBeIndexed(classInfo)) {
-				for (FieldInfo fieldInfo : getIndexFields(classInfo)) {
-					IndexType type = fieldInfo.isConstraint() ? IndexType.UNIQUE_CONSTRAINT : IndexType.SINGLE_INDEX;
-					final AutoIndex autoIndex = new AutoIndex(type, owningType,
-							new String[]{fieldInfo.property()});
-					indexMetadata.add(autoIndex);
-				}
-
-				for (CompositeIndex index : classInfo.getCompositeIndexes()) {
-					IndexType type = index.unique() ? IndexType.NODE_KEY_CONSTRAINT : IndexType.COMPOSITE_INDEX;
-					String[] properties = index.value().length > 0 ? index.value() : index.properties();
-					AutoIndex autoIndex = new AutoIndex(type, owningType, properties);
-					indexMetadata.add(autoIndex);
-				}
-			}
-
-			if (classInfo.hasRequiredFields()) {
-				for (FieldInfo requiredField : classInfo.requiredFields()) {
-					IndexType type = classInfo.isRelationshipEntity() ?
-							IndexType.REL_PROP_EXISTENCE_CONSTRAINT : IndexType.NODE_PROP_EXISTENCE_CONSTRAINT;
-
-					AutoIndex autoIndex = new AutoIndex(type, owningType,
-							new String[]{requiredField.property()});
-
-					indexMetadata.add(autoIndex);
-				}
-			}
-		}
-		return indexMetadata;
+	private List<String> loadIndexesFromFile(String dumpDirectory, String dumpFileName) throws IOException {
+		Path dumpPath = Paths.get(dumpDirectory, dumpFileName);
+		return Files.readAllLines(dumpPath);
 	}
 
-	private static boolean needsToBeIndexed(ClassInfo classInfo) {
-		return (!classInfo.isAbstract() || classInfo.neo4jName() != null) && containsIndexesInHierarchy(classInfo);
-	}
-
-	private static boolean containsIndexesInHierarchy(ClassInfo classInfo) {
-		boolean containsIndexes = false;
-		ClassInfo currentClassInfo = classInfo;
-		while (!containsIndexes && currentClassInfo != null) {
-			containsIndexes = currentClassInfo.containsIndexes();
-			currentClassInfo = currentClassInfo.directSuperclass();
-		}
-		return containsIndexes;
-	}
-
-	private static List<FieldInfo> getIndexFields(ClassInfo classInfo) {
-		List<FieldInfo> indexFields = new ArrayList<>();
-		ClassInfo currentClassInfo = classInfo.directSuperclass();
-		while (currentClassInfo != null) {
-			if (!needsToBeIndexed(currentClassInfo)) {
-				indexFields.addAll(currentClassInfo.getIndexFields());
-			}
-			currentClassInfo = currentClassInfo.directSuperclass();
-		}
-
-		indexFields.addAll(classInfo.getIndexFields());
-		return indexFields;
-	}
 }

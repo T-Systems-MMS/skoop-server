@@ -3,7 +3,7 @@ spring:
     neo4j:
       # Dumps the generated constraints and indexes to a file
       auto-index: dump
-      dump-dir: .
+      dump-dir: src/main/resources/migration
       dump-filename: generated_indexes.cql
       # Set database URI to local server.
       uri: 'bolt://localhost:7687'
