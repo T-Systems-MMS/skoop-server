@@ -11,6 +11,8 @@ public interface UserPermissionRepository extends Neo4jRepository<UserPermission
 
 	Long deleteByOwnerId(String ownerId);
 
+	Iterable<UserPermission> findByAuthorizedUsersId(String authorizedUserId);
+
 	@Query("MATCH (:User {id:{ownerId}})-[:HAS_GRANTED]->(:UserPermission {scope:{scope}})-[:AUTHORIZES]->(authorizedUser:User {id:{authorizedUserId}}) " +
 			"RETURN COUNT(authorizedUser) > 0")
 	Boolean hasUserPermission(@Param("ownerId") String ownerId, @Param("authorizedUserId") String authorizedUserId,

@@ -19,7 +19,7 @@ public class UserPermissionQueryService {
 	}
 
 	@Transactional(readOnly = true)
-	public Stream<UserPermission> getUserPermissionsByOwnerId(String ownerId) {
+	public Stream<UserPermission> getOutboundUserPermissionsByOwnerId(String ownerId) {
 		return StreamSupport.stream(userPermissionRepository.findByOwnerId(ownerId).spliterator(), false);
 	}
 
@@ -33,4 +33,11 @@ public class UserPermissionQueryService {
 	public boolean hasUserPermission(String ownerId, String authorizedUserId, UserPermissionScope scope) {
 		return userPermissionRepository.hasUserPermission(ownerId, authorizedUserId, scope);
 	}
+
+	@Transactional(readOnly = true)
+	public Stream<UserPermission> getInboundUserPermissionsByAuthorizedUserId(String authorizedUserId) {
+		return StreamSupport.stream(userPermissionRepository.findByAuthorizedUsersId(authorizedUserId)
+				.spliterator(), false);
+	}
+
 }
