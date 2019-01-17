@@ -19,6 +19,12 @@ public class User {
 	@Property(name = "id")
 	private String id;
 
+	/**
+	 * This field is forbidden to expose to any external system together with personal user data!!!
+	 */
+	@Property(name = "referenceId")
+	private String referenceId;
+
 	@Property(name = "userName")
 	@Index(unique = true)
 	private String userName;

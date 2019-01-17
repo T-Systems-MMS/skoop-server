@@ -39,6 +39,7 @@ public class UserCommandService {
 		});
 		return userRepository.save(User.builder()
 				.id(UUID.randomUUID().toString())
+				.referenceId(UUID.randomUUID().toString())
 				.userName(userName)
 				.firstName(firstName)
 				.lastName(lastName)
