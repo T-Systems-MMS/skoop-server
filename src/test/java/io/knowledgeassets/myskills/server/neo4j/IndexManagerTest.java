@@ -3,24 +3,22 @@ package io.knowledgeassets.myskills.server.neo4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.neo4j.ogm.session.SessionFactory;
 
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 public class IndexManagerTest {
 
-	@MockBean
-	private IndexService mockIndexService;
+	@Mock
+	private SessionFactory sessionFactory;
 
 	private IndexManager indexManager;
 
@@ -28,31 +26,54 @@ public class IndexManagerTest {
 	public void setUp() throws IOException {
 		initMocks(this);
 
-		indexManager = new IndexManager(mockIndexService, "src/main/resources/migration", "generated_indexes.cql");
+		indexManager = new IndexManager(sessionFactory, "src/main/resources/migration", "generated_indexes.cql");
 	}
 
 	@Test
 	public void testThrowNoSuchFileException() {
 		assertThrows(NoSuchFileException.class,
-				()-> new IndexManager(mockIndexService, "wrong/path/to/file", "wrong_filename.cql"));
+				() -> new IndexManager(sessionFactory, "wrong/path/to/file", "wrong_filename.cql"));
 	}
 
 	@Test
-	public void testCreateNewIndexes() {
-		List<String> dbIndexes = new ArrayList<>(indexManager.getFileIndexes());
-		String newIndex = dbIndexes.remove(0);
-		doReturn(dbIndexes).when(mockIndexService).loadIndexesFromDB();
-		indexManager.createIndexes();
-
-		verify(mockIndexService).executeStatements(Collections.singletonList(newIndex));
+	public void parseWrongIndexTest() {
+		assertThat(indexManager.parseIndexToCreateStatement("some wrong string")).isNull();
 	}
 
 	@Test
-	public void testDoNothingIfIndexesAlreadyExist() {
-		doReturn(indexManager.getFileIndexes()).when(mockIndexService).loadIndexesFromDB();
-		indexManager.createIndexes();
+	public void parseCompositeIndexTest() {
+		assertThat(indexManager.parseIndexToCreateStatement("INDEX ON :Person(age, country)"))
+				.isEqualTo("CREATE INDEX ON :`Person`(`age`,`country`)");
+	}
 
-		verify(mockIndexService, never()).executeStatements(any());
+	@Test
+	public void parseSingleIndexTest() {
+		assertThat(indexManager.parseIndexToCreateStatement("INDEX ON :Person(firstname)"))
+				.isEqualTo("CREATE INDEX ON :`Person`(`firstname`)");
+	}
+
+	@Test
+	public void parseUniqueConstraintTest() {
+		assertThat(indexManager.parseIndexToCreateStatement("CONSTRAINT ON (book:Book) ASSERT book.isbn IS UNIQUE"))
+				.isEqualTo("CREATE CONSTRAINT ON (`book`:`Book`) ASSERT `book`.`isbn` IS UNIQUE");
+	}
+
+	@Test
+	public void parseNodeKeyConstraintTest() {
+		assertThat(indexManager.parseIndexToCreateStatement("CONSTRAINT ON (person:Person) ASSERT (person.firstname, person.surname) IS NODE KEY"))
+				.isEqualTo("CREATE CONSTRAINT ON (`person`:`Person`) ASSERT (`person`.`firstname`,`person`.`surname`) IS NODE KEY");
+	}
+
+	@Test
+	public void parseNodePropertyExistenceConstraintTest() {
+		assertThat(indexManager.parseIndexToCreateStatement("CONSTRAINT ON (book:Book) ASSERT exists(book.isbn)"))
+				.isEqualTo("CREATE CONSTRAINT ON (`book`:`Book`) ASSERT exists(`book`.`isbn`)");
+	}
+
+	@Test
+	public void parseRelationshipPropertyExistenceConstraintTest() {
+		assertThat(indexManager.parseIndexToCreateStatement("CONSTRAINT ON ()-[liked:LIKED]-() ASSERT exists(liked.day)"))
+				.isEqualTo("CREATE CONSTRAINT ON ()-[`liked`:`LIKED`]-() ASSERT exists(`liked`.`day`)");
 	}
 
 }
