@@ -36,10 +36,30 @@ public class UserPermissionQueryController {
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
 	@PreAuthorize("isPrincipalUserId(#userId)")
-	@GetMapping(path = "/users/{userId}/permissions", produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<UserPermissionResponse> getUserPermissions(@PathVariable("userId") String userId) {
-		return userPermissionQueryService.getUserPermissionsByOwnerId(userId)
+	@GetMapping(path = "/users/{userId}/outbound-permissions", produces = MediaType.APPLICATION_JSON_VALUE)
+	public List<UserPermissionResponse> getOutboundUserPermissions(@PathVariable("userId") String userId) {
+		return userPermissionQueryService.getOutboundUserPermissionsByOwnerId(userId)
 				.map(UserPermissionResponse::of)
 				.collect(toList());
 	}
+
+	@ApiOperation(
+			value = "Get all user permissions granted to the user.",
+			notes = "Get all user permissions the given user has been granted by other users in the system."
+	)
+	@ApiResponses({
+			@ApiResponse(code = 200, message = "Successful execution"),
+			@ApiResponse(code = 401, message = "Invalid authentication"),
+			@ApiResponse(code = 403, message = "Insufficient privileges to access resource, e.g. foreign user data"),
+			@ApiResponse(code = 404, message = "Resource not found"),
+			@ApiResponse(code = 500, message = "Error during execution")
+	})
+	@PreAuthorize("isPrincipalUserId(#userId)")
+	@GetMapping(path = "/users/{userId}/inbound-permissions", produces = MediaType.APPLICATION_JSON_VALUE)
+	public List<UserPermissionResponse> getInboundUserPermissions(@PathVariable("userId") String userId) {
+		return userPermissionQueryService.getInboundUserPermissionsByAuthorizedUserId(userId)
+				.map(UserPermissionResponse::of)
+				.collect(toList());
+	}
+
 }

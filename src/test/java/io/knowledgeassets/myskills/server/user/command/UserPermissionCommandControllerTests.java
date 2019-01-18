@@ -67,7 +67,7 @@ class UserPermissionCommandControllerTests extends AbstractControllerTests {
 				.build();
 
 		willThrow(new IllegalArgumentException("Unexpected data in command object!"))
-				.given(userPermissionCommandService).replaceUserPermissions(any());
+				.given(userPermissionCommandService).replaceOutboundUserPermissions(any());
 		willReturn(Stream.of(UserPermission.builder()
 				.scope(UserPermissionScope.READ_USER_SKILLS)
 				.owner(owner)
@@ -104,7 +104,7 @@ class UserPermissionCommandControllerTests extends AbstractControllerTests {
 								.build()
 				))
 				.build()))
-				.given(userPermissionCommandService).replaceUserPermissions(expectedCommand);
+				.given(userPermissionCommandService).replaceOutboundUserPermissions(expectedCommand);
 
 		String requestContent = "[{" +
 				"\"scope\":\"READ_USER_SKILLS\"," +
@@ -114,7 +114,7 @@ class UserPermissionCommandControllerTests extends AbstractControllerTests {
 				"]" +
 				"}]";
 
-		mockMvc.perform(put("/users/db87d46a-e4ca-451a-903b-e8533e0b924b/permissions")
+		mockMvc.perform(put("/users/db87d46a-e4ca-451a-903b-e8533e0b924b/outbound-permissions")
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(requestContent)
@@ -182,7 +182,7 @@ class UserPermissionCommandControllerTests extends AbstractControllerTests {
 				"]" +
 				"}]";
 
-		mockMvc.perform(put("/users/db87d46a-e4ca-451a-903b-e8533e0b924b/permissions")
+		mockMvc.perform(put("/users/db87d46a-e4ca-451a-903b-e8533e0b924b/outbound-permissions")
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(requestContent)

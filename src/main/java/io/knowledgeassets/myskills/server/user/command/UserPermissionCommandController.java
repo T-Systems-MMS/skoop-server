@@ -31,8 +31,8 @@ public class UserPermissionCommandController {
 	}
 
 	@ApiOperation(
-			value = "Replace the list of granted user permissions",
-			notes = "Replace the entire list of granted user permissions for the user with the one in the request."
+			value = "Replace the list of user permissions granted by user.",
+			notes = "Replace the entire list of user permissions granted by user with a specified id."
 	)
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "Successful execution"),
@@ -43,14 +43,14 @@ public class UserPermissionCommandController {
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
 	@PreAuthorize("isPrincipalUserId(#userId)")
-	@PutMapping(path = "/users/{userId}/permissions",
+	@PutMapping(path = "/users/{userId}/outbound-permissions",
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	@CheckBindingResult
-	public List<UserPermissionResponse> replaceUserPermissions(@PathVariable("userId") String userId,
-															   @Valid @RequestBody List<UserPermissionRequest> userPermissionRequests,
-															   BindingResult bindingResult) {
-		return userPermissionCommandService.replaceUserPermissions(
+	public List<UserPermissionResponse> replaceOutboundUserPermissions(@PathVariable("userId") String userId,
+																	   @Valid @RequestBody List<UserPermissionRequest> userPermissionRequests,
+																	   BindingResult bindingResult) {
+		return userPermissionCommandService.replaceOutboundUserPermissions(
 				ReplaceUserPermissionListCommand.builder()
 						.ownerId(userId)
 						.userPermissions(userPermissionRequests.stream()
