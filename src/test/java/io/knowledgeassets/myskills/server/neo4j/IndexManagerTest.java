@@ -26,13 +26,13 @@ public class IndexManagerTest {
 	public void setUp() throws IOException {
 		initMocks(this);
 
-		indexManager = new IndexManager(sessionFactory, "src/main/resources/migration", "generated_indexes.cql");
+		indexManager = new IndexManager(sessionFactory, "src/main/resources/migration/generated_indexes.cql");
 	}
 
 	@Test
 	public void testThrowNoSuchFileException() {
 		assertThrows(NoSuchFileException.class,
-				() -> new IndexManager(sessionFactory, "wrong/path/to/file", "wrong_filename.cql"));
+				() -> new IndexManager(sessionFactory, "wrong/path/to/file/wrong_filename.cql"));
 	}
 
 	@Test

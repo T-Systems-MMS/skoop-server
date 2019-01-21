@@ -33,10 +33,9 @@ public class IndexManager {
 
 	@Autowired
 	public IndexManager(SessionFactory sessionFactory,
-						@Value("${spring.data.neo4j.dump-dir}") String dumpDirectory,
-						@Value("${spring.data.neo4j.dump-filename}") String dumpFileName) throws IOException {
+						@Value("${neo4j.migration.path}") String migrationPath) throws IOException {
 		this.session = (Neo4jSession) sessionFactory.openSession();
-		fileIndexes = loadIndexesFromFile(dumpDirectory, dumpFileName);
+		fileIndexes = loadIndexesFromFile(migrationPath);
 	}
 
 	public void createIndexes() {
@@ -54,8 +53,8 @@ public class IndexManager {
 		}
 	}
 
-	private List<String> loadIndexesFromFile(String dumpDirectory, String dumpFileName) throws IOException {
-		Path dumpPath = Paths.get(dumpDirectory, dumpFileName);
+	private List<String> loadIndexesFromFile(String migrationPath) throws IOException {
+		Path dumpPath = Paths.get(migrationPath);
 		return Files.readAllLines(dumpPath);
 	}
 
