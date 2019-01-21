@@ -1,8 +1,6 @@
 spring:
   data:
     neo4j:
-      # Automatically create and update indexes and constraints.
-      auto-index: update
       # Set database URI to local server.
       uri: 'bolt://localhost:7687'
 
