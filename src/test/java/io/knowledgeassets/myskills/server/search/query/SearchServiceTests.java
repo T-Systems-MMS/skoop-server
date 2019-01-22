@@ -39,10 +39,15 @@ class SearchServiceTests {
 	@DisplayName("Tests if anonymous user skills are fetched.")
 	void testGettingAnonymousSkills() {
 
-		given(anonymousUserSkillRepository.findAnonymousUserSkillsBySkillLevels(Collections.singletonList(UserSearchSkillCriterion.builder()
-				.skillId("B")
-				.minimumCurrentLevel(2)
-				.build()))).willReturn(Stream.of(AnonymousUserSkillResult.builder()
+		given(anonymousUserSkillRepository.findAnonymousUserSkillsBySkillLevels(Arrays.asList(UserSearchSkillCriterion.builder()
+						.skillId("B")
+						.minimumCurrentLevel(2)
+						.build(),
+				UserSearchSkillCriterion.builder()
+						.skillId("A")
+						.minimumCurrentLevel(1)
+						.build()
+		))).willReturn(Stream.of(AnonymousUserSkillResult.builder()
 						.referenceId("ref1")
 						.userSkills(Arrays.asList(
 								UserSkill.builder()
@@ -64,10 +69,14 @@ class SearchServiceTests {
 		);
 
 		Stream<AnonymousUserSkillResult> result = searchService.findAnonymousUserSkillsBySkillLevel(
-				Collections.singletonList(UserSearchSkillCriterion.builder()
-						.skillId("B")
-						.minimumCurrentLevel(2)
-						.build())
+				Arrays.asList(UserSearchSkillCriterion.builder()
+								.skillId("B")
+								.minimumCurrentLevel(2)
+								.build(),
+						UserSearchSkillCriterion.builder()
+								.skillId("A")
+								.minimumCurrentLevel(1)
+								.build())
 		);
 
 		List<AnonymousUserSkillResult> res = result.collect(toList());
