@@ -12,9 +12,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolationException;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 /**
  * This Handler is the last puzzle of all handlers(Minimum order).
@@ -42,6 +44,23 @@ public class LowLevelExceptionHandler implements IExceptionHandler {
 		doLog(ex, logMessage);
 
 		ResponseError responseError = new ResponseError(INTERNAL_SERVER_ERROR);
+		responseError.setMessage(ex.getLocalizedMessage());
+		return buildResponseEntity(ex, responseError);
+	}
+
+	/**
+	 * We catch all constraint violation exception that we want to send HttpStatus.BAD_REQUEST.
+	 * <p>
+	 *
+	 * @param ex
+	 * @return
+	 */
+	@ExceptionHandler({ConstraintViolationException.class})
+	protected ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex) {
+		String logMessage = String.format("{%s} Constraint Violation Exception! %s", BAD_REQUEST.value() + " " + BAD_REQUEST.getReasonPhrase(), ex.getLocalizedMessage());
+		doLog(ex, logMessage);
+
+		ResponseError responseError = new ResponseError(BAD_REQUEST);
 		responseError.setMessage(ex.getLocalizedMessage());
 		return buildResponseEntity(ex, responseError);
 	}
