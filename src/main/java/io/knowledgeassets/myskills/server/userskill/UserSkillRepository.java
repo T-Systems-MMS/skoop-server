@@ -13,6 +13,8 @@ import java.util.Optional;
 public interface UserSkillRepository extends Neo4jRepository<UserSkill, Long> {
 	Iterable<UserSkill> findByUserId(String userId);
 
+	Iterable<UserSkill> findByUserIdOrderByCurrentLevelDesc(String userId);
+
 	Iterable<UserSkill> findBySkillId(String skillId);
 
 	Iterable<UserSkill> findBySkillIdAndPriorityGreaterThanEqual(String skillId, Integer minPriority);

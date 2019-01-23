@@ -26,6 +26,7 @@
 		<springfox-swagger2.version>2.9.2</springfox-swagger2.version>
 		<neo4j.version>3.4.11</neo4j.version>
 		<jacoco.version>0.8.2</jacoco.version>
+		<apache.poi.version>4.0.1</apache.poi.version>
 	</properties>
 
 	<dependencies>
@@ -66,6 +67,16 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>${apache.poi.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>${apache.poi.version}</version>
 		</dependency>
 
 		<dependency>

@@ -11,6 +11,8 @@ import java.util.Optional;
 public interface UserRepository extends Neo4jRepository<User, String> {
 	Optional<User> findByUserName(String userName);
 
+	Optional<User> findByReferenceId(String referenceId);
+
 	@Query("MATCH (user:User) " +
 			"WHERE TOLOWER(user.userName) CONTAINS TOLOWER({search}) " +
 			"OR TOLOWER(user.firstName) CONTAINS TOLOWER({search}) " +
