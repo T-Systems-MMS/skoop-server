@@ -171,7 +171,7 @@ public class UserProfileService {
 	private static void replacePlaceholder(XWPFRun r, String placeholder, String value) {
 		final String text = r.getText(0);
 		if (StringUtils.containsIgnoreCase(text, placeholder)) {
-			final String newText = value == null ? StringUtils.replaceIgnoreCase(text, placeholder, "") :
+			final String newText = value == null ? StringUtils.replaceIgnoreCase(text, placeholder, "N/A") :
 					StringUtils.replaceIgnoreCase(text, placeholder, value);
 			r.setText(newText, 0);
 		}
@@ -179,24 +179,27 @@ public class UserProfileService {
 
 	private static void replaceListPlaceholder(XWPFRun r, String placeholder, List<String> values, XWPFParagraph paragraph, IBody body) {
 		final String text = r.getText(0);
-		if (values == null) {
-			final String newText = StringUtils.replaceIgnoreCase(text, placeholder, "");
-			r.setText(newText, 0);
-			return;
-		}
 		if (StringUtils.containsIgnoreCase(text, placeholder)) {
-			// get cursor to point a position a new paragraph should be inserted at
-			XmlCursor cursor = paragraph.getCTP().newCursor();
-			// the first paragraph in the list should have a bullet
-			// so we can get its style and apply it to all other paragraphs in the list
-			final CTPPr ctpPr = paragraph.getCTP().getPPr();
-			for (int i = 0; i < values.size(); i++) {
-				final String value = values.get(i);
-				if (i == 0) {
-					r.setText(value, 0);
-				}
-				else {
-					cursor = appendNewListParagraph(body, cursor, value, ctpPr);
+			if (values == null) {
+				final String newText = StringUtils.replaceIgnoreCase(text, placeholder, "N/A");
+				// remove bullet styling
+				paragraph.getCTP().unsetPPr();
+				r.setText(newText, 0);
+			}
+			else {
+				// get cursor to point a position a new paragraph should be inserted at
+				XmlCursor cursor = paragraph.getCTP().newCursor();
+				// the first paragraph in the list should have a bullet
+				// so we can get its style and apply it to all other paragraphs in the list
+				final CTPPr ctpPr = paragraph.getCTP().getPPr();
+				for (int i = 0; i < values.size(); i++) {
+					final String value = values.get(i);
+					if (i == 0) {
+						r.setText(value, 0);
+					}
+					else {
+						cursor = appendNewListParagraph(body, cursor, value, ctpPr);
+					}
 				}
 			}
 		}
