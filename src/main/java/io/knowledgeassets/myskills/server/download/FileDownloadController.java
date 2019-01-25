@@ -27,10 +27,10 @@ import static java.util.Objects.requireNonNull;
 @RequestMapping(path = "/download")
 public class FileDownloadController {
 
-	private final UserProfileService msWordUserProfileReportService;
+	private final UserProfileService userProfileService;
 
-	public FileDownloadController(UserProfileService msWordUserProfileReportService) {
-		this.msWordUserProfileReportService = requireNonNull(msWordUserProfileReportService);
+	public FileDownloadController(UserProfileService userProfileService) {
+		this.userProfileService = requireNonNull(userProfileService);
 	}
 
 	@ApiOperation(
@@ -46,8 +46,8 @@ public class FileDownloadController {
 	})
 	@GetMapping(path = "/users/{referenceId}")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<byte[]> getAnonymousUserProfileAsDOCX(@PathVariable("referenceId") String referenceId) {
-		try (InputStream is = msWordUserProfileReportService.getAnonymousUserProfileDocument(referenceId)) {
+	public ResponseEntity<byte[]> getAnonymousUserProfileDocument(@PathVariable("referenceId") String referenceId) {
+		try (InputStream is = userProfileService.getAnonymousUserProfileDocument(referenceId)) {
 			final HttpHeaders httpHeaders = new HttpHeaders();
 			httpHeaders.add("Content-Disposition", "attachment; filename=user-profile.docx");
 			return new ResponseEntity<>(IOUtils.toByteArray(is), httpHeaders, HttpStatus.OK);
