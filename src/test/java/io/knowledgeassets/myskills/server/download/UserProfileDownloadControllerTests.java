@@ -3,7 +3,7 @@ package io.knowledgeassets.myskills.server.download;
 import io.knowledgeassets.myskills.server.common.AbstractControllerTests;
 import io.knowledgeassets.myskills.server.exception.UserProfileDocumentException;
 import io.knowledgeassets.myskills.server.user.User;
-import io.knowledgeassets.myskills.server.user.profile.UserProfileService;
+import io.knowledgeassets.myskills.server.user.profile.UserProfileDocumentService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,21 +23,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(FileDownloadController.class)
-class FileDownloadControllerTests extends AbstractControllerTests {
+@WebMvcTest(UserProfileDownloadController.class)
+class UserProfileDownloadControllerTests extends AbstractControllerTests {
 
 	@Autowired
 	private MockMvc mockMvc;
 
 	@MockBean
-	private UserProfileService userProfileService;
+	private UserProfileDocumentService userProfileDocumentService;
 
 	@Test
 	@DisplayName("Tests if user profile file can be downloaded.")
 	void testIfUserProfileFileCanBeDownloaded() throws Exception {
 		try (final InputStream is = new ClassPathResource("templates/user-profile.docx").getInputStream();
 			 final InputStream expectedContent = new ClassPathResource("templates/user-profile.docx").getInputStream()) {
-			given(userProfileService.getAnonymousUserProfileDocument("5acc24df-792a-4458-8d01-0c67033eceff")).willReturn(is);
+			given(userProfileDocumentService.getAnonymousUserProfileDocument("5acc24df-792a-4458-8d01-0c67033eceff")).willReturn(is.readAllBytes());
 
 			final User owner = User.builder()
 					.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
@@ -63,7 +63,7 @@ class FileDownloadControllerTests extends AbstractControllerTests {
 	@Test
 	@DisplayName("Tests if INTERNAL_SERVER_ERROR is thrown when there is an issue with getting a document.")
 	void testIfInternalServerErrorIsThrownWhenThereIsAnIssueWithGettingOfDocument() throws Exception {
-		given(userProfileService.getAnonymousUserProfileDocument("5acc24df-792a-4458-8d01-0c67033eceff"))
+		given(userProfileDocumentService.getAnonymousUserProfileDocument("5acc24df-792a-4458-8d01-0c67033eceff"))
 				.willThrow(new UserProfileDocumentException("An error has occurred when getting a document"));
 
 		final User owner = User.builder()

@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ClassPathResource;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -25,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-class UserProfileServiceTests {
+class UserProfileDocumentServiceTests {
 
 	@Mock
 	private UserRepository userRepository;
@@ -33,13 +34,13 @@ class UserProfileServiceTests {
 	@Mock
 	private UserSkillRepository userSkillRepository;
 
-	private UserProfileService userProfileService;
+	private UserProfileDocumentService userProfileDocumentService;
 
 	@Test
 	@DisplayName("Tests if user profile document is built")
 	void testIfUserProfileDocumentIsBuilt() throws IOException {
 
-		this.userProfileService = new UserProfileService(userRepository, userSkillRepository, null);
+		this.userProfileDocumentService = new UserProfileDocumentService(userRepository, userSkillRepository, null);
 
 		User user = User.builder()
 				.id("adac977c-8e0d-4e00-98a8-da7b44aa5dd6")
@@ -90,9 +91,11 @@ class UserProfileServiceTests {
 								.build()
 				));
 
-		try (InputStream is = userProfileService.getAnonymousUserProfileDocument("5acc24df-792a-4458-8d01-0c67033eceff")) {
+		final byte[] anonymousUserProfileDocument = userProfileDocumentService.getAnonymousUserProfileDocument("5acc24df-792a-4458-8d01-0c67033eceff");
+		assertThat(anonymousUserProfileDocument).isNotEmpty();
+		try (InputStream is = new ByteArrayInputStream(anonymousUserProfileDocument)) {
 			assertThat(is).isNotNull();
-			XWPFDocument document = new XWPFDocument(is);
+			XWPFDocument document = new XWPFDocument();
 			assertThat(document).isNotNull();
 		}
 	}
@@ -101,7 +104,7 @@ class UserProfileServiceTests {
 	@DisplayName("Tests if user profile document is built when the optional fields are nulls.")
 	void testIfUserProfileDocumentIsBuiltWhenOptionalFieldsAreNulls() throws IOException {
 
-		this.userProfileService = new UserProfileService(userRepository, userSkillRepository, null);
+		this.userProfileDocumentService = new UserProfileDocumentService(userRepository, userSkillRepository, null);
 
 		User user = User.builder()
 				.id("adac977c-8e0d-4e00-98a8-da7b44aa5dd6")
@@ -145,7 +148,9 @@ class UserProfileServiceTests {
 								.build()
 				));
 
-		try (InputStream is = userProfileService.getAnonymousUserProfileDocument("5acc24df-792a-4458-8d01-0c67033eceff")) {
+		final byte[] anonymousUserProfileDocument = userProfileDocumentService.getAnonymousUserProfileDocument("5acc24df-792a-4458-8d01-0c67033eceff");
+		assertThat(anonymousUserProfileDocument).isNotEmpty();
+		try (InputStream is = new ByteArrayInputStream(anonymousUserProfileDocument)) {
 			assertThat(is).isNotNull();
 			XWPFDocument document = new XWPFDocument(is);
 			assertThat(document).isNotNull();
@@ -155,7 +160,7 @@ class UserProfileServiceTests {
 	@Test
 	@DisplayName("Tests if user profile document is built falling back to the default template when a wrong path to a template is set.")
 	void testIfUserProfileDocumentIsBuiltFallingBackToDefaultTemplateWhenWrongPathToTemplateIsSet() throws IOException {
-		this.userProfileService = new UserProfileService(userRepository, userSkillRepository, "some/not/existing/path");
+		this.userProfileDocumentService = new UserProfileDocumentService(userRepository, userSkillRepository, "some/not/existing/path");
 
 		User user = User.builder()
 				.id("adac977c-8e0d-4e00-98a8-da7b44aa5dd6")
@@ -199,7 +204,9 @@ class UserProfileServiceTests {
 								.build()
 				));
 
-		try (InputStream is = userProfileService.getAnonymousUserProfileDocument("5acc24df-792a-4458-8d01-0c67033eceff")) {
+		final byte[] anonymousUserProfileDocument = userProfileDocumentService.getAnonymousUserProfileDocument("5acc24df-792a-4458-8d01-0c67033eceff");
+		assertThat(anonymousUserProfileDocument).isNotEmpty();
+		try (InputStream is = new ByteArrayInputStream(anonymousUserProfileDocument)) {
 			assertThat(is).isNotNull();
 			XWPFDocument document = new XWPFDocument(is);
 			assertThat(document).isNotNull();
@@ -209,7 +216,7 @@ class UserProfileServiceTests {
 	@Test
 	@DisplayName("Tests if an exception is thrown when invalid template is used.")
 	void testIfExceptionIsThrownWhenInvalidTemplateIsUsed() throws IOException {
-		this.userProfileService = new UserProfileService(userRepository, userSkillRepository, new ClassPathResource("fake-template.docx").getFile().getAbsolutePath());
+		this.userProfileDocumentService = new UserProfileDocumentService(userRepository, userSkillRepository, new ClassPathResource("fake-template.docx").getFile().getAbsolutePath());
 
 		User user = User.builder()
 				.id("adac977c-8e0d-4e00-98a8-da7b44aa5dd6")
@@ -225,7 +232,7 @@ class UserProfileServiceTests {
 				Optional.of(user)
 		);
 
-		assertThrows(UserProfileDocumentException.class, () -> userProfileService.getAnonymousUserProfileDocument("5acc24df-792a-4458-8d01-0c67033eceff"));
+		assertThrows(UserProfileDocumentException.class, () -> userProfileDocumentService.getAnonymousUserProfileDocument("5acc24df-792a-4458-8d01-0c67033eceff"));
 	}
 
 }

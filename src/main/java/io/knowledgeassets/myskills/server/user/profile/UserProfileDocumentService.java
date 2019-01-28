@@ -15,7 +15,6 @@ import org.apache.poi.xwpf.usermodel.IBody;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
-import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 import org.apache.xmlbeans.XmlCursor;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTPPr;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,26 +22,26 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 
 import static java.lang.String.format;
-import static java.util.Optional.ofNullable;
 import static java.util.Objects.requireNonNull;
 
 @Service
 @Slf4j
-public class UserProfileService {
+public class UserProfileDocumentService {
 
 	private static final SimpleDateFormat SDF = new SimpleDateFormat("dd.MM.yyyy");
 
@@ -52,20 +51,20 @@ public class UserProfileService {
 	private final UserSkillRepository userSkillRepository;
 	private final String templatePath;
 
-	public UserProfileService(UserRepository userRepository,
-							  UserSkillRepository userSkillRepository,
-							  @Value("${templates.user.profile.path:#{null}}") String templatePath) {
+	public UserProfileDocumentService(UserRepository userRepository,
+									  UserSkillRepository userSkillRepository,
+									  @Value("${myskills.user-profile-download.template-path:#{null}}") String templatePath) {
 		this.userRepository = requireNonNull(userRepository);
 		this.userSkillRepository = requireNonNull(userSkillRepository);
 		this.templatePath = templatePath;
 	}
 
 	/**
-	 * Retrieves MS Word document (DOCX) with anonymous user profile data.
+	 * Retrieves MS Word document (DOCX) with anonymous user profile data as array of bytes.
 	 * @param referenceId user reference id
-	 * @return MS Word document with anonymous user profile data
+	 * @return MS Word document with anonymous user profile data as array of bytes
 	 */
-	public InputStream getAnonymousUserProfileDocument(String referenceId) {
+	public byte[] getAnonymousUserProfileDocument(String referenceId) {
 
 		final User user = getUserByReferenceId(referenceId);
 
@@ -74,7 +73,7 @@ public class UserProfileService {
 			replacePlaceholders(document, user);
 			final ByteArrayOutputStream b = new ByteArrayOutputStream();
 			document.write(b);
-			return new ByteArrayInputStream(b.toByteArray());
+			return b.toByteArray();
 		}
 		catch (IOException | EmptyFileException | NotOfficeXmlFileException e) {
 			throw new UserProfileDocumentException(format("An error has occurred when building user " +
@@ -117,69 +116,73 @@ public class UserProfileService {
 	private void replacePlaceholders(XWPFDocument document, User user) {
 		replaceTablesPlaceholders(document, user);
 		replaceParagraphsPlaceholders(document, user, document.getParagraphs());
-		ofNullable(document.getFooterList()).ifPresent(footers ->
-				footers.forEach(footer -> {
-					replaceTablesPlaceholders(footer, user);
-				})
-		);
+		if (document.getFooterList() != null) {
+			document.getFooterList().forEach(footer -> replaceTablesPlaceholders(footer, user));
+		}
 	}
 
 	private void replaceTablesPlaceholders(IBody body, User user) {
-		ofNullable(body.getTables()).ifPresent(tables ->
-				tables.forEach(table ->
-						ofNullable(table.getRows()).ifPresent(rows ->
-								rows.forEach(row ->
-										ofNullable(row.getTableCells()).ifPresent(cells ->
-												cells.forEach((XWPFTableCell cell) ->
-														replaceParagraphsPlaceholders(cell, user, cell.getParagraphs())
-												)
-										)
-								)
-						)
-				)
-		);
+		if (body.getTables() != null) {
+			body.getTables().forEach(table -> {
+				if (table.getRows() != null) {
+					table.getRows().forEach(row -> {
+						if (row.getTableCells() != null) {
+							row.getTableCells().forEach(cell ->
+									replaceParagraphsPlaceholders(cell, user, cell.getParagraphs())
+							);
+						}
+					});
+				}
+			});
+		}
 	}
 
 	private void replaceParagraphsPlaceholders(IBody body, User user, List<XWPFParagraph> paragraphs) {
-		ofNullable(paragraphs).ifPresent(paragraphList -> {
-			for (int idx = 0; idx < paragraphs.size(); idx++) {
-				replaceParagraphPlaceholders(paragraphList.get(idx), user, body);
-			}
-		});
+		if (paragraphs != null) {
+			// copy paragraph list to address paragraphs as copies to avoid throwing of java.util.ConcurrentModificationException
+			// when inserting new paragraphs
+			final List<XWPFParagraph> paragraphList = new ArrayList<>(paragraphs);
+			paragraphList.forEach(p -> replaceParagraphPlaceholders(p, user, body));
+		}
 	}
 
 	private void replaceParagraphPlaceholders(XWPFParagraph p, User user, IBody body) {
-		ofNullable(p.getRuns()).ifPresent(runs ->
-				runs.forEach(r -> {
-							replacePlaceholder(r, ReportPlaceholder.DATE.getName(), SDF.format(new Date()));
-							replacePlaceholder(r, ReportPlaceholder.ACADEMIC_DEGREE.getName(), user.getAcademicDegree());
-							replacePlaceholder(r, ReportPlaceholder.POSITION_PROFILE.getName(), user.getPositionProfile());
-							replaceListPlaceholder(r, ReportPlaceholder.SPECIALIZATIONS.getName(), user.getSpecializations(), p, body);
-							replaceListPlaceholder(r, ReportPlaceholder.LANGUAGES.getName(), user.getLanguages(), p, body);
-							replaceListPlaceholder(r, ReportPlaceholder.INDUSTRY_SECTORS.getName(), user.getIndustrySectors(), p, body);
-							replaceListPlaceholder(r, ReportPlaceholder.CERTIFICATES.getName(), user.getCertificates(), p, body);
-							replaceListPlaceholder(r, ReportPlaceholder.SKILLS.getName(), StreamSupport.stream(userSkillRepository.findByUserIdOrderByCurrentLevelDesc(user.getId()).spliterator(), false)
-									.map((UserSkill userSkill) -> {
-										StringBuilder level = new StringBuilder();
-										IntStream.rangeClosed(1, userSkill.getCurrentLevel()).forEach((a) -> level.append("*"));
-										return format("%s %s", userSkill.getSkill().getName(), level.toString());
-									}).collect(Collectors.toList()), p, body);
-						}
-				));
+		if (p.getRuns() != null) {
+			p.getRuns().forEach(r -> {
+						replacePlaceholder(r, UserProfilePlaceholder.DATE.getName(), () -> SDF.format(new Date()));
+						replacePlaceholder(r, UserProfilePlaceholder.ACADEMIC_DEGREE.getName(), user::getAcademicDegree);
+						replacePlaceholder(r, UserProfilePlaceholder.POSITION_PROFILE.getName(), user::getPositionProfile);
+						replaceListPlaceholder(r, UserProfilePlaceholder.SPECIALIZATIONS.getName(), user::getSpecializations, p, body);
+						replaceListPlaceholder(r, UserProfilePlaceholder.LANGUAGES.getName(), user::getLanguages, p, body);
+						replaceListPlaceholder(r, UserProfilePlaceholder.INDUSTRY_SECTORS.getName(), user::getIndustrySectors, p, body);
+						replaceListPlaceholder(r, UserProfilePlaceholder.CERTIFICATES.getName(), user::getCertificates, p, body);
+						final Supplier<List<String>> skillsSupplier = () ->
+								StreamSupport.stream(userSkillRepository.findByUserIdOrderByCurrentLevelDesc(user.getId()).spliterator(), false)
+										.map((UserSkill userSkill) -> {
+											StringBuilder level = new StringBuilder();
+											IntStream.rangeClosed(1, userSkill.getCurrentLevel()).forEach((a) -> level.append("*"));
+											return format("%s %s", userSkill.getSkill().getName(), level.toString());
+										}).collect(Collectors.toList());
+						replaceListPlaceholder(r, UserProfilePlaceholder.SKILLS.getName(), skillsSupplier, p, body);
+					}
+			);
+		}
 	}
 
-	private static void replacePlaceholder(XWPFRun r, String placeholder, String value) {
+	private static void replacePlaceholder(XWPFRun r, String placeholder, Supplier<String> valueSupplier) {
 		final String text = r.getText(0);
 		if (StringUtils.containsIgnoreCase(text, placeholder)) {
+			final String value = valueSupplier.get();
 			final String newText = value == null ? StringUtils.replaceIgnoreCase(text, placeholder, "N/A") :
 					StringUtils.replaceIgnoreCase(text, placeholder, value);
 			r.setText(newText, 0);
 		}
 	}
 
-	private static void replaceListPlaceholder(XWPFRun r, String placeholder, List<String> values, XWPFParagraph paragraph, IBody body) {
+	private static void replaceListPlaceholder(XWPFRun r, String placeholder, Supplier<List<String>> valuesSupplier, XWPFParagraph paragraph, IBody body) {
 		final String text = r.getText(0);
 		if (StringUtils.containsIgnoreCase(text, placeholder)) {
+			final List<String> values = valuesSupplier.get();
 			if (values == null) {
 				final String newText = StringUtils.replaceIgnoreCase(text, placeholder, "N/A");
 				// remove bullet styling
@@ -215,7 +218,7 @@ public class UserProfileService {
 		return cursor;
 	}
 
-	public enum ReportPlaceholder {
+	public enum UserProfilePlaceholder {
 
 		DATE("${date}"),
 		ACADEMIC_DEGREE("${academicdegree}"),
@@ -228,7 +231,7 @@ public class UserProfileService {
 
 		private final String name;
 
-		ReportPlaceholder(String name) {
+		UserProfilePlaceholder(String name) {
 			this.name = name;
 		}
 
