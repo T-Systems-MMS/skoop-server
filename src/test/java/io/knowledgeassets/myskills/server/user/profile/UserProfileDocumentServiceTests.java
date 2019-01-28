@@ -216,7 +216,7 @@ class UserProfileDocumentServiceTests {
 	@Test
 	@DisplayName("Tests if an exception is thrown when invalid template is used.")
 	void testIfExceptionIsThrownWhenInvalidTemplateIsUsed() throws IOException {
-		this.userProfileDocumentService = new UserProfileDocumentService(userRepository, userSkillRepository, new ClassPathResource("fake-template.docx").getFile().getAbsolutePath());
+		this.userProfileDocumentService = new UserProfileDocumentService(userRepository, userSkillRepository, new ClassPathResource("templates/fake-template.docx").getFile().getAbsolutePath());
 
 		User user = User.builder()
 				.id("adac977c-8e0d-4e00-98a8-da7b44aa5dd6")
