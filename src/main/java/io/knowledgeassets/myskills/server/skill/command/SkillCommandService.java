@@ -37,6 +37,17 @@ public class SkillCommandService {
 					.build();
 		});
 
+		List<SkillGroup> skillGroups = findSkillGroups(groups);
+		Skill skill = skillRepository.save(Skill.builder()
+				.id(UUID.randomUUID().toString())
+				.name(name)
+				.description(description)
+				.skillGroups(skillGroups)
+				.build());
+		return skill;
+	}
+
+	private List<SkillGroup> findSkillGroups(List<String> groups) {
 		List<SkillGroup> skillGroups = new ArrayList<>();
 		if (!CollectionUtils.isEmpty(groups)) {
 			groups.forEach(groupName -> {
@@ -51,13 +62,7 @@ public class SkillCommandService {
 				skillGroups.add(skillGroup);
 			});
 		}
-		Skill skill = skillRepository.save(Skill.builder()
-				.id(UUID.randomUUID().toString())
-				.name(name)
-				.description(description)
-				.skillGroups(skillGroups)
-				.build());
-		return skill;
+		return skillGroups;
 	}
 
 	@Transactional
@@ -70,20 +75,7 @@ public class SkillCommandService {
 					.build();
 		});
 
-		List<SkillGroup> skillGroups = new ArrayList<>();
-		if (!CollectionUtils.isEmpty(groups)) {
-			groups.forEach(groupName -> {
-				SkillGroup skillGroup = skillGroupQueryService.findByNameIgnoreCase(groupName)
-						.orElseThrow(() -> {
-							String[] searchParamsMap = {"name", groupName};
-							return NoSuchResourceException.builder()
-									.model(Model.SKILL_GROUP)
-									.searchParamsMap(searchParamsMap)
-									.build();
-						});
-				skillGroups.add(skillGroup);
-			});
-		}
+		List<SkillGroup> skillGroups = findSkillGroups(groups);
 		skill.setSkillGroups(skillGroups);
 		skill.setName(name);
 		skill.setDescription(description);
