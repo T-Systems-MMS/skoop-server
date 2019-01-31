@@ -28,6 +28,8 @@ public abstract class GeneralException
         super(message);
     }
 
+    public GeneralException(String message, Throwable cause) {super(message, cause); }
+
 	public String getDebugMessage() {
 		return debugMessage;
 	}
