@@ -14,4 +14,4 @@ logging:
 neo4j:
   migration:
     # Location for neo4j migration script:
-    path: src/main/resources/migration/generated_indexes.cql
+    path: migration/generated_indexes.cql

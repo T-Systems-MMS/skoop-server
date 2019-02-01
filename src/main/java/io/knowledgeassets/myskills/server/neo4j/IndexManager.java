@@ -9,6 +9,8 @@ import org.neo4j.ogm.session.request.DefaultRequest;
 import org.neo4j.ogm.session.request.RowDataStatement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -24,6 +26,7 @@ import static io.knowledgeassets.myskills.server.neo4j.IndexType.*;
 import static java.util.Collections.emptyMap;
 import static java.util.regex.Pattern.compile;
 import static org.neo4j.ogm.transaction.Transaction.Type.READ_WRITE;
+import static java.lang.String.format;
 
 @Component
 public class IndexManager {
@@ -54,8 +57,19 @@ public class IndexManager {
 	}
 
 	private List<String> loadIndexesFromFile(String migrationPath) throws IOException {
-		Path dumpPath = Paths.get(migrationPath);
-		return Files.readAllLines(dumpPath);
+		final Resource migrationFile = new ClassPathResource(migrationPath);
+		if (migrationFile.exists()) {
+			if (migrationFile.isFile()) {
+				Path dumpPath = Paths.get(migrationFile.getFile().getAbsolutePath());
+				return Files.readAllLines(dumpPath);
+			}
+			else {
+				throw new IllegalArgumentException(format("The resource %s is not a migration file. Please check the application configuration.", migrationFile));
+			}
+		}
+		else {
+			throw new IllegalArgumentException(format("The migration file %s does not exist. Please check the application configuration.", migrationPath));
+		}
 	}
 
 	private List<String> loadIndexesFromDB() {
