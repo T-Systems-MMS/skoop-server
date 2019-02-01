@@ -6,3 +6,9 @@ logging:
     io.knowledgeassets.myskills.server: INFO
   # Default log file name.
   file: logs/myskills-server.log
+
+spring:
+  data:
+    neo4j:
+      # Set database URI
+      uri: ${SPRING_DATA_NEO4J_URI}
