@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -64,11 +65,11 @@ public class IndexManager {
 				return Files.readAllLines(dumpPath);
 			}
 			else {
-				throw new IllegalArgumentException(format("The resource %s is not a migration file. Please check the application configuration.", migrationFile));
+				throw new NoSuchFileException(format("The resource %s is not a migration file. Please check the application configuration.", migrationFile));
 			}
 		}
 		else {
-			throw new IllegalArgumentException(format("The migration file %s does not exist. Please check the application configuration.", migrationPath));
+			throw new NoSuchFileException(format("The migration file %s does not exist. Please check the application configuration.", migrationPath));
 		}
 	}
 

@@ -24,7 +24,7 @@ public class IndexManagerTest {
 
 	@BeforeEach
 	public void setUp() throws IOException {
-		indexManager = new IndexManager(sessionFactory, "src/main/resources/migration/generated_indexes.cql");
+		indexManager = new IndexManager(sessionFactory, "migration/generated_indexes.cql");
 	}
 
 	@Test
