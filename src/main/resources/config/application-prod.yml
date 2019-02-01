@@ -12,3 +12,10 @@ spring:
     neo4j:
       # Set database URI
       uri: ${SPRING_DATA_NEO4J_URI}
+
+security:
+  oauth2:
+    resourceserver:
+      jwt:
+        # Set issuer URI to local server.
+        issuer-uri: ${SECURITY_OAUTH2_RESOURCESERVER_JWT_JWKSETURI}

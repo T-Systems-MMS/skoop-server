@@ -10,18 +10,19 @@ import org.neo4j.ogm.session.request.RowDataStatement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static io.knowledgeassets.myskills.server.neo4j.IndexType.*;
 import static java.util.Collections.emptyMap;
@@ -58,14 +59,11 @@ public class IndexManager {
 	}
 
 	private List<String> loadIndexesFromFile(String migrationPath) throws IOException {
-		final Resource migrationFile = new ClassPathResource(migrationPath);
+		final ClassPathResource migrationFile = new ClassPathResource(migrationPath);
 		if (migrationFile.exists()) {
-			if (migrationFile.isFile()) {
-				Path dumpPath = Paths.get(migrationFile.getFile().getAbsolutePath());
-				return Files.readAllLines(dumpPath);
-			}
-			else {
-				throw new NoSuchFileException(format("The resource %s is not a migration file. Please check the application configuration.", migrationFile));
+			try (InputStream is = migrationFile.getInputStream();
+				 BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+				return br.lines().collect(Collectors.toList());
 			}
 		}
 		else {
