@@ -17,5 +17,5 @@ security:
   oauth2:
     resourceserver:
       jwt:
-        # Set issuer URI to local server.
-        issuer-uri: ${SECURITY_OAUTH2_RESOURCESERVER_JWT_JWKSETURI}
+        # Set issuer URI
+        jwk-set-uri: ${SECURITY_OAUTH2_RESOURCESERVER_JWT_JWKSETURI}
