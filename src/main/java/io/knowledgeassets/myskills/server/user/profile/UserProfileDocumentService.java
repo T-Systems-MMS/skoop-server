@@ -183,7 +183,7 @@ public class UserProfileDocumentService {
 		final String text = r.getText(0);
 		if (StringUtils.containsIgnoreCase(text, placeholder)) {
 			final List<String> values = valuesSupplier.get();
-			if (values == null) {
+			if (values == null || values.isEmpty()) {
 				final String newText = StringUtils.replaceIgnoreCase(text, placeholder, "N/A");
 				// remove bullet styling
 				paragraph.getCTP().unsetPPr();
