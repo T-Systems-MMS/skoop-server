@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -186,7 +187,7 @@ public class UserProfileDocumentService {
 			if (values == null || values.isEmpty()) {
 				final String newText = StringUtils.replaceIgnoreCase(text, placeholder, "N/A");
 				// remove bullet styling
-				paragraph.getCTP().unsetPPr();
+				paragraph.setNumID(BigInteger.ZERO);
 				r.setText(newText, 0);
 			}
 			else {
