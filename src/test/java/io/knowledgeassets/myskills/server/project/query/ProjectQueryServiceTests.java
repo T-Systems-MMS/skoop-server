@@ -45,7 +45,7 @@ class ProjectQueryServiceTests {
 	}
 
 	@Test
-	@DisplayName("Returns a stream of all skills from the data repository")
+	@DisplayName("Returns a stream of all projects from the data repository")
 	void returnsStreamOfAllSkills() {
 		given(projectRepository.findAll()).willReturn(Arrays.asList(
 				Project.builder().id("123").name("First project").description("First project description").build(),
