@@ -12,6 +12,8 @@ spring:
     neo4j:
       # Set database URI
       uri: ${SPRING_DATA_NEO4J_URI}
+      password: ${SPRING_DATA_NEO4J_PASSWORD}
+      username: ${SPRING_DATA_NEO4J_USERNAME}
 
 security:
   oauth2:
