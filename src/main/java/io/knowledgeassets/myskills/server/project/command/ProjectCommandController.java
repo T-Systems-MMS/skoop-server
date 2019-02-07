@@ -34,7 +34,7 @@ public class ProjectCommandController {
 			notes = "Create new project in the system. The project name must not exist yet.")
 	@ApiResponses({
 			@ApiResponse(code = 201, message = "Successful execution"),
-			@ApiResponse(code = 400, message = "Invalid input data, e.g. missing mandatory data or skill name exists"),
+			@ApiResponse(code = 400, message = "Invalid input data, e.g. missing mandatory data or project name exists"),
 			@ApiResponse(code = 401, message = "Invalid authentication"),
 			@ApiResponse(code = 403, message = "Insufficient privileges to perform this operation"),
 			@ApiResponse(code = 500, message = "Error during execution")

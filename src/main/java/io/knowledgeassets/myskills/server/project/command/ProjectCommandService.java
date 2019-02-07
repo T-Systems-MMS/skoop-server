@@ -56,14 +56,14 @@ public class ProjectCommandService {
 	@Transactional
 	@PreAuthorize("hasRole('ADMIN')")
 	public void delete(String id) {
-		final Project skill = projectRepository.findById(id).orElseThrow(() -> {
+		final Project project = projectRepository.findById(id).orElseThrow(() -> {
 			final String[] searchParamsMap = {"id", id};
 			return NoSuchResourceException.builder()
 					.model(Model.PROJECT)
 					.searchParamsMap(searchParamsMap)
 					.build();
 		});
-		projectRepository.delete(skill);
+		projectRepository.delete(project);
 	}
 
 }
