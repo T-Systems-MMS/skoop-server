@@ -3,7 +3,9 @@ package io.knowledgeassets.myskills.server.community.command;
 import io.knowledgeassets.myskills.server.common.AbstractControllerTests;
 import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.community.Link;
+import io.knowledgeassets.myskills.server.security.CurrentUserService;
 import io.knowledgeassets.myskills.server.user.User;
+import io.knowledgeassets.myskills.server.user.query.UserQueryService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.stream.Stream;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -29,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static java.util.Collections.singletonList;
 
 @WebMvcTest(CommunityCommandController.class)
 class CommunityCommandControllerTests extends AbstractControllerTests {
@@ -38,6 +42,12 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 
 	@MockBean
 	private CommunityCommandService communityCommandService;
+
+	@MockBean
+	private UserQueryService userQueryService;
+
+	@MockBean
+	private CurrentUserService currentUserService;
 
 	@Test
 	@DisplayName("Tests if a community can be created.")
@@ -76,6 +86,8 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 										.href("https://www.linkedin.com/java-user-group")
 										.build()
 						))
+						.managers(singletonList(owner))
+						.members(singletonList(owner))
 						.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
 						.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
 						.build()
@@ -95,7 +107,11 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 					.andExpect(jsonPath("$.links[0].name", is(equalTo("Facebook"))))
 					.andExpect(jsonPath("$.links[0].href", is(equalTo("https://www.facebook.com/java-user-group"))))
 					.andExpect(jsonPath("$.links[1].name", is(equalTo("Linkedin"))))
-					.andExpect(jsonPath("$.links[1].href", is(equalTo("https://www.linkedin.com/java-user-group"))));
+					.andExpect(jsonPath("$.links[1].href", is(equalTo("https://www.linkedin.com/java-user-group"))))
+					.andExpect(jsonPath("$.managers[0].id", is(equalTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))))
+					.andExpect(jsonPath("$.managers[0].userName", is(equalTo("tester"))))
+					.andExpect(jsonPath("$.members[0].id", is(equalTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))))
+					.andExpect(jsonPath("$.members[0].userName", is(equalTo("tester"))));
 		}
 	}
 
@@ -154,10 +170,13 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 	@Test
 	@DisplayName("Tests if a community can be updated.")
 	void testIfCommunityIsUpdated() throws Exception {
+		given(communityQueryService.hasCommunityManagerRole("1f37fb2a-b4d0-4119-9113-4677beb20ae2", "123")).willReturn(true);
 		final User owner = User.builder()
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
 				.build();
+		given(currentUserService.getCurrentUser()).willReturn(owner);
+		given(userQueryService.getUsersByIds(singletonList("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))).willReturn(Stream.of(owner), Stream.of(owner));
 		final ClassPathResource body = new ClassPathResource("community/update-community.json");
 		final Community community = Community.builder()
 				.id("123")
@@ -173,6 +192,8 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 								.href("https://www.linkedin.com/java-user-group")
 								.build()
 				))
+				.managers(singletonList(owner))
+				.members(singletonList(owner))
 				.build();
 		given(communityCommandService.update(community)).willReturn(
 				Community.builder()
@@ -189,6 +210,8 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 										.href("https://www.linkedin.com/java-user-group")
 										.build()
 						))
+						.managers(singletonList(owner))
+						.members(singletonList(owner))
 						.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
 						.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
 						.build()
@@ -208,7 +231,53 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 					.andExpect(jsonPath("$.links[0].name", is(equalTo("Facebook"))))
 					.andExpect(jsonPath("$.links[0].href", is(equalTo("https://www.facebook.com/java-user-group"))))
 					.andExpect(jsonPath("$.links[1].name", is(equalTo("Linkedin"))))
-					.andExpect(jsonPath("$.links[1].href", is(equalTo("https://www.linkedin.com/java-user-group"))));
+					.andExpect(jsonPath("$.links[1].href", is(equalTo("https://www.linkedin.com/java-user-group"))))
+					.andExpect(jsonPath("$.managers[0].id", is(equalTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))))
+					.andExpect(jsonPath("$.managers[0].userName", is(equalTo("tester"))))
+					.andExpect(jsonPath("$.members[0].id", is(equalTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))))
+					.andExpect(jsonPath("$.members[0].userName", is(equalTo("tester"))));
+		}
+	}
+
+	@Test
+	@DisplayName("Tests if a community cannot be updated when community manager removes community manager role from himself.")
+	void testIfCommunityCannotBeUpdatedWhenCommunityManagerRemovesCommunityManagerRoleFromHimself() throws Exception {
+		given(communityQueryService.hasCommunityManagerRole("1f37fb2a-b4d0-4119-9113-4677beb20ae2", "123")).willReturn(true);
+		final User owner = User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build();
+		given(currentUserService.getCurrentUser()).willReturn(owner);
+		final ClassPathResource body = new ClassPathResource("community/update-community-with-community-manager-removed.json");
+		try (final InputStream is = body.getInputStream()) {
+			mockMvc.perform(put("/communities/123")
+					.accept(MediaType.APPLICATION_JSON)
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(is.readAllBytes())
+					.with(authentication(withUser(owner)))
+					.with(csrf()))
+					.andExpect(status().isBadRequest());
+		}
+	}
+
+	@Test
+	@DisplayName("Tests if a community cannot be updated when community manager removes member role from himself.")
+	void testIfCommunityCannotBeUpdatedWhenCommunityManagerRemovesMemberRoleFromHimself() throws Exception {
+		given(communityQueryService.hasCommunityManagerRole("1f37fb2a-b4d0-4119-9113-4677beb20ae2", "123")).willReturn(true);
+		final User owner = User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build();
+		given(currentUserService.getCurrentUser()).willReturn(owner);
+		final ClassPathResource body = new ClassPathResource("community/update-community-with-community-members-removed.json");
+		try (final InputStream is = body.getInputStream()) {
+			mockMvc.perform(put("/communities/123")
+					.accept(MediaType.APPLICATION_JSON)
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(is.readAllBytes())
+					.with(authentication(withUser(owner)))
+					.with(csrf()))
+					.andExpect(status().isBadRequest());
 		}
 	}
 
@@ -227,15 +296,49 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 	}
 
 	@Test
+	@DisplayName("Tests if forbbiden status code is returned when community is updated by a user who is not a community manager.")
+	void testIfForbiddenStatusCodeIsReturnedWhenCommunityIsUpdatedByUserWhoIsNotCommunityManager() throws Exception {
+		given(communityQueryService.hasCommunityManagerRole("1f37fb2a-b4d0-4119-9113-4677beb20ae2", "123")).willReturn(false);
+		final User owner = User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build();
+		final ClassPathResource body = new ClassPathResource("community/update-community.json");
+		try (final InputStream is = body.getInputStream()) {
+			mockMvc.perform(put("/communities/123")
+					.with(authentication(withUser(owner)))
+					.accept(MediaType.APPLICATION_JSON)
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(is.readAllBytes())
+					.with(csrf()))
+					.andExpect(status().isForbidden());
+		}
+	}
+
+	@Test
 	@DisplayName("Tests if the community can be deleted.")
 	void testIfCommunityCanBeDeleted() throws Exception {
+		given(communityQueryService.hasCommunityManagerRole("1f37fb2a-b4d0-4119-9113-4677beb20ae2", "123")).willReturn(true);
+		final User owner = User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build();
+		mockMvc.perform(delete("/communities/123")
+				.with(authentication(withUser(owner))))
+				.andExpect(status().isNoContent());
+	}
+
+	@Test
+	@DisplayName("Tests if the community cannot be deleted by a user who is not a community manager.")
+	void testIfCommunityCannotBeDeletedByUserWhoIsNotCommunityManager() throws Exception {
+		given(communityQueryService.hasCommunityManagerRole("1f37fb2a-b4d0-4119-9113-4677beb20ae2", "123")).willReturn(false);
 		final User owner = User.builder()
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
 				.build();
 		mockMvc.perform(delete("/communities/123")
 				.with(authentication(withUser(owner, "ADMIN"))))
-				.andExpect(status().isNoContent());
+				.andExpect(status().isForbidden());
 	}
 
 	@Test

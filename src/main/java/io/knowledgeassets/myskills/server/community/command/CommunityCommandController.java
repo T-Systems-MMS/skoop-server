@@ -4,6 +4,9 @@ import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.community.CommunityRequest;
 import io.knowledgeassets.myskills.server.community.CommunityResponse;
 import io.knowledgeassets.myskills.server.community.Link;
+import io.knowledgeassets.myskills.server.community.ValidUpdateCommunityRequest;
+import io.knowledgeassets.myskills.server.user.User;
+import io.knowledgeassets.myskills.server.user.query.UserQueryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -12,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,14 +27,20 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
+
 @Api(tags = "Communities", description = "API allowing modifications of communities")
 @RestController
+@Validated
 public class CommunityCommandController {
 
 	private final CommunityCommandService communityCommandService;
+	private final UserQueryService userQueryService;
 
-	public CommunityCommandController(CommunityCommandService communityCommandService) {
+	public CommunityCommandController(CommunityCommandService communityCommandService,
+									  UserQueryService userQueryService) {
 		this.communityCommandService = communityCommandService;
+		this.userQueryService = userQueryService;
 	}
 
 	@ApiOperation(value = "Create new community",
@@ -62,11 +72,11 @@ public class CommunityCommandController {
 			@ApiResponse(code = 404, message = "Resource not found"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("isAuthenticated()")
+	@PreAuthorize("isAuthenticated() and hasCommunityManagerRole(#communityId)")
 	@PutMapping(path = "/communities/{communityId}",
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<CommunityResponse> update(@PathVariable("communityId") String communityId, @Valid @RequestBody CommunityRequest request) {
+	public ResponseEntity<CommunityResponse> update(@PathVariable("communityId") String communityId, @Valid @ValidUpdateCommunityRequest @RequestBody CommunityRequest request) {
 		final Community community = convertCommunityRequestToCommunityDomain(request);
 		community.setId(communityId);
 		final Community result = communityCommandService.update(community);
@@ -82,7 +92,7 @@ public class CommunityCommandController {
 			@ApiResponse(code = 404, message = "Resource not found"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("isAuthenticated() and hasCommunityManagerRole(#communityId)")
 	@DeleteMapping(path = "/communities/{communityId}")
 	public ResponseEntity<Void> delete(@PathVariable("communityId") String communityId) {
 		communityCommandService.delete(communityId);
@@ -90,10 +100,20 @@ public class CommunityCommandController {
 	}
 
 	private Community convertCommunityRequestToCommunityDomain(CommunityRequest communityRequest) {
+		List<User> managers = null;
+		if (communityRequest.getManagerIds() != null) {
+			managers = userQueryService.getUsersByIds(communityRequest.getManagerIds()).collect(toList());
+		}
+		List<User> members = null;
+		if (communityRequest.getMemberIds() != null) {
+			members = userQueryService.getUsersByIds(communityRequest.getMemberIds()).collect(toList());
+		}
 		return Community.builder()
 				.title(communityRequest.getTitle())
 				.description(communityRequest.getDescription())
 				.links(convertLinkRequestListToLinkList(communityRequest))
+				.managers(managers)
+				.members(members)
 				.build();
 	}
 

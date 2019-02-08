@@ -30,4 +30,10 @@ public class CommunityRequest {
 	@ApiModelProperty("Links of a community.")
 	private List<LinkRequest> links;
 
+	@ApiModelProperty("List of manager identifiers.")
+	private List<String> managerIds;
+
+	@ApiModelProperty("List of member identifiers.")
+	private List<String> memberIds;
+
 }

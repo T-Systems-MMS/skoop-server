@@ -6,9 +6,11 @@ import io.knowledgeassets.myskills.server.user.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+
+import static java.util.stream.StreamSupport.stream;
 
 @Service
 public class UserQueryService {
@@ -20,17 +22,22 @@ public class UserQueryService {
 
 	@Transactional(readOnly = true)
 	public Stream<User> getUsers() {
-		return StreamSupport.stream(userRepository.findAll().spliterator(), false);
+		return stream(userRepository.findAll().spliterator(), false);
 	}
 
 	@Transactional(readOnly = true)
 	public Stream<User> getUsersBySearchTerm(String search) {
-		return StreamSupport.stream(userRepository.findBySearchTerm(search).spliterator(), false);
+		return stream(userRepository.findBySearchTerm(search).spliterator(), false);
 	}
 
 	@Transactional(readOnly = true)
 	public Optional<User> getUserById(String userId) {
 		return userRepository.findById(userId);
+	}
+
+	@Transactional(readOnly = true)
+	public Stream<User> getUsersByIds(List<String> userIds) {
+		return stream(userRepository.findAllById(userIds).spliterator(), false);
 	}
 
 	@Transactional(readOnly = true)

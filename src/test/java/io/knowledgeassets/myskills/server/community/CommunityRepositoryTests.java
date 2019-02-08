@@ -1,5 +1,6 @@
 package io.knowledgeassets.myskills.server.community;
 
+import io.knowledgeassets.myskills.server.user.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.data.neo4j.DataNeo4jTest;
 import java.util.Arrays;
 import java.util.Optional;
 
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataNeo4jTest
@@ -35,6 +37,14 @@ class CommunityRepositoryTests {
 										.href("https://www.linkedin.com/java-user-group")
 										.build()
 						))
+						.managers(singletonList(User.builder()
+								.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+								.userName("tester")
+								.build()))
+						.members(singletonList(User.builder()
+								.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+								.userName("tester")
+								.build()))
 						.build()
 		);
 		// When
@@ -44,6 +54,12 @@ class CommunityRepositoryTests {
 		assertThat(community.get().getId()).isEqualTo("123");
 		assertThat(community.get().getTitle()).isEqualTo("Java User Group");
 		assertThat(community.get().getDescription()).isEqualTo("Community for Java developers");
+		assertThat(community.get().getManagers()).hasSize(1);
+		assertThat(community.get().getManagers().get(0).getId()).isEqualTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2");
+		assertThat(community.get().getManagers().get(0).getUserName()).isEqualTo("tester");
+		assertThat(community.get().getMembers()).hasSize(1);
+		assertThat(community.get().getMembers().get(0).getId()).isEqualTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2");
+		assertThat(community.get().getMembers().get(0).getUserName()).isEqualTo("tester");
 	}
 
 	@Test
@@ -65,6 +81,14 @@ class CommunityRepositoryTests {
 										.href("https://www.linkedin.com/java-user-group")
 										.build()
 						))
+						.managers(singletonList(User.builder()
+								.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+								.userName("tester")
+								.build()))
+						.members(singletonList(User.builder()
+								.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+								.userName("tester")
+								.build()))
 						.build()
 		);
 		// When
@@ -74,6 +98,12 @@ class CommunityRepositoryTests {
 		assertThat(community.get().getId()).isEqualTo("123");
 		assertThat(community.get().getTitle()).isEqualTo("Java User Group");
 		assertThat(community.get().getDescription()).isEqualTo("Community for Java developers");
+		assertThat(community.get().getManagers()).hasSize(1);
+		assertThat(community.get().getManagers().get(0).getId()).isEqualTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2");
+		assertThat(community.get().getManagers().get(0).getUserName()).isEqualTo("tester");
+		assertThat(community.get().getMembers()).hasSize(1);
+		assertThat(community.get().getMembers().get(0).getId()).isEqualTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2");
+		assertThat(community.get().getMembers().get(0).getUserName()).isEqualTo("tester");
 	}
 
 }

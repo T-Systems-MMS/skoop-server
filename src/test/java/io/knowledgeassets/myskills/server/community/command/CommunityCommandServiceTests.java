@@ -5,6 +5,8 @@ import io.knowledgeassets.myskills.server.community.CommunityRepository;
 import io.knowledgeassets.myskills.server.community.Link;
 import io.knowledgeassets.myskills.server.exception.DuplicateResourceException;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
+import io.knowledgeassets.myskills.server.security.CurrentUserService;
+import io.knowledgeassets.myskills.server.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,22 +22,31 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
+import static java.util.Collections.singletonList;
+
 @ExtendWith(MockitoExtension.class)
 class CommunityCommandServiceTests {
 
 	@Mock
 	private CommunityRepository communityRepository;
 
+	@Mock
+	private CurrentUserService currentUserService;
+
 	private CommunityCommandService communityCommandService;
 
 	@BeforeEach
 	void setUp() {
-		communityCommandService = new CommunityCommandService(communityRepository);
+		communityCommandService = new CommunityCommandService(communityRepository, currentUserService);
 	}
 
 	@Test
 	@DisplayName("Tests if community is created.")
 	void testIfCommunityIsCreated() {
+		given(currentUserService.getCurrentUser()).willReturn(User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build());
 		given(communityRepository.findByTitleIgnoreCase("Java User Group")).willReturn(Optional.empty());
 		given(communityRepository.save(ArgumentMatchers.isA(Community.class)))
 				.willReturn(
@@ -53,6 +64,14 @@ class CommunityCommandServiceTests {
 												.href("https://www.linkedin.com/java-user-group")
 												.build()
 								))
+								.managers(singletonList(User.builder()
+										.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+										.userName("tester")
+										.build()))
+								.members(singletonList(User.builder()
+										.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+										.userName("tester")
+										.build()))
 								.build()
 				);
 
@@ -78,6 +97,16 @@ class CommunityCommandServiceTests {
 		assertThat(community.getId()).isEqualTo("123");
 		assertThat(community.getTitle()).isEqualTo("Java User Group");
 		assertThat(community.getDescription()).isEqualTo("Community for Java developers");
+		assertThat(community.getManagers()).hasSize(1);
+		assertThat(community.getManagers().get(0)).isEqualTo(User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build());
+		assertThat(community.getMembers()).hasSize(1);
+		assertThat(community.getMembers().get(0)).isEqualTo(User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build());
 	}
 
 	@Test
@@ -137,6 +166,14 @@ class CommunityCommandServiceTests {
 						.id("123")
 						.title("Java User Group")
 						.description("Community for Java developers")
+						.managers(singletonList(User.builder()
+								.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+								.userName("tester")
+								.build()))
+						.members(singletonList(User.builder()
+								.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+								.userName("tester")
+								.build()))
 						.build()
 		));
 		given(communityRepository.save(ArgumentMatchers.isA(Community.class)))
@@ -145,6 +182,14 @@ class CommunityCommandServiceTests {
 								.id("123")
 								.title("Java User Group")
 								.description("New community for Java developers")
+								.managers(singletonList(User.builder()
+										.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+										.userName("tester")
+										.build()))
+								.members(singletonList(User.builder()
+										.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+										.userName("tester")
+										.build()))
 								.build()
 				);
 
@@ -161,6 +206,16 @@ class CommunityCommandServiceTests {
 		assertThat(community.getId()).isEqualTo("123");
 		assertThat(community.getTitle()).isEqualTo("Java User Group");
 		assertThat(community.getDescription()).isEqualTo("New community for Java developers");
+		assertThat(community.getManagers()).hasSize(1);
+		assertThat(community.getManagers().get(0)).isEqualTo(User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build());
+		assertThat(community.getMembers()).hasSize(1);
+		assertThat(community.getMembers().get(0)).isEqualTo(User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build());
 	}
 
 }

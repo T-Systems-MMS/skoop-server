@@ -8,7 +8,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -28,15 +27,13 @@ import static io.knowledgeassets.myskills.server.common.JwtAuthenticationFactory
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static java.util.Collections.singletonList;
 
 @WebMvcTest(CommunityQueryController.class)
 class CommunityQueryControllerTests extends AbstractControllerTests {
 
 	@Autowired
 	private MockMvc mockMvc;
-
-	@MockBean
-	private CommunityQueryService communityQueryService;
 
 	@Test
 	@DisplayName("Tests if all communities can be fetched.")
@@ -61,6 +58,8 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 												.href("https://www.linkedin.com/java-user-group")
 												.build()
 								))
+								.managers(singletonList(owner))
+								.members(singletonList(owner))
 								.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
 								.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
 								.build(),
@@ -78,6 +77,8 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 												.href("https://www.linkedin.com/scala-user-group")
 												.build()
 								))
+								.managers(singletonList(owner))
+								.members(singletonList(owner))
 								.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
 								.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
 								.build()
@@ -97,13 +98,21 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[0].links[0].href", is(equalTo("https://www.facebook.com/java-user-group"))))
 				.andExpect(jsonPath("$[0].links[1].name", is(equalTo("Linkedin"))))
 				.andExpect(jsonPath("$[0].links[1].href", is(equalTo("https://www.linkedin.com/java-user-group"))))
+				.andExpect(jsonPath("$[0].managers[0].id", is(equalTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))))
+				.andExpect(jsonPath("$[0].managers[0].userName", is(equalTo("tester"))))
+				.andExpect(jsonPath("$[0].members[0].id", is(equalTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))))
+				.andExpect(jsonPath("$[0].members[0].userName", is(equalTo("tester"))))
 				.andExpect(jsonPath("$[1].id", is(equalTo("456"))))
 				.andExpect(jsonPath("$[1].title", is(equalTo("Scala User Group"))))
 				.andExpect(jsonPath("$[1].description", is(equalTo("Community for Scala developers"))))
 				.andExpect(jsonPath("$[1].links[0].name", is(equalTo("Facebook"))))
 				.andExpect(jsonPath("$[1].links[0].href", is(equalTo("https://www.facebook.com/scala-user-group"))))
 				.andExpect(jsonPath("$[1].links[1].name", is(equalTo("Linkedin"))))
-				.andExpect(jsonPath("$[1].links[1].href", is(equalTo("https://www.linkedin.com/scala-user-group"))));
+				.andExpect(jsonPath("$[1].links[1].href", is(equalTo("https://www.linkedin.com/scala-user-group"))))
+				.andExpect(jsonPath("$[1].managers[0].id", is(equalTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))))
+				.andExpect(jsonPath("$[1].managers[0].userName", is(equalTo("tester"))))
+				.andExpect(jsonPath("$[1].members[0].id", is(equalTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))))
+				.andExpect(jsonPath("$[1].members[0].userName", is(equalTo("tester"))));
 	}
 
 	@Test
@@ -129,6 +138,8 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 												.href("https://www.linkedin.com/scala-user-group")
 												.build()
 								))
+								.managers(singletonList(owner))
+								.members(singletonList(owner))
 								.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
 								.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
 								.build()
@@ -147,7 +158,11 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$.links[0].name", is(equalTo("Facebook"))))
 				.andExpect(jsonPath("$.links[0].href", is(equalTo("https://www.facebook.com/scala-user-group"))))
 				.andExpect(jsonPath("$.links[1].name", is(equalTo("Linkedin"))))
-				.andExpect(jsonPath("$.links[1].href", is(equalTo("https://www.linkedin.com/scala-user-group"))));
+				.andExpect(jsonPath("$.links[1].href", is(equalTo("https://www.linkedin.com/scala-user-group"))))
+				.andExpect(jsonPath("$.managers[0].id", is(equalTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))))
+				.andExpect(jsonPath("$.managers[0].userName", is(equalTo("tester"))))
+				.andExpect(jsonPath("$.members[0].id", is(equalTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))))
+				.andExpect(jsonPath("$.members[0].userName", is(equalTo("tester"))));
 	}
 
 	@Test
