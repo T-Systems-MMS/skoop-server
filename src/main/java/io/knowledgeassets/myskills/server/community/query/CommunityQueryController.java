@@ -1,8 +1,11 @@
 package io.knowledgeassets.myskills.server.community.query;
 
+import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.community.CommunityResponse;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.exception.enums.Model;
+import io.knowledgeassets.myskills.server.security.CurrentUserService;
+import io.knowledgeassets.myskills.server.user.User;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -14,6 +17,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -22,9 +27,12 @@ import static java.util.stream.Collectors.toList;
 public class CommunityQueryController {
 
 	private final CommunityQueryService communityQueryService;
+	private final CurrentUserService currentUserService;
 
-	public CommunityQueryController(CommunityQueryService communityQueryService) {
+	public CommunityQueryController(CommunityQueryService communityQueryService,
+									CurrentUserService currentUserService) {
 		this.communityQueryService = communityQueryService;
+		this.currentUserService = currentUserService;
 	}
 
 	@ApiOperation(value = "Get all communities",
@@ -38,8 +46,9 @@ public class CommunityQueryController {
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping(path = "/communities", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<CommunityResponse> getCommunities() {
+		final User currentUser = currentUserService.getCurrentUser();
 		return communityQueryService.getCommunities()
-				.map(CommunityResponse::of)
+				.map(convertCommunityToCommunityResponse(currentUser))
 				.collect(toList());
 	}
 
@@ -55,8 +64,9 @@ public class CommunityQueryController {
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping(path = "/communities/{communityId}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public CommunityResponse getProject(@PathVariable("communityId") String communityId) {
+		final User currentUser = currentUserService.getCurrentUser();
 		return communityQueryService.getCommunityById(communityId)
-				.map(CommunityResponse::of)
+				.map(convertCommunityToCommunityResponse(currentUser))
 				.orElseThrow(() -> {
 					String[] searchParamsMap = {"id", communityId};
 					return NoSuchResourceException.builder()
@@ -64,6 +74,17 @@ public class CommunityQueryController {
 							.searchParamsMap(searchParamsMap)
 							.build();
 				});
+	}
+
+	private Function<Community, CommunityResponse> convertCommunityToCommunityResponse(User currentUser) {
+		return (Community c) -> {
+			if (c.getMembers() != null && c.getMembers().stream().map(User::getId).collect(Collectors.toSet()).contains(currentUser.getId())) {
+				return CommunityResponse.of(c);
+			}
+			else {
+				return CommunityResponse.simple(c);
+			}
+		};
 	}
 
 }

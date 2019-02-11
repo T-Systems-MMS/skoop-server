@@ -434,4 +434,38 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 				.andExpect(status().isUnauthorized());
 	}
 
+	@Test
+	@DisplayName("Tests if authenticated user joins the community.")
+	void testIfAuthenticatedUserJoinsCommunity() throws Exception {
+		final User owner = User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build();
+
+		given(communityCommandService.joinCommunityAsMember("123")).willReturn(Community.builder()
+				.id("123")
+				.title("Java User Group")
+				.members(singletonList(User.builder()
+						.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+						.userName("tester")
+						.build()))
+				.build()
+		);
+
+		mockMvc.perform(post("/communities/123/members")
+				.with(authentication(withUser(owner))))
+				.andExpect(status().isCreated())
+				.andExpect(jsonPath("$.id", is(equalTo("123"))))
+				.andExpect(jsonPath("$.title", is(equalTo("Java User Group"))))
+				.andExpect(jsonPath("$.members[0].id", is(equalTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))))
+				.andExpect(jsonPath("$.members[0].userName", is(equalTo("tester"))));
+	}
+
+	@Test
+	@DisplayName("Tests if not authenticated user is not allowed to join the community.")
+	void testIfNotAuthenticatedUserIsNotAllowedToJoinCommunity() throws Exception {
+		mockMvc.perform(post("/communities/123/members"))
+				.andExpect(status().isUnauthorized());
+	}
+
 }

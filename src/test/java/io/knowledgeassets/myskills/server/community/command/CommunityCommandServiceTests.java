@@ -4,6 +4,7 @@ import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.community.CommunityRepository;
 import io.knowledgeassets.myskills.server.community.CommunityType;
 import io.knowledgeassets.myskills.server.community.Link;
+import io.knowledgeassets.myskills.server.exception.CommunityAccessDeniedException;
 import io.knowledgeassets.myskills.server.exception.DuplicateResourceException;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.security.CurrentUserService;
@@ -21,10 +22,16 @@ import java.util.Arrays;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isA;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
 import static java.util.Collections.singletonList;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 
 @ExtendWith(MockitoExtension.class)
 class CommunityCommandServiceTests {
@@ -143,26 +150,26 @@ class CommunityCommandServiceTests {
 						.title("Java User Group")
 						.type(CommunityType.OPENED)
 						.description("Community for Java developers")
-				.build()
-				));
+						.build()
+		));
 		assertThrows(DuplicateResourceException.class, () ->
-			communityCommandService.create(
-					Community.builder()
-							.title("Java User Group")
-							.type(CommunityType.OPENED)
-							.description("Community for Java developers")
-							.links(Arrays.asList(
-									Link.builder()
-											.name("Facebook")
-											.href("https://www.facebook.com/java-user-group")
-											.build(),
-									Link.builder()
-											.name("Linkedin")
-											.href("https://www.linkedin.com/java-user-group")
-											.build()
-							))
-							.build()
-			));
+				communityCommandService.create(
+						Community.builder()
+								.title("Java User Group")
+								.type(CommunityType.OPENED)
+								.description("Community for Java developers")
+								.links(Arrays.asList(
+										Link.builder()
+												.name("Facebook")
+												.href("https://www.facebook.com/java-user-group")
+												.build(),
+										Link.builder()
+												.name("Linkedin")
+												.href("https://www.linkedin.com/java-user-group")
+												.build()
+								))
+								.build()
+				));
 	}
 
 	@Test
@@ -267,6 +274,73 @@ class CommunityCommandServiceTests {
 				.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
 				.name("Angular")
 				.build());
+	}
+
+	@Test
+	@DisplayName("Tests if authenticated user joins the community.")
+	void testIfAuthenticatedUserJoinsCommunity() {
+
+		given(currentUserService.getCurrentUser()).willReturn(User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build());
+		given(communityRepository.findById("123")).willReturn(Optional.of(
+				Community.builder()
+						.id("123")
+						.title("Java User Group")
+						.type(CommunityType.OPENED)
+						.build()
+		));
+
+		given(communityRepository.save(
+				argThat(allOf(
+						isA(Community.class),
+						hasProperty("id", is("123")),
+						hasProperty("title", is("Java User Group")),
+						hasProperty("members", equalTo(singletonList(User.builder()
+								.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+								.userName("tester")
+								.build()
+						)))
+				))
+		)).willReturn(
+				Community.builder()
+						.id("123")
+						.title("Java User Group")
+						.members(singletonList(
+								User.builder()
+										.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+										.userName("tester")
+										.build()
+						))
+						.build()
+		);
+
+		final Community community = communityCommandService.joinCommunityAsMember("123");
+		assertThat(community).isNotNull();
+		assertThat(community.getId()).isEqualTo("123");
+		assertThat(community.getTitle()).isEqualTo("Java User Group");
+		assertThat(community.getMembers()).contains(User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build());
+	}
+
+	@Test
+	@DisplayName("Tests if an exception is thrown when joining closed community.")
+	void testIfExceptionIsThrownWhenJoiningClosedCommunity() {
+		given(currentUserService.getCurrentUser()).willReturn(User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build());
+		given(communityRepository.findById("123")).willReturn(Optional.of(
+				Community.builder()
+						.id("123")
+						.title("Java User Group")
+						.type(CommunityType.CLOSED)
+						.build()
+		));
+		assertThrows(CommunityAccessDeniedException.class, () -> communityCommandService.joinCommunityAsMember("123"));
 	}
 
 }

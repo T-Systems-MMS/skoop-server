@@ -2,18 +2,24 @@ package io.knowledgeassets.myskills.server.community.command;
 
 import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.community.CommunityRepository;
+import io.knowledgeassets.myskills.server.community.CommunityType;
+import io.knowledgeassets.myskills.server.exception.CommunityAccessDeniedException;
 import io.knowledgeassets.myskills.server.exception.DuplicateResourceException;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.exception.enums.Model;
 import io.knowledgeassets.myskills.server.security.CurrentUserService;
+import io.knowledgeassets.myskills.server.user.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
+import static java.lang.String.format;
 
 @Service
 public class CommunityCommandService {
@@ -67,6 +73,38 @@ public class CommunityCommandService {
 					.build();
 		});
 		communityRepository.delete(community);
+	}
+
+
+	/**
+	 * Authenticated user joins the community as member.
+	 * @param communityId - id of the community to join
+	 */
+	@Transactional
+	public Community joinCommunityAsMember(String communityId) {
+		final User user = currentUserService.getCurrentUser();
+		final Community community = communityRepository.findById(communityId).orElseThrow(() -> {
+			final String[] searchParamsMap = {"communityId", communityId};
+			return NoSuchResourceException.builder()
+					.model(Model.COMMUNITY)
+					.searchParamsMap(searchParamsMap)
+					.build();
+		});
+		if (CommunityType.OPENED.equals(community.getType())) {
+			final List<User> members;
+			if (community.getMembers() != null) {
+				members = community.getMembers();
+			} else {
+				members = new ArrayList<>();
+			}
+			members.add(user);
+			community.setMembers(members);
+			return update(community);
+		}
+		else {
+			throw new CommunityAccessDeniedException(format("The community with ID \"%s\" is not an open one." +
+					" Only open communities can be joined without request.", communityId));
+		}
 	}
 
 }
