@@ -2,6 +2,7 @@ package io.knowledgeassets.myskills.server.community.query;
 
 import io.knowledgeassets.myskills.server.common.AbstractControllerTests;
 import io.knowledgeassets.myskills.server.community.Community;
+import io.knowledgeassets.myskills.server.community.CommunityType;
 import io.knowledgeassets.myskills.server.community.Link;
 import io.knowledgeassets.myskills.server.user.User;
 import org.junit.jupiter.api.DisplayName;
@@ -50,6 +51,7 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 						Community.builder()
 								.id("123")
 								.title("Java User Group")
+								.type(CommunityType.OPENED)
 								.description("Community for Java developers")
 								.links(Arrays.asList(
 										Link.builder()
@@ -67,6 +69,7 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 						Community.builder()
 								.id("456")
 								.title("Scala User Group")
+								.type(CommunityType.OPENED)
 								.description("Community for Scala developers")
 								.links(Arrays.asList(
 										Link.builder()
@@ -92,6 +95,7 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$[0].id", is(equalTo("123"))))
 				.andExpect(jsonPath("$[0].title", is(equalTo("Java User Group"))))
+				.andExpect(jsonPath("$[0].type", is(equalTo("OPENED"))))
 				.andExpect(jsonPath("$[0].description", is(equalTo("Community for Java developers"))))
 				.andExpect(jsonPath("$[0].links[0].name", is(equalTo("Facebook"))))
 				.andExpect(jsonPath("$[0].links[0].href", is(equalTo("https://www.facebook.com/java-user-group"))))
@@ -99,6 +103,7 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[0].links[1].href", is(equalTo("https://www.linkedin.com/java-user-group"))))
 				.andExpect(jsonPath("$[1].id", is(equalTo("456"))))
 				.andExpect(jsonPath("$[1].title", is(equalTo("Scala User Group"))))
+				.andExpect(jsonPath("$[1].type", is(equalTo("OPENED"))))
 				.andExpect(jsonPath("$[1].description", is(equalTo("Community for Scala developers"))))
 				.andExpect(jsonPath("$[1].links[0].name", is(equalTo("Facebook"))))
 				.andExpect(jsonPath("$[1].links[0].href", is(equalTo("https://www.facebook.com/scala-user-group"))))
@@ -118,6 +123,7 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 						Community.builder()
 								.id("456")
 								.title("Scala User Group")
+								.type(CommunityType.OPENED)
 								.description("Community for Scala developers")
 								.links(Arrays.asList(
 										Link.builder()
@@ -143,6 +149,7 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.id", is(equalTo("456"))))
 				.andExpect(jsonPath("$.title", is(equalTo("Scala User Group"))))
+				.andExpect(jsonPath("$.type", is(equalTo("OPENED"))))
 				.andExpect(jsonPath("$.description", is(equalTo("Community for Scala developers"))))
 				.andExpect(jsonPath("$.links[0].name", is(equalTo("Facebook"))))
 				.andExpect(jsonPath("$.links[0].href", is(equalTo("https://www.facebook.com/scala-user-group"))))

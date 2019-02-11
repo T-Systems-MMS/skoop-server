@@ -24,6 +24,7 @@ class CommunityRepositoryTests {
 				Community.builder()
 						.id("123")
 						.title("Java User Group")
+						.type(CommunityType.OPENED)
 						.description("Community for Java developers")
 						.links(Arrays.asList(
 								Link.builder()
@@ -43,6 +44,7 @@ class CommunityRepositoryTests {
 		assertThat(community).isNotEmpty();
 		assertThat(community.get().getId()).isEqualTo("123");
 		assertThat(community.get().getTitle()).isEqualTo("Java User Group");
+		assertThat(community.get().getType()).isEqualTo(CommunityType.OPENED);
 		assertThat(community.get().getDescription()).isEqualTo("Community for Java developers");
 	}
 
@@ -54,6 +56,7 @@ class CommunityRepositoryTests {
 				Community.builder()
 						.id("123")
 						.title("Java User Group")
+						.type(CommunityType.OPENED)
 						.description("Community for Java developers")
 						.links(Arrays.asList(
 								Link.builder()
@@ -73,6 +76,7 @@ class CommunityRepositoryTests {
 		assertThat(community).isNotEmpty();
 		assertThat(community.get().getId()).isEqualTo("123");
 		assertThat(community.get().getTitle()).isEqualTo("Java User Group");
+		assertThat(community.get().getType()).isEqualTo(CommunityType.OPENED);
 		assertThat(community.get().getDescription()).isEqualTo("Community for Java developers");
 	}
 

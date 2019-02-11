@@ -2,6 +2,7 @@ package io.knowledgeassets.myskills.server.community.command;
 
 import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.community.CommunityRepository;
+import io.knowledgeassets.myskills.server.community.CommunityType;
 import io.knowledgeassets.myskills.server.community.Link;
 import io.knowledgeassets.myskills.server.exception.DuplicateResourceException;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
@@ -42,6 +43,7 @@ class CommunityCommandServiceTests {
 						Community.builder()
 								.id("123")
 								.title("Java User Group")
+								.type(CommunityType.OPENED)
 								.description("Community for Java developers")
 								.links(Arrays.asList(
 										Link.builder()
@@ -59,6 +61,7 @@ class CommunityCommandServiceTests {
 		Community community = communityCommandService.create(
 				Community.builder()
 						.title("Java User Group")
+						.type(CommunityType.OPENED)
 						.description("Community for Java developers")
 						.links(Arrays.asList(
 								Link.builder()
@@ -77,6 +80,7 @@ class CommunityCommandServiceTests {
 		assertThat(community.getId()).isNotNull();
 		assertThat(community.getId()).isEqualTo("123");
 		assertThat(community.getTitle()).isEqualTo("Java User Group");
+		assertThat(community.getType()).isEqualTo(CommunityType.OPENED);
 		assertThat(community.getDescription()).isEqualTo("Community for Java developers");
 	}
 
@@ -87,6 +91,7 @@ class CommunityCommandServiceTests {
 				Community.builder()
 						.id("123")
 						.title("Java User Group")
+						.type(CommunityType.OPENED)
 						.description("Community for Java developers")
 				.build()
 				));
@@ -94,6 +99,7 @@ class CommunityCommandServiceTests {
 			communityCommandService.create(
 					Community.builder()
 							.title("Java User Group")
+							.type(CommunityType.OPENED)
 							.description("Community for Java developers")
 							.links(Arrays.asList(
 									Link.builder()
@@ -136,6 +142,7 @@ class CommunityCommandServiceTests {
 				Community.builder()
 						.id("123")
 						.title("Java User Group")
+						.type(CommunityType.OPENED)
 						.description("Community for Java developers")
 						.build()
 		));
@@ -144,6 +151,7 @@ class CommunityCommandServiceTests {
 						Community.builder()
 								.id("123")
 								.title("Java User Group")
+								.type(CommunityType.OPENED)
 								.description("New community for Java developers")
 								.build()
 				);
@@ -152,6 +160,7 @@ class CommunityCommandServiceTests {
 				Community.builder()
 						.id("123")
 						.title("Java User Group")
+						.type(CommunityType.OPENED)
 						.description("New community for Java developers")
 						.build()
 		);
@@ -160,6 +169,7 @@ class CommunityCommandServiceTests {
 		assertThat(community.getId()).isNotNull();
 		assertThat(community.getId()).isEqualTo("123");
 		assertThat(community.getTitle()).isEqualTo("Java User Group");
+		assertThat(community.getType()).isEqualTo(CommunityType.OPENED);
 		assertThat(community.getDescription()).isEqualTo("New community for Java developers");
 	}
 
