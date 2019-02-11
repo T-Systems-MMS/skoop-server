@@ -5,6 +5,7 @@ import io.knowledgeassets.myskills.server.community.CommunityRepository;
 import io.knowledgeassets.myskills.server.exception.DuplicateResourceException;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.exception.enums.Model;
+import io.knowledgeassets.myskills.server.security.CurrentUserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,14 +13,18 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static java.lang.String.format;
+import static java.util.Collections.singletonList;
 
 @Service
 public class CommunityCommandService {
 
 	private final CommunityRepository communityRepository;
+	private final CurrentUserService currentUserService;
 
-	public CommunityCommandService(CommunityRepository communityRepository) {
+	public CommunityCommandService(CommunityRepository communityRepository,
+								   CurrentUserService currentUserService) {
 		this.communityRepository = communityRepository;
+		this.currentUserService = currentUserService;
 	}
 
 	@Transactional
@@ -30,6 +35,8 @@ public class CommunityCommandService {
 					.build();
 		});
 		final LocalDateTime now = LocalDateTime.now();
+		community.setManagers(singletonList(currentUserService.getCurrentUser()));
+		community.setMembers(singletonList(currentUserService.getCurrentUser()));
 		community.setCreationDate(now);
 		community.setLastModifiedDate(now);
 		community.setId(UUID.randomUUID().toString());

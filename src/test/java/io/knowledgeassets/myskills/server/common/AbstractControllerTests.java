@@ -1,5 +1,6 @@
 package io.knowledgeassets.myskills.server.common;
 
+import io.knowledgeassets.myskills.server.community.query.CommunityQueryService;
 import io.knowledgeassets.myskills.server.security.MethodSecurityConfiguration;
 import io.knowledgeassets.myskills.server.user.UserPermissionScope;
 import io.knowledgeassets.myskills.server.user.query.UserPermissionQueryService;
@@ -29,6 +30,8 @@ public abstract class AbstractControllerTests {
 	private JwtDecoder jwtDecoder;
 	@MockBean
 	protected UserPermissionQueryService userPermissionQueryService;
+	@MockBean
+	protected CommunityQueryService communityQueryService;
 
 	@BeforeEach
 	void prepareUserPermissions() {

@@ -1,5 +1,6 @@
 package io.knowledgeassets.myskills.server.community;
 
+import io.knowledgeassets.myskills.server.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -40,5 +41,11 @@ public class Community {
 	@NotNull
 	@Property(name = "lastModifiedDate")
 	private LocalDateTime lastModifiedDate;
+
+	@Relationship(type = "HAS_MEMBER", direction = Relationship.UNDIRECTED)
+	private List<User> members;
+
+	@Relationship(type = "MANAGED_BY", direction = Relationship.UNDIRECTED)
+	private List<User> managers;
 
 }

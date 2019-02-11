@@ -4,6 +4,7 @@ import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.community.CommunityRepository;
 import io.knowledgeassets.myskills.server.community.CommunityType;
 import io.knowledgeassets.myskills.server.community.Link;
+import io.knowledgeassets.myskills.server.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static java.util.stream.Collectors.toList;
+import static java.util.Collections.singletonList;
 
 @ExtendWith(MockitoExtension.class)
 class CommunityQueryServiceTests {
@@ -54,6 +56,14 @@ class CommunityQueryServiceTests {
 										.href("https://www.linkedin.com/java-user-group")
 										.build()
 						))
+						.managers(singletonList(User.builder()
+								.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+								.userName("tester")
+								.build()))
+						.members(singletonList(User.builder()
+								.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+								.userName("tester")
+								.build()))
 						.build()
 		));
 		final Optional<Community> community = communityQueryService.getCommunityById("123");
@@ -71,6 +81,12 @@ class CommunityQueryServiceTests {
 						.href("https://www.linkedin.com/java-user-group")
 						.build()
 		));
+		assertThat(community.get().getManagers()).hasSize(1);
+		assertThat(community.get().getManagers().get(0).getId()).isEqualTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2");
+		assertThat(community.get().getManagers().get(0).getUserName()).isEqualTo("tester");
+		assertThat(community.get().getMembers()).hasSize(1);
+		assertThat(community.get().getMembers().get(0).getId()).isEqualTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2");
+		assertThat(community.get().getMembers().get(0).getUserName()).isEqualTo("tester");
 	}
 
 	@Test
@@ -92,6 +108,14 @@ class CommunityQueryServiceTests {
 												.href("https://www.linkedin.com/java-user-group")
 												.build()
 								))
+								.managers(singletonList(User.builder()
+										.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+										.userName("tester")
+										.build()))
+								.members(singletonList(User.builder()
+										.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+										.userName("tester")
+										.build()))
 								.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
 								.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
 								.build(),
@@ -110,6 +134,14 @@ class CommunityQueryServiceTests {
 												.href("https://www.linkedin.com/scala-user-group")
 												.build()
 								))
+								.managers(singletonList(User.builder()
+										.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+										.userName("tester")
+										.build()))
+								.members(singletonList(User.builder()
+										.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+										.userName("tester")
+										.build()))
 								.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
 								.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
 								.build())
@@ -135,6 +167,12 @@ class CommunityQueryServiceTests {
 						.href("https://www.linkedin.com/java-user-group")
 						.build()
 		));
+		assertThat(community.getManagers()).hasSize(1);
+		assertThat(community.getManagers().get(0).getId()).isEqualTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2");
+		assertThat(community.getManagers().get(0).getUserName()).isEqualTo("tester");
+		assertThat(community.getMembers()).hasSize(1);
+		assertThat(community.getMembers().get(0).getId()).isEqualTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2");
+		assertThat(community.getMembers().get(0).getUserName()).isEqualTo("tester");
 		community = communityList.get(1);
 		assertThat(community.getId()).isEqualTo("456");
 		assertThat(community.getTitle()).isEqualTo("Scala User Group");
@@ -150,6 +188,12 @@ class CommunityQueryServiceTests {
 						.href("https://www.linkedin.com/scala-user-group")
 						.build()
 		));
+		assertThat(community.getManagers()).hasSize(1);
+		assertThat(community.getManagers().get(0).getId()).isEqualTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2");
+		assertThat(community.getManagers().get(0).getUserName()).isEqualTo("tester");
+		assertThat(community.getMembers()).hasSize(1);
+		assertThat(community.getMembers().get(0).getId()).isEqualTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2");
+		assertThat(community.getMembers().get(0).getUserName()).isEqualTo("tester");
 	}
 
 }

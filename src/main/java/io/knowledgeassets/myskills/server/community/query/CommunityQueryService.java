@@ -28,4 +28,9 @@ public class CommunityQueryService {
 		return communityRepository.findById(communityId);
 	}
 
+	@Transactional(readOnly = true)
+	public boolean hasCommunityManagerRole(String userId, String communityId) {
+		return communityRepository.hasCommunityManagerRole(userId, communityId);
+	}
+
 }
