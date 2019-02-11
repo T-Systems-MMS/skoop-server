@@ -13,5 +13,6 @@
 		}
 	],
 	"managerIds": [ "1f37fb2a-b4d0-4119-9113-4677beb20ae2" ],
-	"memberIds": [ "1f37fb2a-b4d0-4119-9113-4677beb20ae2" ]
+	"memberIds": [ "1f37fb2a-b4d0-4119-9113-4677beb20ae2" ],
+	"skillIds": ["4f09647e-c7d3-4aa6-ab3d-0faff66b951f", "6d0870d0-a7b8-4cf4-8a24-bedcfe350903"]
 }

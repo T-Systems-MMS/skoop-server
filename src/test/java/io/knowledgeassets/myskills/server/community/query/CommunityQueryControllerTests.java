@@ -4,6 +4,7 @@ import io.knowledgeassets.myskills.server.common.AbstractControllerTests;
 import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.community.CommunityType;
 import io.knowledgeassets.myskills.server.community.Link;
+import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.user.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,6 +44,22 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
 				.build();
+
+		final Skill springBootSkill = Skill.builder()
+				.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
+				.name("Spring Boot")
+				.build();
+
+		final Skill angularSkill = Skill.builder()
+				.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
+				.name("Angular")
+				.build();
+
+		final Skill javascriptSkill = Skill.builder()
+				.id("10ea2af6-cd81-48e0-b339-0576d16b9d19")
+				.name("JavaScript")
+				.build();
+
 		given(communityQueryService.getCommunities()).willReturn(
 				Stream.of(
 						Community.builder()
@@ -64,6 +81,7 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 								.members(singletonList(owner))
 								.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
 								.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
+								.skills(Arrays.asList(springBootSkill, angularSkill))
 								.build(),
 						Community.builder()
 								.id("456")
@@ -84,6 +102,7 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 								.members(singletonList(owner))
 								.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
 								.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
+								.skills(Arrays.asList(springBootSkill, javascriptSkill))
 								.build()
 				)
 		);
@@ -106,6 +125,10 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[0].managers[0].userName", is(equalTo("tester"))))
 				.andExpect(jsonPath("$[0].members[0].id", is(equalTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))))
 				.andExpect(jsonPath("$[0].members[0].userName", is(equalTo("tester"))))
+				.andExpect(jsonPath("$[0].skills[0].id", is(equalTo("4f09647e-c7d3-4aa6-ab3d-0faff66b951f"))))
+				.andExpect(jsonPath("$[0].skills[0].name", is(equalTo("Spring Boot"))))
+				.andExpect(jsonPath("$[0].skills[1].id", is(equalTo("6d0870d0-a7b8-4cf4-8a24-bedcfe350903"))))
+				.andExpect(jsonPath("$[0].skills[1].name", is(equalTo("Angular"))))
 				.andExpect(jsonPath("$[1].id", is(equalTo("456"))))
 				.andExpect(jsonPath("$[1].title", is(equalTo("Scala User Group"))))
 				.andExpect(jsonPath("$[1].type", is(equalTo("OPENED"))))
@@ -117,7 +140,11 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[1].managers[0].id", is(equalTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))))
 				.andExpect(jsonPath("$[1].managers[0].userName", is(equalTo("tester"))))
 				.andExpect(jsonPath("$[1].members[0].id", is(equalTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))))
-				.andExpect(jsonPath("$[1].members[0].userName", is(equalTo("tester"))));
+				.andExpect(jsonPath("$[1].members[0].userName", is(equalTo("tester"))))
+				.andExpect(jsonPath("$[1].skills[0].id", is(equalTo("4f09647e-c7d3-4aa6-ab3d-0faff66b951f"))))
+				.andExpect(jsonPath("$[1].skills[0].name", is(equalTo("Spring Boot"))))
+				.andExpect(jsonPath("$[1].skills[1].id", is(equalTo("10ea2af6-cd81-48e0-b339-0576d16b9d19"))))
+				.andExpect(jsonPath("$[1].skills[1].name", is(equalTo("JavaScript"))));
 	}
 
 	@Test
@@ -127,6 +154,17 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
 				.build();
+
+		final Skill springBootSkill = Skill.builder()
+				.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
+				.name("Spring Boot")
+				.build();
+
+		final Skill angularSkill = Skill.builder()
+				.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
+				.name("Angular")
+				.build();
+
 		given(communityQueryService.getCommunityById("456")).willReturn(
 				Optional.of(
 						Community.builder()
@@ -148,6 +186,7 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 								.members(singletonList(owner))
 								.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
 								.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
+								.skills(Arrays.asList(springBootSkill, angularSkill))
 								.build()
 				)
 		);
@@ -169,7 +208,11 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$.managers[0].id", is(equalTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))))
 				.andExpect(jsonPath("$.managers[0].userName", is(equalTo("tester"))))
 				.andExpect(jsonPath("$.members[0].id", is(equalTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))))
-				.andExpect(jsonPath("$.members[0].userName", is(equalTo("tester"))));
+				.andExpect(jsonPath("$.members[0].userName", is(equalTo("tester"))))
+				.andExpect(jsonPath("$.skills[0].id", is(equalTo("4f09647e-c7d3-4aa6-ab3d-0faff66b951f"))))
+				.andExpect(jsonPath("$.skills[0].name", is(equalTo("Spring Boot"))))
+				.andExpect(jsonPath("$.skills[1].id", is(equalTo("6d0870d0-a7b8-4cf4-8a24-bedcfe350903"))))
+				.andExpect(jsonPath("$.skills[1].name", is(equalTo("Angular"))));
 	}
 
 	@Test

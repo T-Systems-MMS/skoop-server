@@ -3,7 +3,6 @@ package io.knowledgeassets.myskills.server.userskill.query;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.exception.enums.Model;
 import io.knowledgeassets.myskills.server.skill.SkillResponse;
-import io.knowledgeassets.myskills.server.user.UserResponse;
 import io.knowledgeassets.myskills.server.user.UserSimpleResponse;
 import io.knowledgeassets.myskills.server.userskill.UserSkillResponse;
 import io.swagger.annotations.Api;
@@ -44,11 +43,7 @@ public class UserSkillQueryController {
 	public List<UserSkillResponse> getUserSkills(@PathVariable("userId") String userId) {
 		return userSkillQueryService.getUserSkillsByUserId(userId)
 				.map(userSkill -> UserSkillResponse.builder()
-						.skill(SkillResponse.builder()
-								.id(userSkill.getSkill().getId())
-								.name(userSkill.getSkill().getName())
-								.description(userSkill.getSkill().getDescription())
-								.build())
+						.skill(SkillResponse.of(userSkill.getSkill()))
 						.currentLevel(userSkill.getCurrentLevel())
 						.desiredLevel(userSkill.getDesiredLevel())
 						.priority(userSkill.getPriority())
@@ -72,11 +67,7 @@ public class UserSkillQueryController {
 										  @PathVariable("skillId") String skillId) {
 		return userSkillQueryService.getUserSkillByUserIdAndSkillId(userId, skillId)
 				.map(userSkill -> UserSkillResponse.builder()
-						.skill(SkillResponse.builder()
-								.id(userSkill.getSkill().getId())
-								.name(userSkill.getSkill().getName())
-								.description(userSkill.getSkill().getDescription())
-								.build())
+						.skill(SkillResponse.of(userSkill.getSkill()))
 						.currentLevel(userSkill.getCurrentLevel())
 						.desiredLevel(userSkill.getDesiredLevel())
 						.priority(userSkill.getPriority())

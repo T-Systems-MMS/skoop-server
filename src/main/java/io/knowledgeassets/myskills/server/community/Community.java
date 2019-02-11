@@ -1,10 +1,13 @@
 package io.knowledgeassets.myskills.server.community;
 
+import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Property;
@@ -42,10 +45,19 @@ public class Community {
 	@Property(name = "lastModifiedDate")
 	private LocalDateTime lastModifiedDate;
 
+	@ToString.Exclude
+	@EqualsAndHashCode.Exclude
 	@Relationship(type = "HAS_MEMBER", direction = Relationship.UNDIRECTED)
 	private List<User> members;
 
+	@ToString.Exclude
+	@EqualsAndHashCode.Exclude
 	@Relationship(type = "MANAGED_BY", direction = Relationship.UNDIRECTED)
 	private List<User> managers;
+
+	@ToString.Exclude
+	@EqualsAndHashCode.Exclude
+	@Relationship(type = "RELATES_TO", direction = Relationship.OUTGOING)
+	private List<Skill> skills;
 
 }

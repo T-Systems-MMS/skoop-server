@@ -1,5 +1,7 @@
 package io.knowledgeassets.myskills.server.community;
 
+import io.knowledgeassets.myskills.server.skill.Skill;
+import io.knowledgeassets.myskills.server.skill.SkillResponse;
 import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.user.UserSimpleResponse;
 import io.swagger.annotations.ApiModel;
@@ -10,7 +12,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 @Data
 @Builder
@@ -43,6 +46,9 @@ public class CommunityResponse {
 	@ApiModelProperty("List of community members.")
 	private List<UserSimpleResponse> members;
 
+	@ApiModelProperty("List of skills associated with a community.")
+	private List<SkillResponse> skills;
+
 	public static CommunityResponse of(Community community) {
 		return CommunityResponse.builder()
 				.id(community.getId())
@@ -52,6 +58,7 @@ public class CommunityResponse {
 				.links(convertLinkListToLinkResponseList(community.getLinks()))
 				.managers(convertUserListToUserSimpleResponseList(community.getManagers()))
 				.members(convertUserListToUserSimpleResponseList(community.getMembers()))
+				.skills(convertSkillListToSkillResponseList(community.getSkills()))
 				.build();
 	}
 
@@ -63,14 +70,21 @@ public class CommunityResponse {
 				.name(l.getName())
 				.href(l.getHref())
 				.build()
-		).collect(Collectors.toList());
+		).collect(toList());
+	}
+
+	private static List<SkillResponse> convertSkillListToSkillResponseList(List<Skill> skills) {
+		if (skills == null) {
+			return null;
+		}
+		return skills.stream().map(SkillResponse::of).collect(toList());
 	}
 
 	private static List<UserSimpleResponse> convertUserListToUserSimpleResponseList(List<User> users) {
 		if (users == null) {
 			return null;
 		}
-		return users.stream().map(UserSimpleResponse::of).collect(Collectors.toList());
+		return users.stream().map(UserSimpleResponse::of).collect(toList());
 	}
 
 }
