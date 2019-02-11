@@ -1,5 +1,6 @@
 package io.knowledgeassets.myskills.server.community;
 
+import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.user.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -108,6 +109,43 @@ class CommunityRepositoryTests {
 		assertThat(community.get().getMembers()).hasSize(1);
 		assertThat(community.get().getMembers().get(0).getId()).isEqualTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2");
 		assertThat(community.get().getMembers().get(0).getUserName()).isEqualTo("tester");
+	}
+
+	@Test
+	@DisplayName("Saves community with skills")
+	void saveCommunityWithSkills() {
+		// Given
+		Community c = communityRepository.save(
+				Community.builder()
+						.id("123")
+						.title("Java User Group")
+						.type(CommunityType.OPENED)
+						.description("Community for Java developers")
+						.skills(Arrays.asList(Skill.builder()
+										.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
+										.name("Spring Boot")
+										.build(),
+								Skill.builder()
+										.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
+										.name("Angular")
+										.build()))
+						.build()
+		);
+		// When
+		Optional<Community> community = communityRepository.findById(c.getId());
+		// Then
+		assertThat(community).isNotEmpty();
+		assertThat(community.get().getId()).isEqualTo("123");
+		assertThat(community.get().getTitle()).isEqualTo("Java User Group");
+		assertThat(community.get().getType()).isEqualTo(CommunityType.OPENED);
+		assertThat(community.get().getDescription()).isEqualTo("Community for Java developers");
+		assertThat(community.get().getSkills()).contains(Skill.builder()
+				.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
+				.name("Spring Boot")
+				.build(), Skill.builder()
+				.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
+				.name("Angular")
+				.build());
 	}
 
 }

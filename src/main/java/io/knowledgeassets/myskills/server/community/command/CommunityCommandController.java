@@ -5,6 +5,8 @@ import io.knowledgeassets.myskills.server.community.CommunityRequest;
 import io.knowledgeassets.myskills.server.community.CommunityResponse;
 import io.knowledgeassets.myskills.server.community.Link;
 import io.knowledgeassets.myskills.server.community.ValidUpdateCommunityRequest;
+import io.knowledgeassets.myskills.server.skill.Skill;
+import io.knowledgeassets.myskills.server.skill.query.SkillQueryService;
 import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.user.query.UserQueryService;
 import io.swagger.annotations.Api;
@@ -36,11 +38,14 @@ public class CommunityCommandController {
 
 	private final CommunityCommandService communityCommandService;
 	private final UserQueryService userQueryService;
+	private final SkillQueryService skillQueryService;
 
 	public CommunityCommandController(CommunityCommandService communityCommandService,
-									  UserQueryService userQueryService) {
+									  UserQueryService userQueryService,
+									  SkillQueryService skillQueryService) {
 		this.communityCommandService = communityCommandService;
 		this.userQueryService = userQueryService;
+		this.skillQueryService = skillQueryService;
 	}
 
 	@ApiOperation(value = "Create new community",
@@ -108,6 +113,10 @@ public class CommunityCommandController {
 		if (communityRequest.getMemberIds() != null) {
 			members = userQueryService.getUsersByIds(communityRequest.getMemberIds()).collect(toList());
 		}
+		List<Skill> skills = null;
+		if (communityRequest.getSkillIds() != null) {
+			skills = skillQueryService.getSkillsByIds(communityRequest.getSkillIds()).collect(toList());
+		}
 		return Community.builder()
 				.title(communityRequest.getTitle())
 				.type(communityRequest.getType())
@@ -115,6 +124,7 @@ public class CommunityCommandController {
 				.links(convertLinkRequestListToLinkList(communityRequest))
 				.managers(managers)
 				.members(members)
+				.skills(skills)
 				.build();
 	}
 

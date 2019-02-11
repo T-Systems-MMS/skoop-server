@@ -6,9 +6,12 @@ import io.knowledgeassets.myskills.server.skill.SkillRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
+import static java.util.stream.StreamSupport.stream;
 
 @Service
 public class SkillQueryService {
@@ -52,4 +55,10 @@ public class SkillQueryService {
 	public Boolean isSkillExist(String search) {
 		return skillRepository.isSkillExistByNameIgnoreCase(search);
 	}
+
+	@Transactional(readOnly = true)
+	public Stream<Skill> getSkillsByIds(List<String> skillIds) {
+		return stream(skillRepository.findAllById(skillIds).spliterator(), false);
+	}
+
 }

@@ -4,6 +4,7 @@ import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.community.CommunityRepository;
 import io.knowledgeassets.myskills.server.community.CommunityType;
 import io.knowledgeassets.myskills.server.community.Link;
+import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -40,6 +41,17 @@ class CommunityQueryServiceTests {
 	@Test
 	@DisplayName("Retrieves community by id")
 	void retrievesCommunityById() {
+
+		final Skill springBootSkill = Skill.builder()
+				.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
+				.name("Spring Boot")
+				.build();
+
+		final Skill angularSkill = Skill.builder()
+				.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
+				.name("Angular")
+				.build();
+
 		given(communityRepository.findById("123")).willReturn(Optional.of(
 				Community.builder()
 						.id("123")
@@ -64,6 +76,7 @@ class CommunityQueryServiceTests {
 								.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 								.userName("tester")
 								.build()))
+						.skills(Arrays.asList(springBootSkill, angularSkill))
 						.build()
 		));
 		final Optional<Community> community = communityQueryService.getCommunityById("123");
@@ -87,11 +100,35 @@ class CommunityQueryServiceTests {
 		assertThat(community.get().getMembers()).hasSize(1);
 		assertThat(community.get().getMembers().get(0).getId()).isEqualTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2");
 		assertThat(community.get().getMembers().get(0).getUserName()).isEqualTo("tester");
+		assertThat(community.get().getSkills()).hasSize(2);
+		assertThat(community.get().getSkills()).contains(Skill.builder()
+				.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
+				.name("Spring Boot")
+				.build(), Skill.builder()
+				.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
+				.name("Angular")
+				.build());
 	}
 
 	@Test
 	@DisplayName("Returns a stream of all communities from the data repository")
 	void returnsStreamOfCommunities() {
+
+		final Skill springBootSkill = Skill.builder()
+				.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
+				.name("Spring Boot")
+				.build();
+
+		final Skill angularSkill = Skill.builder()
+				.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
+				.name("Angular")
+				.build();
+
+		final Skill javascriptSkill = Skill.builder()
+				.id("10ea2af6-cd81-48e0-b339-0576d16b9d19")
+				.name("JavaScript")
+				.build();
+
 		given(communityRepository.findAll()).willReturn(
 				Arrays.asList(Community.builder()
 								.id("123")
@@ -118,6 +155,7 @@ class CommunityQueryServiceTests {
 										.build()))
 								.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
 								.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
+								.skills(Arrays.asList(springBootSkill, angularSkill))
 								.build(),
 						Community.builder()
 								.id("456")
@@ -144,6 +182,7 @@ class CommunityQueryServiceTests {
 										.build()))
 								.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
 								.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
+								.skills(Arrays.asList(springBootSkill, javascriptSkill))
 								.build())
 		);
 
@@ -173,6 +212,13 @@ class CommunityQueryServiceTests {
 		assertThat(community.getMembers()).hasSize(1);
 		assertThat(community.getMembers().get(0).getId()).isEqualTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2");
 		assertThat(community.getMembers().get(0).getUserName()).isEqualTo("tester");
+		assertThat(community.getSkills()).contains(Skill.builder()
+				.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
+				.name("Spring Boot")
+				.build(), Skill.builder()
+				.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
+				.name("Angular")
+				.build());
 		community = communityList.get(1);
 		assertThat(community.getId()).isEqualTo("456");
 		assertThat(community.getTitle()).isEqualTo("Scala User Group");
@@ -194,6 +240,13 @@ class CommunityQueryServiceTests {
 		assertThat(community.getMembers()).hasSize(1);
 		assertThat(community.getMembers().get(0).getId()).isEqualTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2");
 		assertThat(community.getMembers().get(0).getUserName()).isEqualTo("tester");
+		assertThat(community.getSkills()).contains(Skill.builder()
+				.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
+				.name("Spring Boot")
+				.build(), Skill.builder()
+				.id("10ea2af6-cd81-48e0-b339-0576d16b9d19")
+				.name("JavaScript")
+				.build());
 	}
 
 }

@@ -7,6 +7,7 @@ import io.knowledgeassets.myskills.server.community.Link;
 import io.knowledgeassets.myskills.server.exception.DuplicateResourceException;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.security.CurrentUserService;
+import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -49,6 +50,17 @@ class CommunityCommandServiceTests {
 				.userName("tester")
 				.build());
 		given(communityRepository.findByTitleIgnoreCase("Java User Group")).willReturn(Optional.empty());
+
+		final Skill springBootSkill = Skill.builder()
+				.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
+				.name("Spring Boot")
+				.build();
+
+		final Skill angularSkill = Skill.builder()
+				.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
+				.name("Angular")
+				.build();
+
 		given(communityRepository.save(ArgumentMatchers.isA(Community.class)))
 				.willReturn(
 						Community.builder()
@@ -74,6 +86,7 @@ class CommunityCommandServiceTests {
 										.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 										.userName("tester")
 										.build()))
+								.skills(Arrays.asList(springBootSkill, angularSkill))
 								.build()
 				);
 
@@ -92,6 +105,7 @@ class CommunityCommandServiceTests {
 										.href("https://www.linkedin.com/java-user-group")
 										.build()
 						))
+						.skills(Arrays.asList(springBootSkill, angularSkill))
 						.build()
 		);
 
@@ -110,6 +124,13 @@ class CommunityCommandServiceTests {
 		assertThat(community.getMembers().get(0)).isEqualTo(User.builder()
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
+				.build());
+		assertThat(community.getSkills()).contains(Skill.builder()
+				.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
+				.name("Spring Boot")
+				.build(), Skill.builder()
+				.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
+				.name("Angular")
 				.build());
 	}
 
@@ -167,6 +188,17 @@ class CommunityCommandServiceTests {
 	@Test
 	@DisplayName("Tests if community is updated")
 	void testIfCommunityIsUpdated() {
+
+		final Skill springBootSkill = Skill.builder()
+				.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
+				.name("Spring Boot")
+				.build();
+
+		final Skill angularSkill = Skill.builder()
+				.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
+				.name("Angular")
+				.build();
+
 		given(communityRepository.findById("123")).willReturn(Optional.of(
 				Community.builder()
 						.id("123")
@@ -181,6 +213,7 @@ class CommunityCommandServiceTests {
 								.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 								.userName("tester")
 								.build()))
+						.skills(Arrays.asList(springBootSkill, angularSkill))
 						.build()
 		));
 		given(communityRepository.save(ArgumentMatchers.isA(Community.class)))
@@ -198,6 +231,7 @@ class CommunityCommandServiceTests {
 										.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 										.userName("tester")
 										.build()))
+								.skills(Arrays.asList(springBootSkill, angularSkill))
 								.build()
 				);
 
@@ -225,6 +259,13 @@ class CommunityCommandServiceTests {
 		assertThat(community.getMembers().get(0)).isEqualTo(User.builder()
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
+				.build());
+		assertThat(community.getSkills()).contains(Skill.builder()
+				.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
+				.name("Spring Boot")
+				.build(), Skill.builder()
+				.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
+				.name("Angular")
 				.build());
 	}
 

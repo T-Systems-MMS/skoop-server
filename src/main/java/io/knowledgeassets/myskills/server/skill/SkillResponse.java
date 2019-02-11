@@ -27,4 +27,13 @@ public class SkillResponse {
 
 	@EqualsAndHashCode.Exclude
 	private List<String> skillGroups;
+
+	public static SkillResponse of(Skill skill) {
+		return SkillResponse.builder()
+				.id(skill.getId())
+				.name(skill.getName())
+				.description(skill.getDescription())
+				.build();
+	}
+
 }

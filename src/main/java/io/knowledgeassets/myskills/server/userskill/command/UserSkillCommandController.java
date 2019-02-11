@@ -64,11 +64,7 @@ public class UserSkillCommandController {
 					.build();
 		}
 		return ResponseEntity.status(HttpStatus.CREATED).body(UserSkillResponse.builder()
-				.skill(SkillResponse.builder()
-						.id(userSkill.getSkill().getId())
-						.name(userSkill.getSkill().getName())
-						.description(userSkill.getSkill().getDescription())
-						.build())
+				.skill(SkillResponse.of(userSkill.getSkill()))
 				.currentLevel(userSkill.getCurrentLevel())
 				.desiredLevel(userSkill.getDesiredLevel())
 				.priority(userSkill.getPriority())
@@ -105,11 +101,7 @@ public class UserSkillCommandController {
 			throw e;
 		}
 		return UserSkillResponse.builder()
-				.skill(SkillResponse.builder()
-						.id(userSkill.getSkill().getId())
-						.name(userSkill.getSkill().getName())
-						.description(userSkill.getSkill().getDescription())
-						.build())
+				.skill(SkillResponse.of(userSkill.getSkill()))
 				.currentLevel(userSkill.getCurrentLevel())
 				.desiredLevel(userSkill.getDesiredLevel())
 				.priority(userSkill.getPriority())

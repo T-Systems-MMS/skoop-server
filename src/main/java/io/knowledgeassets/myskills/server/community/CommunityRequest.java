@@ -39,4 +39,7 @@ public class CommunityRequest {
 	@ApiModelProperty("List of member identifiers.")
 	private List<String> memberIds;
 
+	@ApiModelProperty("List of skill identifiers.")
+	private List<String> skillIds;
+
 }

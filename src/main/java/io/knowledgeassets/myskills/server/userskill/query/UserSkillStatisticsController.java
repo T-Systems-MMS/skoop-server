@@ -39,11 +39,7 @@ public class UserSkillStatisticsController {
 	public List<UserSkillPriorityAggregationResponse> getTop10PrioritizedSkills() {
 		return userSkillQueryService.getTop10UserSkillPriorityAggregationResults()
 				.map(aggregationResult -> UserSkillPriorityAggregationResponse.builder()
-						.skill(SkillResponse.builder()
-								.id(aggregationResult.getSkill().getId())
-								.name(aggregationResult.getSkill().getName())
-								.description(aggregationResult.getSkill().getDescription())
-								.build())
+						.skill(SkillResponse.of(aggregationResult.getSkill()))
 						.averagePriority(aggregationResult.getAveragePriority())
 						.maximumPriority(aggregationResult.getMaximumPriority())
 						.userCount(aggregationResult.getUserCount())
