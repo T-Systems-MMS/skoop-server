@@ -24,6 +24,9 @@ public class CommunityRequest {
 	@NotEmpty
 	private String title;
 
+	@ApiModelProperty("Type of a community.")
+	private CommunityType type;
+
 	@ApiModelProperty("Description of a community.")
 	private String description;
 

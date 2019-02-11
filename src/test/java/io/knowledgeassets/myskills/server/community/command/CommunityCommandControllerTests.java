@@ -2,6 +2,7 @@ package io.knowledgeassets.myskills.server.community.command;
 
 import io.knowledgeassets.myskills.server.common.AbstractControllerTests;
 import io.knowledgeassets.myskills.server.community.Community;
+import io.knowledgeassets.myskills.server.community.CommunityType;
 import io.knowledgeassets.myskills.server.community.Link;
 import io.knowledgeassets.myskills.server.user.User;
 import org.junit.jupiter.api.DisplayName;
@@ -49,6 +50,7 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 		final ClassPathResource body = new ClassPathResource("community/create-community.json");
 		final Community community = Community.builder()
 				.title("Java User Group")
+				.type(CommunityType.OPENED)
 				.description("Community for Java developers")
 				.links(Arrays.asList(
 						Link.builder()
@@ -65,6 +67,7 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 				Community.builder()
 						.id("123")
 						.title("Java User Group")
+						.type(CommunityType.OPENED)
 						.description("Community for Java developers")
 						.links(Arrays.asList(
 								Link.builder()
@@ -91,6 +94,7 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 					.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 					.andExpect(jsonPath("$.id", is(equalTo("123"))))
 					.andExpect(jsonPath("$.title", is(equalTo("Java User Group"))))
+					.andExpect(jsonPath("$.type", is(equalTo("OPENED"))))
 					.andExpect(jsonPath("$.description", is(equalTo("Community for Java developers"))))
 					.andExpect(jsonPath("$.links[0].name", is(equalTo("Facebook"))))
 					.andExpect(jsonPath("$.links[0].href", is(equalTo("https://www.facebook.com/java-user-group"))))
@@ -162,6 +166,7 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 		final Community community = Community.builder()
 				.id("123")
 				.title("Java User Group")
+				.type(CommunityType.OPENED)
 				.description("New community for Java developers")
 				.links(Arrays.asList(
 						Link.builder()
@@ -178,6 +183,7 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 				Community.builder()
 						.id("123")
 						.title("Java User Group")
+						.type(CommunityType.OPENED)
 						.description("New community for java developers")
 						.links(Arrays.asList(
 								Link.builder()
@@ -204,6 +210,7 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 					.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 					.andExpect(jsonPath("$.id", is(equalTo("123"))))
 					.andExpect(jsonPath("$.title", is(equalTo("Java User Group"))))
+					.andExpect(jsonPath("$.type", is(equalTo("OPENED"))))
 					.andExpect(jsonPath("$.description", is(equalTo("New community for java developers"))))
 					.andExpect(jsonPath("$.links[0].name", is(equalTo("Facebook"))))
 					.andExpect(jsonPath("$.links[0].href", is(equalTo("https://www.facebook.com/java-user-group"))))

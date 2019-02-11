@@ -26,6 +26,9 @@ public class CommunityResponse {
 	@ApiModelProperty("Title of a community.")
 	private String title;
 
+	@ApiModelProperty("Type of a community.")
+	private CommunityType type;
+
 	@ApiModelProperty("Description of a community.")
 	private String description;
 
@@ -36,6 +39,7 @@ public class CommunityResponse {
 		return CommunityResponse.builder()
 				.id(community.getId())
 				.title(community.getTitle())
+				.type(community.getType())
 				.description(community.getDescription())
 				.links(convertLinkListToListResponseList(community.getLinks()))
 				.build();

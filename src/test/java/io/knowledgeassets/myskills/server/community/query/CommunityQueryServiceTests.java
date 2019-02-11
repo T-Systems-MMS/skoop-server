@@ -2,6 +2,7 @@ package io.knowledgeassets.myskills.server.community.query;
 
 import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.community.CommunityRepository;
+import io.knowledgeassets.myskills.server.community.CommunityType;
 import io.knowledgeassets.myskills.server.community.Link;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -41,6 +42,7 @@ class CommunityQueryServiceTests {
 				Community.builder()
 						.id("123")
 						.title("Java User Group")
+						.type(CommunityType.OPENED)
 						.description("Community for Java developers")
 						.links(Arrays.asList(
 								Link.builder()
@@ -58,6 +60,7 @@ class CommunityQueryServiceTests {
 		assertThat(community).isNotEmpty();
 		assertThat(community.get().getId()).isEqualTo("123");
 		assertThat(community.get().getTitle()).isEqualTo("Java User Group");
+		assertThat(community.get().getType()).isEqualTo(CommunityType.OPENED);
 		assertThat(community.get().getLinks()).isEqualTo(Arrays.asList(
 				Link.builder()
 						.name("Facebook")
@@ -77,6 +80,7 @@ class CommunityQueryServiceTests {
 				Arrays.asList(Community.builder()
 								.id("123")
 								.title("Java User Group")
+								.type(CommunityType.OPENED)
 								.description("Community for Java developers")
 								.links(Arrays.asList(
 										Link.builder()
@@ -94,6 +98,7 @@ class CommunityQueryServiceTests {
 						Community.builder()
 								.id("456")
 								.title("Scala User Group")
+								.type(CommunityType.OPENED)
 								.description("Community for Scala developers")
 								.links(Arrays.asList(
 										Link.builder()
@@ -118,6 +123,7 @@ class CommunityQueryServiceTests {
 		Community community = communityList.get(0);
 		assertThat(community.getId()).isEqualTo("123");
 		assertThat(community.getTitle()).isEqualTo("Java User Group");
+		assertThat(community.getType()).isEqualTo(CommunityType.OPENED);
 		assertThat(community.getDescription()).isEqualTo("Community for Java developers");
 		assertThat(community.getLinks()).isEqualTo(Arrays.asList(
 				Link.builder()
@@ -132,6 +138,7 @@ class CommunityQueryServiceTests {
 		community = communityList.get(1);
 		assertThat(community.getId()).isEqualTo("456");
 		assertThat(community.getTitle()).isEqualTo("Scala User Group");
+		assertThat(community.getType()).isEqualTo(CommunityType.OPENED);
 		assertThat(community.getDescription()).isEqualTo("Community for Scala developers");
 		assertThat(community.getLinks()).isEqualTo(Arrays.asList(
 				Link.builder()

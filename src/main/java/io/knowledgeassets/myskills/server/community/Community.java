@@ -27,6 +27,8 @@ public class Community {
 	@NotBlank
 	@Property(name = "title")
 	private String title;
+	@Property(name = "type")
+	private CommunityType type;
 	@Property(name = "description")
 	private String description;
 	@Relationship(type = "HAS_LINK", direction = Relationship.UNDIRECTED)

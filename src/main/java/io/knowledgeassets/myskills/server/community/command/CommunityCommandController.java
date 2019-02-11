@@ -92,6 +92,7 @@ public class CommunityCommandController {
 	private Community convertCommunityRequestToCommunityDomain(CommunityRequest communityRequest) {
 		return Community.builder()
 				.title(communityRequest.getTitle())
+				.type(communityRequest.getType())
 				.description(communityRequest.getDescription())
 				.links(convertLinkRequestListToLinkList(communityRequest))
 				.build();
