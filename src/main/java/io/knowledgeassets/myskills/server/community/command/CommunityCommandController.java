@@ -104,6 +104,22 @@ public class CommunityCommandController {
 		return ResponseEntity.noContent().build();
 	}
 
+	@ApiOperation(value = "Authenticated user joins the community as member.",
+			notes = "Authenticated user joins the community as member.")
+	@ApiResponses({
+			@ApiResponse(code = 201, message = "Successful execution"),
+			@ApiResponse(code = 400, message = "Invalid input data, e.g. missing mandatory data or community name exists"),
+			@ApiResponse(code = 401, message = "Invalid authentication"),
+			@ApiResponse(code = 403, message = "Insufficient privileges to perform this operation"),
+			@ApiResponse(code = 500, message = "Error during execution")
+	})
+	@PostMapping(path = "/communities/{communityId}/members")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<CommunityResponse> joinCommunityAsMember(@PathVariable("communityId") String communityId) {
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(CommunityResponse.of(communityCommandService.joinCommunityAsMember(communityId)));
+	}
+
 	private Community convertCommunityRequestToCommunityDomain(CommunityRequest communityRequest) {
 		List<User> managers = null;
 		if (communityRequest.getManagerIds() != null) {

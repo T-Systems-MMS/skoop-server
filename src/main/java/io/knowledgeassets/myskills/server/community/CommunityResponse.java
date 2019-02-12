@@ -62,6 +62,18 @@ public class CommunityResponse {
 				.build();
 	}
 
+	public static CommunityResponse simple(Community community) {
+		return CommunityResponse.builder()
+				.id(community.getId())
+				.title(community.getTitle())
+				.type(community.getType())
+				.description(community.getDescription())
+				.links(convertLinkListToLinkResponseList(community.getLinks()))
+				.managers(convertUserListToUserSimpleResponseList(community.getManagers()))
+				.skills(convertSkillListToSkillResponseList(community.getSkills()))
+				.build();
+	}
+
 	private static List<LinkResponse> convertLinkListToLinkResponseList(List<Link> links) {
 		if (links == null) {
 			return null;
