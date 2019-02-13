@@ -191,7 +191,7 @@ class SkillCommandServiceTests {
 
 	@Test
 	@DisplayName("Delete non existent skill throws an exception")
-	void delete() {
+	void deleteNonExistentSkillThrowsException() {
 		given(skillRepository.findById("123")).willReturn(Optional.empty());
 		assertThrows(NoSuchResourceException.class, () -> skillCommandService.deleteSkill("123"));
 	}
