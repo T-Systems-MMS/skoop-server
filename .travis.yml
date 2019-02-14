@@ -1,7 +1,13 @@
+addons:
+  sonarcloud:
+    organization: "knowledgeassets"
+    token:
+      secure: $SONAR_TOKEN
 language: java
 jdk: openjdk11
 script:
 - ./mvnw install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
 - ./mvnw prepare-package -B -Ptravis
+- sonar-scanner
 after_success:
 - bash <(curl -s https://codecov.io/bash)
