@@ -468,4 +468,37 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 				.andExpect(status().isUnauthorized());
 	}
 
+	@Test
+	@DisplayName("Tests if authenticated user leaves the community.")
+	void testIfAuthenticatedUserLeavesCommunity() throws Exception {
+		final User owner = User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build();
+
+		given(communityCommandService.leaveCommunity("123")).willReturn(Community.builder()
+				.id("123")
+				.title("Java User Group")
+				.members(singletonList(User.builder()
+								.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
+								.userName("anotherTester")
+								.build()))
+				.build()
+		);
+
+		mockMvc.perform(delete("/communities/123/members")
+				.with(authentication(withUser(owner))))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id", is(equalTo("123"))))
+				.andExpect(jsonPath("$.title", is(equalTo("Java User Group"))))
+				.andExpect(jsonPath("$.members").doesNotExist());
+	}
+
+	@Test
+	@DisplayName("Tests if not authenticated user is not allowed to leave the community.")
+	void testIfNotAuthenticatedUserIsNotAllowedToLeaveCommunity() throws Exception {
+		mockMvc.perform(delete("/communities/123/members"))
+				.andExpect(status().isUnauthorized());
+	}
+
 }
