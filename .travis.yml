@@ -6,8 +6,6 @@ addons:
 language: java
 jdk: openjdk11
 script:
-- ./mvnw install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
-- sonar-scanner
-- ./mvnw prepare-package -B -Ptravis
+- ./mvnw install sonar:sonar -Ptravis -Dmaven.javadoc.skip=true -B -V
 after_success:
 - bash <(curl -s https://codecov.io/bash)
