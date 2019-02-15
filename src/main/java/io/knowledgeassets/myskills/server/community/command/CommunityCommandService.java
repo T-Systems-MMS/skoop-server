@@ -126,8 +126,11 @@ public class CommunityCommandService {
 					.searchParamsMap(searchParamsMap)
 					.build();
 		});
-		community.getMembers().stream().filter((User u) -> user.getId().equals(u.getId())).findAny()
-				.orElseThrow(() -> new InvalidInputException(format("The user \"%s\" is not a member of the community \"%s\"", user.getId(), community.getId())));
+
+		if (community.getMembers().stream().noneMatch((User u) -> user.getId().equals(u.getId()))) {
+			throw new InvalidInputException(format("The user \"%s\" is not a member of the community \"%s\"", user.getId(), community.getId()));
+		}
+
 		final List<User> newMemberList = community.getMembers().stream().filter((User u) -> !user.getId().equals(u.getId()))
 				.collect(toList());
 		community.setMembers(newMemberList);
