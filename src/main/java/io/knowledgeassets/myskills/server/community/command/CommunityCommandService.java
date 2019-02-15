@@ -5,6 +5,7 @@ import io.knowledgeassets.myskills.server.community.CommunityRepository;
 import io.knowledgeassets.myskills.server.community.CommunityType;
 import io.knowledgeassets.myskills.server.exception.CommunityAccessDeniedException;
 import io.knowledgeassets.myskills.server.exception.DuplicateResourceException;
+import io.knowledgeassets.myskills.server.exception.InvalidInputException;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.exception.enums.Model;
 import io.knowledgeassets.myskills.server.security.CurrentUserService;
@@ -19,7 +20,7 @@ import java.util.UUID;
 
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
-import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
 
 @Service
 public class CommunityCommandService {
@@ -58,8 +59,12 @@ public class CommunityCommandService {
 					.searchParamsMap(searchParamsMap)
 					.build();
 		});
-		community.setLastModifiedDate(LocalDateTime.now());
 		community.setCreationDate(p.getCreationDate());
+		return innerUpdate(community);
+	}
+
+	private Community innerUpdate(Community community) {
+		community.setLastModifiedDate(LocalDateTime.now());
 		return communityRepository.save(community);
 	}
 
@@ -93,7 +98,7 @@ public class CommunityCommandService {
 		if (CommunityType.OPENED.equals(community.getType())) {
 			final List<User> members;
 			if (community.getMembers() != null) {
-				members = community.getMembers();
+				members = new ArrayList<>(community.getMembers());
 			} else {
 				members = new ArrayList<>();
 			}
@@ -105,6 +110,31 @@ public class CommunityCommandService {
 			throw new CommunityAccessDeniedException(format("The community with ID \"%s\" is not an open one." +
 					" Only open communities can be joined without request.", communityId));
 		}
+	}
+
+	/**
+	 * Authenticated user leaves the community.
+	 * @param communityId - id of the community to leave
+	 */
+	@Transactional
+	public Community leaveCommunity(String communityId) {
+		final User user = currentUserService.getCurrentUser();
+		final Community community = communityRepository.findById(communityId).orElseThrow(() -> {
+			final String[] searchParamsMap = {"communityId", communityId};
+			return NoSuchResourceException.builder()
+					.model(Model.COMMUNITY)
+					.searchParamsMap(searchParamsMap)
+					.build();
+		});
+
+		if (community.getMembers().stream().noneMatch((User u) -> user.getId().equals(u.getId()))) {
+			throw new InvalidInputException(format("The user \"%s\" is not a member of the community \"%s\"", user.getId(), community.getId()));
+		}
+
+		final List<User> newMemberList = community.getMembers().stream().filter((User u) -> !user.getId().equals(u.getId()))
+				.collect(toList());
+		community.setMembers(newMemberList);
+		return innerUpdate(community);
 	}
 
 }

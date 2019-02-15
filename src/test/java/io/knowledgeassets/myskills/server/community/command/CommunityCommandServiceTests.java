@@ -6,6 +6,7 @@ import io.knowledgeassets.myskills.server.community.CommunityType;
 import io.knowledgeassets.myskills.server.community.Link;
 import io.knowledgeassets.myskills.server.exception.CommunityAccessDeniedException;
 import io.knowledgeassets.myskills.server.exception.DuplicateResourceException;
+import io.knowledgeassets.myskills.server.exception.InvalidInputException;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.security.CurrentUserService;
 import io.knowledgeassets.myskills.server.skill.Skill;
@@ -327,6 +328,17 @@ class CommunityCommandServiceTests {
 	}
 
 	@Test
+	@DisplayName("Tests if exception is thrown when authenticated user joins non-existent community.")
+	void testIfExceptionIsThrownWhenAuthenticatedUserJoinsNonExistentCommunity() {
+		given(currentUserService.getCurrentUser()).willReturn(User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build());
+		given(communityRepository.findById("123")).willReturn(Optional.empty());
+		assertThrows(NoSuchResourceException.class, () -> communityCommandService.joinCommunityAsMember("123"));
+	}
+
+	@Test
 	@DisplayName("Tests if an exception is thrown when joining closed community.")
 	void testIfExceptionIsThrownWhenJoiningClosedCommunity() {
 		given(currentUserService.getCurrentUser()).willReturn(User.builder()
@@ -341,6 +353,102 @@ class CommunityCommandServiceTests {
 						.build()
 		));
 		assertThrows(CommunityAccessDeniedException.class, () -> communityCommandService.joinCommunityAsMember("123"));
+	}
+
+	@Test
+	@DisplayName("Tests if authenticated user leaves the community.")
+	void testIfAuthenticatedUserLeavesCommunity() {
+
+		given(currentUserService.getCurrentUser()).willReturn(User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build());
+		given(communityRepository.findById("123")).willReturn(Optional.of(
+				Community.builder()
+						.id("123")
+						.title("Java User Group")
+						.members(Arrays.asList(
+								User.builder()
+										.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+										.userName("tester")
+										.build(),
+								User.builder()
+										.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
+										.userName("anotherTester")
+										.build()
+						))
+						.type(CommunityType.OPENED)
+						.build()
+		));
+
+		given(communityRepository.save(
+				argThat(allOf(
+						isA(Community.class),
+						hasProperty("id", is("123")),
+						hasProperty("title", is("Java User Group")),
+						hasProperty("members", equalTo(singletonList(User.builder()
+								.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
+								.userName("anotherTester")
+								.build()
+						)))
+				))
+		)).willReturn(
+				Community.builder()
+						.id("123")
+						.title("Java User Group")
+						.members(singletonList(
+								User.builder()
+										.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
+										.userName("anotherTester")
+										.build()
+						))
+						.build()
+		);
+
+		final Community community = communityCommandService.leaveCommunity("123");
+		assertThat(community).isNotNull();
+		assertThat(community.getId()).isEqualTo("123");
+		assertThat(community.getTitle()).isEqualTo("Java User Group");
+		assertThat(community.getMembers()).hasSize(1);
+		assertThat(community.getMembers()).contains(User.builder()
+				.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
+				.userName("anotherTester")
+				.build());
+	}
+
+	@Test
+	@DisplayName("Tests if exception is thrown when authenticated user leaves the community he is not a member of.")
+	void testIfExceptionIsThrownWhenAuthenticatedUserLeavesCommunityHeIsNotMemberOf() {
+		given(currentUserService.getCurrentUser()).willReturn(User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build());
+		given(communityRepository.findById("123")).willReturn(Optional.of(
+				Community.builder()
+						.id("123")
+						.title("Java User Group")
+						.members(singletonList(
+								User.builder()
+										.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
+										.userName("anotherTester")
+										.build()
+						))
+						.type(CommunityType.OPENED)
+						.build()
+		));
+
+		assertThrows(InvalidInputException.class, () -> communityCommandService.leaveCommunity("123"));
+	}
+
+	@Test
+	@DisplayName("Tests if exception is thrown when authenticated user leaves non-existent community.")
+	void testIfExceptionIsThrownWhenAuthenticatedUserLeavesNonExistentCommunity() {
+		given(currentUserService.getCurrentUser()).willReturn(User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build());
+		given(communityRepository.findById("123")).willReturn(Optional.empty());
+		assertThrows(NoSuchResourceException.class, () -> communityCommandService.leaveCommunity("123"));
 	}
 
 }
