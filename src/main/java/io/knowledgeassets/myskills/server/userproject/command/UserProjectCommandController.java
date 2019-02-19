@@ -70,7 +70,7 @@ public class UserProjectCommandController {
 	public ResponseEntity<UserProjectResponse> updateUserProject(@PathVariable("userId") String userId,
 																 @PathVariable("projectId") String projectId,
 																 @Valid @RequestBody UpdateUserProjectRequest request) {
-		final UserProject result = userProjectCommandService.updateUserProject(userId, projectId, request);
+		final UserProject result = userProjectCommandService.updateUserProject(userId, projectId, request.command());
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(UserProjectResponse.of(result));
 	}

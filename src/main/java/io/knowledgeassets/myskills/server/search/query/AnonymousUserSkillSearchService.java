@@ -12,16 +12,16 @@ import java.util.stream.Stream;
 import static java.util.Objects.requireNonNull;
 
 @Service
-public class SearchService {
+public class AnonymousUserSkillSearchService {
 
 	private final AnonymousUserSkillRepository anonymousUserSkillRepository;
 
-	public SearchService(AnonymousUserSkillRepository anonymousUserSkillRepository) {
+	public AnonymousUserSkillSearchService(AnonymousUserSkillRepository anonymousUserSkillRepository) {
 		this.anonymousUserSkillRepository = requireNonNull(anonymousUserSkillRepository);
 	}
 
 	@Transactional(readOnly = true)
-	public Stream<AnonymousUserSkillResult> findAnonymousUserSkillsBySkillLevel(List<UserSearchSkillCriterion> searchParams) {
+	public Stream<AnonymousUserSkillResult> findBySkillLevel(List<UserSearchSkillCriterion> searchParams) {
 		if (searchParams == null || searchParams.isEmpty()) {
 			throw new IllegalArgumentException("There are no parameters to search by.");
 		}

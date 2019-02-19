@@ -34,69 +34,77 @@ class UserProfileDocumentServiceTests {
 	@Mock
 	private UserSkillRepository userSkillRepository;
 
+	@Mock
+	private UserProfileDocumentTemplateReader userProfileDocumentTemplateReader;
+
 	private UserProfileDocumentService userProfileDocumentService;
 
 	@Test
 	@DisplayName("Tests if user profile document is built")
 	void testIfUserProfileDocumentIsBuilt() throws IOException {
 
-		this.userProfileDocumentService = new UserProfileDocumentService(userRepository, userSkillRepository, null);
+		try (InputStream templateInputStream = new ClassPathResource("templates/user-profile.docx").getInputStream()) {
 
-		User user = User.builder()
-				.id("adac977c-8e0d-4e00-98a8-da7b44aa5dd6")
-				.referenceId("5acc24df-792a-4458-8d01-0c67033eceff")
-				.userName("johndoe")
-				.firstName("John")
-				.lastName("Doe")
-				.email("john.doe@mail.com")
-				.coach(false)
-				.academicDegree("Diplom-Wirtschaftsinformatiker")
-				.positionProfile("Software Developer")
-				.summary("Developer")
-				.industrySectors(Arrays.asList("Automotive", "Telecommunication"))
-				.specializations(Arrays.asList("IT Consulting", "Software Integration"))
-				.certificates(Collections.singletonList("Java Certified Programmer"))
-				.languages(Collections.singletonList("Deutsch"))
-				.build();
+			given(userProfileDocumentTemplateReader.getTemplate()).willReturn(templateInputStream);
 
-		given(userRepository.findByReferenceId("5acc24df-792a-4458-8d01-0c67033eceff")).willReturn(
-				Optional.of(user)
-		);
+			this.userProfileDocumentService = new UserProfileDocumentService(userRepository, userSkillRepository, userProfileDocumentTemplateReader);
 
-		given(userSkillRepository.findByUserIdOrderByCurrentLevelDesc("adac977c-8e0d-4e00-98a8-da7b44aa5dd6"))
-				.willReturn(Arrays.asList(
-						UserSkill.builder()
-								.id(1L)
-								.user(user)
-								.skill(Skill.builder()
-										.id("e441613b-319f-4698-917d-6a4037c8e330")
-										.name("Angular")
-										.description("JavaScript Framework")
-										.build())
-								.currentLevel(2)
-								.desiredLevel(3)
-								.priority(4)
-								.build(),
-						UserSkill.builder()
-								.id(2L)
-								.user(user)
-								.skill(Skill.builder()
-										.id("3d4236c9-d84a-420a-baee-27b263118a28")
-										.name("Spring Boot")
-										.description("Java Framework")
-										.build())
-								.currentLevel(1)
-								.desiredLevel(2)
-								.priority(3)
-								.build()
-				));
+			User user = User.builder()
+					.id("adac977c-8e0d-4e00-98a8-da7b44aa5dd6")
+					.referenceId("5acc24df-792a-4458-8d01-0c67033eceff")
+					.userName("johndoe")
+					.firstName("John")
+					.lastName("Doe")
+					.email("john.doe@mail.com")
+					.coach(false)
+					.academicDegree("Diplom-Wirtschaftsinformatiker")
+					.positionProfile("Software Developer")
+					.summary("Developer")
+					.industrySectors(Arrays.asList("Automotive", "Telecommunication"))
+					.specializations(Arrays.asList("IT Consulting", "Software Integration"))
+					.certificates(Collections.singletonList("Java Certified Programmer"))
+					.languages(Collections.singletonList("Deutsch"))
+					.build();
 
-		final byte[] anonymousUserProfileDocument = userProfileDocumentService.getAnonymousUserProfileDocument("5acc24df-792a-4458-8d01-0c67033eceff");
-		assertThat(anonymousUserProfileDocument).isNotEmpty();
-		try (InputStream is = new ByteArrayInputStream(anonymousUserProfileDocument)) {
-			assertThat(is).isNotNull();
-			XWPFDocument document = new XWPFDocument();
-			assertThat(document).isNotNull();
+			given(userRepository.findByReferenceId("5acc24df-792a-4458-8d01-0c67033eceff")).willReturn(
+					Optional.of(user)
+			);
+
+			given(userSkillRepository.findByUserIdOrderByCurrentLevelDesc("adac977c-8e0d-4e00-98a8-da7b44aa5dd6"))
+					.willReturn(Arrays.asList(
+							UserSkill.builder()
+									.id(1L)
+									.user(user)
+									.skill(Skill.builder()
+											.id("e441613b-319f-4698-917d-6a4037c8e330")
+											.name("Angular")
+											.description("JavaScript Framework")
+											.build())
+									.currentLevel(2)
+									.desiredLevel(3)
+									.priority(4)
+									.build(),
+							UserSkill.builder()
+									.id(2L)
+									.user(user)
+									.skill(Skill.builder()
+											.id("3d4236c9-d84a-420a-baee-27b263118a28")
+											.name("Spring Boot")
+											.description("Java Framework")
+											.build())
+									.currentLevel(1)
+									.desiredLevel(2)
+									.priority(3)
+									.build()
+					));
+
+			final byte[] anonymousUserProfileDocument = userProfileDocumentService.getAnonymousUserProfileDocument("5acc24df-792a-4458-8d01-0c67033eceff");
+			assertThat(anonymousUserProfileDocument).isNotEmpty();
+			try (InputStream is = new ByteArrayInputStream(anonymousUserProfileDocument)) {
+				assertThat(is).isNotNull();
+				XWPFDocument document = new XWPFDocument();
+				assertThat(document).isNotNull();
+			}
 		}
 	}
 
@@ -104,135 +112,90 @@ class UserProfileDocumentServiceTests {
 	@DisplayName("Tests if user profile document is built when the optional fields are nulls.")
 	void testIfUserProfileDocumentIsBuiltWhenOptionalFieldsAreNulls() throws IOException {
 
-		this.userProfileDocumentService = new UserProfileDocumentService(userRepository, userSkillRepository, null);
+		try (InputStream templateInputStream = new ClassPathResource("templates/user-profile.docx").getInputStream()) {
 
-		User user = User.builder()
-				.id("adac977c-8e0d-4e00-98a8-da7b44aa5dd6")
-				.referenceId("5acc24df-792a-4458-8d01-0c67033eceff")
-				.userName("johndoe")
-				.firstName("John")
-				.lastName("Doe")
-				.email("john.doe@mail.com")
-				.coach(false)
-				.build();
+			given(userProfileDocumentTemplateReader.getTemplate()).willReturn(templateInputStream);
 
-		given(userRepository.findByReferenceId("5acc24df-792a-4458-8d01-0c67033eceff")).willReturn(
-				Optional.of(user)
-		);
+			this.userProfileDocumentService = new UserProfileDocumentService(userRepository, userSkillRepository, userProfileDocumentTemplateReader);
 
-		given(userSkillRepository.findByUserIdOrderByCurrentLevelDesc("adac977c-8e0d-4e00-98a8-da7b44aa5dd6"))
-				.willReturn(Arrays.asList(
-						UserSkill.builder()
-								.id(1L)
-								.user(user)
-								.skill(Skill.builder()
-										.id("e441613b-319f-4698-917d-6a4037c8e330")
-										.name("Angular")
-										.description("JavaScript Framework")
-										.build())
-								.currentLevel(2)
-								.desiredLevel(3)
-								.priority(4)
-								.build(),
-						UserSkill.builder()
-								.id(2L)
-								.user(user)
-								.skill(Skill.builder()
-										.id("3d4236c9-d84a-420a-baee-27b263118a28")
-										.name("Spring Boot")
-										.description("Java Framework")
-										.build())
-								.currentLevel(1)
-								.desiredLevel(2)
-								.priority(3)
-								.build()
-				));
+			User user = User.builder()
+					.id("adac977c-8e0d-4e00-98a8-da7b44aa5dd6")
+					.referenceId("5acc24df-792a-4458-8d01-0c67033eceff")
+					.userName("johndoe")
+					.firstName("John")
+					.lastName("Doe")
+					.email("john.doe@mail.com")
+					.coach(false)
+					.build();
 
-		final byte[] anonymousUserProfileDocument = userProfileDocumentService.getAnonymousUserProfileDocument("5acc24df-792a-4458-8d01-0c67033eceff");
-		assertThat(anonymousUserProfileDocument).isNotEmpty();
-		try (InputStream is = new ByteArrayInputStream(anonymousUserProfileDocument)) {
-			assertThat(is).isNotNull();
-			XWPFDocument document = new XWPFDocument(is);
-			assertThat(document).isNotNull();
-		}
-	}
+			given(userRepository.findByReferenceId("5acc24df-792a-4458-8d01-0c67033eceff")).willReturn(
+					Optional.of(user)
+			);
 
-	@Test
-	@DisplayName("Tests if user profile document is built falling back to the default template when a wrong path to a template is set.")
-	void testIfUserProfileDocumentIsBuiltFallingBackToDefaultTemplateWhenWrongPathToTemplateIsSet() throws IOException {
-		this.userProfileDocumentService = new UserProfileDocumentService(userRepository, userSkillRepository, "some/not/existing/path");
+			given(userSkillRepository.findByUserIdOrderByCurrentLevelDesc("adac977c-8e0d-4e00-98a8-da7b44aa5dd6"))
+					.willReturn(Arrays.asList(
+							UserSkill.builder()
+									.id(1L)
+									.user(user)
+									.skill(Skill.builder()
+											.id("e441613b-319f-4698-917d-6a4037c8e330")
+											.name("Angular")
+											.description("JavaScript Framework")
+											.build())
+									.currentLevel(2)
+									.desiredLevel(3)
+									.priority(4)
+									.build(),
+							UserSkill.builder()
+									.id(2L)
+									.user(user)
+									.skill(Skill.builder()
+											.id("3d4236c9-d84a-420a-baee-27b263118a28")
+											.name("Spring Boot")
+											.description("Java Framework")
+											.build())
+									.currentLevel(1)
+									.desiredLevel(2)
+									.priority(3)
+									.build()
+					));
 
-		User user = User.builder()
-				.id("adac977c-8e0d-4e00-98a8-da7b44aa5dd6")
-				.referenceId("5acc24df-792a-4458-8d01-0c67033eceff")
-				.userName("johndoe")
-				.firstName("John")
-				.lastName("Doe")
-				.email("john.doe@mail.com")
-				.coach(false)
-				.build();
-
-		given(userRepository.findByReferenceId("5acc24df-792a-4458-8d01-0c67033eceff")).willReturn(
-				Optional.of(user)
-		);
-
-		given(userSkillRepository.findByUserIdOrderByCurrentLevelDesc("adac977c-8e0d-4e00-98a8-da7b44aa5dd6"))
-				.willReturn(Arrays.asList(
-						UserSkill.builder()
-								.id(1L)
-								.user(user)
-								.skill(Skill.builder()
-										.id("e441613b-319f-4698-917d-6a4037c8e330")
-										.name("Angular")
-										.description("JavaScript Framework")
-										.build())
-								.currentLevel(2)
-								.desiredLevel(3)
-								.priority(4)
-								.build(),
-						UserSkill.builder()
-								.id(2L)
-								.user(user)
-								.skill(Skill.builder()
-										.id("3d4236c9-d84a-420a-baee-27b263118a28")
-										.name("Spring Boot")
-										.description("Java Framework")
-										.build())
-								.currentLevel(1)
-								.desiredLevel(2)
-								.priority(3)
-								.build()
-				));
-
-		final byte[] anonymousUserProfileDocument = userProfileDocumentService.getAnonymousUserProfileDocument("5acc24df-792a-4458-8d01-0c67033eceff");
-		assertThat(anonymousUserProfileDocument).isNotEmpty();
-		try (InputStream is = new ByteArrayInputStream(anonymousUserProfileDocument)) {
-			assertThat(is).isNotNull();
-			XWPFDocument document = new XWPFDocument(is);
-			assertThat(document).isNotNull();
+			final byte[] anonymousUserProfileDocument = userProfileDocumentService.getAnonymousUserProfileDocument("5acc24df-792a-4458-8d01-0c67033eceff");
+			assertThat(anonymousUserProfileDocument).isNotEmpty();
+			try (InputStream is = new ByteArrayInputStream(anonymousUserProfileDocument)) {
+				assertThat(is).isNotNull();
+				XWPFDocument document = new XWPFDocument(is);
+				assertThat(document).isNotNull();
+			}
 		}
 	}
 
 	@Test
 	@DisplayName("Tests if an exception is thrown when invalid template is used.")
 	void testIfExceptionIsThrownWhenInvalidTemplateIsUsed() throws IOException {
-		this.userProfileDocumentService = new UserProfileDocumentService(userRepository, userSkillRepository, new ClassPathResource("templates/fake-template.docx").getFile().getAbsolutePath());
+		this.userProfileDocumentService = new UserProfileDocumentService(userRepository, userSkillRepository, userProfileDocumentTemplateReader);
 
-		User user = User.builder()
-				.id("adac977c-8e0d-4e00-98a8-da7b44aa5dd6")
-				.referenceId("5acc24df-792a-4458-8d01-0c67033eceff")
-				.userName("johndoe")
-				.firstName("John")
-				.lastName("Doe")
-				.email("john.doe@mail.com")
-				.coach(false)
-				.build();
+		try (InputStream templateInputStream = new ClassPathResource("templates/fake-template.docx").getInputStream()) {
 
-		given(userRepository.findByReferenceId("5acc24df-792a-4458-8d01-0c67033eceff")).willReturn(
-				Optional.of(user)
-		);
+			given(userProfileDocumentTemplateReader.getTemplate()).willReturn(templateInputStream);
 
-		assertThrows(UserProfileDocumentException.class, () -> userProfileDocumentService.getAnonymousUserProfileDocument("5acc24df-792a-4458-8d01-0c67033eceff"));
+			User user = User.builder()
+					.id("adac977c-8e0d-4e00-98a8-da7b44aa5dd6")
+					.referenceId("5acc24df-792a-4458-8d01-0c67033eceff")
+					.userName("johndoe")
+					.firstName("John")
+					.lastName("Doe")
+					.email("john.doe@mail.com")
+					.coach(false)
+					.build();
+
+			given(userRepository.findByReferenceId("5acc24df-792a-4458-8d01-0c67033eceff")).willReturn(
+					Optional.of(user)
+			);
+
+			assertThrows(UserProfileDocumentException.class, () -> userProfileDocumentService.getAnonymousUserProfileDocument("5acc24df-792a-4458-8d01-0c67033eceff"));
+
+		}
 	}
 
 }

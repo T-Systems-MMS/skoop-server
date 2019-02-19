@@ -28,4 +28,13 @@ public class UpdateUserProjectRequest {
 	@ApiModelProperty("The date when user finished working on the project")
 	private LocalDate endDate;
 
+	public UpdateUserProjectCommand command() {
+		return UpdateUserProjectCommand.builder()
+				.role(role)
+				.tasks(tasks)
+				.startDate(startDate)
+				.endDate(endDate)
+				.build();
+	}
+
 }

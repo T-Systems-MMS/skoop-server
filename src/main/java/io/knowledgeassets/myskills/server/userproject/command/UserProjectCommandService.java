@@ -58,16 +58,16 @@ public class UserProjectCommandService {
 
 	@Transactional
 	@PreAuthorize("isPrincipalUserId(#userId)")
-	public UserProject updateUserProject(String userId, String projectId, UpdateUserProjectRequest request) {
+	public UserProject updateUserProject(String userId, String projectId, UpdateUserProjectCommand command) {
 		final UserProject userProject = userProjectRepository.findByUserIdAndProjectId(userId, projectId)
 				.orElseThrow(() -> NoSuchResourceException.builder()
 						.model(Model.USER_PROJECT)
 						.searchParamsMap(new String[]{"userId", userId, "projectId", projectId})
 						.build());
-		userProject.setRole(request.getRole());
-		userProject.setTasks(request.getTasks());
-		userProject.setStartDate(request.getStartDate());
-		userProject.setEndDate(request.getEndDate());
+		userProject.setRole(command.getRole());
+		userProject.setTasks(command.getTasks());
+		userProject.setStartDate(command.getStartDate());
+		userProject.setEndDate(command.getEndDate());
 		return save(userProject);
 	}
 
