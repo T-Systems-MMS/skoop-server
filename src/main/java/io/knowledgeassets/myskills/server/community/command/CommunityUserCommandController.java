@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-@Api(tags = "Communities", description = "API to manage user's communities")
+@Api(tags = { "CommunityUsers" })
 @RestController
 @Validated
 public class CommunityUserCommandController {

@@ -52,7 +52,11 @@ public class OpenAPIConfiguration {
 						new Tag("Reports",
 								"API allowing queries and creation of reports"),
 						new Tag("SkillGroups",
-								"API allowing queries and creation of skill groups"));
+								"API allowing queries and creation of skill groups"),
+						new Tag("Communities",
+								"API allowing modifications of communities."),
+						new Tag("SkillSearch", "API to search for anonymous user skills."),
+						new Tag("CommunityUsers", "API to manage user's communities."));
 	}
 
 	@Bean

@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
-@Api(tags = "Search", description = "API to search for anonymous user skills.")
+@Api(tags = { "SkillSearch" })
 @RestController
 @Validated
 @RequestMapping(path = "/search")

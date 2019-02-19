@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
@@ -39,20 +40,8 @@ public class CommunityUserCommandService {
 	@Transactional
 	public Community joinCommunityAsMember(String communityId, String userId) {
 		final User user = userQueryService.getUserById(userId)
-				.orElseThrow(() -> {
-					String[] searchParamsMap = {"id", userId};
-					return NoSuchResourceException.builder()
-							.model(Model.USER)
-							.searchParamsMap(searchParamsMap)
-							.build();
-				});
-		final Community community = communityRepository.findById(communityId).orElseThrow(() -> {
-			final String[] searchParamsMap = {"communityId", communityId};
-			return NoSuchResourceException.builder()
-					.model(Model.COMMUNITY)
-					.searchParamsMap(searchParamsMap)
-					.build();
-		});
+				.orElseThrow(buildNoSuchResourceExceptionSupplier("id", userId, Model.USER));
+		final Community community = communityRepository.findById(communityId).orElseThrow(buildNoSuchResourceExceptionSupplier("communityId", communityId, Model.COMMUNITY));
 		if (CommunityType.OPENED.equals(community.getType())) {
 			final List<User> members;
 			if (community.getMembers() != null) {
@@ -71,6 +60,16 @@ public class CommunityUserCommandService {
 		}
 	}
 
+	private Supplier<NoSuchResourceException> buildNoSuchResourceExceptionSupplier(String paramName, String paramValue, Model community) {
+		return () -> {
+			final String[] searchParamsMap = {paramName, paramValue};
+			return NoSuchResourceException.builder()
+					.model(community)
+					.searchParamsMap(searchParamsMap)
+					.build();
+		};
+	}
+
 	/**
 	 * Authenticated user leaves the community.
 	 * @param communityId - id of the community to leave
@@ -79,20 +78,8 @@ public class CommunityUserCommandService {
 	@Transactional
 	public Community leaveCommunity(String communityId, String userId) {
 		final User user = userQueryService.getUserById(userId)
-				.orElseThrow(() -> {
-					String[] searchParamsMap = {"id", userId};
-					return NoSuchResourceException.builder()
-							.model(Model.USER)
-							.searchParamsMap(searchParamsMap)
-							.build();
-				});
-		final Community community = communityRepository.findById(communityId).orElseThrow(() -> {
-			final String[] searchParamsMap = {"communityId", communityId};
-			return NoSuchResourceException.builder()
-					.model(Model.COMMUNITY)
-					.searchParamsMap(searchParamsMap)
-					.build();
-		});
+				.orElseThrow(buildNoSuchResourceExceptionSupplier("id", userId, Model.USER));
+		final Community community = communityRepository.findById(communityId).orElseThrow(buildNoSuchResourceExceptionSupplier("communityId", communityId, Model.COMMUNITY));
 
 		if (community.getMembers().stream().noneMatch((User u) -> user.getId().equals(u.getId()))) {
 			throw new InvalidInputException(format("The user \"%s\" is not a member of the community \"%s\"", user.getId(), community.getId()));
