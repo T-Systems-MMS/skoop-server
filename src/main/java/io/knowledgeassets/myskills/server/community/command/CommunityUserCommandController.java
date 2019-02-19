@@ -38,8 +38,8 @@ public class CommunityUserCommandController {
 	})
 	@PostMapping(path = "/communities/{communityId}/users")
 	@PreAuthorize("isAuthenticated() and isPrincipalUserId(#request.userId)")
-	public ResponseEntity<CommunityResponse> assignCommunityRoleToUser(@PathVariable("communityId") String communityId,
-																	   @RequestBody CommunityUserRequest request) {
+	public ResponseEntity<CommunityResponse> joinCommunity(@PathVariable("communityId") String communityId,
+														   @RequestBody CommunityUserRequest request) {
 			return ResponseEntity.status(HttpStatus.CREATED)
 					.body(CommunityResponse.of(communityUserCommandService.joinCommunityAsMember(communityId, request.getUserId())));
 	}
