@@ -47,7 +47,7 @@ public class AnonymousUserSkillSearchController {
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
 	@PreAuthorize("isAuthenticated()")
-	@GetMapping(path = "/skills", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(path = "/anonymous-user-profiles", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<AnonymousUserSkillResponse>> searchForAnonymousUserSkills(
 			@Valid @NotEmpty @RequestParam("params") List<@Pattern(regexp = "^.+\\+\\d+$") String> searchParameters) {
 		final List<UserSearchSkillCriterion> searchParams = extractUserSearchSkillCriterionList(searchParameters);

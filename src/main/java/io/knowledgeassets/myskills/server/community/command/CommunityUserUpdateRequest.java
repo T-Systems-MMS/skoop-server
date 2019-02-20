@@ -14,10 +14,10 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @Builder
 @ApiModel(
-		value = "CommunityUserRoleRequest",
+		value = "CommunityUserUpdateRequest",
 		description = "Request object to assign role to a user."
 )
-public class CommunityUserRoleRequest {
+public class CommunityUserUpdateRequest {
 
 	@NotNull
 	private CommunityRole role;

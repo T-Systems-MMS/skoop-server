@@ -1,6 +1,5 @@
 package io.knowledgeassets.myskills.server.user.profile;
 
-import io.knowledgeassets.myskills.server.exception.UserProfileDocumentException;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.user.UserRepository;
@@ -22,8 +21,8 @@ import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
+import static io.knowledgeassets.myskills.server.user.profile.UserProfileDocumentService.UserProfilePlaceholder.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserProfileDocumentServiceTests {
@@ -43,9 +42,10 @@ class UserProfileDocumentServiceTests {
 	@DisplayName("Tests if user profile document is built")
 	void testIfUserProfileDocumentIsBuilt() throws IOException {
 
-		try (InputStream templateInputStream = new ClassPathResource("templates/user-profile.docx").getInputStream()) {
+		try (InputStream templateInputStream = new ClassPathResource("templates/user-profile.docx").getInputStream();
+			 XWPFDocument d = new XWPFDocument(templateInputStream)) {
 
-			given(userProfileDocumentTemplateReader.getTemplate()).willReturn(templateInputStream);
+			given(userProfileDocumentTemplateReader.getTemplate()).willReturn(d);
 
 			this.userProfileDocumentService = new UserProfileDocumentService(userRepository, userSkillRepository, userProfileDocumentTemplateReader);
 
@@ -102,8 +102,19 @@ class UserProfileDocumentServiceTests {
 			assertThat(anonymousUserProfileDocument).isNotEmpty();
 			try (InputStream is = new ByteArrayInputStream(anonymousUserProfileDocument)) {
 				assertThat(is).isNotNull();
-				XWPFDocument document = new XWPFDocument();
+				XWPFDocument document = new XWPFDocument(is);
 				assertThat(document).isNotNull();
+				assertThat(UserProfileDocumentTestUtils.checkIfDocumentContainsText(document, "Spring Boot")).isTrue();
+				assertThat(UserProfileDocumentTestUtils.checkIfDocumentContainsText(document, "Angular")).isTrue();
+				assertThat(UserProfileDocumentTestUtils.checkIfDocumentContainsText(document, "Software Developer")).isTrue();
+				assertThat(UserProfileDocumentTestUtils.checkIfDocumentContainsText(document, "Developer")).isTrue();
+				assertThat(UserProfileDocumentTestUtils.checkIfDocumentContainsText(document, "Diplom-Wirtschaftsinformatiker")).isTrue();
+				assertThat(UserProfileDocumentTestUtils.checkIfDocumentContainsText(document, "Automotive")).isTrue();
+				assertThat(UserProfileDocumentTestUtils.checkIfDocumentContainsText(document, "Telecommunication")).isTrue();
+				assertThat(UserProfileDocumentTestUtils.checkIfDocumentContainsText(document, "IT Consulting")).isTrue();
+				assertThat(UserProfileDocumentTestUtils.checkIfDocumentContainsText(document, "Software Integration")).isTrue();
+				assertThat(UserProfileDocumentTestUtils.checkIfDocumentContainsText(document, "Java Certified Programmer")).isTrue();
+				assertThat(UserProfileDocumentTestUtils.checkIfDocumentContainsText(document, "Deutsch")).isTrue();
 			}
 		}
 	}
@@ -112,9 +123,10 @@ class UserProfileDocumentServiceTests {
 	@DisplayName("Tests if user profile document is built when the optional fields are nulls.")
 	void testIfUserProfileDocumentIsBuiltWhenOptionalFieldsAreNulls() throws IOException {
 
-		try (InputStream templateInputStream = new ClassPathResource("templates/user-profile.docx").getInputStream()) {
+		try (InputStream templateInputStream = new ClassPathResource("templates/user-profile.docx").getInputStream();
+			 XWPFDocument d = new XWPFDocument(templateInputStream)) {
 
-			given(userProfileDocumentTemplateReader.getTemplate()).willReturn(templateInputStream);
+			given(userProfileDocumentTemplateReader.getTemplate()).willReturn(d);
 
 			this.userProfileDocumentService = new UserProfileDocumentService(userRepository, userSkillRepository, userProfileDocumentTemplateReader);
 
@@ -166,35 +178,16 @@ class UserProfileDocumentServiceTests {
 				assertThat(is).isNotNull();
 				XWPFDocument document = new XWPFDocument(is);
 				assertThat(document).isNotNull();
+				assertThat(UserProfileDocumentTestUtils.checkIfDocumentContainsText(document, "Spring Boot")).isTrue();
+				assertThat(UserProfileDocumentTestUtils.checkIfDocumentContainsText(document, "Angular")).isTrue();
+				assertThat(UserProfileDocumentTestUtils.checkIfDocumentContainsText(document, POSITION_PROFILE.getName())).isFalse();
+				assertThat(UserProfileDocumentTestUtils.checkIfDocumentContainsText(document, ACADEMIC_DEGREE.getName())).isFalse();
+				assertThat(UserProfileDocumentTestUtils.checkIfDocumentContainsText(document, SPECIALIZATIONS.getName())).isFalse();
+				assertThat(UserProfileDocumentTestUtils.checkIfDocumentContainsText(document, LANGUAGES.getName())).isFalse();
+				assertThat(UserProfileDocumentTestUtils.checkIfDocumentContainsText(document, INDUSTRY_SECTORS.getName())).isFalse();
+				assertThat(UserProfileDocumentTestUtils.checkIfDocumentContainsText(document, CERTIFICATES.getName())).isFalse();
+				assertThat(UserProfileDocumentTestUtils.checkIfDocumentContainsText(document, SKILLS.getName())).isFalse();
 			}
-		}
-	}
-
-	@Test
-	@DisplayName("Tests if an exception is thrown when invalid template is used.")
-	void testIfExceptionIsThrownWhenInvalidTemplateIsUsed() throws IOException {
-		this.userProfileDocumentService = new UserProfileDocumentService(userRepository, userSkillRepository, userProfileDocumentTemplateReader);
-
-		try (InputStream templateInputStream = new ClassPathResource("templates/fake-template.docx").getInputStream()) {
-
-			given(userProfileDocumentTemplateReader.getTemplate()).willReturn(templateInputStream);
-
-			User user = User.builder()
-					.id("adac977c-8e0d-4e00-98a8-da7b44aa5dd6")
-					.referenceId("5acc24df-792a-4458-8d01-0c67033eceff")
-					.userName("johndoe")
-					.firstName("John")
-					.lastName("Doe")
-					.email("john.doe@mail.com")
-					.coach(false)
-					.build();
-
-			given(userRepository.findByReferenceId("5acc24df-792a-4458-8d01-0c67033eceff")).willReturn(
-					Optional.of(user)
-			);
-
-			assertThrows(UserProfileDocumentException.class, () -> userProfileDocumentService.getAnonymousUserProfileDocument("5acc24df-792a-4458-8d01-0c67033eceff"));
-
 		}
 	}
 

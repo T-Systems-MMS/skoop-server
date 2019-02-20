@@ -41,7 +41,7 @@ class AnonymousUserSkillSearchControllerTests extends AbstractControllerTests {
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
 				.build();
-		mockMvc.perform(get("/search/skills")
+		mockMvc.perform(get("/search/anonymous-user-profiles")
 				.param("params", "A2", "B1")
 				.with(authentication(withUser(owner))))
 				.andExpect(status().isBadRequest());
@@ -54,7 +54,7 @@ class AnonymousUserSkillSearchControllerTests extends AbstractControllerTests {
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
 				.build();
-		mockMvc.perform(get("/search/skills")
+		mockMvc.perform(get("/search/anonymous-user-profiles")
 				.with(authentication(withUser(owner))))
 				.andExpect(status().isBadRequest());
 	}
@@ -66,7 +66,7 @@ class AnonymousUserSkillSearchControllerTests extends AbstractControllerTests {
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
 				.build();
-		mockMvc.perform(get("/search/skills")
+		mockMvc.perform(get("/search/anonymous-user-profiles")
 				.param("params", "")
 				.with(authentication(withUser(owner))))
 				.andExpect(status().isBadRequest());
@@ -75,7 +75,7 @@ class AnonymousUserSkillSearchControllerTests extends AbstractControllerTests {
 	@Test
 	@DisplayName("Tests if UNAUTHORIZED status code is returned when a user sending a request is unknown.")
 	void testIfUnauthorizedStatusCodeIsReturnedWhenUserIsUnknown() throws Exception {
-		mockMvc.perform(get("/search/skills"))
+		mockMvc.perform(get("/search/anonymous-user-profiles"))
 				.andExpect(status().isUnauthorized());
 	}
 
@@ -117,7 +117,7 @@ class AnonymousUserSkillSearchControllerTests extends AbstractControllerTests {
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
 				.build();
-		mockMvc.perform(get("/search/skills")
+		mockMvc.perform(get("/search/anonymous-user-profiles")
 				.param("params", "B+2", "A+1")
 				.with(authentication(withUser(owner))))
 				.andExpect(status().isOk())

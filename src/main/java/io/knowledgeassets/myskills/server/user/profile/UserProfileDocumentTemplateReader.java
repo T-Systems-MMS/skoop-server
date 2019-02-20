@@ -1,7 +1,11 @@
 package io.knowledgeassets.myskills.server.user.profile;
 
+import io.knowledgeassets.myskills.server.exception.UserProfileDocumentException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.EmptyFileException;
+import org.apache.poi.openxml4j.exceptions.NotOfficeXmlFileException;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
@@ -26,7 +30,16 @@ public class UserProfileDocumentTemplateReader {
 		this.templatePath = templatePath;
 	}
 
-	public InputStream getTemplate() throws IOException {
+	public XWPFDocument getTemplate() {
+		try (final InputStream is = getTemplateInputStream()) {
+			 return new XWPFDocument(is);
+		}
+		catch (IOException | EmptyFileException | NotOfficeXmlFileException e) {
+			throw new UserProfileDocumentException("An error has occurred when getting the user profile document template", e);
+		}
+	}
+
+	private InputStream getTemplateInputStream() throws IOException {
 		if (StringUtils.isEmpty(this.templatePath)) {
 			return DEFAULT_TEMPLATE_RESOURCE.getInputStream();
 		}

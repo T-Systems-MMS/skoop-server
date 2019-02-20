@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -60,14 +59,13 @@ public class UserProfileDocumentService {
 
 		final User user = getUserByReferenceId(referenceId);
 
-		try (final InputStream is = userProfileDocumentTemplateReader.getTemplate();
-			 final XWPFDocument document = new XWPFDocument(is)) {
+		try (final XWPFDocument document = userProfileDocumentTemplateReader.getTemplate()) {
 			replacePlaceholders(document, user);
 			final ByteArrayOutputStream b = new ByteArrayOutputStream();
 			document.write(b);
 			return b.toByteArray();
 		}
-		catch (IOException | EmptyFileException | NotOfficeXmlFileException e) {
+		catch (IOException e) {
 			throw new UserProfileDocumentException(format("An error has occurred when building user " +
 					"profile document for a user with the reference id %s", referenceId), e);
 		}

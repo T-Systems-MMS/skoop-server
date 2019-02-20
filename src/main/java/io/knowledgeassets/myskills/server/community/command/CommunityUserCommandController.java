@@ -57,7 +57,7 @@ public class CommunityUserCommandController {
 	@PreAuthorize("isAuthenticated() and hasCommunityManagerRole(#communityId)")
 	public ResponseEntity<CommunityResponse> changeCommunityUserRole(@PathVariable("communityId") String communityId,
 																	 @PathVariable("userId") String userId,
-																	 @RequestBody CommunityUserRoleRequest request) {
+																	 @RequestBody CommunityUserUpdateRequest request) {
 		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
 	}
 

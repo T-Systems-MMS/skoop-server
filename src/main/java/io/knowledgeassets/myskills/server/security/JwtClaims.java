@@ -1,6 +1,11 @@
 package io.knowledgeassets.myskills.server.security;
 
 public final class JwtClaims {
+
+	private JwtClaims() {
+		throw new IllegalStateException("Utility class");
+	}
+
 	public static final String USER_NAME = "user_name";
 	public static final String FIRST_NAME = "given_name";
 	public static final String LAST_NAME = "family_name";

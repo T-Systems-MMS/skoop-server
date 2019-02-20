@@ -15,13 +15,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isA;
@@ -57,6 +58,14 @@ class CommunityUserCommandServiceTests {
 				Community.builder()
 						.id("123")
 						.title("Java User Group")
+						.members(new ArrayList<>(singletonList(User.builder()
+								.id("dce8b8c9-cd49-4a87-8cd2-4ca106dcf7f3")
+								.userName("owner")
+								.build())))
+						.managers(singletonList(User.builder()
+								.id("dce8b8c9-cd49-4a87-8cd2-4ca106dcf7f3")
+								.userName("owner")
+								.build()))
 						.type(CommunityType.OPENED)
 						.build()
 		));
@@ -66,22 +75,38 @@ class CommunityUserCommandServiceTests {
 						isA(Community.class),
 						hasProperty("id", is("123")),
 						hasProperty("title", is("Java User Group")),
-						hasProperty("members", equalTo(singletonList(User.builder()
-								.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
-								.userName("tester")
-								.build()
-						)))
+						hasProperty("managers", hasItems(User.builder()
+								.id("dce8b8c9-cd49-4a87-8cd2-4ca106dcf7f3")
+								.userName("owner")
+								.build())),
+						hasProperty("members", hasItems(User.builder()
+										.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+										.userName("tester")
+										.build(),
+								User.builder()
+										.id("dce8b8c9-cd49-4a87-8cd2-4ca106dcf7f3")
+										.userName("owner")
+										.build()
+						))
 				))
 		)).willReturn(
 				Community.builder()
 						.id("123")
 						.title("Java User Group")
-						.members(singletonList(
+						.members(Arrays.asList(
+								User.builder()
+										.id("dce8b8c9-cd49-4a87-8cd2-4ca106dcf7f3")
+										.userName("owner")
+										.build(),
 								User.builder()
 										.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 										.userName("tester")
 										.build()
 						))
+						.managers(singletonList(User.builder()
+								.id("dce8b8c9-cd49-4a87-8cd2-4ca106dcf7f3")
+								.userName("owner")
+								.build()))
 						.build()
 		);
 
@@ -122,6 +147,14 @@ class CommunityUserCommandServiceTests {
 						.id("123")
 						.title("Java User Group")
 						.type(CommunityType.CLOSED)
+						.members(singletonList(User.builder()
+								.id("dce8b8c9-cd49-4a87-8cd2-4ca106dcf7f3")
+								.userName("owner")
+								.build()))
+						.managers(singletonList(User.builder()
+								.id("dce8b8c9-cd49-4a87-8cd2-4ca106dcf7f3")
+								.userName("owner")
+								.build()))
 						.build()
 		));
 		assertThrows(CommunityAccessDeniedException.class, () -> communityUserCommandService.joinCommunityAsMember("123", "1f37fb2a-b4d0-4119-9113-4677beb20ae2"));
@@ -141,16 +174,20 @@ class CommunityUserCommandServiceTests {
 				Community.builder()
 						.id("123")
 						.title("Java User Group")
-						.members(Arrays.asList(
+						.members(new ArrayList<>(Arrays.asList(
 								User.builder()
 										.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 										.userName("tester")
 										.build(),
 								User.builder()
-										.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
-										.userName("anotherTester")
+										.id("dce8b8c9-cd49-4a87-8cd2-4ca106dcf7f3")
+										.userName("owner")
 										.build()
-						))
+						)))
+						.managers(singletonList(User.builder()
+								.id("dce8b8c9-cd49-4a87-8cd2-4ca106dcf7f3")
+								.userName("owner")
+								.build()))
 						.type(CommunityType.OPENED)
 						.build()
 		));
@@ -160,11 +197,16 @@ class CommunityUserCommandServiceTests {
 						isA(Community.class),
 						hasProperty("id", is("123")),
 						hasProperty("title", is("Java User Group")),
-						hasProperty("members", equalTo(singletonList(User.builder()
-								.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
-								.userName("anotherTester")
+						hasProperty("members", hasItems(User.builder()
+								.id("dce8b8c9-cd49-4a87-8cd2-4ca106dcf7f3")
+								.userName("owner")
 								.build()
-						)))
+						)),
+						hasProperty("managers", hasItems(User.builder()
+								.id("dce8b8c9-cd49-4a87-8cd2-4ca106dcf7f3")
+								.userName("owner")
+								.build())
+						)
 				))
 		)).willReturn(
 				Community.builder()
@@ -172,10 +214,15 @@ class CommunityUserCommandServiceTests {
 						.title("Java User Group")
 						.members(singletonList(
 								User.builder()
-										.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
-										.userName("anotherTester")
+										.id("dce8b8c9-cd49-4a87-8cd2-4ca106dcf7f3")
+										.userName("owner")
 										.build()
 						))
+						.managers(singletonList(
+								User.builder()
+								.id("dce8b8c9-cd49-4a87-8cd2-4ca106dcf7f3")
+								.userName("owner")
+								.build()))
 						.build()
 		);
 
@@ -185,8 +232,13 @@ class CommunityUserCommandServiceTests {
 		assertThat(community.getTitle()).isEqualTo("Java User Group");
 		assertThat(community.getMembers()).hasSize(1);
 		assertThat(community.getMembers()).contains(User.builder()
-				.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
-				.userName("anotherTester")
+				.id("dce8b8c9-cd49-4a87-8cd2-4ca106dcf7f3")
+				.userName("owner")
+				.build());
+		assertThat(community.getManagers()).hasSize(1);
+		assertThat(community.getManagers()).contains(User.builder()
+				.id("dce8b8c9-cd49-4a87-8cd2-4ca106dcf7f3")
+				.userName("owner")
 				.build());
 	}
 
@@ -204,6 +256,12 @@ class CommunityUserCommandServiceTests {
 						.id("123")
 						.title("Java User Group")
 						.members(singletonList(
+								User.builder()
+										.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
+										.userName("anotherTester")
+										.build()
+						))
+						.managers(singletonList(
 								User.builder()
 										.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
 										.userName("anotherTester")

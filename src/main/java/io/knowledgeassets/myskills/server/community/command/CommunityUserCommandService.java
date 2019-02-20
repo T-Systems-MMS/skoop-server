@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -43,14 +42,7 @@ public class CommunityUserCommandService {
 				.orElseThrow(buildNoSuchResourceExceptionSupplier("id", userId, Model.USER));
 		final Community community = communityRepository.findById(communityId).orElseThrow(buildNoSuchResourceExceptionSupplier("communityId", communityId, Model.COMMUNITY));
 		if (CommunityType.OPENED.equals(community.getType())) {
-			final List<User> members;
-			if (community.getMembers() != null) {
-				members = new ArrayList<>(community.getMembers());
-			} else {
-				members = new ArrayList<>();
-			}
-			members.add(user);
-			community.setMembers(members);
+			community.getMembers().add(user);
 			community.setLastModifiedDate(LocalDateTime.now());
 			return communityRepository.save(community);
 		}
