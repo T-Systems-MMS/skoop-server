@@ -8,8 +8,6 @@ import io.knowledgeassets.myskills.server.user.UserRepository;
 import io.knowledgeassets.myskills.server.userskill.UserSkill;
 import io.knowledgeassets.myskills.server.userskill.UserSkillRepository;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.EmptyFileException;
-import org.apache.poi.openxml4j.exceptions.NotOfficeXmlFileException;
 import org.apache.poi.xwpf.usermodel.IBody;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
