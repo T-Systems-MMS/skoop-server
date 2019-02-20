@@ -11,7 +11,7 @@ public enum IndexType {
 		@Override
 		public String indexCommand(String owningType, String[] properties) {
 			if (properties.length != 1) {
-				throw new IllegalArgumentException(SINGLE_INDEX + " must have exactly one property, got " +
+				throw new IllegalArgumentException(SINGLE_INDEX + MUST_HAVE_EXACTLY_ONE_PROPERTY_GOT_MESSAGE +
 						Arrays.toString(properties));
 			}
 			return "INDEX ON :`" + owningType + "`(`" + properties[0] + "`)";
@@ -22,6 +22,18 @@ public enum IndexType {
 	 * Composite neo4j
 	 */
 	COMPOSITE_INDEX {
+
+		private void appendProperties(StringBuilder sb, String[] properties) {
+			for (int i = 0; i < properties.length; i++) {
+				sb.append('`');
+				sb.append(properties[i]);
+				sb.append('`');
+				if (i < (properties.length - 1)) {
+					sb.append(',');
+				}
+			}
+		}
+
 		@Override
 		public String indexCommand(String owningType, String[] properties) {
 			StringBuilder sb = new StringBuilder();
@@ -43,10 +55,10 @@ public enum IndexType {
 			String name = owningType.toLowerCase();
 
 			if (properties.length != 1) {
-				throw new IllegalArgumentException(UNIQUE_CONSTRAINT + " must have exactly one property, got " +
+				throw new IllegalArgumentException(UNIQUE_CONSTRAINT + MUST_HAVE_EXACTLY_ONE_PROPERTY_GOT_MESSAGE +
 						Arrays.toString(properties));
 			}
-			return "CONSTRAINT ON (`" + name + "`:`" + owningType + "`) ASSERT `" + name + "`.`" + properties[0]
+			return CONSTRAINT_ON + name + "`:`" + owningType + "`) ASSERT `" + name + "`.`" + properties[0]
 					+ "` IS UNIQUE";
 		}
 	},
@@ -55,12 +67,26 @@ public enum IndexType {
 	 * Node key constraint
 	 */
 	NODE_KEY_CONSTRAINT {
+
+		private void appendPropertiesWithNode(StringBuilder sb, String nodeName, String[] properties) {
+			for (int i = 0; i < properties.length; i++) {
+				sb.append('`');
+				sb.append(nodeName);
+				sb.append("`.`");
+				sb.append(properties[i]);
+				sb.append('`');
+				if (i < (properties.length - 1)) {
+					sb.append(',');
+				}
+			}
+		}
+
 		@Override
 		public String indexCommand(String owningType, String[] properties) {
 			String name = owningType.toLowerCase();
 
 			StringBuilder sb = new StringBuilder();
-			sb.append("CONSTRAINT ON (`")
+			sb.append(CONSTRAINT_ON)
 					.append(name)
 					.append("`:`")
 					.append(owningType)
@@ -81,10 +107,10 @@ public enum IndexType {
 
 			if (properties.length != 1) {
 				throw new IllegalArgumentException(
-						NODE_PROP_EXISTENCE_CONSTRAINT + " must have exactly one property, got " +
+						NODE_PROP_EXISTENCE_CONSTRAINT + MUST_HAVE_EXACTLY_ONE_PROPERTY_GOT_MESSAGE +
 								Arrays.toString(properties));
 			}
-			return "CONSTRAINT ON (`" + name + "`:`" + owningType + "`) ASSERT exists(`" + name + "`.`"
+			return CONSTRAINT_ON + name + "`:`" + owningType + "`) ASSERT exists(`" + name + "`.`"
 					+ properties[0] + "`)";
 		}
 	},
@@ -99,7 +125,7 @@ public enum IndexType {
 
 			if (properties.length != 1) {
 				throw new IllegalArgumentException(
-						NODE_PROP_EXISTENCE_CONSTRAINT + " must have exactly one property, got " +
+						NODE_PROP_EXISTENCE_CONSTRAINT + MUST_HAVE_EXACTLY_ONE_PROPERTY_GOT_MESSAGE +
 								Arrays.toString(properties));
 			}
 			return "CONSTRAINT ON ()-[`" + name + "`:`" + owningType + "`]-() ASSERT exists(`" + name + "`.`"
@@ -107,34 +133,13 @@ public enum IndexType {
 		}
 	};
 
+	private static final String CONSTRAINT_ON = "CONSTRAINT ON (`";
+	private static final String MUST_HAVE_EXACTLY_ONE_PROPERTY_GOT_MESSAGE = " must have exactly one property, got ";
+
 	public String convertToCreateCommand(String owningType, String[] properties) {
 		return "CREATE " + indexCommand(owningType, properties);
 	}
 
 	protected abstract String indexCommand(String owningType, String[] properties);
-
-	private static void appendProperties(StringBuilder sb, String[] properties) {
-		for (int i = 0; i < properties.length; i++) {
-			sb.append('`');
-			sb.append(properties[i]);
-			sb.append('`');
-			if (i < (properties.length - 1)) {
-				sb.append(',');
-			}
-		}
-	}
-
-	private static void appendPropertiesWithNode(StringBuilder sb, String nodeName, String[] properties) {
-		for (int i = 0; i < properties.length; i++) {
-			sb.append('`');
-			sb.append(nodeName);
-			sb.append("`.`");
-			sb.append(properties[i]);
-			sb.append('`');
-			if (i < (properties.length - 1)) {
-				sb.append(',');
-			}
-		}
-	}
 
 }

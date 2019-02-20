@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Collections;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
@@ -76,7 +77,7 @@ public class CommunityResponse {
 
 	private static List<LinkResponse> convertLinkListToLinkResponseList(List<Link> links) {
 		if (links == null) {
-			return null;
+			return Collections.emptyList();
 		}
 		return links.stream().map(l -> LinkResponse.builder()
 				.name(l.getName())
@@ -87,14 +88,14 @@ public class CommunityResponse {
 
 	private static List<SkillResponse> convertSkillListToSkillResponseList(List<Skill> skills) {
 		if (skills == null) {
-			return null;
+			return Collections.emptyList();
 		}
 		return skills.stream().map(SkillResponse::of).collect(toList());
 	}
 
 	private static List<UserSimpleResponse> convertUserListToUserSimpleResponseList(List<User> users) {
 		if (users == null) {
-			return null;
+			return Collections.emptyList();
 		}
 		return users.stream().map(UserSimpleResponse::of).collect(toList());
 	}

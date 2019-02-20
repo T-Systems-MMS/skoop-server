@@ -46,7 +46,7 @@ public class UserQueryService {
 	}
 
 	@Transactional(readOnly = true)
-	public boolean exists(String userId) throws EmptyInputException {
+	public boolean exists(String userId) {
 		if (userId == null) {
 			throw EmptyInputException.builder()
 					.message("userId is null.")

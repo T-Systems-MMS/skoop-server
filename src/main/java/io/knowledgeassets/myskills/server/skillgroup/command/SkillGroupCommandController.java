@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-@Api(tags = "SkillGroups", description = "API allowing modifications of skill groups")
+@Api(tags = "SkillGroups")
 @RestController
 public class SkillGroupCommandController {
 	private SkillGroupCommandService skillGroupCommandService;

@@ -7,7 +7,6 @@ import io.knowledgeassets.myskills.server.skillgroup.SkillGroup;
 import io.knowledgeassets.myskills.server.skillgroup.query.SkillGroupQueryService;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.skill.SkillRepository;
-import io.knowledgeassets.myskills.server.skillgroup.command.SkillGroupCommandService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -38,13 +37,12 @@ public class SkillCommandService {
 		});
 
 		List<SkillGroup> skillGroups = findSkillGroups(groups);
-		Skill skill = skillRepository.save(Skill.builder()
+		return skillRepository.save(Skill.builder()
 				.id(UUID.randomUUID().toString())
 				.name(name)
 				.description(description)
 				.skillGroups(skillGroups)
 				.build());
-		return skill;
 	}
 
 	private List<SkillGroup> findSkillGroups(List<String> groups) {

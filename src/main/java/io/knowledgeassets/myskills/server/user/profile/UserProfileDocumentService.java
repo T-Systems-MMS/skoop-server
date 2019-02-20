@@ -130,7 +130,7 @@ public class UserProfileDocumentService {
 								StreamSupport.stream(userSkillRepository.findByUserIdOrderByCurrentLevelDesc(user.getId()).spliterator(), false)
 										.map((UserSkill userSkill) -> {
 											StringBuilder level = new StringBuilder();
-											IntStream.rangeClosed(1, userSkill.getCurrentLevel()).forEach((a) -> level.append("*"));
+											IntStream.rangeClosed(1, userSkill.getCurrentLevel()).forEach(a -> level.append("*"));
 											return format("%s %s", userSkill.getSkill().getName(), level.toString());
 										}).collect(Collectors.toList());
 						replaceListPlaceholder(r, UserProfilePlaceholder.SKILLS.getName(), skillsSupplier, p, body);

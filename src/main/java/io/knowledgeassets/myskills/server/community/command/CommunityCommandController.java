@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -130,7 +131,7 @@ public class CommunityCommandController {
 
 	private List<Link> convertLinkRequestListToLinkList(CommunityRequest communityRequest) {
 		if (communityRequest.getLinks() == null) {
-			return null;
+			return Collections.emptyList();
 		}
 		return communityRequest.getLinks().stream().map(linkRequest -> Link.builder()
 				.name(linkRequest.getName())

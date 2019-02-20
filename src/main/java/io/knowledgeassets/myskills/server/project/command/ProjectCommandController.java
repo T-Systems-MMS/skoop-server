@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
-@Api(tags = "Projects", description = "API allowing modifications of projects")
+@Api(tags = "Projects")
 @RestController
 public class ProjectCommandController {
 

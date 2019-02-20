@@ -1,6 +1,5 @@
 package io.knowledgeassets.myskills.server.report.userskillpriority.query;
 
-import io.knowledgeassets.myskills.server.exception.BusinessException;
 import io.knowledgeassets.myskills.server.report.skill.SkillReportSimpleResponse;
 import io.knowledgeassets.myskills.server.report.user.UserReportSimpleResponse;
 import io.knowledgeassets.myskills.server.report.userskill.UserSkillReportResponse;
@@ -29,7 +28,7 @@ import static io.knowledgeassets.myskills.server.user.UserPermissionScope.READ_U
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
-@Api(tags = "Reports", description = "API allowing queries of user skill priority reports")
+@Api(tags = "UserSkillPriorityReports")
 @RestController
 public class UserSkillPriorityReportQueryController {
 	private UserSkillPriorityReportQueryService userSkillPriorityReportQueryService;
@@ -74,7 +73,7 @@ public class UserSkillPriorityReportQueryController {
 	})
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping(path = "/reports/skills/priority/{reportId}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public UserSkillPriorityReportResponse getReportById(@PathVariable("reportId") String reportId) throws BusinessException {
+	public UserSkillPriorityReportResponse getReportById(@PathVariable("reportId") String reportId) {
 		UserSkillPriorityReport report = userSkillPriorityReportQueryService.getReportById(reportId);
 		return UserSkillPriorityReportResponse.builder()
 				.id(report.getId())
@@ -118,7 +117,7 @@ public class UserSkillPriorityReportQueryController {
 	)
 	public List<UserSkillReportResponse> getUserSkillReportsByAggregationReportId(
 			@PathVariable("aggregationReportId") String aggregationReportId,
-			@ApiIgnore @AuthenticationPrincipal Jwt jwt) throws BusinessException {
+			@ApiIgnore @AuthenticationPrincipal Jwt jwt) {
 		// Create a whitelist of those user names who allowed the principal read access to their skill relationships.
 		Set<String> allowedUserNames = userPermissionQueryService.getUsersWhoGrantedPermission(
 				jwt.getClaimAsString(MYSKILLS_USER_ID), READ_USER_SKILLS).map(User::getUserName).collect(toSet());

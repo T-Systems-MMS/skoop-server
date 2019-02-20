@@ -1,6 +1,5 @@
 package io.knowledgeassets.myskills.server.skillgroup.query;
 
-import io.knowledgeassets.myskills.server.exception.BusinessException;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.exception.enums.Model;
 import io.knowledgeassets.myskills.server.skill.SkillResponse;
@@ -20,7 +19,7 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-@Api(tags = "SkillGroups", description = "API allowing queries of skill groups")
+@Api(tags = "SkillGroups")
 @RestController
 public class SkillGroupQueryController {
 	private SkillGroupQueryService skillGroupQueryService;
@@ -89,7 +88,7 @@ public class SkillGroupQueryController {
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping(path = "/groups/group-existence", produces = MediaType.APPLICATION_JSON_VALUE)
 	// TODO: Replace this method by adding a filter parameter to the "GET /groups" endpoint to search for group name.
-	public Boolean isGroupExist(@RequestParam("search") String skillName) throws BusinessException {
+	public Boolean isGroupExist(@RequestParam("search") String skillName) {
 		return skillGroupQueryService.isSkillGroupExist(skillName);
 	}
 }

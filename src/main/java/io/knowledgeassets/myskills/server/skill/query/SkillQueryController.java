@@ -1,6 +1,5 @@
 package io.knowledgeassets.myskills.server.skill.query;
 
-import io.knowledgeassets.myskills.server.exception.BusinessException;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.exception.enums.Model;
 import io.knowledgeassets.myskills.server.skill.SkillResponse;
@@ -17,11 +16,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Collections;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-@Api(tags = "Skills", description = "API allowing queries of skills")
+@Api(tags = "Skills")
 @RestController
 public class SkillQueryController {
 	private SkillQueryService skillQueryService;
@@ -90,7 +90,7 @@ public class SkillQueryController {
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping(path = "/skills/skill-existence", produces = MediaType.APPLICATION_JSON_VALUE)
 	// TODO: Replace this method by adding a filter parameter to the "GET /skills" endpoint to search for skill name.
-	public Boolean isSkillExist(@RequestParam("search") String skillName) throws BusinessException {
+	public Boolean isSkillExist(@RequestParam("search") String skillName) {
 		return skillQueryService.isSkillExist(skillName);
 	}
 
@@ -98,7 +98,7 @@ public class SkillQueryController {
 		if (!CollectionUtils.isEmpty(skillGroups)) {
 			return skillGroups.stream().map(SkillGroup::getName).collect(toList());
 		} else {
-			return null;
+			return Collections.emptyList();
 		}
 	}
 }

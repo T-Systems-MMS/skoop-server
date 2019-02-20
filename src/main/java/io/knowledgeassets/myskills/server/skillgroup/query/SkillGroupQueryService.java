@@ -1,8 +1,6 @@
 package io.knowledgeassets.myskills.server.skillgroup.query;
 
 import io.knowledgeassets.myskills.server.exception.EmptyInputException;
-import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
-import io.knowledgeassets.myskills.server.skill.query.SkillQueryService;
 import io.knowledgeassets.myskills.server.skillgroup.SkillGroup;
 import io.knowledgeassets.myskills.server.skillgroup.SkillGroupRepository;
 import org.springframework.stereotype.Service;
@@ -42,7 +40,7 @@ public class SkillGroupQueryService {
 	}
 
 	@Transactional(readOnly = true)
-	public boolean exists(String skillGroupId) throws EmptyInputException {
+	public boolean exists(String skillGroupId) {
 		if (skillGroupId == null) {
 			throw EmptyInputException.builder()
 					.message("skillGroupId is null.")
@@ -56,7 +54,7 @@ public class SkillGroupQueryService {
 	}
 
 	@Transactional(readOnly = true)
-	public Stream<SkillGroup> getSkillGroupSuggestions(String search) throws EmptyInputException, NoSuchResourceException {
+	public Stream<SkillGroup> getSkillGroupSuggestions(String search) {
 		return StreamSupport.stream(skillGroupRepository.findSkillGroupSuggestions(search)
 				.spliterator(), false);
 	}

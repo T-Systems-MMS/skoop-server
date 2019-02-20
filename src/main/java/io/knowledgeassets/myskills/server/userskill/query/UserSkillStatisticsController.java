@@ -14,7 +14,7 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-@Api(tags = "Statistics", description = "API allowing queries of statistics for relationships between users and skills")
+@Api(tags = "Statistics")
 @RestController
 public class UserSkillStatisticsController {
 	private UserSkillQueryService userSkillQueryService;

@@ -25,7 +25,7 @@ import static io.knowledgeassets.myskills.server.user.UserPermissionScope.READ_U
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
-@Api(tags = "Users", description = "API allowing queries of users")
+@Api(tags = "Users")
 @RestController
 public class UserQueryController {
 	private UserQueryService userQueryService;

@@ -43,7 +43,7 @@ public class SkillQueryService {
 	}
 
 	@Transactional(readOnly = true)
-	public boolean exists(String skillId) throws EmptyInputException {
+	public boolean exists(String skillId) {
 		if (skillId == null) {
 			throw EmptyInputException.builder()
 					.message("skillId is null.")

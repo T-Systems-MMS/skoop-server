@@ -19,7 +19,7 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-@Api(tags = "UserSkills", description = "API allowing queries of relationships from users to skills")
+@Api(tags = "UserSkills")
 @RestController
 public class UserSkillQueryController {
 	private UserSkillQueryService userSkillQueryService;

@@ -38,25 +38,33 @@ public class OpenAPIConfiguration {
 				.apiInfo(apiInfo())
 				// Configure the tags for grouping API endpoints.
 				.tags(new Tag("MyIdentity",
-								"API allowing queries of the user identity for the authenticated user"),
+								"API allowing queries of the user identity for the authenticated user."),
 						new Tag("UserSkills",
-								"API allowing queries and modifications of relationships from users to skills"),
+								"API allowing queries and modifications of relationships from users to skills."),
 						new Tag("SkillUsers",
-								"API allowing queries and modifications of relationships from skills to users"),
+								"API allowing queries and modifications of relationships from skills to users."),
 						new Tag("Users",
-								"API allowing queries and modifications of users"),
+								"API allowing queries and modifications of users."),
 						new Tag("Skills",
-								"API allowing queries and modifications of skills"),
+								"API allowing queries and modifications of skills."),
 						new Tag("Statistics",
-								"API allowing queries of various statistics"),
+								"API allowing queries of statistics for relationships between users and skills."),
 						new Tag("Reports",
-								"API allowing queries and creation of reports"),
+								"API allowing queries and creation of reports."),
 						new Tag("SkillGroups",
-								"API allowing queries and creation of skill groups"),
+								"API allowing queries and creation of skill groups."),
 						new Tag("Communities",
-								"API allowing modifications of communities."),
+								"API allowing queries and modifications of communities."),
 						new Tag("SkillSearch", "API to search for anonymous user skills."),
-						new Tag("CommunityUsers", "API to manage user's communities."));
+						new Tag("CommunityUsers", "API to manage user's communities."),
+						new Tag("Download", "API to provide user profile documents for downloading."),
+						new Tag("Projects", "API allowing queries and modifications of projects."),
+						new Tag("UserSkillPriorityReports", "API allowing queries and modifications of user skill priority reports."),
+						new Tag("SkillGroupsSuggestions", "API allowing queries of skill group suggestions for skill."),
+						new Tag("UserPermissions", "API allowing queries and modifications of user permissions."),
+						new Tag("UserSuggestions", "API allowing queries of user suggestions."),
+						new Tag("UserSkills", "API to modify relationships between users and skills"),
+						new Tag("UserProjects", "API allowing queries and modifications of relationships between users and projects."));
 	}
 
 	@Bean

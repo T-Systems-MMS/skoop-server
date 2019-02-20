@@ -22,7 +22,7 @@ public class UserPermissionCommandService {
 	@Transactional
 	public Stream<UserPermission> replaceOutboundUserPermissions(ReplaceUserPermissionListCommand command) {
 		// Create mapping for each scope to the authorized users (merges potential duplicate scope entries).
-		Map<UserPermissionScope, Set<String>> scopeAuthorizedUsers = new HashMap<>();
+		final EnumMap<UserPermissionScope, Set<String>> scopeAuthorizedUsers = new EnumMap<>(UserPermissionScope.class);
 		command.getUserPermissions().forEach(userPermissionEntry -> {
 			Set<String> authorizedUsers = scopeAuthorizedUsers.computeIfAbsent(
 					userPermissionEntry.getScope(), scope -> new HashSet<>());

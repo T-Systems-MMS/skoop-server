@@ -2,6 +2,7 @@ package io.knowledgeassets.myskills.server.userproject.command;
 
 import io.knowledgeassets.myskills.server.userproject.UserProject;
 import io.knowledgeassets.myskills.server.userproject.UserProjectResponse;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
+@Api(tags = "UserProjects")
 @RestController
 public class UserProjectCommandController {
 

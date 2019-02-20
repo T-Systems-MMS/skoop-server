@@ -16,10 +16,12 @@ import java.util.UUID;
 @WebListener
 public class Slf4jUniqueIdentifierRequestListener implements ServletRequestListener {
 
+	@Override
 	public void requestInitialized(ServletRequestEvent arg0) {
 		MDC.put("RequestId", UUID.randomUUID().toString().replace("-", ""));
 	}
 
+	@Override
 	public void requestDestroyed(ServletRequestEvent arg0) {
 		MDC.clear();
 	}

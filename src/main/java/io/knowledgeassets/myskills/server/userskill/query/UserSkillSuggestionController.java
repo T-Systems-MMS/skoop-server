@@ -40,7 +40,7 @@ public class UserSkillSuggestionController {
 	@PreAuthorize("isPrincipalUserId(#userId)")
 	@GetMapping(path = "/users/{userId}/skill-suggestions", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<String> getUserSkillSuggestions(@PathVariable("userId") String userId,
-												@RequestParam("search") String search) throws BusinessException {
+												@RequestParam("search") String search) {
 		try {
 			return userSkillQueryService.getUserSkillSuggestions(userId, search).map(Skill::getName).collect(toList());
 		} catch (BusinessException e) {

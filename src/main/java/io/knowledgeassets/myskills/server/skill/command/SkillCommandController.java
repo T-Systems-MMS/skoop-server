@@ -19,11 +19,12 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Collections;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-@Api(tags = "Skills", description = "API allowing modifications of skills")
+@Api(tags = "Skills")
 @RestController
 public class SkillCommandController {
 	private SkillCommandService skillCommandService;
@@ -110,7 +111,7 @@ public class SkillCommandController {
 		if (!CollectionUtils.isEmpty(skillGroups)) {
 			return skillGroups.stream().map(SkillGroup::getName).collect(toList());
 		} else {
-			return null;
+			return Collections.emptyList();
 		}
 	}
 }

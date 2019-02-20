@@ -15,7 +15,7 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-@Api(tags = "Users", description = "API allowing queries of users")
+@Api(tags = "UserSuggestions")
 @RestController
 public class UserSuggestionController {
 	private UserQueryService userQueryService;
