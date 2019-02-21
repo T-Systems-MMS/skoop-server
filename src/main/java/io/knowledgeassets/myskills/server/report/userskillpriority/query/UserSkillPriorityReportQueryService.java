@@ -1,6 +1,5 @@
 package io.knowledgeassets.myskills.server.report.userskillpriority.query;
 
-import io.knowledgeassets.myskills.server.exception.BusinessException;
 import io.knowledgeassets.myskills.server.exception.EmptyInputException;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.exception.enums.Model;
@@ -37,7 +36,7 @@ public class UserSkillPriorityReportQueryService {
 	}
 
 	@Transactional(readOnly = true)
-	public UserSkillPriorityReport getReportById(String reportId) throws BusinessException {
+	public UserSkillPriorityReport getReportById(String reportId) {
 		return userSkillPriorityReportRepository.findById(reportId)
 				.orElseThrow(() -> NoSuchResourceException.builder()
 						.model(Model.USER_SKILL_PRIORITY_REPORT)
@@ -46,7 +45,7 @@ public class UserSkillPriorityReportQueryService {
 	}
 
 	@Transactional(readOnly = true)
-	public boolean existsReport(String reportId) throws EmptyInputException {
+	public boolean existsReport(String reportId) {
 		if (reportId == null) {
 			throw EmptyInputException.builder()
 					.message("reportId is null")
@@ -56,7 +55,7 @@ public class UserSkillPriorityReportQueryService {
 	}
 
 	@Transactional(readOnly = true)
-	public boolean existsAggregationReport(String aggregationReportId) throws EmptyInputException {
+	public boolean existsAggregationReport(String aggregationReportId) {
 		if (aggregationReportId == null) {
 			throw EmptyInputException.builder()
 					.message("aggregationReportId is null.")
@@ -66,8 +65,7 @@ public class UserSkillPriorityReportQueryService {
 	}
 
 	@Transactional(readOnly = true)
-	public Stream<UserSkillReport> getUserSkillReportsByAggregationReportId(String aggregationReportId)
-			throws BusinessException {
+	public Stream<UserSkillReport> getUserSkillReportsByAggregationReportId(String aggregationReportId) {
 		if (!existsAggregationReport(aggregationReportId)) {
 			String[] searchParamsMap = {"id", aggregationReportId};
 			throw NoSuchResourceException.builder()

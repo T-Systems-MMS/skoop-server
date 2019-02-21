@@ -220,7 +220,7 @@ class UserProjectCommandServiceTests {
 							.build())
 				.build()
 		);
-		UserProject userProject = userProjectCommandService.updateUserProject("123", "ABC", UpdateUserProjectRequest.builder()
+		UserProject userProject = userProjectCommandService.updateUserProject("123", "ABC", UpdateUserProjectCommand.builder()
 				.role("developer")
 				.tasks("development")
 				.startDate(LocalDate.of(2019, 1, 10))
@@ -245,7 +245,7 @@ class UserProjectCommandServiceTests {
 	@DisplayName("Update user-project relationshop throws an exception when there is no such user-project relationship")
 	void updateUserProjectRelationshipThrowsExceptionWhenThereIsNoSuchUserProjectRelationship() {
 		given(userProjectRepository.findByUserIdAndProjectId("123", "ABC")).willReturn(Optional.empty());
-		assertThrows(NoSuchResourceException.class, () -> userProjectCommandService.updateUserProject("123", "ABC", UpdateUserProjectRequest.builder()
+		assertThrows(NoSuchResourceException.class, () -> userProjectCommandService.updateUserProject("123", "ABC", UpdateUserProjectCommand.builder()
 				.role("developer")
 				.tasks("development")
 				.startDate(LocalDate.of(2019, 1, 10))

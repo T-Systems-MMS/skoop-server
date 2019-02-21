@@ -21,7 +21,7 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-@Api(tags = "Users", description = "API allowing modifications of users")
+@Api(tags = "UserPermissions")
 @RestController
 public class UserPermissionCommandController {
 	private UserPermissionCommandService userPermissionCommandService;

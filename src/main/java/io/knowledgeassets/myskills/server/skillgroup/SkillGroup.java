@@ -1,12 +1,10 @@
 package io.knowledgeassets.myskills.server.skillgroup;
 
-import io.knowledgeassets.myskills.server.skillgroup.SkillGroup;
 import lombok.*;
 import org.neo4j.ogm.annotation.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.util.List;
 
 @Data
 @Builder

@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-@Api(tags = "Users", description = "API allowing modifications of users")
+@Api(tags = "Users")
 @RestController
 public class UserCommandController {
 	private UserCommandService userCommandService;

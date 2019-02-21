@@ -1,7 +1,5 @@
 package io.knowledgeassets.myskills.server.userskill.query;
 
-import io.knowledgeassets.myskills.server.exception.BusinessException;
-import io.knowledgeassets.myskills.server.exception.EmptyInputException;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.exception.enums.Model;
 import io.knowledgeassets.myskills.server.skill.Skill;
@@ -49,12 +47,12 @@ public class UserSkillQueryService {
 	}
 
 	@Transactional(readOnly = true)
-	public Stream<UserSkill> getBySkillId(String skillId) throws BusinessException {
+	public Stream<UserSkill> getBySkillId(String skillId) {
 		return getBySkillId(skillId, 0);
 	}
 
 	@Transactional(readOnly = true)
-	public Stream<UserSkill> getBySkillId(String skillId, Integer minPriority) throws BusinessException {
+	public Stream<UserSkill> getBySkillId(String skillId, Integer minPriority) {
 		if (!skillQueryService.exists(skillId)) {
 			String[] searchParamsMap = {"id", skillId};
 			throw NoSuchResourceException.builder()
@@ -77,7 +75,7 @@ public class UserSkillQueryService {
 	}
 
 	@Transactional(readOnly = true)
-	public Stream<Skill> getUserSkillSuggestions(String userId, String search) throws EmptyInputException, NoSuchResourceException {
+	public Stream<Skill> getUserSkillSuggestions(String userId, String search) {
 		if (!userQueryService.exists(userId)) {
 			String[] searchParamsMap = {"id", userId};
 			throw NoSuchResourceException.builder()

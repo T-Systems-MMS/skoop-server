@@ -2,6 +2,7 @@ package io.knowledgeassets.myskills.server.userproject.command;
 
 import io.knowledgeassets.myskills.server.userproject.UserProject;
 import io.knowledgeassets.myskills.server.userproject.UserProjectResponse;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
+@Api(tags = "UserProjects")
 @RestController
 public class UserProjectCommandController {
 
@@ -70,7 +72,7 @@ public class UserProjectCommandController {
 	public ResponseEntity<UserProjectResponse> updateUserProject(@PathVariable("userId") String userId,
 																 @PathVariable("projectId") String projectId,
 																 @Valid @RequestBody UpdateUserProjectRequest request) {
-		final UserProject result = userProjectCommandService.updateUserProject(userId, projectId, request);
+		final UserProject result = userProjectCommandService.updateUserProject(userId, projectId, request.command());
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(UserProjectResponse.of(result));
 	}

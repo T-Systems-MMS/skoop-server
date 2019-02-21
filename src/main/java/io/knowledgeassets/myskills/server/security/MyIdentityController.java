@@ -17,7 +17,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import static io.knowledgeassets.myskills.server.exception.enums.Model.USER;
 import static io.knowledgeassets.myskills.server.security.JwtClaims.MYSKILLS_USER_ID;
 
-@Api(tags = "MyIdentity", description = "API allowing queries of the user identity for the authenticated user")
+@Api(tags = "MyIdentity")
 @RestController
 public class MyIdentityController {
 	private final UserQueryService userQueryService;

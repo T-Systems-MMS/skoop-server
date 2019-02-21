@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
-@Api(tags = "Communities", description = "API allowing queries of communities")
+@Api(tags = "Communities")
 @RestController
 public class CommunityQueryController {
 

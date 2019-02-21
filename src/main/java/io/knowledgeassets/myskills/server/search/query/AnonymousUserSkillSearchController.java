@@ -24,21 +24,21 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
-@Api(tags = "Search", description = "API to search for entities.")
+@Api(tags = { "SkillSearch" })
 @RestController
 @Validated
 @RequestMapping(path = "/search")
-public class SearchController {
+public class AnonymousUserSkillSearchController {
 
-	private final SearchService searchService;
+	private final AnonymousUserSkillSearchService anonymousUserSkillSearchService;
 
-	public SearchController(SearchService searchService) {
-		this.searchService = requireNonNull(searchService);
+	public AnonymousUserSkillSearchController(AnonymousUserSkillSearchService anonymousUserSkillSearchService) {
+		this.anonymousUserSkillSearchService = requireNonNull(anonymousUserSkillSearchService);
 	}
 
 	@ApiOperation(
-			value = "Get anonymous user profiles having some skills at least at specified level.",
-			notes = "Get anonymous user profiles having some skills at least at specified level."
+			value = "Get anonymous user skills at least at the specified level.",
+			notes = "Get anonymous user skills at least at the specified level."
 	)
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "Successful execution"),
@@ -47,11 +47,11 @@ public class SearchController {
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
 	@PreAuthorize("isAuthenticated()")
-	@GetMapping(path = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<AnonymousUserSkillResponse>> searchForAnonymousUserProfilesWithSkills(
+	@GetMapping(path = "/anonymous-user-profiles", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<AnonymousUserSkillResponse>> searchForAnonymousUserSkills(
 			@Valid @NotEmpty @RequestParam("params") List<@Pattern(regexp = "^.+\\+\\d+$") String> searchParameters) {
 		final List<UserSearchSkillCriterion> searchParams = extractUserSearchSkillCriterionList(searchParameters);
-		final List<AnonymousUserSkillResult> results = searchService.findAnonymousUserSkillsBySkillLevel(searchParams).collect(Collectors.toList());
+		final List<AnonymousUserSkillResult> results = anonymousUserSkillSearchService.findBySkillLevel(searchParams).collect(Collectors.toList());
 		return ResponseEntity.ok().body(results.stream().map((AnonymousUserSkillResult r) ->
 				AnonymousUserSkillResponse.builder()
 						.userReferenceId(r.getReferenceId())

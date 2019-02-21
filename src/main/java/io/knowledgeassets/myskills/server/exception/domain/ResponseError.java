@@ -37,14 +37,12 @@ public class ResponseError implements Serializable {
 	 */
 	private List<ResponseValidationError> subErrors;
 
-	{
+	private ResponseError() {
 		timestamp = LocalDateTime.now();
 	}
 
-	private ResponseError() {
-	}
-
 	public ResponseError(HttpStatus status) {
+		this();
 		this.status = status;
 	}
 

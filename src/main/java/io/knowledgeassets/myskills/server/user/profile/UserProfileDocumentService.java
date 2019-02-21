@@ -7,27 +7,18 @@ import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.user.UserRepository;
 import io.knowledgeassets.myskills.server.userskill.UserSkill;
 import io.knowledgeassets.myskills.server.userskill.UserSkillRepository;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.EmptyFileException;
-import org.apache.poi.openxml4j.exceptions.NotOfficeXmlFileException;
 import org.apache.poi.xwpf.usermodel.IBody;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.apache.xmlbeans.XmlCursor;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTPPr;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigInteger;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -41,23 +32,20 @@ import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
 @Service
-@Slf4j
 public class UserProfileDocumentService {
 
 	private static final SimpleDateFormat SDF = new SimpleDateFormat("dd.MM.yyyy");
 
-	private static final ClassPathResource DEFAULT_TEMPLATE_RESOURCE = new ClassPathResource("templates/user-profile.docx");
-
 	private final UserRepository userRepository;
 	private final UserSkillRepository userSkillRepository;
-	private final String templatePath;
+	private final UserProfileDocumentTemplateReader userProfileDocumentTemplateReader;
 
 	public UserProfileDocumentService(UserRepository userRepository,
 									  UserSkillRepository userSkillRepository,
-									  @Value("${myskills.user-profile-download.template-path:#{null}}") String templatePath) {
+									  UserProfileDocumentTemplateReader userProfileDocumentTemplateReader) {
 		this.userRepository = requireNonNull(userRepository);
 		this.userSkillRepository = requireNonNull(userSkillRepository);
-		this.templatePath = templatePath;
+		this.userProfileDocumentTemplateReader = requireNonNull(userProfileDocumentTemplateReader);
 	}
 
 	/**
@@ -69,38 +57,15 @@ public class UserProfileDocumentService {
 
 		final User user = getUserByReferenceId(referenceId);
 
-		try (final InputStream is = getTemplate();
-			 final XWPFDocument document = new XWPFDocument(is)) {
+		try (final XWPFDocument document = userProfileDocumentTemplateReader.getTemplate()) {
 			replacePlaceholders(document, user);
 			final ByteArrayOutputStream b = new ByteArrayOutputStream();
 			document.write(b);
 			return b.toByteArray();
 		}
-		catch (IOException | EmptyFileException | NotOfficeXmlFileException e) {
+		catch (IOException e) {
 			throw new UserProfileDocumentException(format("An error has occurred when building user " +
 					"profile document for a user with the reference id %s", referenceId), e);
-		}
-	}
-
-	private InputStream getTemplate() throws IOException {
-		if (StringUtils.isEmpty(this.templatePath)) {
-			return DEFAULT_TEMPLATE_RESOURCE.getInputStream();
-		}
-		else {
-			final Path path = Paths.get(this.templatePath);
-			if (path.toFile().exists()) {
-				try {
-					return new FileSystemResource(path).getInputStream();
-				}
-				catch (IOException ex) {
-					log.warn(format("The template file \"%s\" cannot be read. The default template file will be used as a fallback option.", path), ex);
-					return DEFAULT_TEMPLATE_RESOURCE.getInputStream();
-				}
-			}
-			else {
-				log.warn(format("The template file \"%s\" does not exist. The default template file will be used as a fallback option.", path));
-				return DEFAULT_TEMPLATE_RESOURCE.getInputStream();
-			}
 		}
 	}
 
@@ -161,7 +126,7 @@ public class UserProfileDocumentService {
 								StreamSupport.stream(userSkillRepository.findByUserIdOrderByCurrentLevelDesc(user.getId()).spliterator(), false)
 										.map((UserSkill userSkill) -> {
 											StringBuilder level = new StringBuilder();
-											IntStream.rangeClosed(1, userSkill.getCurrentLevel()).forEach((a) -> level.append("*"));
+											IntStream.rangeClosed(1, userSkill.getCurrentLevel()).forEach(a -> level.append("*"));
 											return format("%s %s", userSkill.getSkill().getName(), level.toString());
 										}).collect(Collectors.toList());
 						replaceListPlaceholder(r, UserProfilePlaceholder.SKILLS.getName(), skillsSupplier, p, body);

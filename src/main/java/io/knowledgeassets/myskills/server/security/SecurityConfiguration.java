@@ -56,7 +56,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	}
 
 	@Bean
-	public Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter() {
+	public Converter<Jwt, AbstractAuthenticationToken> jwtAuthenticationConverter() {
 		return new MySkillsJwtAuthenticationConverter();
 	}
 

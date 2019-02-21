@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static java.util.Objects.requireNonNull;
 
-@Api(tags = "Download", description = "API to provide user profile documents for downloading.")
+@Api(tags = "Download")
 @RestController
 @RequestMapping(path = "/download")
 public class UserProfileDownloadController {

@@ -9,7 +9,6 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,7 +16,7 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-@Api(tags = "SkillGroups", description = "API allowing queries of skill group suggestions for skill")
+@Api(tags = "SkillGroupsSuggestions")
 @RestController
 public class SkillGroupSuggestionController {
 	private SkillGroupQueryService skillGroupQueryService;
@@ -38,7 +37,7 @@ public class SkillGroupSuggestionController {
 	})
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping(path = "/group-suggestions", produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<String> getSkillGroupSuggestions(@RequestParam("search") String search) throws BusinessException {
+	public List<String> getSkillGroupSuggestions(@RequestParam("search") String search) {
 		try {
 			return skillGroupQueryService.getSkillGroupSuggestions(search).map(SkillGroup::getName).collect(toList());
 		} catch (BusinessException e) {

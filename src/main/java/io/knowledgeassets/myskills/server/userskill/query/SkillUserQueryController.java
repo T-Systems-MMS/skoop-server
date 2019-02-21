@@ -1,12 +1,9 @@
 package io.knowledgeassets.myskills.server.userskill.query;
 
-import io.knowledgeassets.myskills.server.exception.BusinessException;
 import io.knowledgeassets.myskills.server.exception.InvalidInputException;
 import io.knowledgeassets.myskills.server.user.User;
-import io.knowledgeassets.myskills.server.user.UserResponse;
 import io.knowledgeassets.myskills.server.user.UserSimpleResponse;
 import io.knowledgeassets.myskills.server.user.query.UserPermissionQueryService;
-import io.knowledgeassets.myskills.server.userskill.UserSkill;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -30,7 +27,7 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
-@Api(tags = "SkillUsers", description = "API allowing queries of relationships from skills to users")
+@Api(tags = "SkillUsers")
 @RestController
 public class SkillUserQueryController {
 	private UserSkillQueryService userSkillQueryService;
@@ -58,8 +55,7 @@ public class SkillUserQueryController {
 	public List<SkillUserResponse> getSkillUsers(@PathVariable("skillId") String skillId,
 												 @RequestParam(value = "minPriority", required = false)
 														 Integer minPriority,
-												 @ApiIgnore @AuthenticationPrincipal Jwt jwt)
-			throws BusinessException {
+												 @ApiIgnore @AuthenticationPrincipal Jwt jwt) {
 		// Create a whitelist of those user IDs who allowed the principal read access to their skill relationships.
 		Set<String> allowedUserIds = userPermissionQueryService.getUsersWhoGrantedPermission(
 				jwt.getClaimAsString(MYSKILLS_USER_ID), READ_USER_SKILLS).map(User::getId).collect(toSet());

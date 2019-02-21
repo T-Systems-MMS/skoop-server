@@ -33,6 +33,9 @@ import static java.lang.String.format;
 @Component
 public class IndexManager {
 
+	private static final String LABEL = "label";
+	private static final String PROPERTY = "property";
+
 	private final List<String> fileIndexes;
 	private final Neo4jSession session;
 
@@ -121,8 +124,8 @@ public class IndexManager {
 		pattern = compile("INDEX ON :(?<label>.*)\\((?<property>.*)\\)");
 		matcher = pattern.matcher(indexValue);
 		if (matcher.matches()) {
-			String label = matcher.group("label");
-			String[] properties = matcher.group("property").split(",");
+			String label = matcher.group(LABEL);
+			String[] properties = matcher.group(PROPERTY).split(",");
 			for (int i = 0; i < properties.length; i++) {
 				properties[i] = properties[i].trim();
 			}
@@ -137,15 +140,15 @@ public class IndexManager {
 		pattern = compile("CONSTRAINT ON \\((?<name>.*):(?<label>.*)\\) ASSERT ?\\k<name>.(?<property>.*) IS UNIQUE");
 		matcher = pattern.matcher(indexValue);
 		if (matcher.matches()) {
-			String label = matcher.group("label").trim();
-			String[] properties = matcher.group("property").split(",");
+			String label = matcher.group(LABEL).trim();
+			String[] properties = matcher.group(PROPERTY).split(",");
 			return UNIQUE_CONSTRAINT.convertToCreateCommand(label, properties);
 		}
 
 		pattern = compile("CONSTRAINT ON \\((?<name>.*):(?<label>.*)\\) ASSERT \\((?<properties>.*)\\) IS NODE KEY");
 		matcher = pattern.matcher(indexValue);
 		if (matcher.matches()) {
-			String label = matcher.group("label").trim();
+			String label = matcher.group(LABEL).trim();
 			String[] properties = matcher.group("properties").split(",");
 			for (int i = 0; i < properties.length; i++) {
 				properties[i] = properties[i].trim().substring(label.length() + 1);
@@ -157,8 +160,8 @@ public class IndexManager {
 				"CONSTRAINT ON \\(\\s?(?<name>.*):(?<label>.*)\\s?\\) ASSERT exists\\(?\\k<name>.(?<property>.*)\\)");
 		matcher = pattern.matcher(indexValue);
 		if (matcher.matches()) {
-			String label = matcher.group("label").trim();
-			String[] properties = matcher.group("property").split(",");
+			String label = matcher.group(LABEL).trim();
+			String[] properties = matcher.group(PROPERTY).split(",");
 			return NODE_PROP_EXISTENCE_CONSTRAINT.convertToCreateCommand(label, properties);
 		}
 
@@ -166,8 +169,8 @@ public class IndexManager {
 				"CONSTRAINT ON \\(\\)-\\[\\s?(?<name>.*):(?<label>.*)\\s?]-\\(\\) ASSERT exists\\(?\\k<name>.(?<property>.*)\\)");
 		matcher = pattern.matcher(indexValue);
 		if (matcher.matches()) {
-			String label = matcher.group("label").trim();
-			String[] properties = matcher.group("property").split(",");
+			String label = matcher.group(LABEL).trim();
+			String[] properties = matcher.group(PROPERTY).split(",");
 			for (int i = 0; i < properties.length; i++) {
 				properties[i] = properties[i].trim();
 			}

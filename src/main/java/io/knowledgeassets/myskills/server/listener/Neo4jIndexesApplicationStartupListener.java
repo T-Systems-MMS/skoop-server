@@ -7,12 +7,12 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 @Component
-public class OnApplicationStartupListener {
+public class Neo4jIndexesApplicationStartupListener {
 
 	private final IndexManager indexManager;
 
 	@Autowired
-	public OnApplicationStartupListener(IndexManager indexManager) {
+	public Neo4jIndexesApplicationStartupListener(IndexManager indexManager) {
 		this.indexManager = indexManager;
 	}
 

@@ -23,16 +23,16 @@ import static org.mockito.BDDMockito.given;
 import static java.util.stream.Collectors.toList;
 
 @ExtendWith(MockitoExtension.class)
-class SearchServiceTests {
+class AnonymousUserSkillSearchServiceTests {
 
 	@Mock
 	private AnonymousUserSkillRepository anonymousUserSkillRepository;
 
-	private SearchService searchService;
+	private AnonymousUserSkillSearchService anonymousUserSkillSearchService;
 
 	@BeforeEach
 	void setUp() {
-		this.searchService = new SearchService(anonymousUserSkillRepository);
+		this.anonymousUserSkillSearchService = new AnonymousUserSkillSearchService(anonymousUserSkillRepository);
 	}
 
 	@Test
@@ -68,7 +68,7 @@ class SearchServiceTests {
 				)
 		);
 
-		Stream<AnonymousUserSkillResult> result = searchService.findAnonymousUserSkillsBySkillLevel(
+		Stream<AnonymousUserSkillResult> result = anonymousUserSkillSearchService.findBySkillLevel(
 				Arrays.asList(UserSearchSkillCriterion.builder()
 								.skillId("B")
 								.minimumCurrentLevel(2)
@@ -97,7 +97,7 @@ class SearchServiceTests {
 	@Test
 	@DisplayName("Tests if an exception is thrown when there are no parameters to search by")
 	void testIfExceptionIsThrownWhenThereAreNoParametersToSearchBy() {
-		assertThrows(IllegalArgumentException.class, () -> searchService.findAnonymousUserSkillsBySkillLevel(Collections.emptyList()));
+		assertThrows(IllegalArgumentException.class, () -> anonymousUserSkillSearchService.findBySkillLevel(Collections.emptyList()));
 	}
 
 }

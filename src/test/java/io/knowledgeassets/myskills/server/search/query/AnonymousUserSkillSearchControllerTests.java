@@ -25,14 +25,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(SearchController.class)
-class SearchControllerTests extends AbstractControllerTests {
+@WebMvcTest(AnonymousUserSkillSearchController.class)
+class AnonymousUserSkillSearchControllerTests extends AbstractControllerTests {
 
 	@Autowired
 	private MockMvc mockMvc;
 
 	@MockBean
-	private SearchService searchService;
+	private AnonymousUserSkillSearchService anonymousUserSkillSearchService;
 
 	@Test
 	@DisplayName("Tests if BAD_REQUEST status code is returned when wrong search parameters are passed.")
@@ -41,7 +41,7 @@ class SearchControllerTests extends AbstractControllerTests {
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
 				.build();
-		mockMvc.perform(get("/search/users")
+		mockMvc.perform(get("/search/anonymous-user-profiles")
 				.param("params", "A2", "B1")
 				.with(authentication(withUser(owner))))
 				.andExpect(status().isBadRequest());
@@ -54,7 +54,7 @@ class SearchControllerTests extends AbstractControllerTests {
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
 				.build();
-		mockMvc.perform(get("/search/users")
+		mockMvc.perform(get("/search/anonymous-user-profiles")
 				.with(authentication(withUser(owner))))
 				.andExpect(status().isBadRequest());
 	}
@@ -66,7 +66,7 @@ class SearchControllerTests extends AbstractControllerTests {
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
 				.build();
-		mockMvc.perform(get("/search/users")
+		mockMvc.perform(get("/search/anonymous-user-profiles")
 				.param("params", "")
 				.with(authentication(withUser(owner))))
 				.andExpect(status().isBadRequest());
@@ -75,7 +75,7 @@ class SearchControllerTests extends AbstractControllerTests {
 	@Test
 	@DisplayName("Tests if UNAUTHORIZED status code is returned when a user sending a request is unknown.")
 	void testIfUnauthorizedStatusCodeIsReturnedWhenUserIsUnknown() throws Exception {
-		mockMvc.perform(get("/search/users"))
+		mockMvc.perform(get("/search/anonymous-user-profiles"))
 				.andExpect(status().isUnauthorized());
 	}
 
@@ -83,7 +83,7 @@ class SearchControllerTests extends AbstractControllerTests {
 	@DisplayName("Test if anonymous user skills are successfully retrieved.")
 	void testIfAnonymousUserSkillsAreSuccessfullyRetrieved() throws Exception {
 
-		given(searchService.findAnonymousUserSkillsBySkillLevel(Arrays.asList(UserSearchSkillCriterion.builder()
+		given(anonymousUserSkillSearchService.findBySkillLevel(Arrays.asList(UserSearchSkillCriterion.builder()
 						.skillId("B")
 						.minimumCurrentLevel(2)
 						.build(),
@@ -117,7 +117,7 @@ class SearchControllerTests extends AbstractControllerTests {
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
 				.build();
-		mockMvc.perform(get("/search/users")
+		mockMvc.perform(get("/search/anonymous-user-profiles")
 				.param("params", "B+2", "A+1")
 				.with(authentication(withUser(owner))))
 				.andExpect(status().isOk())

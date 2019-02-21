@@ -146,7 +146,7 @@ class UserProjectCommandControllerTests extends AbstractControllerTests {
 	@DisplayName("Tests if user project can be updated.")
 	void testIfUserProjectCanBeUpdated() throws Exception {
 		final ClassPathResource body = new ClassPathResource("update-user-project.json");
-		given(userProjectCommandService.updateUserProject("1f37fb2a-b4d0-4119-9113-4677beb20ae2", "123", UpdateUserProjectRequest.builder()
+		given(userProjectCommandService.updateUserProject("1f37fb2a-b4d0-4119-9113-4677beb20ae2", "123", UpdateUserProjectCommand.builder()
 				.role("developer")
 				.tasks("development")
 				.startDate(LocalDate.of(2019, 1, 9))

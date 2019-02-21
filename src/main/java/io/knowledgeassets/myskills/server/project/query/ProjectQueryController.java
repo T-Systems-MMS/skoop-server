@@ -17,7 +17,7 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-@Api(tags = "Projects", description = "API allowing queries of projects")
+@Api(tags = "Projects")
 @RestController
 public class ProjectQueryController {
 

@@ -21,7 +21,7 @@ import javax.validation.Valid;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-@Api(tags = "UserSkills", description = "API to modify relationships between users and skills")
+@Api(tags = "UserSkills")
 @RestController
 public class UserSkillCommandController {
 	private UserSkillCommandService userSkillCommandService;
