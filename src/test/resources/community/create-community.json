@@ -12,5 +12,9 @@
 			"href": "https://www.linkedin.com/java-user-group"
 		}
 	],
-	"skillIds": ["4f09647e-c7d3-4aa6-ab3d-0faff66b951f", "6d0870d0-a7b8-4cf4-8a24-bedcfe350903"]
+	"skillNames": [
+		"Spring Boot",
+		"Angular",
+		"Spring MVC"
+	]
 }
