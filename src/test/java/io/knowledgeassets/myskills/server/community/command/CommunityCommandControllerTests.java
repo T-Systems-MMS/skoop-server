@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.mockito.BDDMockito.given;
@@ -64,15 +65,23 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 				.build();
 		final ClassPathResource body = new ClassPathResource("community/create-community.json");
 
-		given(skillQueryService.getSkillsByIds(Arrays.asList("4f09647e-c7d3-4aa6-ab3d-0faff66b951f", "6d0870d0-a7b8-4cf4-8a24-bedcfe350903")))
-				.willReturn(Stream.of(Skill.builder()
-						.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
-						.name("Spring Boot")
-						.build(),
+		given(skillQueryService.findByNameIgnoreCase("Spring Boot")).willReturn(
+				Optional.of(
 						Skill.builder()
-						.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
-						.name("Angular")
-						.build()));
+								.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
+								.name("Spring Boot")
+								.build()
+				)
+		);
+
+		given(skillQueryService.findByNameIgnoreCase("Angular")).willReturn(
+				Optional.of(
+						Skill.builder()
+								.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
+								.name("Angular")
+								.build()
+				)
+		);
 
 		final Community community = Community.builder()
 				.title("Java User Group")
@@ -95,7 +104,11 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 						Skill.builder()
 						.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
 						.name("Angular")
-						.build()))
+						.build(),
+						Skill.builder()
+						.name("Spring MVC")
+						.build()
+						))
 				.build();
 		given(communityCommandService.create(community)).willReturn(
 				Community.builder()
@@ -124,6 +137,10 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 								Skill.builder()
 										.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
 										.name("Angular")
+										.build(),
+								Skill.builder()
+										.id("dce8b8c9-cd49-4a87-8cd2-4ca106dcf7f3")
+										.name("Spring MVC")
 										.build()))
 						.build()
 		);
@@ -151,7 +168,9 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 					.andExpect(jsonPath("$.skills[0].id", is(equalTo("4f09647e-c7d3-4aa6-ab3d-0faff66b951f"))))
 					.andExpect(jsonPath("$.skills[0].name", is(equalTo("Spring Boot"))))
 					.andExpect(jsonPath("$.skills[1].id", is(equalTo("6d0870d0-a7b8-4cf4-8a24-bedcfe350903"))))
-					.andExpect(jsonPath("$.skills[1].name", is(equalTo("Angular"))));
+					.andExpect(jsonPath("$.skills[1].name", is(equalTo("Angular"))))
+					.andExpect(jsonPath("$.skills[2].id", is(equalTo("dce8b8c9-cd49-4a87-8cd2-4ca106dcf7f3"))))
+					.andExpect(jsonPath("$.skills[2].name", is(equalTo("Spring MVC"))));
 		}
 	}
 
@@ -217,15 +236,23 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 				.build();
 		given(currentUserService.getCurrentUser()).willReturn(owner);
 
-		given(skillQueryService.getSkillsByIds(Arrays.asList("4f09647e-c7d3-4aa6-ab3d-0faff66b951f", "6d0870d0-a7b8-4cf4-8a24-bedcfe350903")))
-				.willReturn(Stream.of(Skill.builder()
+		given(skillQueryService.findByNameIgnoreCase("Spring Boot")).willReturn(
+				Optional.of(
+						Skill.builder()
 								.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
 								.name("Spring Boot")
-								.build(),
+								.build()
+				)
+		);
+
+		given(skillQueryService.findByNameIgnoreCase("Angular")).willReturn(
+				Optional.of(
 						Skill.builder()
 								.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
 								.name("Angular")
-								.build()));
+								.build()
+				)
+		);
 
 		given(userQueryService.getUsersByIds(singletonList("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))).willReturn(Stream.of(owner), Stream.of(owner));
 		final ClassPathResource body = new ClassPathResource("community/update-community.json");
@@ -247,13 +274,16 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 				.managers(singletonList(owner))
 				.members(singletonList(owner))
 				.skills(Arrays.asList(Skill.builder()
-						.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
-						.name("Spring Boot")
-						.build(),
+								.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
+								.name("Spring Boot")
+								.build(),
 						Skill.builder()
-						.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
-						.name("Angular")
-						.build()))
+								.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
+								.name("Angular")
+								.build(),
+						Skill.builder()
+								.name("Spring MVC")
+								.build()))
 				.build();
 		given(communityCommandService.update(community)).willReturn(
 				Community.builder()
@@ -280,6 +310,10 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 								Skill.builder()
 										.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
 										.name("Angular")
+										.build(),
+								Skill.builder()
+										.id("dce8b8c9-cd49-4a87-8cd2-4ca106dcf7f3")
+										.name("Spring MVC")
 										.build()))
 						.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
 						.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
@@ -309,7 +343,9 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 					.andExpect(jsonPath("$.skills[0].id", is(equalTo("4f09647e-c7d3-4aa6-ab3d-0faff66b951f"))))
 					.andExpect(jsonPath("$.skills[0].name", is(equalTo("Spring Boot"))))
 					.andExpect(jsonPath("$.skills[1].id", is(equalTo("6d0870d0-a7b8-4cf4-8a24-bedcfe350903"))))
-					.andExpect(jsonPath("$.skills[1].name", is(equalTo("Angular"))));
+					.andExpect(jsonPath("$.skills[1].name", is(equalTo("Angular"))))
+					.andExpect(jsonPath("$.skills[2].id", is(equalTo("dce8b8c9-cd49-4a87-8cd2-4ca106dcf7f3"))))
+					.andExpect(jsonPath("$.skills[2].name", is(equalTo("Spring MVC"))));
 		}
 	}
 

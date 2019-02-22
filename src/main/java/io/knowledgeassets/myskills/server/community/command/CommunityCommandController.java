@@ -114,10 +114,12 @@ public class CommunityCommandController {
 		if (communityRequest.getMemberIds() != null) {
 			members = userQueryService.getUsersByIds(communityRequest.getMemberIds()).collect(toList());
 		}
-		List<Skill> skills = null;
-		if (communityRequest.getSkillIds() != null) {
-			skills = skillQueryService.getSkillsByIds(communityRequest.getSkillIds()).collect(toList());
-		}
+		final List<Skill> skills = communityRequest.getSkillNames().stream().map(skillName ->
+				skillQueryService.findByNameIgnoreCase(skillName).orElse(
+						Skill.builder()
+								.name(skillName)
+								.build()
+				)).collect(toList());
 		return Community.builder()
 				.title(communityRequest.getTitle())
 				.type(communityRequest.getType())

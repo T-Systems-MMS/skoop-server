@@ -17,6 +17,7 @@ import java.util.List;
 		description = "Request object for creating or updating a skill."
 )
 public class SkillRequest {
+
 	@ApiModelProperty("Name of a skill. It cannot be blank.")
 	@NotBlank
 	@Size(min = 3, max = 64)
