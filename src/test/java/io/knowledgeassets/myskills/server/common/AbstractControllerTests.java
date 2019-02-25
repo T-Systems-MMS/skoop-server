@@ -2,6 +2,7 @@ package io.knowledgeassets.myskills.server.common;
 
 import io.knowledgeassets.myskills.server.community.query.CommunityQueryService;
 import io.knowledgeassets.myskills.server.security.MethodSecurityConfiguration;
+import io.knowledgeassets.myskills.server.security.SecurityService;
 import io.knowledgeassets.myskills.server.user.UserPermissionScope;
 import io.knowledgeassets.myskills.server.user.query.UserPermissionQueryService;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +25,7 @@ import static org.mockito.BDDMockito.willReturn;
  * </ul>
  * <p>Provides convenient builder methods to configure user permissions checked by method security.</p>
  */
-@Import({Neo4jSessionFactoryConfiguration.class, MethodSecurityConfiguration.class})
+@Import({Neo4jSessionFactoryConfiguration.class, MethodSecurityConfiguration.class, SecurityService.class})
 public abstract class AbstractControllerTests {
 	@MockBean
 	private JwtDecoder jwtDecoder;

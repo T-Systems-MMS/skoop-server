@@ -186,4 +186,33 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 				.andExpect(status().isUnauthorized());
 	}
 
+	@Test
+	@DisplayName("Test if community manager kicks out a community member.")
+	void testIfCommunityManagesKicksOutCommunityMember() throws Exception {
+		final User owner = User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build();
+
+		given(communityQueryService.hasCommunityManagerRole("1f37fb2a-b4d0-4119-9113-4677beb20ae2", "123")).willReturn(true);
+
+		given(communityUserCommandService.leaveCommunity("123", "a396d5a8-a6b1-4c71-9498-a16e655dae2e")).willReturn(Community.builder()
+				.id("123")
+				.title("Java User Group")
+				.members(singletonList(User.builder()
+						.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
+						.userName("anotherTester")
+						.build()))
+				.build()
+		);
+
+		mockMvc.perform(delete("/communities/123/users/a396d5a8-a6b1-4c71-9498-a16e655dae2e")
+				.with(authentication(withUser(owner))))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id", is(equalTo("123"))))
+				.andExpect(jsonPath("$.title", is(equalTo("Java User Group"))))
+				.andExpect(jsonPath("$.members[0].id", is(equalTo("56ef4778-a084-4509-9a3e-80b7895cf7b0"))))
+				.andExpect(jsonPath("$.members[0].userName", is(equalTo("anotherTester"))));
+	}
+
 }

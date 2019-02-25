@@ -1,6 +1,5 @@
 package io.knowledgeassets.myskills.server.security;
 
-import io.knowledgeassets.myskills.server.community.query.CommunityQueryService;
 import io.knowledgeassets.myskills.server.user.UserPermissionScope;
 import io.knowledgeassets.myskills.server.user.query.UserPermissionQueryService;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
@@ -14,14 +13,14 @@ public class MySkillsSecurityExpressionRoot extends SecurityExpressionRoot imple
 	private Object filterObject;
 	private Object returnObject;
 	private Object target;
-	private UserPermissionQueryService userPermissionQueryService;
-	private CommunityQueryService communityQueryService;
+	private final UserPermissionQueryService userPermissionQueryService;
+	private final SecurityService securityService;
 
 	public MySkillsSecurityExpressionRoot(Authentication authentication, UserPermissionQueryService userPermissionQueryService,
-										  CommunityQueryService communityQueryService) {
+										  SecurityService securityService) {
 		super(authentication);
 		this.userPermissionQueryService = userPermissionQueryService;
-		this.communityQueryService = communityQueryService;
+		this.securityService = securityService;
 	}
 
 	/**
@@ -71,12 +70,7 @@ public class MySkillsSecurityExpressionRoot extends SecurityExpressionRoot imple
 	 * @return <code>true</code> if the authenticated user has community manager role for the community referenced by the community ID.
 	 */
 	public boolean hasCommunityManagerRole(String communityId) {
-		final Object principal = getPrincipal();
-		if (principal instanceof Jwt) {
-			final String userIdClaim = ((Jwt) principal).getClaimAsString(MYSKILLS_USER_ID);
-			return communityQueryService.hasCommunityManagerRole(userIdClaim, communityId);
-		}
-		return false;
+		return securityService.hasCommunityManagerRole(getPrincipal(), communityId);
 	}
 
 	public void setFilterObject(Object filterObject) {
