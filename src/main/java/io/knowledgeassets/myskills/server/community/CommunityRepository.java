@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface CommunityRepository extends Neo4jRepository<Community, String> {
+public interface CommunityRepository extends Neo4jRepository<Community, String>, RecommendedCommunityRepository {
 
 	@Query("MATCH (community:Community) WHERE TOLOWER(community.title) = TOLOWER({title}) RETURN community")
 	Optional<Community> findByTitleIgnoreCase(@Param("title") String title);

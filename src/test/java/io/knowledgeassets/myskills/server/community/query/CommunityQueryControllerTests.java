@@ -4,6 +4,7 @@ import io.knowledgeassets.myskills.server.common.AbstractControllerTests;
 import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.community.CommunityType;
 import io.knowledgeassets.myskills.server.community.Link;
+import io.knowledgeassets.myskills.server.community.RecommendedCommunity;
 import io.knowledgeassets.myskills.server.security.CurrentUserService;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.user.User;
@@ -68,50 +69,60 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 
 		given(currentUserService.getCurrentUser()).willReturn(owner);
 
-		given(communityQueryService.getCommunities()).willReturn(
+		given(communityQueryService.getCommunitiesRecommendedForUser("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(
 				Stream.of(
-						Community.builder()
-								.id("123")
-								.title("Java User Group")
-								.type(CommunityType.OPENED)
-								.description("Community for Java developers")
-								.links(Arrays.asList(
-										Link.builder()
-												.name("Facebook")
-												.href("https://www.facebook.com/java-user-group")
-												.build(),
-										Link.builder()
-												.name("Linkedin")
-												.href("https://www.linkedin.com/java-user-group")
+						RecommendedCommunity.builder()
+								.community(
+										Community.builder()
+												.id("123")
+												.title("Java User Group")
+												.type(CommunityType.OPENED)
+												.description("Community for Java developers")
+												.links(Arrays.asList(
+														Link.builder()
+																.name("Facebook")
+																.href("https://www.facebook.com/java-user-group")
+																.build(),
+														Link.builder()
+																.name("Linkedin")
+																.href("https://www.linkedin.com/java-user-group")
+																.build()
+												))
+												.managers(singletonList(owner))
+												.members(singletonList(owner))
+												.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
+												.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
+												.skills(Arrays.asList(springBootSkill, angularSkill))
 												.build()
-								))
-								.managers(singletonList(owner))
-								.members(singletonList(owner))
-								.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
-								.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
-								.skills(Arrays.asList(springBootSkill, angularSkill))
-								.build(),
-						Community.builder()
-								.id("456")
-								.title("Scala User Group")
-								.type(CommunityType.OPENED)
-								.description("Community for Scala developers")
-								.links(Arrays.asList(
-										Link.builder()
-												.name("Facebook")
-												.href("https://www.facebook.com/scala-user-group")
-												.build(),
-										Link.builder()
-												.name("Linkedin")
-												.href("https://www.linkedin.com/scala-user-group")
-												.build()
-								))
-								.managers(singletonList(owner))
-								.members(singletonList(owner))
-								.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
-								.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
-								.skills(Arrays.asList(springBootSkill, javascriptSkill))
-								.build()
+								)
+							.recommended(true)
+						.build(),
+						RecommendedCommunity.builder()
+						.community(
+								Community.builder()
+										.id("456")
+										.title("Scala User Group")
+										.type(CommunityType.OPENED)
+										.description("Community for Scala developers")
+										.links(Arrays.asList(
+												Link.builder()
+														.name("Facebook")
+														.href("https://www.facebook.com/scala-user-group")
+														.build(),
+												Link.builder()
+														.name("Linkedin")
+														.href("https://www.linkedin.com/scala-user-group")
+														.build()
+										))
+										.managers(singletonList(owner))
+										.members(singletonList(owner))
+										.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
+										.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
+										.skills(Arrays.asList(springBootSkill, javascriptSkill))
+										.build()
+						)
+						.recommended(false)
+						.build()
 				)
 		);
 		mockMvc.perform(get("/communities")
@@ -137,6 +148,7 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[0].skills[0].name", is(equalTo("Spring Boot"))))
 				.andExpect(jsonPath("$[0].skills[1].id", is(equalTo("6d0870d0-a7b8-4cf4-8a24-bedcfe350903"))))
 				.andExpect(jsonPath("$[0].skills[1].name", is(equalTo("Angular"))))
+				.andExpect(jsonPath("$[0].recommended", is(true)))
 				.andExpect(jsonPath("$[1].id", is(equalTo("456"))))
 				.andExpect(jsonPath("$[1].title", is(equalTo("Scala User Group"))))
 				.andExpect(jsonPath("$[1].type", is(equalTo("OPENED"))))
@@ -152,7 +164,8 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[1].skills[0].id", is(equalTo("4f09647e-c7d3-4aa6-ab3d-0faff66b951f"))))
 				.andExpect(jsonPath("$[1].skills[0].name", is(equalTo("Spring Boot"))))
 				.andExpect(jsonPath("$[1].skills[1].id", is(equalTo("10ea2af6-cd81-48e0-b339-0576d16b9d19"))))
-				.andExpect(jsonPath("$[1].skills[1].name", is(equalTo("JavaScript"))));
+				.andExpect(jsonPath("$[1].skills[1].name", is(equalTo("JavaScript"))))
+				.andExpect(jsonPath("$[1].recommended", is(false)));
 	}
 
 	@Test
@@ -180,56 +193,66 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 
 		given(currentUserService.getCurrentUser()).willReturn(owner);
 
-		given(communityQueryService.getCommunities()).willReturn(
+		given(communityQueryService.getCommunitiesRecommendedForUser("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(
 				Stream.of(
-						Community.builder()
-								.id("123")
-								.title("Java User Group")
-								.type(CommunityType.OPENED)
-								.description("Community for Java developers")
-								.links(Arrays.asList(
-										Link.builder()
-												.name("Facebook")
-												.href("https://www.facebook.com/java-user-group")
-												.build(),
-										Link.builder()
-												.name("Linkedin")
-												.href("https://www.linkedin.com/java-user-group")
-												.build()
-								))
-								.managers(singletonList(owner))
-								.members(singletonList(owner))
-								.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
-								.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
-								.skills(Arrays.asList(springBootSkill, angularSkill))
-								.build(),
-						Community.builder()
-								.id("456")
-								.title("Scala User Group")
-								.type(CommunityType.OPENED)
-								.description("Community for Scala developers")
-								.links(Arrays.asList(
-										Link.builder()
-												.name("Facebook")
-												.href("https://www.facebook.com/scala-user-group")
-												.build(),
-										Link.builder()
-												.name("Linkedin")
-												.href("https://www.linkedin.com/scala-user-group")
-												.build()
-								))
-								.managers(singletonList(User.builder()
-										.id("a396d5a8-a6b1-4c71-9498-a16e655dae2e")
-										.userName("anotherUser")
-										.build()))
-								.members(singletonList(User.builder()
-										.id("a396d5a8-a6b1-4c71-9498-a16e655dae2e")
-										.userName("anotherUser")
-										.build()))
-								.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
-								.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
-								.skills(Arrays.asList(springBootSkill, javascriptSkill))
-								.build()
+						RecommendedCommunity.builder()
+						.community(
+								Community.builder()
+										.id("123")
+										.title("Java User Group")
+										.type(CommunityType.OPENED)
+										.description("Community for Java developers")
+										.links(Arrays.asList(
+												Link.builder()
+														.name("Facebook")
+														.href("https://www.facebook.com/java-user-group")
+														.build(),
+												Link.builder()
+														.name("Linkedin")
+														.href("https://www.linkedin.com/java-user-group")
+														.build()
+										))
+										.managers(singletonList(owner))
+										.members(singletonList(owner))
+										.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
+										.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
+										.skills(Arrays.asList(springBootSkill, angularSkill))
+										.build()
+						)
+						.recommended(true)
+						.build(),
+						RecommendedCommunity.builder()
+						.community(
+								Community.builder()
+										.id("456")
+										.title("Scala User Group")
+										.type(CommunityType.OPENED)
+										.description("Community for Scala developers")
+										.links(Arrays.asList(
+												Link.builder()
+														.name("Facebook")
+														.href("https://www.facebook.com/scala-user-group")
+														.build(),
+												Link.builder()
+														.name("Linkedin")
+														.href("https://www.linkedin.com/scala-user-group")
+														.build()
+										))
+										.managers(singletonList(User.builder()
+												.id("a396d5a8-a6b1-4c71-9498-a16e655dae2e")
+												.userName("anotherUser")
+												.build()))
+										.members(singletonList(User.builder()
+												.id("a396d5a8-a6b1-4c71-9498-a16e655dae2e")
+												.userName("anotherUser")
+												.build()))
+										.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
+										.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
+										.skills(Arrays.asList(springBootSkill, javascriptSkill))
+										.build()
+						)
+						.recommended(false)
+						.build()
 				)
 		);
 		mockMvc.perform(get("/communities")
@@ -255,6 +278,7 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[0].skills[0].name", is(equalTo("Spring Boot"))))
 				.andExpect(jsonPath("$[0].skills[1].id", is(equalTo("6d0870d0-a7b8-4cf4-8a24-bedcfe350903"))))
 				.andExpect(jsonPath("$[0].skills[1].name", is(equalTo("Angular"))))
+				.andExpect(jsonPath("$[0].recommended", is(true)))
 				.andExpect(jsonPath("$[1].id", is(equalTo("456"))))
 				.andExpect(jsonPath("$[1].title", is(equalTo("Scala User Group"))))
 				.andExpect(jsonPath("$[1].type", is(equalTo("OPENED"))))
@@ -269,7 +293,8 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[1].skills[0].id", is(equalTo("4f09647e-c7d3-4aa6-ab3d-0faff66b951f"))))
 				.andExpect(jsonPath("$[1].skills[0].name", is(equalTo("Spring Boot"))))
 				.andExpect(jsonPath("$[1].skills[1].id", is(equalTo("10ea2af6-cd81-48e0-b339-0576d16b9d19"))))
-				.andExpect(jsonPath("$[1].skills[1].name", is(equalTo("JavaScript"))));
+				.andExpect(jsonPath("$[1].skills[1].name", is(equalTo("JavaScript"))))
+				.andExpect(jsonPath("$[1].recommended", is(false)));
 	}
 
 	@Test

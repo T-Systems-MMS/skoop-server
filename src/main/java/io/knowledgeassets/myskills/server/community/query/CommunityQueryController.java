@@ -2,6 +2,8 @@ package io.knowledgeassets.myskills.server.community.query;
 
 import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.community.CommunityResponse;
+import io.knowledgeassets.myskills.server.community.RecommendedCommunity;
+import io.knowledgeassets.myskills.server.community.RecommendedCommunityResponse;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.exception.enums.Model;
 import io.knowledgeassets.myskills.server.security.CurrentUserService;
@@ -45,10 +47,10 @@ public class CommunityQueryController {
 	})
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping(path = "/communities", produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<CommunityResponse> getCommunities() {
+	public List<RecommendedCommunityResponse> getCommunities() {
 		final User currentUser = currentUserService.getCurrentUser();
-		return communityQueryService.getCommunities()
-				.map(convertCommunityToCommunityResponse(currentUser))
+		return communityQueryService.getCommunitiesRecommendedForUser(currentUser.getId())
+				.map(convertRecommendedCommunityToRecommendedCommunityResponse(currentUser))
 				.collect(toList());
 	}
 
@@ -63,7 +65,7 @@ public class CommunityQueryController {
 	})
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping(path = "/communities/{communityId}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public CommunityResponse getProject(@PathVariable("communityId") String communityId) {
+	public CommunityResponse getCommunity(@PathVariable("communityId") String communityId) {
 		final User currentUser = currentUserService.getCurrentUser();
 		return communityQueryService.getCommunityById(communityId)
 				.map(convertCommunityToCommunityResponse(currentUser))
@@ -74,6 +76,17 @@ public class CommunityQueryController {
 							.searchParamsMap(searchParamsMap)
 							.build();
 				});
+	}
+
+	private Function<RecommendedCommunity, RecommendedCommunityResponse> convertRecommendedCommunityToRecommendedCommunityResponse(User currentUser) {
+		return (RecommendedCommunity c) -> {
+			if (c.getCommunity().getMembers() != null && c.getCommunity().getMembers().stream().map(User::getId).collect(Collectors.toSet()).contains(currentUser.getId())) {
+				return RecommendedCommunityResponse.of(c);
+			}
+			else {
+				return RecommendedCommunityResponse.simple(c);
+			}
+		};
 	}
 
 	private Function<Community, CommunityResponse> convertCommunityToCommunityResponse(User currentUser) {
