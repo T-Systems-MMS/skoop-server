@@ -26,4 +26,6 @@ public class UserIdentityResponse {
 
 	@ApiModelProperty("Email of the authenticated user.")
 	private String email;
+	@ApiModelProperty("Amount of notifications")
+	private Integer notificationCount;
 }
