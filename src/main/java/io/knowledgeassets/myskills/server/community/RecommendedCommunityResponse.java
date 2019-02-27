@@ -6,49 +6,36 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
-import static io.knowledgeassets.myskills.server.util.ConversionUtils.convertUserListToUserSimpleResponseList;
-import static io.knowledgeassets.myskills.server.util.ConversionUtils.convertSkillListToSkillResponseList;
-import static io.knowledgeassets.myskills.server.util.ConversionUtils.convertLinkListToLinkResponseList;
+import static io.knowledgeassets.myskills.server.util.ConversionUtils.*;
 
-@Builder
 @Data
-@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
-public class RecommendedCommunityResponse {
-
-	@ApiModelProperty("Identifier of a community.")
-	private String id;
-
-	@ApiModelProperty("Title of a community.")
-	private String title;
-
-	@ApiModelProperty("Type of a community.")
-	private CommunityType type;
-
-	@ApiModelProperty("Description of a community.")
-	private String description;
-
-	@ApiModelProperty("Links of a community.")
-	private List<LinkResponse> links;
-
-	@ApiModelProperty("List of community managers.")
-	private List<UserSimpleResponse> managers;
-
-	@ApiModelProperty("List of community members.")
-	private List<UserSimpleResponse> members;
-
-	@ApiModelProperty("List of skills associated with a community.")
-	private List<SkillResponse> skills;
+public class RecommendedCommunityResponse extends CommunityResponse {
 
 	@ApiModelProperty("Flag indicating if a community is recommended.")
-	private boolean recommended;
+	private final boolean recommended;
+
+	@Builder(builderMethodName = "recommendedCommunityResponseBuilder")
+	public RecommendedCommunityResponse(String id,
+										String title,
+										CommunityType type,
+										String description,
+										List<LinkResponse> links,
+										List<UserSimpleResponse> managers,
+										List<UserSimpleResponse> members,
+										List<SkillResponse> skills,
+										boolean recommended) {
+		super(id, title, type, description, links, managers, members, skills);
+		this.recommended = recommended;
+	}
 
 	public static RecommendedCommunityResponse of(RecommendedCommunity recommendedCommunity) {
-		return RecommendedCommunityResponse.builder()
+		return RecommendedCommunityResponse.recommendedCommunityResponseBuilder()
 				.id(recommendedCommunity.getCommunity().getId())
 				.title(recommendedCommunity.getCommunity().getTitle())
 				.type(recommendedCommunity.getCommunity().getType())
@@ -62,7 +49,7 @@ public class RecommendedCommunityResponse {
 	}
 
 	public static RecommendedCommunityResponse simple(RecommendedCommunity recommendedCommunity) {
-		return RecommendedCommunityResponse.builder()
+		return RecommendedCommunityResponse.recommendedCommunityResponseBuilder()
 				.id(recommendedCommunity.getCommunity().getId())
 				.title(recommendedCommunity.getCommunity().getTitle())
 				.type(recommendedCommunity.getCommunity().getType())

@@ -11,9 +11,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-import static io.knowledgeassets.myskills.server.util.ConversionUtils.convertUserListToUserSimpleResponseList;
-import static io.knowledgeassets.myskills.server.util.ConversionUtils.convertSkillListToSkillResponseList;
-import static io.knowledgeassets.myskills.server.util.ConversionUtils.convertLinkListToLinkResponseList;
+import static io.knowledgeassets.myskills.server.util.ConversionUtils.*;
 
 @Data
 @Builder
