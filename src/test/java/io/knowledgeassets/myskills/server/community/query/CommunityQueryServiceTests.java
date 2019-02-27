@@ -397,6 +397,7 @@ class CommunityQueryServiceTests {
 				.id("10ea2af6-cd81-48e0-b339-0576d16b9d19")
 				.name("JavaScript")
 				.build());
+		assertThat(recommendedCommunity.isRecommended()).isFalse();
 		assertThat(recommendedCommunity.getSkillCounter()).isEqualTo(0L);
 	}
 
