@@ -4,7 +4,8 @@ import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.community.CommunityRequest;
 import io.knowledgeassets.myskills.server.community.CommunityResponse;
 import io.knowledgeassets.myskills.server.community.Link;
-import io.knowledgeassets.myskills.server.community.ValidUpdateCommunityRequest;
+import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
+import io.knowledgeassets.myskills.server.exception.enums.Model;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.skill.query.SkillQueryService;
 import io.knowledgeassets.myskills.server.user.User;
@@ -64,7 +65,7 @@ public class CommunityCommandController {
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<CommunityResponse> create(@RequestBody @Valid CommunityRequest request) {
 		final Community community = convertCommunityRequestToCommunityDomain(request);
-		final Community result = communityCommandService.create(community);
+		final Community result = communityCommandService.create(community, getInvitedUsers(request));
 		return ResponseEntity.status(HttpStatus.CREATED).body(CommunityResponse.of(result));
 	}
 
@@ -82,10 +83,10 @@ public class CommunityCommandController {
 	@PutMapping(path = "/communities/{communityId}",
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<CommunityResponse> update(@PathVariable("communityId") String communityId, @Valid @ValidUpdateCommunityRequest @RequestBody CommunityRequest request) {
+	public ResponseEntity<CommunityResponse> update(@PathVariable("communityId") String communityId, @Valid @RequestBody CommunityRequest request) {
 		final Community community = convertCommunityRequestToCommunityDomain(request);
 		community.setId(communityId);
-		final Community result = communityCommandService.update(community);
+		final Community result = communityCommandService.update(community, getInvitedUsers(request));
 		return ResponseEntity.status(HttpStatus.OK).body(CommunityResponse.of(result));
 	}
 
@@ -105,28 +106,38 @@ public class CommunityCommandController {
 		return ResponseEntity.noContent().build();
 	}
 
+	private List<User> getInvitedUsers(CommunityRequest communityRequest) {
+		if (communityRequest.getInvitedUserIds() == null) {
+			return Collections.emptyList();
+		} else {
+			return communityRequest.getInvitedUserIds().stream().map(invitedUserId -> userQueryService.getUserById(invitedUserId).orElseThrow(() -> {
+				String[] searchParamsMap = {"id", invitedUserId};
+				return NoSuchResourceException.builder()
+						.model(Model.USER)
+						.searchParamsMap(searchParamsMap)
+						.build();
+			})).collect(toList());
+		}
+	}
+
 	private Community convertCommunityRequestToCommunityDomain(CommunityRequest communityRequest) {
-		List<User> managers = null;
-		if (communityRequest.getManagerIds() != null) {
-			managers = userQueryService.getUsersByIds(communityRequest.getManagerIds()).collect(toList());
+		final List<Skill> skills;
+		if (communityRequest.getSkillNames() != null) {
+			skills = communityRequest.getSkillNames().stream().map(skillName ->
+					skillQueryService.findByNameIgnoreCase(skillName).orElse(
+							Skill.builder()
+									.name(skillName)
+									.build()
+					)).collect(toList());
 		}
-		List<User> members = null;
-		if (communityRequest.getMemberIds() != null) {
-			members = userQueryService.getUsersByIds(communityRequest.getMemberIds()).collect(toList());
+		else {
+			skills = Collections.emptyList();
 		}
-		final List<Skill> skills = communityRequest.getSkillNames().stream().map(skillName ->
-				skillQueryService.findByNameIgnoreCase(skillName).orElse(
-						Skill.builder()
-								.name(skillName)
-								.build()
-				)).collect(toList());
 		return Community.builder()
 				.title(communityRequest.getTitle())
 				.type(communityRequest.getType())
 				.description(communityRequest.getDescription())
 				.links(convertLinkRequestListToLinkList(communityRequest))
-				.managers(managers)
-				.members(members)
 				.skills(skills)
 				.build();
 	}

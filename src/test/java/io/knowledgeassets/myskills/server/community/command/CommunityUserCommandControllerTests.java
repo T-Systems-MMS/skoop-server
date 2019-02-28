@@ -92,6 +92,28 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 	}
 
 	@Test
+	@DisplayName("Tests if a community manager cannot change his own role.")
+	void testIfCommunityManagerCannotChangeHisOwnRole() throws Exception {
+		final User owner = User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build();
+
+		given(communityQueryService.hasCommunityManagerRole("1f37fb2a-b4d0-4119-9113-4677beb20ae2", "123")).willReturn(true);
+
+		final ClassPathResource body = new ClassPathResource("community/command/change-community-user-role.json");
+
+		try (InputStream is = body.getInputStream()) {
+			mockMvc.perform(put("/communities/123/users/1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+					.content(is.readAllBytes())
+					.accept(MediaType.APPLICATION_JSON)
+					.contentType(MediaType.APPLICATION_JSON)
+					.with(authentication(withUser(owner))))
+					.andExpect(status().isForbidden());
+		}
+	}
+
+	@Test
 	@DisplayName("Tests if not authenticated user cannot change community user role.")
 	void testIfNotAuthenticatedUserCannotChangeCommunityUserRole() throws Exception {
 		final ClassPathResource body = new ClassPathResource("community/command/change-community-user-role.json");

@@ -10,6 +10,7 @@ import io.knowledgeassets.myskills.server.security.CurrentUserService;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.skill.command.SkillCommandService;
 import io.knowledgeassets.myskills.server.user.User;
+import io.knowledgeassets.myskills.server.usernotification.command.UserNotificationCommandService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,11 +46,14 @@ class CommunityCommandServiceTests {
 	@Mock
 	private SkillCommandService skillCommandService;
 
+	@Mock
+	private UserNotificationCommandService userNotificationCommandService;
+
 	private CommunityCommandService communityCommandService;
 
 	@BeforeEach
 	void setUp() {
-		communityCommandService = new CommunityCommandService(communityRepository, currentUserService, skillCommandService);
+		communityCommandService = new CommunityCommandService(communityRepository, currentUserService, skillCommandService, userNotificationCommandService);
 	}
 
 	@Test
@@ -158,7 +163,17 @@ class CommunityCommandServiceTests {
 										.build()
 						))
 						.skills(Arrays.asList(springBootSkill, angularSkill, tomcatSkill))
-						.build()
+						.build(),
+				Arrays.asList(
+						User.builder()
+								.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+								.userName("firstTester")
+								.build(),
+						User.builder()
+								.id("d9d74c04-0ab0-479c-a1d7-d372990f11b6")
+								.userName("secondTester")
+								.build()
+				)
 		);
 
 		assertThat(community).isNotNull();
@@ -219,7 +234,17 @@ class CommunityCommandServiceTests {
 												.href("https://www.linkedin.com/java-user-group")
 												.build()
 								))
-								.build()
+								.build(),
+						Arrays.asList(
+								User.builder()
+										.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+										.userName("firstTester")
+										.build(),
+								User.builder()
+										.id("d9d74c04-0ab0-479c-a1d7-d372990f11b6")
+										.userName("secondTester")
+										.build()
+						)
 				));
 	}
 
@@ -239,7 +264,8 @@ class CommunityCommandServiceTests {
 						.id("123")
 						.title("Java User Group")
 						.description("Community for Java developers")
-						.build()
+						.build(),
+				Collections.emptyList()
 		));
 	}
 
@@ -336,7 +362,17 @@ class CommunityCommandServiceTests {
 						.type(CommunityType.OPENED)
 						.description("New community for Java developers")
 						.skills(Arrays.asList(springBootSkill, angularSkill, tomcatSkill))
-						.build()
+						.build(),
+				Arrays.asList(
+						User.builder()
+								.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+								.userName("firstTester")
+								.build(),
+						User.builder()
+								.id("d9d74c04-0ab0-479c-a1d7-d372990f11b6")
+								.userName("secondTester")
+								.build()
+				)
 		);
 
 		assertThat(community).isNotNull();
