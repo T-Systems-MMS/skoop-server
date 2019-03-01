@@ -8,8 +8,11 @@ import io.knowledgeassets.myskills.server.exception.enums.Model;
 import io.knowledgeassets.myskills.server.security.CurrentUserService;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.skill.command.SkillCommandService;
+import io.knowledgeassets.myskills.server.user.User;
+import io.knowledgeassets.myskills.server.usernotification.command.UserNotificationCommandService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -26,17 +29,20 @@ public class CommunityCommandService {
 	private final CommunityRepository communityRepository;
 	private final CurrentUserService currentUserService;
 	private final SkillCommandService skillCommandService;
+	private final UserNotificationCommandService userNotificationCommandService;
 
 	public CommunityCommandService(CommunityRepository communityRepository,
 								   CurrentUserService currentUserService,
-								   SkillCommandService skillCommandService) {
+								   SkillCommandService skillCommandService,
+								   UserNotificationCommandService userNotificationCommandService) {
 		this.communityRepository = communityRepository;
 		this.currentUserService = currentUserService;
 		this.skillCommandService = skillCommandService;
+		this.userNotificationCommandService = userNotificationCommandService;
 	}
 
 	@Transactional
-	public Community create(Community community) {
+	public Community create(Community community, List<User> invitedUsers) {
 		communityRepository.findByTitleIgnoreCase(community.getTitle()).ifPresent(skill -> {
 			throw DuplicateResourceException.builder()
 					.message(format("Community with title '%s' already exists", community.getTitle()))
@@ -49,11 +55,15 @@ public class CommunityCommandService {
 		community.setLastModifiedDate(now);
 		community.setId(UUID.randomUUID().toString());
 		community.setSkills(createNonExistentSkills(community));
-		return communityRepository.save(community);
+		Community c = communityRepository.save(community);
+		if (!CollectionUtils.isEmpty(invitedUsers)) {
+			userNotificationCommandService.inviteUsers(invitedUsers, c);
+		}
+		return c;
 	}
 
 	@Transactional
-	public Community update(Community community) {
+	public Community update(Community community, List<User> invitedUsers) {
 		final Community p = communityRepository.findById(community.getId()).orElseThrow(() -> {
 			final String[] searchParamsMap = {"id", community.getId()};
 			return NoSuchResourceException.builder()
@@ -61,10 +71,16 @@ public class CommunityCommandService {
 					.searchParamsMap(searchParamsMap)
 					.build();
 		});
+		community.setMembers(p.getMembers());
+		community.setManagers(p.getManagers());
 		community.setCreationDate(p.getCreationDate());
 		community.setLastModifiedDate(LocalDateTime.now());
 		community.setSkills(createNonExistentSkills(community));
-		return communityRepository.save(community);
+		final Community c = communityRepository.save(community);
+		if (!CollectionUtils.isEmpty(invitedUsers)) {
+			userNotificationCommandService.inviteUsers(invitedUsers, c);
+		}
+		return c;
 	}
 
 	@Transactional

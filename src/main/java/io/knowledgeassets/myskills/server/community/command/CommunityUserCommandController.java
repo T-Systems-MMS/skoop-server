@@ -54,7 +54,7 @@ public class CommunityUserCommandController {
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
 	@PutMapping(path = "/communities/{communityId}/users/{userId}")
-	@PreAuthorize("isAuthenticated() and hasCommunityManagerRole(#communityId)")
+	@PreAuthorize("isAuthenticated() and hasCommunityManagerRole(#communityId) and !isPrincipalUserId(#userId)")
 	public ResponseEntity<CommunityResponse> changeCommunityUserRole(@PathVariable("communityId") String communityId,
 																	 @PathVariable("userId") String userId,
 																	 @RequestBody CommunityUserUpdateRequest request) {
