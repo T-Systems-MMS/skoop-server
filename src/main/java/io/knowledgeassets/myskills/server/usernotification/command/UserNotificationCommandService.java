@@ -56,4 +56,29 @@ public class UserNotificationCommandService {
 				.collect(Collectors.toList());
 	}
 
+	/**
+	 * Sends a request on behalf of a user to join a community.
+	 * @param user - user to send a request on behalf of
+	 * @param community - community to join
+	 * @return user notification
+	 */
+	@Transactional
+	public UserNotification sendUserRequestToJoinCommunity(User user, Community community) {
+		if (user == null) {
+			throw new IllegalArgumentException("User cannot be null.");
+		}
+		if (community == null) {
+			throw new IllegalArgumentException("Community cannot be null.");
+		}
+		UserNotification userNotification = UserNotification.builder()
+				.community(community)
+				.initiator(user)
+				.status(UserNotificationStatus.PENDING)
+				.type(UserNotificationType.COMMUNITY_JOIN_REQUEST)
+				.id(UUID.randomUUID().toString())
+				.creationDatetime(LocalDateTime.now())
+				.build();
+		return userNotificationRepository.save(userNotification);
+	}
+
 }
