@@ -3,12 +3,12 @@ package io.knowledgeassets.myskills.server.community.command;
 import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.community.CommunityRepository;
 import io.knowledgeassets.myskills.server.community.CommunityType;
-import io.knowledgeassets.myskills.server.exception.CommunityAccessDeniedException;
 import io.knowledgeassets.myskills.server.exception.InvalidInputException;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.exception.enums.Model;
 import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.user.query.UserQueryService;
+import io.knowledgeassets.myskills.server.usernotification.command.UserNotificationCommandService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,11 +24,14 @@ public class CommunityUserCommandService {
 
 	private final CommunityRepository communityRepository;
 	private final UserQueryService userQueryService;
+	private final UserNotificationCommandService userNotificationCommandService;
 
 	public CommunityUserCommandService(CommunityRepository communityRepository,
-								   UserQueryService userQueryService) {
+									   UserQueryService userQueryService,
+									   UserNotificationCommandService userNotificationCommandService) {
 		this.communityRepository = communityRepository;
 		this.userQueryService = userQueryService;
+		this.userNotificationCommandService = userNotificationCommandService;
 	}
 
 	/**
@@ -47,8 +50,8 @@ public class CommunityUserCommandService {
 			return communityRepository.save(community);
 		}
 		else {
-			throw new CommunityAccessDeniedException(format("The community with ID \"%s\" is not an open one." +
-					" Only open communities can be joined without request.", communityId));
+			userNotificationCommandService.sendUserRequestToJoinCommunity(user, community);
+			return community;
 		}
 	}
 

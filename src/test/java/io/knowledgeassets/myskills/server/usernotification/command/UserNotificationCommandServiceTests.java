@@ -87,6 +87,7 @@ class UserNotificationCommandServiceTests {
 										)),
 										hasProperty("status", is(UserNotificationStatus.PENDING)),
 										hasProperty("type", is(UserNotificationType.INVITATION)),
+										hasProperty("id", isA(String.class)),
 										hasProperty("creationDatetime", isA(LocalDateTime.class))
 								),
 								allOf(
@@ -113,6 +114,7 @@ class UserNotificationCommandServiceTests {
 										)),
 										hasProperty("status", is(UserNotificationStatus.PENDING)),
 										hasProperty("type", is(UserNotificationType.INVITATION)),
+										hasProperty("id", isA(String.class)),
 										hasProperty("creationDatetime", isA(LocalDateTime.class))
 								)
 						)
@@ -229,6 +231,98 @@ class UserNotificationCommandServiceTests {
 				.type(CommunityType.OPENED)
 				.description("Community for Java developers")
 				.build()));
+	}
+
+	@DisplayName("Tests if user request to join a community is sent.")
+	@Test
+	void testIfUserRequestToJoinCommunityIsSent() {
+
+		User tester = User.builder()
+				.id("db87d46a-e4ca-451a-903b-e8533e0b924b")
+				.userName("tester")
+				.build();
+
+		Community community = Community.builder()
+				.id("123")
+				.title("Java User Group")
+				.type(CommunityType.CLOSED)
+				.description("Community for Java developers")
+				.build();
+
+		given(userNotificationRepository.save(argThat(allOf(
+				isA(UserNotification.class),
+				hasProperty("community", equalTo(
+						Community.builder()
+								.id("123")
+								.title("Java User Group")
+								.type(CommunityType.CLOSED)
+								.description("Community for Java developers")
+								.build()
+				)),
+				hasProperty("initiator", equalTo(
+						User.builder()
+								.id("db87d46a-e4ca-451a-903b-e8533e0b924b")
+								.userName("tester")
+								.build()
+				)),
+				hasProperty("id", isA(String.class)),
+				hasProperty("status", is(UserNotificationStatus.PENDING)),
+				hasProperty("type", is(UserNotificationType.COMMUNITY_JOIN_REQUEST)),
+				hasProperty("creationDatetime", isA(LocalDateTime.class))
+		)))).willReturn(UserNotification.builder()
+				.id("e156c6e5-8bf2-4c7b-98c1-f3d9b63318fc")
+				.community(Community.builder()
+						.id("123")
+						.title("Java User Group")
+						.type(CommunityType.CLOSED)
+						.description("Community for Java developers")
+						.build())
+				.initiator(User.builder()
+						.id("db87d46a-e4ca-451a-903b-e8533e0b924b")
+						.userName("tester")
+						.build())
+				.creationDatetime(LocalDateTime.of(2019, 1, 15, 20, 0))
+				.status(UserNotificationStatus.PENDING)
+				.type(UserNotificationType.COMMUNITY_JOIN_REQUEST)
+				.build()
+		);
+
+		UserNotification userNotification = userNotificationCommandService.sendUserRequestToJoinCommunity(tester, community);
+		assertThat(userNotification.getId()).isEqualTo("e156c6e5-8bf2-4c7b-98c1-f3d9b63318fc");
+		assertThat(userNotification.getCommunity()).isEqualTo(Community.builder()
+				.id("123")
+				.title("Java User Group")
+				.type(CommunityType.CLOSED)
+				.description("Community for Java developers")
+				.build());
+		assertThat(userNotification.getInitiator()).isEqualTo(User.builder()
+				.id("db87d46a-e4ca-451a-903b-e8533e0b924b")
+				.userName("tester")
+				.build());
+
+		assertThat(userNotification.getStatus()).isEqualTo(UserNotificationStatus.PENDING);
+		assertThat(userNotification.getType()).isEqualTo(UserNotificationType.COMMUNITY_JOIN_REQUEST);
+		assertThat(userNotification.getCreationDatetime()).isOfAnyClassIn(LocalDateTime.class);
+	}
+
+	@DisplayName("Tests if an exception is thrown when user is null when sending a request to join a community.")
+	@Test
+	void testIfExceptionIsThrownWhenUserIsNullWhenSendingRequestToJoinCommunity() {
+		assertThrows(IllegalArgumentException.class, () -> userNotificationCommandService.sendUserRequestToJoinCommunity(null, Community.builder()
+				.id("123")
+				.title("Java User Group")
+				.type(CommunityType.CLOSED)
+				.description("Community for Java developers")
+				.build()));
+	}
+
+	@DisplayName("Tests if an exception is thrown when community is null when sending a request to join a community.")
+	@Test
+	void testIfExceptionIsThrownWhenCommunityIsNullWhenSendingRequestToJoinCommunity() {
+		assertThrows(IllegalArgumentException.class, () -> userNotificationCommandService.sendUserRequestToJoinCommunity(User.builder()
+				.id("db87d46a-e4ca-451a-903b-e8533e0b924b")
+				.userName("tester")
+				.build(), null));
 	}
 
 }
