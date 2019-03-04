@@ -2,6 +2,7 @@ package io.knowledgeassets.myskills.server.community.query;
 
 import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.community.CommunityRepository;
+import io.knowledgeassets.myskills.server.community.RecommendedCommunity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,11 @@ public class CommunityQueryService {
 	@Transactional(readOnly = true)
 	public Stream<Community> getCommunities() {
 		return StreamSupport.stream(communityRepository.findAll().spliterator(), false);
+	}
+
+	@Transactional(readOnly = true)
+	public Stream<RecommendedCommunity> getCommunitiesRecommendedForUser(String userId) {
+		return communityRepository.getRecommendedCommunities(userId);
 	}
 
 	@Transactional(readOnly = true)

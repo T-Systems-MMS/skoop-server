@@ -1,23 +1,41 @@
 package io.knowledgeassets.myskills.server.community;
 
 import io.knowledgeassets.myskills.server.skill.Skill;
+import io.knowledgeassets.myskills.server.skill.SkillRepository;
 import io.knowledgeassets.myskills.server.user.User;
+import io.knowledgeassets.myskills.server.user.UserRepository;
+import io.knowledgeassets.myskills.server.userskill.UserSkill;
+import io.knowledgeassets.myskills.server.userskill.UserSkillRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.neo4j.DataNeo4jTest;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Stream;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+
+import static java.util.stream.Collectors.toList;
 
 @DataNeo4jTest
 class CommunityRepositoryTests {
 
 	@Autowired
 	private CommunityRepository communityRepository;
+
+	@Autowired
+	private UserRepository userRepository;
+
+	@Autowired
+	private SkillRepository skillRepository;
+
+	@Autowired
+	private UserSkillRepository userSkillRepository;
 
 	@Test
 	@DisplayName("Provides the existing project queried by its exact name")
@@ -146,6 +164,130 @@ class CommunityRepositoryTests {
 				.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
 				.name("Angular")
 				.build());
+	}
+
+	@DisplayName("Test if communities recommended for a user are retrieved.")
+	@Test
+	void testIfCommunitiesRecommendedForUserAreRetrieved() {
+
+		Skill angular = Skill.builder()
+				.id("323c89ae-8407-4ac1-8f79-89456e79a328")
+				.name("Angular")
+				.description("JavaScript Framework")
+				.build();
+		angular = skillRepository.save(angular);
+		Skill springBoot = Skill.builder()
+				.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
+				.name("Spring Boot")
+				.description("Java Application Framework")
+				.build();
+		springBoot = skillRepository.save(springBoot);
+		Skill springSecurity = Skill.builder()
+				.id("bd309237-80a2-44de-9552-1dfe760866d1")
+				.name("Spring Security")
+				.description("Java Security Framework")
+				.build();
+		springSecurity = skillRepository.save(springSecurity);
+
+		User tester = User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build();
+		tester = userRepository.save(tester);
+		User other = User.builder()
+				.id("f1228ec5-59ba-4ace-809b-1fbff60888d0")
+				.userName("other")
+				.build();
+		other = userRepository.save(other);
+
+		UserSkill testerAngular = UserSkill.builder()
+				.user(tester)
+				.skill(angular)
+				.currentLevel(1)
+				.desiredLevel(2)
+				.priority(3)
+				.build();
+		userSkillRepository.save(testerAngular);
+		UserSkill testerSpringBoot = UserSkill.builder()
+				.user(tester)
+				.skill(springBoot)
+				.currentLevel(2)
+				.desiredLevel(3)
+				.priority(4)
+				.build();
+		userSkillRepository.save(testerSpringBoot);
+
+		userSkillRepository.save(UserSkill.builder()
+				.user(other)
+				.skill(springBoot)
+				.currentLevel(1)
+				.desiredLevel(2)
+				.priority(3)
+				.build());
+		userSkillRepository.save(UserSkill.builder()
+				.user(other)
+				.skill(springSecurity)
+				.currentLevel(2)
+				.desiredLevel(3)
+				.priority(4)
+				.build());
+
+		Community javaUserGroup = communityRepository.save(
+				Community.builder()
+						.id(UUID.randomUUID().toString())
+						.title("Java User Group")
+						.description("Group for Java developers")
+						.skills(Arrays.asList(springBoot, angular))
+						.type(CommunityType.OPENED)
+						.managers(singletonList(other))
+						.members(singletonList(other))
+						.build()
+		);
+
+		Community frontendDevelopers = communityRepository.save(
+				Community.builder()
+						.id(UUID.randomUUID().toString())
+						.title("Frontend developers")
+						.description("Group for frontend developers")
+						.skills(singletonList(angular))
+						.type(CommunityType.OPENED)
+						.managers(singletonList(other))
+						.members(Arrays.asList(other, tester))
+						.build()
+		);
+
+		Community dotnetDevelopers = communityRepository.save(
+				Community.builder()
+						.id(UUID.randomUUID().toString())
+						.title(".NET developers")
+						.description("Group for .NET developers")
+						.type(CommunityType.OPENED)
+						.managers(singletonList(other))
+						.members(singletonList(other))
+						.build()
+		);
+
+		Stream<RecommendedCommunity> communitiesStream = communityRepository.getRecommendedCommunities("1f37fb2a-b4d0-4119-9113-4677beb20ae2");
+
+		List<RecommendedCommunity> communities = communitiesStream.collect(toList());
+
+		assertThat(communities).containsExactly(RecommendedCommunity.builder()
+						.community(javaUserGroup)
+						.recommended(true)
+						.skillCounter(2L)
+						.build(),
+				RecommendedCommunity.builder()
+						.community(frontendDevelopers)
+						.recommended(false)
+						.skillCounter(1L)
+						.build(),
+				RecommendedCommunity.builder()
+						.community(dotnetDevelopers)
+						.recommended(false)
+						.skillCounter(0L)
+						.build()
+		);
+
 	}
 
 }

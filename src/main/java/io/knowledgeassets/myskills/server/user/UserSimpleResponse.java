@@ -5,6 +5,11 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.Collections;
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
+
 @Data
 @Builder
 @ApiModel(
@@ -40,6 +45,13 @@ public class UserSimpleResponse {
 				.email(user.getEmail())
 				.coach(user.getCoach())
 				.build();
+	}
+
+	public static List<UserSimpleResponse> convertUserListToUserSimpleResponseList(List<User> users) {
+		if (users == null) {
+			return Collections.emptyList();
+		}
+		return users.stream().map(UserSimpleResponse::of).collect(toList());
 	}
 
 }

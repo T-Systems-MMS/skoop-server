@@ -4,7 +4,10 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
+import java.util.Collections;
 import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @Data
 @Builder
@@ -34,6 +37,13 @@ public class SkillResponse {
 				.name(skill.getName())
 				.description(skill.getDescription())
 				.build();
+	}
+
+	public static List<SkillResponse> convertSkillListToSkillResponseList(List<Skill> skills) {
+		if (skills == null) {
+			return Collections.emptyList();
+		}
+		return skills.stream().map(SkillResponse::of).collect(toList());
 	}
 
 }

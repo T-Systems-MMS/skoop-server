@@ -4,6 +4,7 @@ import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.community.CommunityRepository;
 import io.knowledgeassets.myskills.server.community.CommunityType;
 import io.knowledgeassets.myskills.server.community.Link;
+import io.knowledgeassets.myskills.server.community.RecommendedCommunity;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.user.User;
 import org.junit.jupiter.api.BeforeEach;
@@ -247,6 +248,157 @@ class CommunityQueryServiceTests {
 				.id("10ea2af6-cd81-48e0-b339-0576d16b9d19")
 				.name("JavaScript")
 				.build());
+	}
+
+	@DisplayName("Test if communities recommended to a user are retrieved.")
+	@Test
+	void testIfRecommendedCommunitiesAreRetrieved() {
+
+		final Skill springBootSkill = Skill.builder()
+				.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
+				.name("Spring Boot")
+				.build();
+
+		final Skill angularSkill = Skill.builder()
+				.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
+				.name("Angular")
+				.build();
+
+		final Skill javascriptSkill = Skill.builder()
+				.id("10ea2af6-cd81-48e0-b339-0576d16b9d19")
+				.name("JavaScript")
+				.build();
+
+		given(communityRepository.getRecommendedCommunities("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(
+				Stream.of(RecommendedCommunity.builder()
+						.community(Community.builder()
+								.id("123")
+								.title("Java User Group")
+								.type(CommunityType.OPENED)
+								.description("Community for Java developers")
+								.links(Arrays.asList(
+										Link.builder()
+												.name("Facebook")
+												.href("https://www.facebook.com/java-user-group")
+												.build(),
+										Link.builder()
+												.name("Linkedin")
+												.href("https://www.linkedin.com/java-user-group")
+												.build()
+								))
+								.managers(singletonList(User.builder()
+										.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+										.userName("tester")
+										.build()))
+								.members(singletonList(User.builder()
+										.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+										.userName("tester")
+										.build()))
+								.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
+								.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
+								.skills(Arrays.asList(springBootSkill, angularSkill))
+								.build())
+						.recommended(true)
+						.skillCounter(2L)
+						.build(),
+						RecommendedCommunity.builder()
+						.community(Community.builder()
+								.id("456")
+								.title("Scala User Group")
+								.type(CommunityType.OPENED)
+								.description("Community for Scala developers")
+								.links(Arrays.asList(
+										Link.builder()
+												.name("Facebook")
+												.href("https://www.facebook.com/scala-user-group")
+												.build(),
+										Link.builder()
+												.name("Linkedin")
+												.href("https://www.linkedin.com/scala-user-group")
+												.build()
+								))
+								.managers(singletonList(User.builder()
+										.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+										.userName("tester")
+										.build()))
+								.members(singletonList(User.builder()
+										.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+										.userName("tester")
+										.build()))
+								.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
+								.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
+								.skills(Arrays.asList(springBootSkill, javascriptSkill))
+								.build())
+						.skillCounter(0L)
+						.recommended(false)
+						.build()
+				));
+
+		Stream<RecommendedCommunity> recommendedCommunities = communityQueryService.getCommunitiesRecommendedForUser("1f37fb2a-b4d0-4119-9113-4677beb20ae2");
+
+		assertThat(recommendedCommunities).isNotNull();
+		List<RecommendedCommunity> recommendedCommunityList = recommendedCommunities.collect(toList());
+		assertThat(recommendedCommunityList).hasSize(2);
+		RecommendedCommunity recommendedCommunity = recommendedCommunityList.get(0);
+		assertThat(recommendedCommunity.getCommunity().getId()).isEqualTo("123");
+		assertThat(recommendedCommunity.getCommunity().getTitle()).isEqualTo("Java User Group");
+		assertThat(recommendedCommunity.getCommunity().getType()).isEqualTo(CommunityType.OPENED);
+		assertThat(recommendedCommunity.getCommunity().getDescription()).isEqualTo("Community for Java developers");
+		assertThat(recommendedCommunity.getCommunity().getLinks()).isEqualTo(Arrays.asList(
+				Link.builder()
+						.name("Facebook")
+						.href("https://www.facebook.com/java-user-group")
+						.build(),
+				Link.builder()
+						.name("Linkedin")
+						.href("https://www.linkedin.com/java-user-group")
+						.build()
+		));
+		assertThat(recommendedCommunity.getCommunity().getManagers()).hasSize(1);
+		assertThat(recommendedCommunity.getCommunity().getManagers().get(0).getId()).isEqualTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2");
+		assertThat(recommendedCommunity.getCommunity().getManagers().get(0).getUserName()).isEqualTo("tester");
+		assertThat(recommendedCommunity.getCommunity().getMembers()).hasSize(1);
+		assertThat(recommendedCommunity.getCommunity().getMembers().get(0).getId()).isEqualTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2");
+		assertThat(recommendedCommunity.getCommunity().getMembers().get(0).getUserName()).isEqualTo("tester");
+		assertThat(recommendedCommunity.getCommunity().getSkills()).contains(Skill.builder()
+				.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
+				.name("Spring Boot")
+				.build(), Skill.builder()
+				.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
+				.name("Angular")
+				.build());
+		assertThat(recommendedCommunity.isRecommended()).isTrue();
+		assertThat(recommendedCommunity.getSkillCounter()).isEqualTo(2L);
+		recommendedCommunity = recommendedCommunityList.get(1);
+		assertThat(recommendedCommunity.getCommunity().getId()).isEqualTo("456");
+		assertThat(recommendedCommunity.getCommunity().getTitle()).isEqualTo("Scala User Group");
+		assertThat(recommendedCommunity.getCommunity().getType()).isEqualTo(CommunityType.OPENED);
+		assertThat(recommendedCommunity.getCommunity().getDescription()).isEqualTo("Community for Scala developers");
+		assertThat(recommendedCommunity.getCommunity().getLinks()).isEqualTo(Arrays.asList(
+				Link.builder()
+						.name("Facebook")
+						.href("https://www.facebook.com/scala-user-group")
+						.build(),
+				Link.builder()
+						.name("Linkedin")
+						.href("https://www.linkedin.com/scala-user-group")
+						.build()
+		));
+		assertThat(recommendedCommunity.getCommunity().getManagers()).hasSize(1);
+		assertThat(recommendedCommunity.getCommunity().getManagers().get(0).getId()).isEqualTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2");
+		assertThat(recommendedCommunity.getCommunity().getManagers().get(0).getUserName()).isEqualTo("tester");
+		assertThat(recommendedCommunity.getCommunity().getMembers()).hasSize(1);
+		assertThat(recommendedCommunity.getCommunity().getMembers().get(0).getId()).isEqualTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2");
+		assertThat(recommendedCommunity.getCommunity().getMembers().get(0).getUserName()).isEqualTo("tester");
+		assertThat(recommendedCommunity.getCommunity().getSkills()).contains(Skill.builder()
+				.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
+				.name("Spring Boot")
+				.build(), Skill.builder()
+				.id("10ea2af6-cd81-48e0-b339-0576d16b9d19")
+				.name("JavaScript")
+				.build());
+		assertThat(recommendedCommunity.isRecommended()).isFalse();
+		assertThat(recommendedCommunity.getSkillCounter()).isEqualTo(0L);
 	}
 
 }
