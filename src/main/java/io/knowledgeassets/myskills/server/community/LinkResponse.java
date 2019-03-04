@@ -7,6 +7,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Collections;
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -21,5 +26,16 @@ public class LinkResponse {
 	private String name;
 	@ApiModelProperty("Hyper reference of a link.")
 	private String href;
+
+	public static List<LinkResponse> convertLinkListToLinkResponseList(List<Link> links) {
+		if (links == null) {
+			return Collections.emptyList();
+		}
+		return links.stream().map(l -> LinkResponse.builder()
+				.name(l.getName())
+				.href(l.getHref())
+				.build()
+		).collect(toList());
+	}
 
 }
