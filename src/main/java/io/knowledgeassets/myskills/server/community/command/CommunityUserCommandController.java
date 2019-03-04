@@ -10,7 +10,8 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 @Api(tags = { "CommunityUsers" })
 @RestController
@@ -78,10 +80,12 @@ public class CommunityUserCommandController {
 	})
 	@DeleteMapping(path = "/communities/{communityId}/users/{userId}")
 	@PreAuthorize("(isAuthenticated() and isPrincipalUserId(#userId)) or hasCommunityManagerRole(#communityId)")
-	public ResponseEntity<CommunityResponse> leaveCommunity(@PathVariable("communityId") String communityId,
-															@PathVariable("userId") String userId) {
+	public ResponseEntity<CommunityResponse> leaveCommunity(
+			@ApiIgnore @AuthenticationPrincipal Jwt jwt,
+			@PathVariable("communityId") String communityId,
+			@PathVariable("userId") String userId) {
 		final Community community = communityUserCommandService.leaveCommunity(communityId, userId);
-		final CommunityResponse communityResponse = securityService.hasCommunityManagerRole(SecurityContextHolder.getContext().getAuthentication().getPrincipal(), communityId) ?
+		final CommunityResponse communityResponse = securityService.hasCommunityManagerRole(jwt, communityId) ?
 				CommunityResponse.of(community) : CommunityResponse.simple(community);
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(communityResponse);

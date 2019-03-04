@@ -1,6 +1,7 @@
 package io.knowledgeassets.myskills.server.security;
 
 import io.knowledgeassets.myskills.server.community.query.CommunityQueryService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
@@ -20,12 +21,13 @@ public class SecurityService {
 		this.communityQueryService = requireNonNull(communityQueryService);
 	}
 
-	public boolean hasCommunityManagerRole(Object principal, String communityId) {
-		if (principal instanceof Jwt) {
-			final String userIdClaim = ((Jwt) principal).getClaimAsString(MYSKILLS_USER_ID);
+	public boolean hasCommunityManagerRole(Jwt jwt, String communityId) {
+		final String userIdClaim = jwt.getClaimAsString(MYSKILLS_USER_ID);
+		if (StringUtils.isEmpty(userIdClaim)) {
+			throw new IllegalArgumentException("User identifier is not defined.");
+		} else {
 			return communityQueryService.hasCommunityManagerRole(userIdClaim, communityId);
 		}
-		return false;
 	}
 
 }

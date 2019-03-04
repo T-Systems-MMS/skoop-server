@@ -70,7 +70,11 @@ public class MySkillsSecurityExpressionRoot extends SecurityExpressionRoot imple
 	 * @return <code>true</code> if the authenticated user has community manager role for the community referenced by the community ID.
 	 */
 	public boolean hasCommunityManagerRole(String communityId) {
-		return securityService.hasCommunityManagerRole(getPrincipal(), communityId);
+		Object principal = getPrincipal();
+		if (principal instanceof Jwt) {
+			return securityService.hasCommunityManagerRole((Jwt) principal, communityId);
+		}
+		return false;
 	}
 
 	public void setFilterObject(Object filterObject) {
