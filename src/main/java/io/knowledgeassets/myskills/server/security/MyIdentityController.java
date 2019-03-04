@@ -48,6 +48,7 @@ public class MyIdentityController {
 						.firstName(user.getFirstName())
 						.lastName(user.getLastName())
 						.email(user.getEmail())
+						.notificationCount(199) // TODO: get value from service
 						.build())
 				.orElseThrow(() -> NoSuchResourceException.builder()
 						.model(USER)
