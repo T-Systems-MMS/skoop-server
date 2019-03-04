@@ -40,6 +40,9 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 	@MockBean
 	private CurrentUserService currentUserService;
 
+	@MockBean
+	private CommunityQueryService communityQueryService;
+
 	@Autowired
 	private MockMvc mockMvc;
 

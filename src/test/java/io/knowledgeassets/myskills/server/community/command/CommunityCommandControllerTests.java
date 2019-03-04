@@ -16,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.InputStream;
@@ -24,7 +25,14 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static io.knowledgeassets.myskills.server.security.JwtClaims.MYSKILLS_USER_ID;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.isA;
+import static org.hamcrest.core.AllOf.allOf;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -229,7 +237,10 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 	@Test
 	@DisplayName("Tests if a community can be updated.")
 	void testIfCommunityIsUpdated() throws Exception {
-		given(communityQueryService.hasCommunityManagerRole("1f37fb2a-b4d0-4119-9113-4677beb20ae2", "123")).willReturn(true);
+		given(securityService.hasCommunityManagerRole(argThat(allOf(
+				isA(Jwt.class),
+				hasProperty("claims", hasEntry(MYSKILLS_USER_ID, "1f37fb2a-b4d0-4119-9113-4677beb20ae2"))
+		)), eq("123"))).willReturn(true);
 		final User owner = User.builder()
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
@@ -352,7 +363,10 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 	@Test
 	@DisplayName("Tests if a community cannot be updated when community manager removes community manager role from himself.")
 	void testIfCommunityCannotBeUpdatedWhenCommunityManagerRemovesCommunityManagerRoleFromHimself() throws Exception {
-		given(communityQueryService.hasCommunityManagerRole("1f37fb2a-b4d0-4119-9113-4677beb20ae2", "123")).willReturn(true);
+		given(securityService.hasCommunityManagerRole(argThat(allOf(
+				isA(Jwt.class),
+				hasProperty("claims", hasEntry(MYSKILLS_USER_ID, "1f37fb2a-b4d0-4119-9113-4677beb20ae2"))
+		)), eq("123"))).willReturn(true);
 		final User owner = User.builder()
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
@@ -373,7 +387,10 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 	@Test
 	@DisplayName("Tests if a community cannot be updated when community manager removes member role from himself.")
 	void testIfCommunityCannotBeUpdatedWhenCommunityManagerRemovesMemberRoleFromHimself() throws Exception {
-		given(communityQueryService.hasCommunityManagerRole("1f37fb2a-b4d0-4119-9113-4677beb20ae2", "123")).willReturn(true);
+		given(securityService.hasCommunityManagerRole(argThat(allOf(
+				isA(Jwt.class),
+				hasProperty("claims", hasEntry(MYSKILLS_USER_ID, "1f37fb2a-b4d0-4119-9113-4677beb20ae2"))
+		)), eq("123"))).willReturn(true);
 		final User owner = User.builder()
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
@@ -408,7 +425,10 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 	@Test
 	@DisplayName("Tests if forbbiden status code is returned when community is updated by a user who is not a community manager.")
 	void testIfForbiddenStatusCodeIsReturnedWhenCommunityIsUpdatedByUserWhoIsNotCommunityManager() throws Exception {
-		given(communityQueryService.hasCommunityManagerRole("1f37fb2a-b4d0-4119-9113-4677beb20ae2", "123")).willReturn(false);
+		given(securityService.hasCommunityManagerRole(argThat(allOf(
+				isA(Jwt.class),
+				hasProperty("claims", hasEntry(MYSKILLS_USER_ID, "1f37fb2a-b4d0-4119-9113-4677beb20ae2"))
+		)), eq("123"))).willReturn(false);
 		final User owner = User.builder()
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
@@ -428,7 +448,10 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 	@Test
 	@DisplayName("Tests if the community can be deleted.")
 	void testIfCommunityCanBeDeleted() throws Exception {
-		given(communityQueryService.hasCommunityManagerRole("1f37fb2a-b4d0-4119-9113-4677beb20ae2", "123")).willReturn(true);
+		given(securityService.hasCommunityManagerRole(argThat(allOf(
+				isA(Jwt.class),
+				hasProperty("claims", hasEntry(MYSKILLS_USER_ID, "1f37fb2a-b4d0-4119-9113-4677beb20ae2"))
+		)), eq("123"))).willReturn(true);
 		final User owner = User.builder()
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
@@ -441,7 +464,10 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 	@Test
 	@DisplayName("Tests if the community cannot be deleted by a user who is not a community manager.")
 	void testIfCommunityCannotBeDeletedByUserWhoIsNotCommunityManager() throws Exception {
-		given(communityQueryService.hasCommunityManagerRole("1f37fb2a-b4d0-4119-9113-4677beb20ae2", "123")).willReturn(false);
+		given(securityService.hasCommunityManagerRole(argThat(allOf(
+				isA(Jwt.class),
+				hasProperty("claims", hasEntry(MYSKILLS_USER_ID, "1f37fb2a-b4d0-4119-9113-4677beb20ae2"))
+		)), eq("123"))).willReturn(false);
 		final User owner = User.builder()
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
