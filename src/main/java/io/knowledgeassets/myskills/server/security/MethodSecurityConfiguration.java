@@ -1,6 +1,5 @@
 package io.knowledgeassets.myskills.server.security;
 
-import io.knowledgeassets.myskills.server.community.query.CommunityQueryService;
 import io.knowledgeassets.myskills.server.user.query.UserPermissionQueryService;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
@@ -11,16 +10,16 @@ import org.springframework.security.config.annotation.method.configuration.Globa
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class MethodSecurityConfiguration extends GlobalMethodSecurityConfiguration {
 	private final UserPermissionQueryService userPermissionQueryService;
-	private final CommunityQueryService communityQueryService;
+	private final SecurityService securityService;
 
 	public MethodSecurityConfiguration(UserPermissionQueryService userPermissionQueryService,
-									   CommunityQueryService communityQueryService) {
+									   SecurityService securityService) {
 		this.userPermissionQueryService = userPermissionQueryService;
-		this.communityQueryService = communityQueryService;
+		this.securityService = securityService;
 	}
 
 	@Override
 	protected MethodSecurityExpressionHandler createExpressionHandler() {
-		return new MySkillsMethodSecurityExpressionHandler(userPermissionQueryService, communityQueryService);
+		return new MySkillsMethodSecurityExpressionHandler(userPermissionQueryService, securityService);
 	}
 }

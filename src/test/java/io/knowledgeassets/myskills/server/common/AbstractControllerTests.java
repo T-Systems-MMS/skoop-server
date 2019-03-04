@@ -1,7 +1,7 @@
 package io.knowledgeassets.myskills.server.common;
 
-import io.knowledgeassets.myskills.server.community.query.CommunityQueryService;
 import io.knowledgeassets.myskills.server.security.MethodSecurityConfiguration;
+import io.knowledgeassets.myskills.server.security.SecurityService;
 import io.knowledgeassets.myskills.server.user.UserPermissionScope;
 import io.knowledgeassets.myskills.server.user.query.UserPermissionQueryService;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +31,7 @@ public abstract class AbstractControllerTests {
 	@MockBean
 	protected UserPermissionQueryService userPermissionQueryService;
 	@MockBean
-	protected CommunityQueryService communityQueryService;
+	protected SecurityService securityService;
 
 	@BeforeEach
 	void prepareUserPermissions() {
