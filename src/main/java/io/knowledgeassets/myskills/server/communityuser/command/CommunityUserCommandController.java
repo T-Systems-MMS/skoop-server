@@ -1,8 +1,16 @@
-package io.knowledgeassets.myskills.server.community.command;
+package io.knowledgeassets.myskills.server.communityuser.command;
 
 import io.knowledgeassets.myskills.server.community.Community;
-import io.knowledgeassets.myskills.server.community.CommunityResponse;
+import io.knowledgeassets.myskills.server.community.CommunityRole;
+import io.knowledgeassets.myskills.server.community.CommunityType;
+import io.knowledgeassets.myskills.server.communityuser.CommunityUserResponse;
+import io.knowledgeassets.myskills.server.community.query.CommunityQueryService;
+import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
+import io.knowledgeassets.myskills.server.exception.UserCommunityAccessDeniedException;
+import io.knowledgeassets.myskills.server.exception.enums.Model;
 import io.knowledgeassets.myskills.server.security.SecurityService;
+import io.knowledgeassets.myskills.server.user.User;
+import io.knowledgeassets.myskills.server.user.query.UserQueryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -10,8 +18,6 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,7 +25,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.annotations.ApiIgnore;
 
 @Api(tags = { "CommunityUsers" })
 @RestController
@@ -28,11 +33,17 @@ public class CommunityUserCommandController {
 
 	private final CommunityUserCommandService communityUserCommandService;
 	private final SecurityService securityService;
+	private final CommunityQueryService communityQueryService;
+	private final UserQueryService userQueryService;
 
 	public CommunityUserCommandController(CommunityUserCommandService communityUserCommandService,
-										  SecurityService securityService) {
+										  SecurityService securityService,
+										  CommunityQueryService communityQueryService,
+										  UserQueryService userQueryService) {
 		this.communityUserCommandService = communityUserCommandService;
 		this.securityService = securityService;
+		this.communityQueryService = communityQueryService;
+		this.userQueryService = userQueryService;
 	}
 
 	@ApiOperation(value = "User joins the community as member.",
@@ -45,11 +56,30 @@ public class CommunityUserCommandController {
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
 	@PostMapping(path = "/communities/{communityId}/users")
-	@PreAuthorize("isAuthenticated() and isPrincipalUserId(#request.userId)")
-	public ResponseEntity<CommunityResponse> joinCommunity(@PathVariable("communityId") String communityId,
-														   @RequestBody CommunityUserRequest request) {
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<CommunityUserResponse> joinCommunity(@PathVariable("communityId") String communityId,
+															   @RequestBody CommunityUserRequest request) {
+		final Community community = communityQueryService.getCommunityById(communityId).orElseThrow(() -> {
+			final String[] searchParamsMap = {"id", communityId};
+			return NoSuchResourceException.builder()
+					.model(Model.COMMUNITY)
+					.searchParamsMap(searchParamsMap)
+					.build();
+		});
+		final User user = userQueryService.getUserById(request.getUserId()).orElseThrow(() -> {
+			final String[] searchParamsMap = {"id", request.getUserId()};
+			return NoSuchResourceException.builder()
+					.model(Model.USER)
+					.searchParamsMap(searchParamsMap)
+					.build();
+		});
+		if ((securityService.isAuthenticatedUserId(request.getUserId()) && CommunityType.OPEN.equals(community.getType()))
+				|| (securityService.isCommunityManager(communityId) && CommunityType.CLOSED.equals(community.getType()))) {
 			return ResponseEntity.status(HttpStatus.CREATED)
-					.body(CommunityResponse.of(communityUserCommandService.joinCommunityAsMember(communityId, request.getUserId())));
+					.body(CommunityUserResponse.of(communityUserCommandService.create(community, user, CommunityRole.MEMBER)));
+		} else {
+			throw new UserCommunityAccessDeniedException();
+		}
 	}
 
 	@ApiOperation(value = "Change community role of the user.",
@@ -62,11 +92,15 @@ public class CommunityUserCommandController {
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
 	@PutMapping(path = "/communities/{communityId}/users/{userId}")
-	@PreAuthorize("isAuthenticated() and hasCommunityManagerRole(#communityId) and !isPrincipalUserId(#userId)")
-	public ResponseEntity<CommunityResponse> changeCommunityUserRole(@PathVariable("communityId") String communityId,
-																	 @PathVariable("userId") String userId,
-																	 @RequestBody CommunityUserUpdateRequest request) {
-		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
+	@PreAuthorize("isAuthenticated() and !isPrincipalUserId(#userId)")
+	public ResponseEntity<CommunityUserResponse> changeCommunityUserRole(@PathVariable("communityId") String communityId,
+																 @PathVariable("userId") String userId,
+																 @RequestBody CommunityUserUpdateRequest request) {
+		if (!securityService.isCommunityManager(communityId)) {
+			throw new UserCommunityAccessDeniedException();
+		} else {
+			return ResponseEntity.status(HttpStatus.OK).body(CommunityUserResponse.of(communityUserCommandService.update(communityId, userId, request.getRole())));
+		}
 	}
 
 	@ApiOperation(value = "User leaves the community.",
@@ -79,16 +113,16 @@ public class CommunityUserCommandController {
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
 	@DeleteMapping(path = "/communities/{communityId}/users/{userId}")
-	@PreAuthorize("(isAuthenticated() and isPrincipalUserId(#userId)) or hasCommunityManagerRole(#communityId)")
-	public ResponseEntity<CommunityResponse> leaveCommunity(
-			@ApiIgnore @AuthenticationPrincipal Jwt jwt,
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<Void> leaveCommunity(
 			@PathVariable("communityId") String communityId,
 			@PathVariable("userId") String userId) {
-		final Community community = communityUserCommandService.leaveCommunity(communityId, userId);
-		final CommunityResponse communityResponse = securityService.hasCommunityManagerRole(jwt, communityId) ?
-				CommunityResponse.of(community) : CommunityResponse.simple(community);
-		return ResponseEntity.status(HttpStatus.OK)
-				.body(communityResponse);
+		if (!securityService.isCommunityManager(communityId) && !securityService.isAuthenticatedUserId(userId)) {
+			throw new UserCommunityAccessDeniedException();
+		} else {
+			communityUserCommandService.remove(communityId, userId);
+			return ResponseEntity.noContent().build();
+		}
 	}
 
 }

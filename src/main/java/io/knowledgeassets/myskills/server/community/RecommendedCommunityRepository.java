@@ -4,6 +4,6 @@ import java.util.stream.Stream;
 
 public interface RecommendedCommunityRepository {
 
-	Stream<RecommendedCommunity> getRecommendedCommunities(String userId);
+	Stream<Community> getRecommendedCommunities(String userId);
 
 }

@@ -1,8 +1,13 @@
-package io.knowledgeassets.myskills.server.community.command;
+package io.knowledgeassets.myskills.server.communityuser.command;
 
 import io.knowledgeassets.myskills.server.common.AbstractControllerTests;
 import io.knowledgeassets.myskills.server.community.Community;
+import io.knowledgeassets.myskills.server.community.CommunityRole;
+import io.knowledgeassets.myskills.server.community.CommunityType;
+import io.knowledgeassets.myskills.server.community.query.CommunityQueryService;
+import io.knowledgeassets.myskills.server.communityuser.CommunityUser;
 import io.knowledgeassets.myskills.server.user.User;
+import io.knowledgeassets.myskills.server.user.query.UserQueryService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,29 +15,22 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.InputStream;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static io.knowledgeassets.myskills.server.common.JwtAuthenticationFactory.withUser;
-import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isA;
-import static org.hamcrest.core.AllOf.allOf;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static io.knowledgeassets.myskills.server.security.JwtClaims.MYSKILLS_USER_ID;
 
 @WebMvcTest(CommunityUserCommandController.class)
 class CommunityUserCommandControllerTests extends AbstractControllerTests {
@@ -43,21 +41,40 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 	@MockBean
 	private CommunityUserCommandService communityUserCommandService;
 
+	@MockBean
+	private CommunityQueryService communityQueryService;
+
+	@MockBean
+	private UserQueryService userQueryService;
+
 	@Test
 	@DisplayName("Tests if authenticated user joins the community.")
 	void testIfUserJoinsCommunity() throws Exception {
-		final User owner = User.builder()
+		final User tester = User.builder()
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
 				.build();
 
-		given(communityUserCommandService.joinCommunityAsMember("123", "1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(Community.builder()
+		final Community community = Community.builder()
 				.id("123")
 				.title("Java User Group")
-				.members(singletonList(User.builder()
-						.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
-						.userName("tester")
-						.build()))
+				.type(CommunityType.OPEN)
+				.build();
+
+		given(communityQueryService.getCommunityById("123")).willReturn(Optional.of(community));
+
+		given(securityService.isAuthenticatedUserId(tester.getId())).willReturn(true);
+
+		given(userQueryService.getUserById("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(Optional.of(tester));
+
+		given(communityUserCommandService.create(community, tester, CommunityRole.MEMBER)).willReturn(
+				CommunityUser.builder()
+						.id(123L)
+				.role(CommunityRole.MEMBER)
+				.user(tester)
+				.community(community)
+				.lastModifiedDate(LocalDateTime.of(2019, 1, 15, 20, 0))
+				.creationDate(LocalDateTime.of(2019, 1, 15, 20, 0))
 				.build()
 		);
 
@@ -68,27 +85,34 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 					.content(is.readAllBytes())
 					.accept(MediaType.APPLICATION_JSON)
 					.contentType(MediaType.APPLICATION_JSON)
-					.with(authentication(withUser(owner))))
+					.with(authentication(withUser(tester))))
 					.andExpect(status().isCreated())
-					.andExpect(jsonPath("$.id", is(equalTo("123"))))
-					.andExpect(jsonPath("$.title", is(equalTo("Java User Group"))))
-					.andExpect(jsonPath("$.members[0].id", is(equalTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))))
-					.andExpect(jsonPath("$.members[0].userName", is(equalTo("tester"))));
+					.andExpect(jsonPath("$.role", is(equalTo(CommunityRole.MEMBER.toString()))))
+					.andExpect(jsonPath("$.user.id", is(equalTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))))
+					.andExpect(jsonPath("$.user.userName", is(equalTo("tester"))));
 		}
 	}
 
 	@Test
-	@DisplayName("Tests if request to change community user role is processed.")
-	void testIfRequestToChangeCommunityUserRoleIsProcessed() throws Exception {
+	@DisplayName("User role is changed.")
+	void userRoleIsChanged() throws Exception {
 		final User owner = User.builder()
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
 				.build();
 
-		given(securityService.hasCommunityManagerRole(argThat(allOf(
-				isA(Jwt.class),
-				hasProperty("claims", hasEntry(MYSKILLS_USER_ID, "1f37fb2a-b4d0-4119-9113-4677beb20ae2"))
-		)), eq("123"))).willReturn(true);
+		given(securityService.isCommunityManager( "123")).willReturn(true);
+
+		given(communityUserCommandService.update("123", "4f09647e-c7d3-4aa6-ab3d-0faff66b951f", CommunityRole.MANAGER)).willReturn(
+				CommunityUser.builder()
+				.user(User.builder()
+						.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
+						.userName("other")
+						.build()
+				)
+				.role(CommunityRole.MANAGER)
+				.build()
+		);
 
 		final ClassPathResource body = new ClassPathResource("community/command/change-community-user-role.json");
 
@@ -98,7 +122,10 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 					.accept(MediaType.APPLICATION_JSON)
 					.contentType(MediaType.APPLICATION_JSON)
 					.with(authentication(withUser(owner))))
-					.andExpect(status().isNotImplemented());
+					.andExpect(status().isOk())
+					.andExpect(jsonPath("$.role", is(equalTo(CommunityRole.MANAGER.toString()))))
+					.andExpect(jsonPath("$.user.id", is(equalTo("4f09647e-c7d3-4aa6-ab3d-0faff66b951f"))))
+					.andExpect(jsonPath("$.user.userName", is(equalTo("other"))));
 		}
 	}
 
@@ -110,10 +137,7 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 				.userName("tester")
 				.build();
 
-		given(securityService.hasCommunityManagerRole(argThat(allOf(
-				isA(Jwt.class),
-				hasProperty("claims", hasEntry(MYSKILLS_USER_ID, "1f37fb2a-b4d0-4119-9113-4677beb20ae2"))
-		)), eq("123"))).willReturn(true);
+		given(securityService.isCommunityManager("1f37fb2a-b4d0-4119-9113-4677beb20ae2", "123")).willReturn(true);
 
 		final ClassPathResource body = new ClassPathResource("community/command/change-community-user-role.json");
 
@@ -168,10 +192,7 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 				.userName("tester")
 				.build();
 
-		given(securityService.hasCommunityManagerRole(argThat(allOf(
-				isA(Jwt.class),
-				hasProperty("claims", hasEntry(MYSKILLS_USER_ID, "1f37fb2a-b4d0-4119-9113-4677beb20ae2"))
-		)), eq("123"))).willReturn(true);
+		given(securityService.isCommunityManager("1f37fb2a-b4d0-4119-9113-4677beb20ae2", "123")).willReturn(true);
 
 		final ClassPathResource body = new ClassPathResource("community/command/change-community-user-role-invalid.json");
 
@@ -188,7 +209,7 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 	@Test
 	@DisplayName("Tests if not authenticated user is not allowed to join the community.")
 	void testIfNotAuthenticatedUserIsNotAllowedToJoinCommunity() throws Exception {
-		mockMvc.perform(post("/communities/123/members"))
+		mockMvc.perform(post("/communities/123/users"))
 				.andExpect(status().isUnauthorized());
 	}
 
@@ -200,22 +221,11 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 				.userName("tester")
 				.build();
 
-		given(communityUserCommandService.leaveCommunity("123", "1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(Community.builder()
-				.id("123")
-				.title("Java User Group")
-				.members(singletonList(User.builder()
-						.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
-						.userName("anotherTester")
-						.build()))
-				.build()
-		);
+		given(securityService.isAuthenticatedUserId("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(true);
 
 		mockMvc.perform(delete("/communities/123/users/1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.with(authentication(withUser(owner))))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.id", is(equalTo("123"))))
-				.andExpect(jsonPath("$.title", is(equalTo("Java User Group"))))
-				.andExpect(jsonPath("$.members").doesNotExist());
+				.andExpect(status().isNoContent());
 	}
 
 	@Test
@@ -233,28 +243,11 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 				.userName("tester")
 				.build();
 
-		given(securityService.hasCommunityManagerRole(argThat(allOf(
-				isA(Jwt.class),
-				hasProperty("claims", hasEntry(MYSKILLS_USER_ID, "1f37fb2a-b4d0-4119-9113-4677beb20ae2"))
-		)), eq("123"))).willReturn(true);
-
-		given(communityUserCommandService.leaveCommunity("123", "a396d5a8-a6b1-4c71-9498-a16e655dae2e")).willReturn(Community.builder()
-				.id("123")
-				.title("Java User Group")
-				.members(singletonList(User.builder()
-						.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
-						.userName("anotherTester")
-						.build()))
-				.build()
-		);
+		given(securityService.isCommunityManager( "123")).willReturn(true);
 
 		mockMvc.perform(delete("/communities/123/users/a396d5a8-a6b1-4c71-9498-a16e655dae2e")
 				.with(authentication(withUser(owner))))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.id", is(equalTo("123"))))
-				.andExpect(jsonPath("$.title", is(equalTo("Java User Group"))))
-				.andExpect(jsonPath("$.members[0].id", is(equalTo("56ef4778-a084-4509-9a3e-80b7895cf7b0"))))
-				.andExpect(jsonPath("$.members[0].userName", is(equalTo("anotherTester"))));
+				.andExpect(status().isNoContent());
 	}
 
 }

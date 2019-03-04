@@ -232,9 +232,11 @@ class UserProjectQueryControllerTests extends AbstractControllerTests {
 				.id("2a29ca1o-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
 				.build();
-		given(userPermissionQueryService.hasUserPermission("1f37fb2a-b4d0-4119-9113-4677beb20ae2", "2a29ca1o-b4d0-4119-9113-4677beb20ae2",
-				UserPermissionScope.READ_USER_SKILLS))
-				.willReturn(true);
+
+		givenUser("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.hasAuthorizedUsers("2a29ca1o-b4d0-4119-9113-4677beb20ae2")
+				.forScopes(UserPermissionScope.READ_USER_SKILLS);
+
 		mockMvc.perform(get("/users/1f37fb2a-b4d0-4119-9113-4677beb20ae2/projects")
 				.with(authentication(withUser(owner))))
 				.andExpect(status().isOk())

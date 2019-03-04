@@ -2,9 +2,10 @@ package io.knowledgeassets.myskills.server.community.command;
 
 import io.knowledgeassets.myskills.server.common.AbstractControllerTests;
 import io.knowledgeassets.myskills.server.community.Community;
+import io.knowledgeassets.myskills.server.community.CommunityRole;
 import io.knowledgeassets.myskills.server.community.CommunityType;
 import io.knowledgeassets.myskills.server.community.Link;
-import io.knowledgeassets.myskills.server.security.CurrentUserService;
+import io.knowledgeassets.myskills.server.communityuser.CommunityUser;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.skill.query.SkillQueryService;
 import io.knowledgeassets.myskills.server.user.User;
@@ -16,7 +17,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.InputStream;
@@ -25,14 +25,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static io.knowledgeassets.myskills.server.security.JwtClaims.MYSKILLS_USER_ID;
-import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.hamcrest.Matchers.isA;
-import static org.hamcrest.core.AllOf.allOf;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -57,9 +50,6 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 
 	@MockBean
 	private UserQueryService userQueryService;
-
-	@MockBean
-	private CurrentUserService currentUserService;
 
 	@MockBean
 	private SkillQueryService skillQueryService;
@@ -107,7 +97,7 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 
 		final Community community = Community.builder()
 				.title("Java User Group")
-				.type(CommunityType.OPENED)
+				.type(CommunityType.OPEN)
 				.description("Community for Java developers")
 				.links(Arrays.asList(
 						Link.builder()
@@ -145,7 +135,7 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 				Community.builder()
 						.id("123")
 						.title("Java User Group")
-						.type(CommunityType.OPENED)
+						.type(CommunityType.OPEN)
 						.description("Community for Java developers")
 						.links(Arrays.asList(
 								Link.builder()
@@ -157,8 +147,6 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 										.href("https://www.linkedin.com/java-user-group")
 										.build()
 						))
-						.managers(singletonList(owner))
-						.members(singletonList(owner))
 						.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
 						.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
 						.skills(Arrays.asList(Skill.builder()
@@ -173,6 +161,11 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 										.id("dce8b8c9-cd49-4a87-8cd2-4ca106dcf7f3")
 										.name("Spring MVC")
 										.build()))
+						.communityUsers(singletonList(CommunityUser.builder()
+								.user(owner)
+								.role(CommunityRole.MANAGER)
+								.build()
+						))
 						.build()
 		);
 		try (final InputStream is = body.getInputStream()) {
@@ -186,7 +179,7 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 					.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 					.andExpect(jsonPath("$.id", is(equalTo("123"))))
 					.andExpect(jsonPath("$.title", is(equalTo("Java User Group"))))
-					.andExpect(jsonPath("$.type", is(equalTo("OPENED"))))
+					.andExpect(jsonPath("$.type", is(equalTo("OPEN"))))
 					.andExpect(jsonPath("$.description", is(equalTo("Community for Java developers"))))
 					.andExpect(jsonPath("$.links[0].name", is(equalTo("Facebook"))))
 					.andExpect(jsonPath("$.links[0].href", is(equalTo("https://www.facebook.com/java-user-group"))))
@@ -194,8 +187,6 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 					.andExpect(jsonPath("$.links[1].href", is(equalTo("https://www.linkedin.com/java-user-group"))))
 					.andExpect(jsonPath("$.managers[0].id", is(equalTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))))
 					.andExpect(jsonPath("$.managers[0].userName", is(equalTo("tester"))))
-					.andExpect(jsonPath("$.members[0].id", is(equalTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))))
-					.andExpect(jsonPath("$.members[0].userName", is(equalTo("tester"))))
 					.andExpect(jsonPath("$.skills[0].id", is(equalTo("4f09647e-c7d3-4aa6-ab3d-0faff66b951f"))))
 					.andExpect(jsonPath("$.skills[0].name", is(equalTo("Spring Boot"))))
 					.andExpect(jsonPath("$.skills[1].id", is(equalTo("6d0870d0-a7b8-4cf4-8a24-bedcfe350903"))))
@@ -260,15 +251,11 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 	@Test
 	@DisplayName("Tests if a community can be updated.")
 	void testIfCommunityIsUpdated() throws Exception {
-		given(securityService.hasCommunityManagerRole(argThat(allOf(
-				isA(Jwt.class),
-				hasProperty("claims", hasEntry(MYSKILLS_USER_ID, "1f37fb2a-b4d0-4119-9113-4677beb20ae2"))
-		)), eq("123"))).willReturn(true);
+		given(securityService.isCommunityManager( "123")).willReturn(true);
 		final User owner = User.builder()
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
 				.build();
-		given(currentUserService.getCurrentUser()).willReturn(owner);
 
 		given(skillQueryService.findByNameIgnoreCase("Spring Boot")).willReturn(
 				Optional.of(
@@ -307,7 +294,7 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 		final Community community = Community.builder()
 				.id("123")
 				.title("Java User Group")
-				.type(CommunityType.OPENED)
+				.type(CommunityType.OPEN)
 				.description("New community for Java developers")
 				.links(Arrays.asList(
 						Link.builder()
@@ -319,8 +306,6 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 								.href("https://www.linkedin.com/java-user-group")
 								.build()
 				))
-				.managers(singletonList(owner))
-				.members(singletonList(owner))
 				.skills(Arrays.asList(Skill.builder()
 								.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
 								.name("Spring Boot")
@@ -333,20 +318,11 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 								.name("Spring MVC")
 								.build()))
 				.build();
-		given(communityCommandService.update(community, Arrays.asList(
-				User.builder()
-						.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
-						.userName("firstTester")
-						.build(),
-				User.builder()
-						.id("d9d74c04-0ab0-479c-a1d7-d372990f11b6")
-						.userName("secondTester")
-						.build()
-		))).willReturn(
+		given(communityCommandService.update(community)).willReturn(
 				Community.builder()
 						.id("123")
 						.title("Java User Group")
-						.type(CommunityType.OPENED)
+						.type(CommunityType.OPEN)
 						.description("New community for java developers")
 						.links(Arrays.asList(
 								Link.builder()
@@ -358,8 +334,6 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 										.href("https://www.linkedin.com/java-user-group")
 										.build()
 						))
-						.managers(singletonList(owner))
-						.members(singletonList(owner))
 						.skills(Arrays.asList(Skill.builder()
 								.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
 								.name("Spring Boot")
@@ -372,6 +346,11 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 										.id("dce8b8c9-cd49-4a87-8cd2-4ca106dcf7f3")
 										.name("Spring MVC")
 										.build()))
+						.communityUsers(singletonList(CommunityUser.builder()
+								.user(owner)
+								.role(CommunityRole.MANAGER)
+								.build()
+						))
 						.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
 						.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
 						.build()
@@ -387,7 +366,7 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 					.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 					.andExpect(jsonPath("$.id", is(equalTo("123"))))
 					.andExpect(jsonPath("$.title", is(equalTo("Java User Group"))))
-					.andExpect(jsonPath("$.type", is(equalTo("OPENED"))))
+					.andExpect(jsonPath("$.type", is(equalTo("OPEN"))))
 					.andExpect(jsonPath("$.description", is(equalTo("New community for java developers"))))
 					.andExpect(jsonPath("$.links[0].name", is(equalTo("Facebook"))))
 					.andExpect(jsonPath("$.links[0].href", is(equalTo("https://www.facebook.com/java-user-group"))))
@@ -395,8 +374,6 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 					.andExpect(jsonPath("$.links[1].href", is(equalTo("https://www.linkedin.com/java-user-group"))))
 					.andExpect(jsonPath("$.managers[0].id", is(equalTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))))
 					.andExpect(jsonPath("$.managers[0].userName", is(equalTo("tester"))))
-					.andExpect(jsonPath("$.members[0].id", is(equalTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))))
-					.andExpect(jsonPath("$.members[0].userName", is(equalTo("tester"))))
 					.andExpect(jsonPath("$.skills[0].id", is(equalTo("4f09647e-c7d3-4aa6-ab3d-0faff66b951f"))))
 					.andExpect(jsonPath("$.skills[0].name", is(equalTo("Spring Boot"))))
 					.andExpect(jsonPath("$.skills[1].id", is(equalTo("6d0870d0-a7b8-4cf4-8a24-bedcfe350903"))))
@@ -423,10 +400,7 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 	@Test
 	@DisplayName("Tests if forbbiden status code is returned when community is updated by a user who is not a community manager.")
 	void testIfForbiddenStatusCodeIsReturnedWhenCommunityIsUpdatedByUserWhoIsNotCommunityManager() throws Exception {
-		given(securityService.hasCommunityManagerRole(argThat(allOf(
-				isA(Jwt.class),
-				hasProperty("claims", hasEntry(MYSKILLS_USER_ID, "1f37fb2a-b4d0-4119-9113-4677beb20ae2"))
-		)), eq("123"))).willReturn(false);
+		given(securityService.isCommunityManager( "123")).willReturn(false);
 		final User owner = User.builder()
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
@@ -446,10 +420,7 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 	@Test
 	@DisplayName("Tests if the community can be deleted.")
 	void testIfCommunityCanBeDeleted() throws Exception {
-		given(securityService.hasCommunityManagerRole(argThat(allOf(
-				isA(Jwt.class),
-				hasProperty("claims", hasEntry(MYSKILLS_USER_ID, "1f37fb2a-b4d0-4119-9113-4677beb20ae2"))
-		)), eq("123"))).willReturn(true);
+		given(securityService.isCommunityManager( "123")).willReturn(true);
 		final User owner = User.builder()
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
@@ -462,10 +433,7 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 	@Test
 	@DisplayName("Tests if the community cannot be deleted by a user who is not a community manager.")
 	void testIfCommunityCannotBeDeletedByUserWhoIsNotCommunityManager() throws Exception {
-		given(securityService.hasCommunityManagerRole(argThat(allOf(
-				isA(Jwt.class),
-				hasProperty("claims", hasEntry(MYSKILLS_USER_ID, "1f37fb2a-b4d0-4119-9113-4677beb20ae2"))
-		)), eq("123"))).willReturn(false);
+		given(securityService.isCommunityManager( "123")).willReturn(false);
 		final User owner = User.builder()
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")

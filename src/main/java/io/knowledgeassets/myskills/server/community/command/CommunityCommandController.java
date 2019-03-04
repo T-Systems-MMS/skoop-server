@@ -5,7 +5,9 @@ import io.knowledgeassets.myskills.server.community.CommunityRequest;
 import io.knowledgeassets.myskills.server.community.CommunityResponse;
 import io.knowledgeassets.myskills.server.community.Link;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
+import io.knowledgeassets.myskills.server.exception.UserCommunityAccessDeniedException;
 import io.knowledgeassets.myskills.server.exception.enums.Model;
+import io.knowledgeassets.myskills.server.security.SecurityService;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.skill.query.SkillQueryService;
 import io.knowledgeassets.myskills.server.user.User;
@@ -41,13 +43,16 @@ public class CommunityCommandController {
 	private final CommunityCommandService communityCommandService;
 	private final UserQueryService userQueryService;
 	private final SkillQueryService skillQueryService;
+	private final SecurityService securityService;
 
 	public CommunityCommandController(CommunityCommandService communityCommandService,
 									  UserQueryService userQueryService,
-									  SkillQueryService skillQueryService) {
+									  SkillQueryService skillQueryService,
+									  SecurityService securityService) {
 		this.communityCommandService = communityCommandService;
 		this.userQueryService = userQueryService;
 		this.skillQueryService = skillQueryService;
+		this.securityService = securityService;
 	}
 
 	@ApiOperation(value = "Create new community",
@@ -79,14 +84,17 @@ public class CommunityCommandController {
 			@ApiResponse(code = 404, message = "Resource not found"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("isAuthenticated() and hasCommunityManagerRole(#communityId)")
+	@PreAuthorize("isAuthenticated()")
 	@PutMapping(path = "/communities/{communityId}",
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<CommunityResponse> update(@PathVariable("communityId") String communityId, @Valid @RequestBody CommunityRequest request) {
+		if (!securityService.isCommunityManager(communityId)) {
+			throw new UserCommunityAccessDeniedException();
+		}
 		final Community community = convertCommunityRequestToCommunityDomain(request);
 		community.setId(communityId);
-		final Community result = communityCommandService.update(community, getInvitedUsers(request));
+		final Community result = communityCommandService.update(community);
 		return ResponseEntity.status(HttpStatus.OK).body(CommunityResponse.of(result));
 	}
 
@@ -99,9 +107,12 @@ public class CommunityCommandController {
 			@ApiResponse(code = 404, message = "Resource not found"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("isAuthenticated() and hasCommunityManagerRole(#communityId)")
+	@PreAuthorize("isAuthenticated()")
 	@DeleteMapping(path = "/communities/{communityId}")
 	public ResponseEntity<Void> delete(@PathVariable("communityId") String communityId) {
+		if (!securityService.isCommunityManager(communityId)) {
+			throw new UserCommunityAccessDeniedException();
+		}
 		communityCommandService.delete(communityId);
 		return ResponseEntity.noContent().build();
 	}

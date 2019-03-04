@@ -1,4 +1,4 @@
-package io.knowledgeassets.myskills.server.usernotification;
+package io.knowledgeassets.myskills.server.communityuser.registration;
 
 import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.user.User;
@@ -19,25 +19,21 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @NodeEntity
-public class UserNotification {
+public class CommunityUserRegistration {
 
 	@Id
 	@Property(name = "id")
 	private String id;
-
-	@Relationship(type = "INITIATED_BY", direction = Relationship.INCOMING)
-	private User initiator;
-	@Relationship(type = "RELATES_TO")
+	@Relationship(type = "community")
 	private Community community;
-	@Relationship(type = "SENT_TO")
-	private User recipient;
+	@Relationship(type = "registeredUser")
+	private User registeredUser;
 	@Property(name = "creationDatetime")
 	@NotNull
 	private LocalDateTime creationDatetime;
-	@Property(name = "status")
-	private UserNotificationStatus status;
-	@Property(name = "type")
-	@NotNull
-	private UserNotificationType type;
+	@Property("approvedByUser")
+	private Boolean approvedByUser;
+	@Property("approvedByCommunity")
+	private Boolean approvedByCommunity;
 
 }

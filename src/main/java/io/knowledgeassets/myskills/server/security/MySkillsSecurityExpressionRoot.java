@@ -1,7 +1,6 @@
 package io.knowledgeassets.myskills.server.security;
 
 import io.knowledgeassets.myskills.server.user.UserPermissionScope;
-import io.knowledgeassets.myskills.server.user.query.UserPermissionQueryService;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
 import org.springframework.security.core.Authentication;
@@ -13,13 +12,10 @@ public class MySkillsSecurityExpressionRoot extends SecurityExpressionRoot imple
 	private Object filterObject;
 	private Object returnObject;
 	private Object target;
-	private final UserPermissionQueryService userPermissionQueryService;
 	private final SecurityService securityService;
 
-	public MySkillsSecurityExpressionRoot(Authentication authentication, UserPermissionQueryService userPermissionQueryService,
-										  SecurityService securityService) {
+	public MySkillsSecurityExpressionRoot(Authentication authentication, SecurityService securityService) {
 		super(authentication);
-		this.userPermissionQueryService = userPermissionQueryService;
 		this.securityService = securityService;
 	}
 
@@ -35,7 +31,7 @@ public class MySkillsSecurityExpressionRoot extends SecurityExpressionRoot imple
 		Object principal = getPrincipal();
 		if (principal instanceof Jwt) {
 			String userIdClaim = ((Jwt) principal).getClaimAsString(MYSKILLS_USER_ID);
-			return userId == null && userIdClaim == null || userId != null && userId.equals(userIdClaim);
+			return securityService.isAuthenticatedUserId(userIdClaim, userId);
 		}
 		return false;
 	}
@@ -55,24 +51,7 @@ public class MySkillsSecurityExpressionRoot extends SecurityExpressionRoot imple
 		Object principal = getPrincipal();
 		if (principal instanceof Jwt) {
 			String userIdClaim = ((Jwt) principal).getClaimAsString(MYSKILLS_USER_ID);
-			return userPermissionQueryService.hasUserPermission(ownerId, userIdClaim,
-					UserPermissionScope.valueOf(scope));
-		}
-		return false;
-	}
-
-	/**
-	 * Checks whether the authenticated user has community manager role for the community referenced by the community ID.
-	 * <p>Usage example assuming a method with a parameter named "communityId":</p>
-	 * <p>@PreAuthorize("hasCommunityManagerRole(#communityId)")</p>
-	 *
-	 * @param communityId ID of the community
-	 * @return <code>true</code> if the authenticated user has community manager role for the community referenced by the community ID.
-	 */
-	public boolean hasCommunityManagerRole(String communityId) {
-		Object principal = getPrincipal();
-		if (principal instanceof Jwt) {
-			return securityService.hasCommunityManagerRole((Jwt) principal, communityId);
+			return securityService.hasUserPermission(ownerId, userIdClaim, UserPermissionScope.valueOf(scope));
 		}
 		return false;
 	}

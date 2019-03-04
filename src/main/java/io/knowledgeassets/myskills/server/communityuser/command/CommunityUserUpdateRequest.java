@@ -1,4 +1,4 @@
-package io.knowledgeassets.myskills.server.community.command;
+package io.knowledgeassets.myskills.server.communityuser.command;
 
 import io.knowledgeassets.myskills.server.community.CommunityRole;
 import io.swagger.annotations.ApiModel;

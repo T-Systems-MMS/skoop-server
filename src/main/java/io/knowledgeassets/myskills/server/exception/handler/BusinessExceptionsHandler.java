@@ -4,6 +4,7 @@ import io.knowledgeassets.myskills.server.exception.DuplicateResourceException;
 import io.knowledgeassets.myskills.server.exception.EmptyInputException;
 import io.knowledgeassets.myskills.server.exception.MethodArgumentNotValidException;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
+import io.knowledgeassets.myskills.server.exception.UserCommunityAccessDeniedException;
 import io.knowledgeassets.myskills.server.exception.domain.ResponseError;
 import io.knowledgeassets.myskills.server.exception.domain.ResponseValidationError;
 import lombok.extern.slf4j.Slf4j;
@@ -90,6 +91,20 @@ public class BusinessExceptionsHandler implements IExceptionHandler {
 		doLog(ex, logMessage);
 
 		ResponseError responseError = new ResponseError(BAD_REQUEST);
+		responseError.setMessage(ex.getLocalizedMessage());
+		return buildResponseEntity(ex, responseError);
+	}
+
+	/**
+	 * Handles UserIsNotCommunityManagerException. If user has some issues with an access to the community we throw this exception.
+	 */
+	@ExceptionHandler(UserCommunityAccessDeniedException.class)
+	protected ResponseEntity<Object> handleUserIsNotCommunityManager(UserCommunityAccessDeniedException ex) {
+		String logMessage = String.format("{%s} User has issues with an access to the community! %s",
+				FORBIDDEN.value() + " " + FORBIDDEN.getReasonPhrase(), ex.getLocalizedMessage());
+		doLog(ex, logMessage);
+
+		ResponseError responseError = new ResponseError(FORBIDDEN);
 		responseError.setMessage(ex.getLocalizedMessage());
 		return buildResponseEntity(ex, responseError);
 	}
