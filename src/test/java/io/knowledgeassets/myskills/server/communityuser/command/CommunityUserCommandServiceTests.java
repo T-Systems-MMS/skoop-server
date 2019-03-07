@@ -25,6 +25,7 @@ import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isA;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 
@@ -124,7 +125,7 @@ class CommunityUserCommandServiceTests {
 						.role(CommunityRole.MEMBER)
 						.build())
 		);
-		communityUserCommandService.remove("456", "1f37fb2a-b4d0-4119-9113-4677beb20ae2");
+		assertDoesNotThrow(() -> communityUserCommandService.remove("456", "1f37fb2a-b4d0-4119-9113-4677beb20ae2"));
 	}
 
 	@DisplayName("Exception is thrown when there is no deleted community user relationship.")

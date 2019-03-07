@@ -68,6 +68,7 @@ public class CommunityUserCommandService {
 	 * @param role - new role of the user
 	 * @return community user
 	 */
+	@Transactional
 	public CommunityUser update(Community community, User user, CommunityRole role) {
 		checkArguments(community, user, role);
 		return update(community.getId(), user.getId(), role);
