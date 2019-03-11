@@ -21,4 +21,10 @@ public class CommunityUserRegistrationQueryService {
 		return communityUserRegistrationRepository.findById(registrationId);
 	}
 
+	@Transactional(readOnly = true)
+	public Optional<CommunityUserRegistration> getPendingUserRequestToJoinCommunity(String userId, String communityId) {
+		return communityUserRegistrationRepository
+				.findByRegisteredUserIdAndCommunityIdAndApprovedByUserIsTrueAndApprovedByCommunityIsNull(userId, communityId);
+	}
+
 }

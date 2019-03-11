@@ -3,10 +3,15 @@ package io.knowledgeassets.myskills.server.communityuser.command;
 import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.community.CommunityRole;
 import io.knowledgeassets.myskills.server.community.CommunityType;
+import io.knowledgeassets.myskills.server.communityuser.CommunityUser;
 import io.knowledgeassets.myskills.server.communityuser.CommunityUserResponse;
 import io.knowledgeassets.myskills.server.community.query.CommunityQueryService;
+import io.knowledgeassets.myskills.server.communityuser.registration.CommunityUserRegistration;
+import io.knowledgeassets.myskills.server.communityuser.registration.command.CommunityUserRegistrationApprovalCommand;
+import io.knowledgeassets.myskills.server.communityuser.registration.command.CommunityUserRegistrationCommandService;
+import io.knowledgeassets.myskills.server.communityuser.registration.query.CommunityUserRegistrationQueryService;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
-import io.knowledgeassets.myskills.server.exception.UserCommunityAccessDeniedException;
+import io.knowledgeassets.myskills.server.exception.UserCommunityException;
 import io.knowledgeassets.myskills.server.exception.enums.Model;
 import io.knowledgeassets.myskills.server.security.SecurityService;
 import io.knowledgeassets.myskills.server.user.User;
@@ -26,6 +31,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Optional;
+
 @Api(tags = { "CommunityUsers" })
 @RestController
 @Validated
@@ -35,15 +42,21 @@ public class CommunityUserCommandController {
 	private final SecurityService securityService;
 	private final CommunityQueryService communityQueryService;
 	private final UserQueryService userQueryService;
+	private final CommunityUserRegistrationQueryService communityUserRegistrationQueryService;
+	private final CommunityUserRegistrationCommandService communityUserRegistrationCommandService;
 
 	public CommunityUserCommandController(CommunityUserCommandService communityUserCommandService,
 										  SecurityService securityService,
 										  CommunityQueryService communityQueryService,
-										  UserQueryService userQueryService) {
+										  UserQueryService userQueryService,
+										  CommunityUserRegistrationQueryService communityUserRegistrationQueryService,
+										  CommunityUserRegistrationCommandService communityUserRegistrationCommandService) {
 		this.communityUserCommandService = communityUserCommandService;
 		this.securityService = securityService;
 		this.communityQueryService = communityQueryService;
 		this.userQueryService = userQueryService;
+		this.communityUserRegistrationQueryService = communityUserRegistrationQueryService;
+		this.communityUserRegistrationCommandService = communityUserRegistrationCommandService;
 	}
 
 	@ApiOperation(value = "User joins the community as member.",
@@ -73,12 +86,24 @@ public class CommunityUserCommandController {
 					.searchParamsMap(searchParamsMap)
 					.build();
 		});
-		if ((securityService.isAuthenticatedUserId(request.getUserId()) && CommunityType.OPEN.equals(community.getType()))
-				|| (securityService.isCommunityManager(communityId) && CommunityType.CLOSED.equals(community.getType()))) {
+		final Optional<CommunityUserRegistration> communityUserRegistration = communityUserRegistrationQueryService.getPendingUserRequestToJoinCommunity(request.getUserId(), communityId);
+		if (securityService.isAuthenticatedUserId(request.getUserId()) && CommunityType.OPEN.equals(community.getType())) {
 			return ResponseEntity.status(HttpStatus.CREATED)
 					.body(CommunityUserResponse.of(communityUserCommandService.create(community, user, CommunityRole.MEMBER)));
+		} else if (securityService.isCommunityManager(communityId) && CommunityType.CLOSED.equals(community.getType())) {
+			if (communityUserRegistration.isPresent()) {
+				final CommunityUserRegistration registration = communityUserRegistrationCommandService.approve(communityUserRegistration.get(), CommunityUserRegistrationApprovalCommand.builder()
+						.approvedByCommunity(true)
+						.approvedByUser(null)
+						.build()
+				);
+				return ResponseEntity.status(HttpStatus.CREATED)
+						.body(CommunityUserResponse.of(registration.getCommunityUser()));
+			} else {
+				throw new UserCommunityException(String.format("There is no pending community user registration for user '%s' and community '%s'", user.getUserName(), community.getTitle()));
+			}
 		} else {
-			throw new UserCommunityAccessDeniedException();
+			throw new UserCommunityException();
 		}
 	}
 
@@ -97,7 +122,7 @@ public class CommunityUserCommandController {
 																 @PathVariable("userId") String userId,
 																 @RequestBody CommunityUserUpdateRequest request) {
 		if (!securityService.isCommunityManager(communityId)) {
-			throw new UserCommunityAccessDeniedException();
+			throw new UserCommunityException();
 		} else {
 			return ResponseEntity.status(HttpStatus.OK).body(CommunityUserResponse.of(communityUserCommandService.update(communityId, userId, request.getRole())));
 		}
@@ -118,7 +143,7 @@ public class CommunityUserCommandController {
 			@PathVariable("communityId") String communityId,
 			@PathVariable("userId") String userId) {
 		if (!securityService.isCommunityManager(communityId) && !securityService.isAuthenticatedUserId(userId)) {
-			throw new UserCommunityAccessDeniedException();
+			throw new UserCommunityException();
 		} else {
 			communityUserCommandService.remove(communityId, userId);
 			return ResponseEntity.noContent().build();

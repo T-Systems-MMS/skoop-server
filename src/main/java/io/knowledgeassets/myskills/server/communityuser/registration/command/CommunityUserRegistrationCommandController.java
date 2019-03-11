@@ -6,7 +6,7 @@ import io.knowledgeassets.myskills.server.communityuser.registration.CommunityUs
 import io.knowledgeassets.myskills.server.communityuser.registration.CommunityUserRegistrationResponse;
 import io.knowledgeassets.myskills.server.communityuser.registration.query.CommunityUserRegistrationQueryService;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
-import io.knowledgeassets.myskills.server.exception.UserCommunityAccessDeniedException;
+import io.knowledgeassets.myskills.server.exception.UserCommunityException;
 import io.knowledgeassets.myskills.server.exception.enums.Model;
 import io.knowledgeassets.myskills.server.security.SecurityService;
 import io.knowledgeassets.myskills.server.user.User;
@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -64,22 +65,23 @@ public class CommunityUserRegistrationCommandController {
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<List<CommunityUserRegistrationResponse>> createRequestToJoinCommunity(@PathVariable("communityId") String communityId,
 																						  @RequestBody CommunityUserRegistrationRequest request) {
-
-		if (securityService.isCommunityManager(communityId) || (request.getUserIds().size() == 1 && securityService.isAuthenticatedUserId(request.getUserIds().get(0)))) {
-			final List<User> users = userQueryService.getUsersByIds(request.getUserIds()).collect(Collectors.toList());
-			final Community community = communityQueryService.getCommunityById(communityId).orElseThrow(() -> {
-				final String[] searchParamsMap = {"id", communityId};
-				return NoSuchResourceException.builder()
-						.model(Model.COMMUNITY)
-						.searchParamsMap(searchParamsMap)
-						.build();
-			});
-			return ResponseEntity.status(HttpStatus.CREATED).body(
-					communityUserRegistrationCommandService.createUserRegistrationsOnBehalfOfCommunity(users, community).stream().map(CommunityUserRegistrationResponse::of).collect(Collectors.toList())
-			);
+		final List<User> users = userQueryService.getUsersByIds(request.getUserIds()).collect(Collectors.toList());
+		final Community community = communityQueryService.getCommunityById(communityId).orElseThrow(() -> {
+			final String[] searchParamsMap = {"id", communityId};
+			return NoSuchResourceException.builder()
+					.model(Model.COMMUNITY)
+					.searchParamsMap(searchParamsMap)
+					.build();
+		});
+		final List<CommunityUserRegistrationResponse> result;
+		if (securityService.isCommunityManager(communityId)) {
+			result = communityUserRegistrationCommandService.createUserRegistrationsOnBehalfOfCommunity(users, community).stream().map(CommunityUserRegistrationResponse::of).collect(Collectors.toList());
+		} else if (request.getUserIds().size() == 1 && securityService.isAuthenticatedUserId(request.getUserIds().get(0))) {
+			result = Collections.singletonList(CommunityUserRegistrationResponse.of(communityUserRegistrationCommandService.createUserRegistrationsOnBehalfOfUser(users.get(0), community)));
 		} else {
-			throw new UserCommunityAccessDeniedException();
+			throw new UserCommunityException();
 		}
+		return ResponseEntity.status(HttpStatus.CREATED).body(result);
 	}
 
 	@ApiOperation(value = "Update user registration.",
@@ -111,7 +113,7 @@ public class CommunityUserRegistrationCommandController {
 			command.setApprovedByCommunity(null);
 			return ResponseEntity.ok(CommunityUserRegistrationResponse.of(communityUserRegistrationCommandService.approve(registration, command)));
 		} else {
-			throw new UserCommunityAccessDeniedException();
+			throw new UserCommunityException();
 		}
 	}
 

@@ -1,6 +1,8 @@
 package io.knowledgeassets.myskills.server.communityuser.registration.command;
 
 import io.knowledgeassets.myskills.server.community.Community;
+import io.knowledgeassets.myskills.server.community.CommunityRole;
+import io.knowledgeassets.myskills.server.communityuser.command.CommunityUserCommandService;
 import io.knowledgeassets.myskills.server.security.CurrentUserService;
 import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.communityuser.registration.CommunityUserRegistration;
@@ -20,11 +22,14 @@ public class CommunityUserRegistrationCommandService {
 
 	private final CommunityUserRegistrationRepository communityUserRegistrationRepository;
 	private final CurrentUserService currentUserService;
+	private final CommunityUserCommandService communityUserCommandService;
 
 	public CommunityUserRegistrationCommandService(CommunityUserRegistrationRepository communityUserRegistrationRepository,
-												   CurrentUserService currentUserService) {
+												   CurrentUserService currentUserService,
+												   CommunityUserCommandService communityUserCommandService) {
 		this.communityUserRegistrationRepository = communityUserRegistrationRepository;
 		this.currentUserService = currentUserService;
+		this.communityUserCommandService = communityUserCommandService;
 	}
 
 	@Transactional
@@ -35,7 +40,11 @@ public class CommunityUserRegistrationCommandService {
 		if (command.getApprovedByUser() != null) {
 			registration.setApprovedByUser(command.getApprovedByUser());
 		}
-		return communityUserRegistrationRepository.save(registration);
+		final CommunityUserRegistration communityUserRegistration = communityUserRegistrationRepository.save(registration);
+		if (communityUserRegistration.getApprovedByCommunity() && communityUserRegistration.getApprovedByUser()) {
+			communityUserRegistration.setCommunityUser(communityUserCommandService.create(registration.getCommunity(), registration.getRegisteredUser(), CommunityRole.MEMBER));
+		}
+		return communityUserRegistration;
 	}
 
 	/**

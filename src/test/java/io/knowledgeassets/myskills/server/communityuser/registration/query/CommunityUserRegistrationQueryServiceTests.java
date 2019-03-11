@@ -53,7 +53,7 @@ class CommunityUserRegistrationQueryServiceTests {
 						.build()
 				)
 		);
-		final Optional<CommunityUserRegistration> communityUserRegistrationOptional = this.communityUserRegistrationQueryService.getCommunityUserRegistrationById("123");
+		final Optional<CommunityUserRegistration> communityUserRegistrationOptional = communityUserRegistrationQueryService.getCommunityUserRegistrationById("123");
 		assertThat(communityUserRegistrationOptional).isNotEmpty();
 		final CommunityUserRegistration communityUserRegistration = communityUserRegistrationOptional.get();
 		assertThat(communityUserRegistration.getApprovedByCommunity()).isTrue();
@@ -68,6 +68,46 @@ class CommunityUserRegistrationQueryServiceTests {
 				.id("456")
 				.type(CommunityType.OPEN)
 				.build());
+	}
+
+	@DisplayName("Get pending request to join a community.")
+	@Test
+	void getPendingUserRequestToJoinCommunity() {
+		given(communityUserRegistrationRepository.findByRegisteredUserIdAndCommunityIdAndApprovedByUserIsTrueAndApprovedByCommunityIsNull("123", "456")).willReturn(
+				Optional.of(
+						CommunityUserRegistration.builder()
+								.approvedByCommunity(false)
+								.approvedByUser(true)
+								.community(Community.builder()
+										.title("Java User Group")
+										.id("456")
+										.type(CommunityType.OPEN)
+										.build())
+								.registeredUser(User.builder()
+										.id("123")
+										.userName("tester")
+										.build())
+								.id("abc")
+								.creationDatetime(LocalDateTime.of(2019, 1, 20, 10, 0))
+								.build()
+				)
+		);
+		Optional<CommunityUserRegistration> userRegistrationOptional = communityUserRegistrationQueryService.getPendingUserRequestToJoinCommunity("123", "456");
+		assertThat(userRegistrationOptional).isNotEmpty();
+		CommunityUserRegistration registration = userRegistrationOptional.get();
+		assertThat(registration.getId()).isEqualTo("abc");
+		assertThat(registration.getCreationDatetime()).isEqualTo(LocalDateTime.of(2019, 1, 20, 10, 0));
+		assertThat(registration.getRegisteredUser()).isEqualTo(User.builder()
+				.id("123")
+				.userName("tester")
+				.build());
+		assertThat(registration.getCommunity()).isEqualTo(Community.builder()
+				.title("Java User Group")
+				.id("456")
+				.type(CommunityType.OPEN)
+				.build());
+		assertThat(registration.getApprovedByCommunity()).isFalse();
+		assertThat(registration.getApprovedByUser()).isTrue();
 	}
 
 }

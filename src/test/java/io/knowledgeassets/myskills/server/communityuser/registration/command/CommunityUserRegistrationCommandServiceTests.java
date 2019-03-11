@@ -2,9 +2,9 @@ package io.knowledgeassets.myskills.server.communityuser.registration.command;
 
 import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.community.CommunityType;
+import io.knowledgeassets.myskills.server.communityuser.command.CommunityUserCommandService;
 import io.knowledgeassets.myskills.server.communityuser.registration.CommunityUserRegistration;
 import io.knowledgeassets.myskills.server.communityuser.registration.CommunityUserRegistrationRepository;
-import io.knowledgeassets.myskills.server.communityuser.registration.command.CommunityUserRegistrationCommandService;
 import io.knowledgeassets.myskills.server.security.CurrentUserService;
 import io.knowledgeassets.myskills.server.user.User;
 import org.hamcrest.Matchers;
@@ -23,7 +23,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.isA;
@@ -43,10 +42,13 @@ class CommunityUserRegistrationCommandServiceTests {
 
 	private CommunityUserRegistrationCommandService communityUserRegistrationCommandService;
 
+	@Mock
+	private CommunityUserCommandService communityUserCommandService;
+
 	@BeforeEach
 	void setUp() {
 		this.communityUserRegistrationCommandService = new CommunityUserRegistrationCommandService(communityUserRegistrationRepository,
-				currentUserService);
+				currentUserService, communityUserCommandService);
 	}
 
 	@DisplayName("Test if users are invited.")
@@ -278,6 +280,160 @@ class CommunityUserRegistrationCommandServiceTests {
 				.id("db87d46a-e4ca-451a-903b-e8533e0b924b")
 				.userName("tester")
 				.build(), null));
+	}
+
+	@DisplayName("Approves community user registration by user.")
+	@Test
+	void approveByUser() {
+		given(communityUserRegistrationRepository.save(
+				CommunityUserRegistration.builder()
+						.approvedByCommunity(true)
+						.approvedByUser(true)
+						.registeredUser(User.builder()
+								.id("db87d46a-e4ca-451a-903b-e8533e0b924b")
+								.userName("tester")
+								.build())
+						.community(Community.builder()
+								.id("123")
+								.title("Java User Group")
+								.type(CommunityType.CLOSED)
+								.description("Community for Java developers")
+								.build())
+						.creationDatetime(LocalDateTime.of(2019, 1, 15, 20, 0))
+						.id("123")
+						.build()
+		)).willReturn(
+				CommunityUserRegistration.builder()
+						.approvedByCommunity(true)
+						.approvedByUser(true)
+						.registeredUser(User.builder()
+								.id("db87d46a-e4ca-451a-903b-e8533e0b924b")
+								.userName("tester")
+								.build())
+						.community(Community.builder()
+								.id("123")
+								.title("Java User Group")
+								.type(CommunityType.CLOSED)
+								.description("Community for Java developers")
+								.build())
+						.creationDatetime(LocalDateTime.of(2019, 1, 15, 20, 0))
+						.id("123")
+						.build()
+		);
+		final CommunityUserRegistration registration = communityUserRegistrationCommandService.approve(CommunityUserRegistration.builder()
+				.approvedByCommunity(true)
+				.approvedByUser(null)
+				.registeredUser(User.builder()
+						.id("db87d46a-e4ca-451a-903b-e8533e0b924b")
+						.userName("tester")
+						.build())
+				.community(Community.builder()
+						.id("123")
+						.title("Java User Group")
+						.type(CommunityType.CLOSED)
+						.description("Community for Java developers")
+						.build())
+				.creationDatetime(LocalDateTime.of(2019, 1, 15, 20, 0))
+				.id("123")
+				.build(),
+				CommunityUserRegistrationApprovalCommand.builder()
+				.approvedByUser(true)
+				.approvedByCommunity(null)
+				.build()
+		);
+		assertThat(registration.getId()).isEqualTo("123");
+		assertThat(registration.getApprovedByUser()).isTrue();
+		assertThat(registration.getApprovedByCommunity()).isTrue();
+		assertThat(registration.getCreationDatetime()).isEqualTo(LocalDateTime.of(2019, 1, 15, 20, 0));
+		assertThat(registration.getCommunity()).isEqualTo(Community.builder()
+				.id("123")
+				.title("Java User Group")
+				.type(CommunityType.CLOSED)
+				.description("Community for Java developers")
+				.build());
+		assertThat(registration.getRegisteredUser()).isEqualTo(
+				User.builder()
+						.id("db87d46a-e4ca-451a-903b-e8533e0b924b")
+						.userName("tester")
+						.build()
+		);
+	}
+
+	@DisplayName("Approves community user registration by community.")
+	@Test
+	void approveByCommunity() {
+		given(communityUserRegistrationRepository.save(
+				CommunityUserRegistration.builder()
+						.approvedByCommunity(true)
+						.approvedByUser(true)
+						.registeredUser(User.builder()
+								.id("db87d46a-e4ca-451a-903b-e8533e0b924b")
+								.userName("tester")
+								.build())
+						.community(Community.builder()
+								.id("123")
+								.title("Java User Group")
+								.type(CommunityType.CLOSED)
+								.description("Community for Java developers")
+								.build())
+						.creationDatetime(LocalDateTime.of(2019, 1, 15, 20, 0))
+						.id("123")
+						.build()
+		)).willReturn(
+				CommunityUserRegistration.builder()
+						.approvedByCommunity(true)
+						.approvedByUser(true)
+						.registeredUser(User.builder()
+								.id("db87d46a-e4ca-451a-903b-e8533e0b924b")
+								.userName("tester")
+								.build())
+						.community(Community.builder()
+								.id("123")
+								.title("Java User Group")
+								.type(CommunityType.CLOSED)
+								.description("Community for Java developers")
+								.build())
+						.creationDatetime(LocalDateTime.of(2019, 1, 15, 20, 0))
+						.id("123")
+						.build()
+		);
+		final CommunityUserRegistration registration = communityUserRegistrationCommandService.approve(CommunityUserRegistration.builder()
+						.approvedByCommunity(null)
+						.approvedByUser(true)
+						.registeredUser(User.builder()
+								.id("db87d46a-e4ca-451a-903b-e8533e0b924b")
+								.userName("tester")
+								.build())
+						.community(Community.builder()
+								.id("123")
+								.title("Java User Group")
+								.type(CommunityType.CLOSED)
+								.description("Community for Java developers")
+								.build())
+						.creationDatetime(LocalDateTime.of(2019, 1, 15, 20, 0))
+						.id("123")
+						.build(),
+				CommunityUserRegistrationApprovalCommand.builder()
+						.approvedByUser(null)
+						.approvedByCommunity(true)
+						.build()
+		);
+		assertThat(registration.getId()).isEqualTo("123");
+		assertThat(registration.getApprovedByUser()).isTrue();
+		assertThat(registration.getApprovedByCommunity()).isTrue();
+		assertThat(registration.getCreationDatetime()).isEqualTo(LocalDateTime.of(2019, 1, 15, 20, 0));
+		assertThat(registration.getCommunity()).isEqualTo(Community.builder()
+				.id("123")
+				.title("Java User Group")
+				.type(CommunityType.CLOSED)
+				.description("Community for Java developers")
+				.build());
+		assertThat(registration.getRegisteredUser()).isEqualTo(
+				User.builder()
+						.id("db87d46a-e4ca-451a-903b-e8533e0b924b")
+						.userName("tester")
+						.build()
+		);
 	}
 
 }

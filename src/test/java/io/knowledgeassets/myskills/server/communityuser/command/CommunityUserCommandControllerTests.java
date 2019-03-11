@@ -6,6 +6,10 @@ import io.knowledgeassets.myskills.server.community.CommunityRole;
 import io.knowledgeassets.myskills.server.community.CommunityType;
 import io.knowledgeassets.myskills.server.community.query.CommunityQueryService;
 import io.knowledgeassets.myskills.server.communityuser.CommunityUser;
+import io.knowledgeassets.myskills.server.communityuser.registration.CommunityUserRegistration;
+import io.knowledgeassets.myskills.server.communityuser.registration.command.CommunityUserRegistrationApprovalCommand;
+import io.knowledgeassets.myskills.server.communityuser.registration.command.CommunityUserRegistrationCommandService;
+import io.knowledgeassets.myskills.server.communityuser.registration.query.CommunityUserRegistrationQueryService;
 import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.user.query.UserQueryService;
 import org.junit.jupiter.api.DisplayName;
@@ -47,9 +51,15 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 	@MockBean
 	private UserQueryService userQueryService;
 
+	@MockBean
+	private CommunityUserRegistrationQueryService communityUserRegistrationQueryService;
+
+	@MockBean
+	private CommunityUserRegistrationCommandService communityUserRegistrationCommandService;
+
 	@Test
-	@DisplayName("Tests if authenticated user joins the community.")
-	void testIfUserJoinsCommunity() throws Exception {
+	@DisplayName("Authenticated user joins the community.")
+	void userJoinsCommunity() throws Exception {
 		final User tester = User.builder()
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
@@ -90,6 +100,173 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 					.andExpect(jsonPath("$.role", is(equalTo(CommunityRole.MEMBER.toString()))))
 					.andExpect(jsonPath("$.user.id", is(equalTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))))
 					.andExpect(jsonPath("$.user.userName", is(equalTo("tester"))));
+		}
+	}
+
+	@DisplayName("NOT_FOUND status is returned when trying to join non existent community.")
+	@Test
+	void notFoundStatusWhenTryingToJoinNonExistentCommunity() throws Exception {
+		final User tester = User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build();
+
+		given(communityQueryService.getCommunityById("123")).willReturn(Optional.empty());
+
+		final ClassPathResource body = new ClassPathResource("community/command/join-community-as-member.json");
+
+		try (InputStream is = body.getInputStream()) {
+			mockMvc.perform(post("/communities/123/users")
+					.content(is.readAllBytes())
+					.accept(MediaType.APPLICATION_JSON)
+					.contentType(MediaType.APPLICATION_JSON)
+					.with(authentication(withUser(tester))))
+					.andExpect(status().isNotFound());
+		}
+	}
+
+	@DisplayName("NOT_FOUND status is returned when trying to invite non existent user to join a community.")
+	@Test
+	void notFoundStatusWhenTryingToInviteNonExistentUser() throws Exception {
+		final User tester = User.builder()
+				.id("abcdefgh-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build();
+
+		given(communityQueryService.getCommunityById("123")).willReturn(Optional.of(
+				Community.builder()
+						.id("123")
+						.title("Java User Group")
+						.type(CommunityType.CLOSED)
+						.build()
+		));
+
+		given(userQueryService.getUserById("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(Optional.empty());
+
+		final ClassPathResource body = new ClassPathResource("community/command/join-community-as-member.json");
+
+		try (InputStream is = body.getInputStream()) {
+			mockMvc.perform(post("/communities/123/users")
+					.content(is.readAllBytes())
+					.accept(MediaType.APPLICATION_JSON)
+					.contentType(MediaType.APPLICATION_JSON)
+					.with(authentication(withUser(tester))))
+					.andExpect(status().isNotFound());
+		}
+	}
+
+	@DisplayName("Community manager approves user community registration.")
+	@Test
+	void communityManagerApprovesUserCommunityRegistration() throws Exception {
+		final User tester = User.builder()
+				.id("abcdefgh-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build();
+
+		given(communityQueryService.getCommunityById("123")).willReturn(Optional.of(
+				Community.builder()
+						.id("123")
+						.title("Java User Group")
+						.type(CommunityType.CLOSED)
+						.build()
+		));
+
+		given(userQueryService.getUserById("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(Optional.of(
+				User.builder()
+						.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+						.userName("anotherTester")
+						.build()
+		));
+
+		given(securityService.isCommunityManager("123")).willReturn(true);
+
+		given(communityUserRegistrationQueryService.getPendingUserRequestToJoinCommunity("1f37fb2a-b4d0-4119-9113-4677beb20ae2", "123"))
+				.willReturn(Optional.of(
+						CommunityUserRegistration.builder()
+								.id("abc")
+								.creationDatetime(LocalDateTime.of(2019, 1, 20, 20, 0))
+								.registeredUser(User.builder()
+										.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+										.userName("anotherTester")
+										.build())
+								.community(Community.builder()
+										.id("123")
+										.title("Java User Group")
+										.type(CommunityType.CLOSED)
+										.build())
+								.approvedByUser(true)
+								.approvedByCommunity(false)
+								.build()
+						)
+				);
+
+		given(communityUserRegistrationCommandService.approve(
+				CommunityUserRegistration.builder()
+						.id("abc")
+						.creationDatetime(LocalDateTime.of(2019, 1, 20, 20, 0))
+						.registeredUser(User.builder()
+								.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+								.userName("anotherTester")
+								.build())
+						.community(Community.builder()
+								.id("123")
+								.title("Java User Group")
+								.type(CommunityType.CLOSED)
+								.build())
+						.approvedByUser(true)
+						.approvedByCommunity(false)
+						.build(),
+				CommunityUserRegistrationApprovalCommand.builder()
+						.approvedByCommunity(true)
+						.approvedByUser(null)
+						.build()
+		)).willReturn(
+				CommunityUserRegistration.builder()
+						.id("abc")
+						.creationDatetime(LocalDateTime.of(2019, 1, 20, 20, 0))
+						.registeredUser(User.builder()
+								.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+								.userName("anotherTester")
+								.build())
+						.community(Community.builder()
+								.id("123")
+								.title("Java User Group")
+								.type(CommunityType.CLOSED)
+								.build())
+						.approvedByUser(true)
+						.approvedByCommunity(true)
+						.communityUser(
+								CommunityUser.builder()
+										.role(CommunityRole.MEMBER)
+										.user(User.builder()
+												.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+												.userName("anotherTester")
+												.build())
+										.community(Community.builder()
+												.id("123")
+												.title("Java User Group")
+												.type(CommunityType.CLOSED)
+												.build())
+										.creationDate(LocalDateTime.of(2019, 1, 21, 10, 0))
+										.lastModifiedDate(LocalDateTime.of(2019, 1, 21, 10, 0))
+										.id(120L)
+										.build()
+						)
+						.build()
+		);
+
+		final ClassPathResource body = new ClassPathResource("community/command/join-community-as-member.json");
+
+		try (InputStream is = body.getInputStream()) {
+			mockMvc.perform(post("/communities/123/users")
+					.content(is.readAllBytes())
+					.accept(MediaType.APPLICATION_JSON)
+					.contentType(MediaType.APPLICATION_JSON)
+					.with(authentication(withUser(tester))))
+					.andExpect(status().isCreated())
+					.andExpect(jsonPath("$.role", is(equalTo(CommunityRole.MEMBER.toString()))))
+					.andExpect(jsonPath("$.user.id", is(equalTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))))
+					.andExpect(jsonPath("$.user.userName", is(equalTo("anotherTester"))));
 		}
 	}
 
@@ -152,8 +329,8 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 	}
 
 	@Test
-	@DisplayName("Tests if not authenticated user cannot change community user role.")
-	void testIfNotAuthenticatedUserCannotChangeCommunityUserRole() throws Exception {
+	@DisplayName("Not authenticated user cannot change community user role.")
+	void notAuthenticatedUserCannotChangeCommunityUserRole() throws Exception {
 		final ClassPathResource body = new ClassPathResource("community/command/change-community-user-role.json");
 
 		try (InputStream is = body.getInputStream()) {
@@ -165,8 +342,8 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 	}
 
 	@Test
-	@DisplayName("Tests if a user who is not a community manager cannot change community user role.")
-	void testIfUserWhoIsNotCommunityManagerCannotChangeCommunityUserRole() throws Exception {
+	@DisplayName("User who is not a community manager cannot change community user role.")
+	void userWhoIsNotCommunityManagerCannotChangeCommunityUserRole() throws Exception {
 		final User owner = User.builder()
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
@@ -185,8 +362,8 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 	}
 
 	@Test
-	@DisplayName("Tests if BAD_REQUEST status code is returned when invalid role name is passed.")
-	void testIfBadRequestStatusCodeIsReturnedWhenInvalidRoleNameIsPassed() throws Exception {
+	@DisplayName("BAD_REQUEST status code is returned when invalid role name is passed.")
+	void badRequestStatusCodeIsReturnedWhenInvalidRoleNameIsPassed() throws Exception {
 		final User owner = User.builder()
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
@@ -207,15 +384,15 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 	}
 
 	@Test
-	@DisplayName("Tests if not authenticated user is not allowed to join the community.")
-	void testIfNotAuthenticatedUserIsNotAllowedToJoinCommunity() throws Exception {
+	@DisplayName("Not authenticated user is not allowed to join the community.")
+	void notAuthenticatedUserIsNotAllowedToJoinCommunity() throws Exception {
 		mockMvc.perform(post("/communities/123/users"))
 				.andExpect(status().isUnauthorized());
 	}
 
 	@Test
-	@DisplayName("Tests if authenticated user leaves the community.")
-	void testIfAuthenticatedUserLeavesCommunity() throws Exception {
+	@DisplayName("Authenticated user leaves the community.")
+	void authenticatedUserLeavesCommunity() throws Exception {
 		final User owner = User.builder()
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
@@ -229,15 +406,15 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 	}
 
 	@Test
-	@DisplayName("Tests if not authenticated user is not allowed to leave the community.")
-	void testIfNotAuthenticatedUserIsNotAllowedToLeaveCommunity() throws Exception {
+	@DisplayName("Not authenticated user is not allowed to leave the community.")
+	void notAuthenticatedUserIsNotAllowedToLeaveCommunity() throws Exception {
 		mockMvc.perform(delete("/communities/123/members"))
 				.andExpect(status().isUnauthorized());
 	}
 
 	@Test
-	@DisplayName("Test if community manager kicks out a community member.")
-	void testIfCommunityManagesKicksOutCommunityMember() throws Exception {
+	@DisplayName("Community manager kicks out a community member.")
+	void communityManagesKicksOutCommunityMember() throws Exception {
 		final User owner = User.builder()
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")

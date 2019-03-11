@@ -151,16 +151,14 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 						.build()
 		));
 
-		given(communityUserRegistrationCommandService.createUserRegistrationsOnBehalfOfCommunity(Collections.singletonList(
-				User.builder()
-						.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
-						.userName("tester")
-						.build()
-		), Community.builder()
+		given(communityUserRegistrationCommandService.createUserRegistrationsOnBehalfOfUser(User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build(), Community.builder()
 				.id("123")
 				.title("Java User Group")
 				.build())
-		).willReturn(Collections.singletonList(CommunityUserRegistration.builder()
+		).willReturn(CommunityUserRegistration.builder()
 						.registeredUser(User.builder()
 								.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 								.userName("tester")
@@ -168,7 +166,7 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 						.approvedByCommunity(false)
 						.approvedByUser(true)
 						.build()
-		));
+		);
 
 		final ClassPathResource body = new ClassPathResource("communityuser/registration/command/create-user-registration.json");
 
@@ -227,6 +225,19 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 				.id("abcdefgh-b4d0-4119-9113-4677beb20ae2")
 				.userName("anotherTester")
 				.build();
+
+		given(userQueryService.getUsersByIds(Collections.singletonList("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))).willReturn(Stream.of(User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build()
+		));
+
+		given(communityQueryService.getCommunityById("123")).willReturn(Optional.of(
+				Community.builder()
+						.id("123")
+						.title("Java User Group")
+						.build()
+		));
 
 		given(securityService.isCommunityManager("123")).willReturn(false);
 		given(securityService.isAuthenticatedUserId("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(false);

@@ -2,7 +2,7 @@ package io.knowledgeassets.myskills.server.communityuser.query;
 
 import io.knowledgeassets.myskills.server.community.CommunityRole;
 import io.knowledgeassets.myskills.server.communityuser.CommunityUserResponse;
-import io.knowledgeassets.myskills.server.exception.UserCommunityAccessDeniedException;
+import io.knowledgeassets.myskills.server.exception.UserCommunityException;
 import io.knowledgeassets.myskills.server.security.SecurityService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -58,7 +58,7 @@ public class CommunityUserQueryController {
 			return ResponseEntity.ok(communityUserQueryService
 					.getCommunityUsers(communityId, communityRole).map(CommunityUserResponse::of).collect(toList()));
 		} else {
-			throw new UserCommunityAccessDeniedException();
+			throw new UserCommunityException();
 		}
 	}
 

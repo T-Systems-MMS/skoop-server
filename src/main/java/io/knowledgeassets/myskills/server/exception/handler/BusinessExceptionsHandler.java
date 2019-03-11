@@ -4,7 +4,7 @@ import io.knowledgeassets.myskills.server.exception.DuplicateResourceException;
 import io.knowledgeassets.myskills.server.exception.EmptyInputException;
 import io.knowledgeassets.myskills.server.exception.MethodArgumentNotValidException;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
-import io.knowledgeassets.myskills.server.exception.UserCommunityAccessDeniedException;
+import io.knowledgeassets.myskills.server.exception.UserCommunityException;
 import io.knowledgeassets.myskills.server.exception.domain.ResponseError;
 import io.knowledgeassets.myskills.server.exception.domain.ResponseValidationError;
 import lombok.extern.slf4j.Slf4j;
@@ -96,11 +96,11 @@ public class BusinessExceptionsHandler implements IExceptionHandler {
 	}
 
 	/**
-	 * Handles UserIsNotCommunityManagerException. If user has some issues with an access to the community we throw this exception.
+	 * Handles UserCommunityException. If user has some problems with access to / interaction with a community we throw this exception.
 	 */
-	@ExceptionHandler(UserCommunityAccessDeniedException.class)
-	protected ResponseEntity<Object> handleUserIsNotCommunityManager(UserCommunityAccessDeniedException ex) {
-		String logMessage = String.format("{%s} User has issues with an access to the community! %s",
+	@ExceptionHandler(UserCommunityException.class)
+	protected ResponseEntity<Object> handleUserCommunityException(UserCommunityException ex) {
+		String logMessage = String.format("{%s} User has some problems with access to / interaction with the community! %s",
 				FORBIDDEN.value() + " " + FORBIDDEN.getReasonPhrase(), ex.getLocalizedMessage());
 		doLog(ex, logMessage);
 

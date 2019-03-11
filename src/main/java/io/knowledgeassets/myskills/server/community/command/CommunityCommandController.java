@@ -5,7 +5,7 @@ import io.knowledgeassets.myskills.server.community.CommunityRequest;
 import io.knowledgeassets.myskills.server.community.CommunityResponse;
 import io.knowledgeassets.myskills.server.community.Link;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
-import io.knowledgeassets.myskills.server.exception.UserCommunityAccessDeniedException;
+import io.knowledgeassets.myskills.server.exception.UserCommunityException;
 import io.knowledgeassets.myskills.server.exception.enums.Model;
 import io.knowledgeassets.myskills.server.security.SecurityService;
 import io.knowledgeassets.myskills.server.skill.Skill;
@@ -90,7 +90,7 @@ public class CommunityCommandController {
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<CommunityResponse> update(@PathVariable("communityId") String communityId, @Valid @RequestBody CommunityRequest request) {
 		if (!securityService.isCommunityManager(communityId)) {
-			throw new UserCommunityAccessDeniedException();
+			throw new UserCommunityException();
 		}
 		final Community community = convertCommunityRequestToCommunityDomain(request);
 		community.setId(communityId);
@@ -111,7 +111,7 @@ public class CommunityCommandController {
 	@DeleteMapping(path = "/communities/{communityId}")
 	public ResponseEntity<Void> delete(@PathVariable("communityId") String communityId) {
 		if (!securityService.isCommunityManager(communityId)) {
-			throw new UserCommunityAccessDeniedException();
+			throw new UserCommunityException();
 		}
 		communityCommandService.delete(communityId);
 		return ResponseEntity.noContent().build();
