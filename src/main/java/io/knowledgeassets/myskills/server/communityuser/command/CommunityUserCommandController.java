@@ -3,7 +3,6 @@ package io.knowledgeassets.myskills.server.communityuser.command;
 import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.community.CommunityRole;
 import io.knowledgeassets.myskills.server.community.CommunityType;
-import io.knowledgeassets.myskills.server.communityuser.CommunityUser;
 import io.knowledgeassets.myskills.server.communityuser.CommunityUserResponse;
 import io.knowledgeassets.myskills.server.community.query.CommunityQueryService;
 import io.knowledgeassets.myskills.server.communityuser.registration.CommunityUserRegistration;

@@ -43,6 +43,7 @@ class CommunityUserQueryControllerTests extends AbstractControllerTests {
 				.build();
 
 		given(securityService.isCommunityManager("123")).willReturn(true);
+		given(securityService.isCommunityMember("123")).willReturn(true);
 
 		given(communityUserQueryService.getCommunityUsers("123", null))
 				.willReturn(Stream.of(CommunityUser.builder()
@@ -54,8 +55,6 @@ class CommunityUserQueryControllerTests extends AbstractControllerTests {
 								.user(tester)
 								.build()
 				));
-
-		communityUserQueryService.getCommunityUsers("123", null);
 
 		mockMvc.perform(get("/communities/123/users")
 				.accept(MediaType.APPLICATION_JSON)
@@ -81,6 +80,7 @@ class CommunityUserQueryControllerTests extends AbstractControllerTests {
 				.build();
 
 		given(securityService.isCommunityManager("123")).willReturn(true);
+		given(securityService.isCommunityMember("123")).willReturn(true);
 
 		given(communityUserQueryService.getCommunityUsers("123", CommunityRole.MEMBER))
 				.willReturn(
@@ -89,8 +89,6 @@ class CommunityUserQueryControllerTests extends AbstractControllerTests {
 								.user(tester)
 								.build())
 				);
-
-		communityUserQueryService.getCommunityUsers("123", null);
 
 		mockMvc.perform(get("/communities/123/users")
 				.param("role", "MEMBER")
@@ -102,6 +100,27 @@ class CommunityUserQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[0].role", is(equalTo("MEMBER"))))
 				.andExpect(jsonPath("$[0].user.id", is(equalTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))))
 				.andExpect(jsonPath("$[0].user.userName", is(equalTo("tester"))));
+	}
+
+	@DisplayName("FORBIDDEN status code is returned when user is not authorized to fetch community users.")
+	@Test
+	void forbiddenStatusWhenUserIsNotAuthorizedToFetchCommunityUsers() throws Exception {
+
+		final User tester = User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build();
+
+		given(securityService.isCommunityManager("123")).willReturn(false);
+		given(securityService.isCommunityMember("123")).willReturn(false);
+
+		mockMvc.perform(get("/communities/123/users")
+				.param("role", "MEMBER")
+				.accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON)
+				.with(authentication(withUser(tester)))
+				.with(csrf()))
+				.andExpect(status().isForbidden());
 	}
 
 }
