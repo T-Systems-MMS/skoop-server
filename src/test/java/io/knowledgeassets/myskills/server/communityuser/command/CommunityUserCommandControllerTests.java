@@ -74,6 +74,7 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 		given(communityQueryService.getCommunityById("123")).willReturn(Optional.of(community));
 
 		given(securityService.isAuthenticatedUserId(tester.getId())).willReturn(true);
+		given(securityService.isCommunityManager("123")).willReturn(false);
 
 		given(userQueryService.getUserById("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(Optional.of(tester));
 
@@ -252,6 +253,7 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 		));
 
 		given(securityService.isCommunityManager("123")).willReturn(true);
+		given(securityService.isAuthenticatedUserId("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(false);
 
 		given(communityUserRegistrationQueryService.getPendingUserRequestToJoinCommunity("1f37fb2a-b4d0-4119-9113-4677beb20ae2", "123"))
 				.willReturn(Optional.of(
