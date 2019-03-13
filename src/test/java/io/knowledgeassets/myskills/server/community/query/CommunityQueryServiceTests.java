@@ -350,4 +350,11 @@ class CommunityQueryServiceTests {
 		);
 	}
 
+	@DisplayName("User has community manager role.")
+	@Test
+	void userHasCommunityManagerRole() {
+		given(communityRepository.isCommunityManager("123", "456")).willReturn(true);
+		assertThat(communityQueryService.hasCommunityManagerRole("123", "456")).isTrue();
+	}
+
 }

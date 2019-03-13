@@ -78,7 +78,7 @@ public class SecurityService {
 	 * @return <code>true</code> if the authenticated user is a member of the community referenced by the community ID.
 	 */
 	public boolean isCommunityMember(String communityId) {
-		return isCommunityManager(currentUserService.getCurrentUser().getId(), communityId);
+		return isCommunityMember(currentUserService.getCurrentUser().getId(), communityId);
 	}
 
 	/**
