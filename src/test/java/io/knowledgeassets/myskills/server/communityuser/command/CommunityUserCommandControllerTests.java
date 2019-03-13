@@ -155,6 +155,79 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 		}
 	}
 
+	@DisplayName("FORBIDDEN status code is returned when unauthorized user adds a user to the community.")
+	@Test
+	void forbiddenStatusWhenUnauthorizedUserAddsUserToCommunity() throws Exception {
+
+		final User tester = User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build();
+
+		given(communityQueryService.getCommunityById("123")).willReturn(Optional.of(Community.builder()
+				.id("123")
+				.title("Java User Group")
+				.type(CommunityType.CLOSED)
+				.build()));
+
+		given(securityService.isAuthenticatedUserId("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(true);
+		given(securityService.isCommunityManager("123")).willReturn(false);
+
+		given(userQueryService.getUserById("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(Optional.of(tester));
+
+		final ClassPathResource body = new ClassPathResource("community/command/join-community-as-member.json");
+
+		try (InputStream is = body.getInputStream()) {
+			mockMvc.perform(post("/communities/123/users")
+					.content(is.readAllBytes())
+					.accept(MediaType.APPLICATION_JSON)
+					.contentType(MediaType.APPLICATION_JSON)
+					.with(authentication(withUser(tester))))
+					.andExpect(status().isForbidden());
+		}
+	}
+
+	@DisplayName("FORBIDDEN status code is returned when community manager adds user without pending request to the community.")
+	@Test
+	void forbiddenStatusWhenCommunityManagerAddsUserWithoutPendingRequestToCommunity() throws Exception {
+		final User tester = User.builder()
+				.id("abcdefgh-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build();
+
+		given(communityQueryService.getCommunityById("123")).willReturn(Optional.of(
+				Community.builder()
+						.id("123")
+						.title("Java User Group")
+						.type(CommunityType.CLOSED)
+						.build()
+		));
+
+		given(userQueryService.getUserById("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(Optional.of(
+				User.builder()
+						.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+						.userName("anotherTester")
+						.build()
+		));
+
+		given(securityService.isCommunityManager("123")).willReturn(true);
+		given(securityService.isAuthenticatedUserId("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(false);
+
+		given(communityUserRegistrationQueryService.getPendingUserRequestToJoinCommunity("1f37fb2a-b4d0-4119-9113-4677beb20ae2", "123"))
+				.willReturn(Optional.empty());
+
+		final ClassPathResource body = new ClassPathResource("community/command/join-community-as-member.json");
+
+		try (InputStream is = body.getInputStream()) {
+			mockMvc.perform(post("/communities/123/users")
+					.content(is.readAllBytes())
+					.accept(MediaType.APPLICATION_JSON)
+					.contentType(MediaType.APPLICATION_JSON)
+					.with(authentication(withUser(tester))))
+					.andExpect(status().isForbidden());
+		}
+	}
+
 	@DisplayName("Community manager approves user community registration.")
 	@Test
 	void communityManagerApprovesUserCommunityRegistration() throws Exception {
@@ -425,6 +498,22 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 		mockMvc.perform(delete("/communities/123/users/a396d5a8-a6b1-4c71-9498-a16e655dae2e")
 				.with(authentication(withUser(owner))))
 				.andExpect(status().isNoContent());
+	}
+
+	@DisplayName("FORBIDDEN status when an ordinary user removes another community member.")
+	@Test
+	void forbiddenStatusWhenOrdinaryUserRemovesAnotherCommunityMember() throws Exception {
+		final User owner = User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build();
+
+		given(securityService.isCommunityManager( "123")).willReturn(false);
+		given(securityService.isAuthenticatedUserId("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(false);
+
+		mockMvc.perform(delete("/communities/123/users/a396d5a8-a6b1-4c71-9498-a16e655dae2e")
+				.with(authentication(withUser(owner))))
+				.andExpect(status().isForbidden());
 	}
 
 }

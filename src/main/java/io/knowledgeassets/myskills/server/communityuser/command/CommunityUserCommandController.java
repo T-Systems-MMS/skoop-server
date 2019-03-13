@@ -58,8 +58,8 @@ public class CommunityUserCommandController {
 		this.communityUserRegistrationCommandService = communityUserRegistrationCommandService;
 	}
 
-	@ApiOperation(value = "User joins the community as member.",
-			notes = "User joins the community as member.")
+	@ApiOperation(value = "Adds a user as a member to the community.",
+			notes = "Adds a user as a member to the community. User ID is given in the request body.")
 	@ApiResponses({
 			@ApiResponse(code = 201, message = "Successful execution"),
 			@ApiResponse(code = 400, message = "Invalid input data, e.g. missing mandatory data or community name exists"),
@@ -69,7 +69,7 @@ public class CommunityUserCommandController {
 	})
 	@PostMapping(path = "/communities/{communityId}/users")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<CommunityUserResponse> joinCommunity(@PathVariable("communityId") String communityId,
+	public ResponseEntity<CommunityUserResponse> addUserAsMemberToCommunity(@PathVariable("communityId") String communityId,
 															   @RequestBody CommunityUserRequest request) {
 		final Community community = communityQueryService.getCommunityById(communityId).orElseThrow(() -> {
 			final String[] searchParamsMap = {"id", communityId};
@@ -138,11 +138,11 @@ public class CommunityUserCommandController {
 	})
 	@DeleteMapping(path = "/communities/{communityId}/users/{userId}")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<Void> leaveCommunity(
+	public ResponseEntity<Void> removeUserFromCommunity(
 			@PathVariable("communityId") String communityId,
 			@PathVariable("userId") String userId) {
 		if (!securityService.isCommunityManager(communityId) && !securityService.isAuthenticatedUserId(userId)) {
-			throw new UserCommunityException();
+			throw new UserCommunityException("The authenticated user must be either a community manager or the one who is leaving the community.");
 		} else {
 			communityUserCommandService.remove(communityId, userId);
 			return ResponseEntity.noContent().build();
