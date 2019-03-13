@@ -2,7 +2,11 @@ package io.knowledgeassets.myskills.server.communityuser.registration.command;
 
 import io.knowledgeassets.myskills.server.common.AbstractControllerTests;
 import io.knowledgeassets.myskills.server.community.Community;
+import io.knowledgeassets.myskills.server.community.CommunityRole;
+import io.knowledgeassets.myskills.server.community.CommunityType;
 import io.knowledgeassets.myskills.server.community.query.CommunityQueryService;
+import io.knowledgeassets.myskills.server.communityuser.CommunityUser;
+import io.knowledgeassets.myskills.server.communityuser.command.CommunityUserCommandService;
 import io.knowledgeassets.myskills.server.communityuser.registration.CommunityUserRegistration;
 import io.knowledgeassets.myskills.server.communityuser.registration.query.CommunityUserRegistrationQueryService;
 import io.knowledgeassets.myskills.server.user.User;
@@ -51,6 +55,9 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 	@MockBean
 	private CommunityUserRegistrationQueryService communityUserRegistrationQueryService;
 
+	@MockBean
+	private CommunityUserCommandService communityUserCommandService;
+
 	@DisplayName("Create user registration on behalf of community manager.")
 	@Test
 	void createUserRegistrationsOnBehalfOfCommunity() throws Exception {
@@ -74,6 +81,7 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 				Community.builder()
 						.id("123")
 						.title("Java User Group")
+						.type(CommunityType.CLOSED)
 						.build()
 		));
 
@@ -91,6 +99,7 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 		), Community.builder()
 				.id("123")
 				.title("Java User Group")
+				.type(CommunityType.CLOSED)
 				.build())).willReturn(Arrays.asList(CommunityUserRegistration.builder()
 						.registeredUser(User.builder()
 								.id("abc")
@@ -148,6 +157,7 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 				Community.builder()
 						.id("123")
 						.title("Java User Group")
+						.type(CommunityType.CLOSED)
 						.build()
 		));
 
@@ -157,6 +167,7 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 				.build(), Community.builder()
 				.id("123")
 				.title("Java User Group")
+				.type(CommunityType.CLOSED)
 				.build())
 		).willReturn(CommunityUserRegistration.builder()
 						.registeredUser(User.builder()
@@ -180,6 +191,75 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 					.andExpect(jsonPath("$[0].user.userName", is(equalTo("tester"))))
 					.andExpect(jsonPath("$[0].approvedByUser", is(equalTo(true))))
 					.andExpect(jsonPath("$[0].approvedByCommunity", is(equalTo(false))));
+		}
+
+	}
+
+	@DisplayName("Create user registration on behalf of user to join open community.")
+	@Test
+	void createUserRegistrationOnBehalfOfUserToJoinOpenCommunity() throws Exception {
+
+		final User tester = User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build();
+
+		given(securityService.isAuthenticatedUserId("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(true);
+
+		given(userQueryService.getUsersByIds(Collections.singletonList("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))).willReturn(Stream.of(User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build()
+		));
+
+		given(communityQueryService.getCommunityById("123")).willReturn(Optional.of(
+				Community.builder()
+						.id("123")
+						.title("Java User Group")
+						.type(CommunityType.OPEN)
+						.build()
+		));
+
+		given(communityUserCommandService.create(
+				Community.builder()
+						.id("123")
+						.title("Java User Group")
+						.type(CommunityType.OPEN)
+						.build(),
+				User.builder()
+						.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+						.userName("tester")
+						.build(),
+				CommunityRole.MEMBER
+		)).willReturn(CommunityUser.builder()
+				.id(123L)
+				.lastModifiedDate(LocalDateTime.of(2019, 1, 20, 19, 0))
+				.creationDate(LocalDateTime.of(2019, 1, 20, 19, 0))
+				.community(Community.builder()
+						.id("123")
+						.title("Java User Group")
+						.type(CommunityType.OPEN)
+						.build())
+				.user(User.builder()
+						.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+						.userName("tester")
+						.build())
+				.role(CommunityRole.MEMBER)
+				.build()
+		);
+
+		final ClassPathResource body = new ClassPathResource("communityuser/registration/command/create-user-registration.json");
+
+		try (InputStream is = body.getInputStream()) {
+
+			mockMvc.perform(post("/communities/123/user-registrations").content(is.readAllBytes())
+					.accept(MediaType.APPLICATION_JSON)
+					.contentType(MediaType.APPLICATION_JSON)
+					.with(authentication(withUser(tester))))
+					.andExpect(status().isCreated())
+					.andExpect(jsonPath("$[0].user.userName", is(equalTo("tester"))))
+					.andExpect(jsonPath("$[0].approvedByUser", is(equalTo(true))))
+					.andExpect(jsonPath("$[0].approvedByCommunity", is(equalTo(true))));
 		}
 
 	}

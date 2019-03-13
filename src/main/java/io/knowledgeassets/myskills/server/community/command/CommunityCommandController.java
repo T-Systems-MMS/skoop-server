@@ -90,7 +90,7 @@ public class CommunityCommandController {
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<CommunityResponse> update(@PathVariable("communityId") String communityId, @Valid @RequestBody CommunityRequest request) {
 		if (!securityService.isCommunityManager(communityId)) {
-			throw new UserCommunityException();
+			throw new UserCommunityException("The user has to be a community manager to alter the community.");
 		}
 		final Community community = convertCommunityRequestToCommunityDomain(request);
 		community.setId(communityId);
@@ -111,7 +111,7 @@ public class CommunityCommandController {
 	@DeleteMapping(path = "/communities/{communityId}")
 	public ResponseEntity<Void> delete(@PathVariable("communityId") String communityId) {
 		if (!securityService.isCommunityManager(communityId)) {
-			throw new UserCommunityException();
+			throw new UserCommunityException("The user has to be a community manager to delete the community.");
 		}
 		communityCommandService.delete(communityId);
 		return ResponseEntity.noContent().build();

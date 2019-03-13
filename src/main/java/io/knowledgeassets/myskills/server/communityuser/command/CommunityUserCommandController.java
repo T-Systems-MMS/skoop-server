@@ -121,7 +121,7 @@ public class CommunityUserCommandController {
 																 @PathVariable("userId") String userId,
 																 @RequestBody CommunityUserUpdateRequest request) {
 		if (!securityService.isCommunityManager(communityId)) {
-			throw new UserCommunityException();
+			throw new UserCommunityException("The user has to be a community manager to alter other user's membership.");
 		} else {
 			return ResponseEntity.status(HttpStatus.OK).body(CommunityUserResponse.of(communityUserCommandService.update(communityId, userId, request.getRole())));
 		}

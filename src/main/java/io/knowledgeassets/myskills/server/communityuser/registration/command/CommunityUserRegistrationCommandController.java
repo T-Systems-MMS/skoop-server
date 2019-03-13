@@ -1,7 +1,11 @@
 package io.knowledgeassets.myskills.server.communityuser.registration.command;
 
 import io.knowledgeassets.myskills.server.community.Community;
+import io.knowledgeassets.myskills.server.community.CommunityRole;
+import io.knowledgeassets.myskills.server.community.CommunityType;
 import io.knowledgeassets.myskills.server.community.query.CommunityQueryService;
+import io.knowledgeassets.myskills.server.communityuser.CommunityUser;
+import io.knowledgeassets.myskills.server.communityuser.command.CommunityUserCommandService;
 import io.knowledgeassets.myskills.server.communityuser.registration.CommunityUserRegistration;
 import io.knowledgeassets.myskills.server.communityuser.registration.CommunityUserRegistrationResponse;
 import io.knowledgeassets.myskills.server.communityuser.registration.query.CommunityUserRegistrationQueryService;
@@ -39,17 +43,20 @@ public class CommunityUserRegistrationCommandController {
 	private final UserQueryService userQueryService;
 	private final CommunityQueryService communityQueryService;
 	private final CommunityUserRegistrationQueryService communityUserRegistrationQueryService;
+	private final CommunityUserCommandService communityUserCommandService;
 
 	public CommunityUserRegistrationCommandController(CommunityUserRegistrationCommandService communityUserRegistrationCommandService,
 													  SecurityService securityService,
 													  UserQueryService userQueryService,
 													  CommunityQueryService communityQueryService,
-													  CommunityUserRegistrationQueryService communityUserRegistrationQueryService) {
+													  CommunityUserRegistrationQueryService communityUserRegistrationQueryService,
+													  CommunityUserCommandService communityUserCommandService) {
 		this.communityUserRegistrationCommandService = requireNonNull(communityUserRegistrationCommandService);
 		this.securityService = requireNonNull(securityService);
 		this.userQueryService = requireNonNull(userQueryService);
 		this.communityQueryService = requireNonNull(communityQueryService);
 		this.communityUserRegistrationQueryService = requireNonNull(communityUserRegistrationQueryService);
+		this.communityUserCommandService = requireNonNull(communityUserCommandService);
 	}
 
 	@ApiOperation(value = "User joins the community as member.",
@@ -77,7 +84,19 @@ public class CommunityUserRegistrationCommandController {
 		if (securityService.isCommunityManager(communityId)) {
 			result = communityUserRegistrationCommandService.createUserRegistrationsOnBehalfOfCommunity(users, community).stream().map(CommunityUserRegistrationResponse::of).collect(Collectors.toList());
 		} else if (request.getUserIds().size() == 1 && securityService.isAuthenticatedUserId(request.getUserIds().get(0))) {
-			result = Collections.singletonList(CommunityUserRegistrationResponse.of(communityUserRegistrationCommandService.createUserRegistrationsOnBehalfOfUser(users.get(0), community)));
+			if (CommunityType.OPEN.equals(community.getType())) {
+				// user is added as member immediately because registrations for open communities can be regarded as "auto-approved by the community
+				final CommunityUser communityUser = communityUserCommandService.create(community, users.get(0), CommunityRole.MEMBER);
+				result = Collections.singletonList(
+						CommunityUserRegistrationResponse.of(CommunityUserRegistration.builder()
+								.registeredUser(communityUser.getUser())
+								.approvedByCommunity(true)
+								.approvedByUser(true)
+								.build())
+				);
+			} else {
+				result = Collections.singletonList(CommunityUserRegistrationResponse.of(communityUserRegistrationCommandService.createUserRegistrationsOnBehalfOfUser(users.get(0), community)));
+			}
 		} else {
 			throw new UserCommunityException();
 		}
@@ -113,7 +132,8 @@ public class CommunityUserRegistrationCommandController {
 			command.setApprovedByCommunity(null);
 			return ResponseEntity.ok(CommunityUserRegistrationResponse.of(communityUserRegistrationCommandService.approve(registration, command)));
 		} else {
-			throw new UserCommunityException();
+			throw new UserCommunityException("The user is not authorized to update the registration. " +
+					"Only community managers of a target community or a registered user can approve the registration.");
 		}
 	}
 

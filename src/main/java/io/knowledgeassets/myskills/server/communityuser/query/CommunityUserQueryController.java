@@ -36,7 +36,7 @@ public class CommunityUserQueryController {
 
 
 	@ApiOperation(value = "Gets users of the specified community.",
-			notes = "Gets users of the specified community.")
+			notes = "Gets users of the specified community. Only managers and members of the given community are allowed to access this endpoint.")
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "Successful execution"),
 			@ApiResponse(code = 400, message = "Invalid input data, e.g. missing mandatory data or community name exists"),
@@ -58,7 +58,7 @@ public class CommunityUserQueryController {
 			return ResponseEntity.ok(communityUserQueryService
 					.getCommunityUsers(communityId, communityRole).map(CommunityUserResponse::of).collect(toList()));
 		} else {
-			throw new UserCommunityException();
+			throw new UserCommunityException("Only managers and members of the given community are allowed to access the endpoint.");
 		}
 	}
 
