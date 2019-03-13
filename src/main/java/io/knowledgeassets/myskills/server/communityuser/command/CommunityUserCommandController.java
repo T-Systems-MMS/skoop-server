@@ -102,7 +102,7 @@ public class CommunityUserCommandController {
 				throw new UserCommunityException(String.format("There is no pending community user registration for user '%s' and community '%s'", user.getUserName(), community.getTitle()));
 			}
 		} else {
-			throw new UserCommunityException();
+			throw new UserCommunityException("The endpoint can be used either by a community manager to invite users to join a community or by authenticated user to join an open community.");
 		}
 	}
 
