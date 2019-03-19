@@ -15,3 +15,8 @@ neo4j:
   migration:
     # Location for neo4j migration script:
     path: migration/generated_indexes.cql
+
+spring:
+  datasource:
+    url: jdbc:neo4j:http://localhost:7474
+    driver-class-name: org.neo4j.jdbc.http.HttpDriver
