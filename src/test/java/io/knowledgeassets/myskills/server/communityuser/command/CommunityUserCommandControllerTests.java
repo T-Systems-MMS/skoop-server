@@ -474,6 +474,7 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 				.build();
 
 		given(securityService.isAuthenticatedUserId("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(true);
+		given(securityService.isCommunityManager("123")).willReturn(false);
 
 		mockMvc.perform(delete("/communities/123/users/1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.with(authentication(withUser(owner))))
@@ -489,17 +490,34 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 
 	@Test
 	@DisplayName("Community manager kicks out a community member.")
-	void communityManagesKicksOutCommunityMember() throws Exception {
+	void communityManagerKicksOutCommunityMember() throws Exception {
 		final User owner = User.builder()
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
 				.build();
 
 		given(securityService.isCommunityManager( "123")).willReturn(true);
+		given(securityService.isAuthenticatedUserId("a396d5a8-a6b1-4c71-9498-a16e655dae2e")).willReturn(false);
 
 		mockMvc.perform(delete("/communities/123/users/a396d5a8-a6b1-4c71-9498-a16e655dae2e")
 				.with(authentication(withUser(owner))))
 				.andExpect(status().isNoContent());
+	}
+
+	@Test
+	@DisplayName("Community manager is not allowed to leave a community.")
+	void communityManagerIsNotAllowedToLeaveCommunity() throws Exception {
+		final User owner = User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build();
+
+		given(securityService.isCommunityManager( "123")).willReturn(true);
+		given(securityService.isAuthenticatedUserId("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(true);
+
+		mockMvc.perform(delete("/communities/123/users/1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.with(authentication(withUser(owner))))
+				.andExpect(status().isForbidden());
 	}
 
 	@DisplayName("FORBIDDEN status when an ordinary user removes another community member.")
