@@ -4,9 +4,7 @@ import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.community.CommunityRepository;
 import io.knowledgeassets.myskills.server.community.CommunityType;
 import io.knowledgeassets.myskills.server.community.Link;
-import io.knowledgeassets.myskills.server.community.RecommendedCommunity;
 import io.knowledgeassets.myskills.server.skill.Skill;
-import io.knowledgeassets.myskills.server.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +21,6 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static java.util.stream.Collectors.toList;
-import static java.util.Collections.singletonList;
 
 @ExtendWith(MockitoExtension.class)
 class CommunityQueryServiceTests {
@@ -57,7 +54,7 @@ class CommunityQueryServiceTests {
 				Community.builder()
 						.id("123")
 						.title("Java User Group")
-						.type(CommunityType.OPENED)
+						.type(CommunityType.OPEN)
 						.description("Community for Java developers")
 						.links(Arrays.asList(
 								Link.builder()
@@ -69,14 +66,6 @@ class CommunityQueryServiceTests {
 										.href("https://www.linkedin.com/java-user-group")
 										.build()
 						))
-						.managers(singletonList(User.builder()
-								.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
-								.userName("tester")
-								.build()))
-						.members(singletonList(User.builder()
-								.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
-								.userName("tester")
-								.build()))
 						.skills(Arrays.asList(springBootSkill, angularSkill))
 						.build()
 		));
@@ -84,7 +73,7 @@ class CommunityQueryServiceTests {
 		assertThat(community).isNotEmpty();
 		assertThat(community.get().getId()).isEqualTo("123");
 		assertThat(community.get().getTitle()).isEqualTo("Java User Group");
-		assertThat(community.get().getType()).isEqualTo(CommunityType.OPENED);
+		assertThat(community.get().getType()).isEqualTo(CommunityType.OPEN);
 		assertThat(community.get().getLinks()).isEqualTo(Arrays.asList(
 				Link.builder()
 						.name("Facebook")
@@ -95,12 +84,6 @@ class CommunityQueryServiceTests {
 						.href("https://www.linkedin.com/java-user-group")
 						.build()
 		));
-		assertThat(community.get().getManagers()).hasSize(1);
-		assertThat(community.get().getManagers().get(0).getId()).isEqualTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2");
-		assertThat(community.get().getManagers().get(0).getUserName()).isEqualTo("tester");
-		assertThat(community.get().getMembers()).hasSize(1);
-		assertThat(community.get().getMembers().get(0).getId()).isEqualTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2");
-		assertThat(community.get().getMembers().get(0).getUserName()).isEqualTo("tester");
 		assertThat(community.get().getSkills()).hasSize(2);
 		assertThat(community.get().getSkills()).contains(Skill.builder()
 				.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
@@ -134,7 +117,7 @@ class CommunityQueryServiceTests {
 				Arrays.asList(Community.builder()
 								.id("123")
 								.title("Java User Group")
-								.type(CommunityType.OPENED)
+								.type(CommunityType.OPEN)
 								.description("Community for Java developers")
 								.links(Arrays.asList(
 										Link.builder()
@@ -146,14 +129,6 @@ class CommunityQueryServiceTests {
 												.href("https://www.linkedin.com/java-user-group")
 												.build()
 								))
-								.managers(singletonList(User.builder()
-										.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
-										.userName("tester")
-										.build()))
-								.members(singletonList(User.builder()
-										.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
-										.userName("tester")
-										.build()))
 								.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
 								.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
 								.skills(Arrays.asList(springBootSkill, angularSkill))
@@ -161,7 +136,7 @@ class CommunityQueryServiceTests {
 						Community.builder()
 								.id("456")
 								.title("Scala User Group")
-								.type(CommunityType.OPENED)
+								.type(CommunityType.OPEN)
 								.description("Community for Scala developers")
 								.links(Arrays.asList(
 										Link.builder()
@@ -173,14 +148,6 @@ class CommunityQueryServiceTests {
 												.href("https://www.linkedin.com/scala-user-group")
 												.build()
 								))
-								.managers(singletonList(User.builder()
-										.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
-										.userName("tester")
-										.build()))
-								.members(singletonList(User.builder()
-										.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
-										.userName("tester")
-										.build()))
 								.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
 								.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
 								.skills(Arrays.asList(springBootSkill, javascriptSkill))
@@ -195,7 +162,7 @@ class CommunityQueryServiceTests {
 		Community community = communityList.get(0);
 		assertThat(community.getId()).isEqualTo("123");
 		assertThat(community.getTitle()).isEqualTo("Java User Group");
-		assertThat(community.getType()).isEqualTo(CommunityType.OPENED);
+		assertThat(community.getType()).isEqualTo(CommunityType.OPEN);
 		assertThat(community.getDescription()).isEqualTo("Community for Java developers");
 		assertThat(community.getLinks()).isEqualTo(Arrays.asList(
 				Link.builder()
@@ -207,12 +174,6 @@ class CommunityQueryServiceTests {
 						.href("https://www.linkedin.com/java-user-group")
 						.build()
 		));
-		assertThat(community.getManagers()).hasSize(1);
-		assertThat(community.getManagers().get(0).getId()).isEqualTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2");
-		assertThat(community.getManagers().get(0).getUserName()).isEqualTo("tester");
-		assertThat(community.getMembers()).hasSize(1);
-		assertThat(community.getMembers().get(0).getId()).isEqualTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2");
-		assertThat(community.getMembers().get(0).getUserName()).isEqualTo("tester");
 		assertThat(community.getSkills()).contains(Skill.builder()
 				.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
 				.name("Spring Boot")
@@ -223,7 +184,7 @@ class CommunityQueryServiceTests {
 		community = communityList.get(1);
 		assertThat(community.getId()).isEqualTo("456");
 		assertThat(community.getTitle()).isEqualTo("Scala User Group");
-		assertThat(community.getType()).isEqualTo(CommunityType.OPENED);
+		assertThat(community.getType()).isEqualTo(CommunityType.OPEN);
 		assertThat(community.getDescription()).isEqualTo("Community for Scala developers");
 		assertThat(community.getLinks()).isEqualTo(Arrays.asList(
 				Link.builder()
@@ -235,12 +196,6 @@ class CommunityQueryServiceTests {
 						.href("https://www.linkedin.com/scala-user-group")
 						.build()
 		));
-		assertThat(community.getManagers()).hasSize(1);
-		assertThat(community.getManagers().get(0).getId()).isEqualTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2");
-		assertThat(community.getManagers().get(0).getUserName()).isEqualTo("tester");
-		assertThat(community.getMembers()).hasSize(1);
-		assertThat(community.getMembers().get(0).getId()).isEqualTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2");
-		assertThat(community.getMembers().get(0).getUserName()).isEqualTo("tester");
 		assertThat(community.getSkills()).contains(Skill.builder()
 				.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
 				.name("Spring Boot")
@@ -250,9 +205,9 @@ class CommunityQueryServiceTests {
 				.build());
 	}
 
-	@DisplayName("Test if communities recommended to a user are retrieved.")
+	@DisplayName("Communities recommended to a user are retrieved.")
 	@Test
-	void testIfRecommendedCommunitiesAreRetrieved() {
+	void recommendedCommunitiesAreRetrieved() {
 
 		final Skill springBootSkill = Skill.builder()
 				.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
@@ -270,11 +225,10 @@ class CommunityQueryServiceTests {
 				.build();
 
 		given(communityRepository.getRecommendedCommunities("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(
-				Stream.of(RecommendedCommunity.builder()
-						.community(Community.builder()
+				Stream.of(Community.builder()
 								.id("123")
 								.title("Java User Group")
-								.type(CommunityType.OPENED)
+								.type(CommunityType.OPEN)
 								.description("Community for Java developers")
 								.links(Arrays.asList(
 										Link.builder()
@@ -286,26 +240,14 @@ class CommunityQueryServiceTests {
 												.href("https://www.linkedin.com/java-user-group")
 												.build()
 								))
-								.managers(singletonList(User.builder()
-										.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
-										.userName("tester")
-										.build()))
-								.members(singletonList(User.builder()
-										.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
-										.userName("tester")
-										.build()))
 								.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
 								.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
 								.skills(Arrays.asList(springBootSkill, angularSkill))
-								.build())
-						.recommended(true)
-						.skillCounter(2L)
-						.build(),
-						RecommendedCommunity.builder()
-						.community(Community.builder()
+								.build(),
+						Community.builder()
 								.id("456")
 								.title("Scala User Group")
-								.type(CommunityType.OPENED)
+								.type(CommunityType.OPEN)
 								.description("Community for Scala developers")
 								.links(Arrays.asList(
 										Link.builder()
@@ -317,34 +259,23 @@ class CommunityQueryServiceTests {
 												.href("https://www.linkedin.com/scala-user-group")
 												.build()
 								))
-								.managers(singletonList(User.builder()
-										.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
-										.userName("tester")
-										.build()))
-								.members(singletonList(User.builder()
-										.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
-										.userName("tester")
-										.build()))
 								.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
 								.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
 								.skills(Arrays.asList(springBootSkill, javascriptSkill))
-								.build())
-						.skillCounter(0L)
-						.recommended(false)
-						.build()
+								.build()
 				));
 
-		Stream<RecommendedCommunity> recommendedCommunities = communityQueryService.getCommunitiesRecommendedForUser("1f37fb2a-b4d0-4119-9113-4677beb20ae2");
+		Stream<Community> communities = communityQueryService.getCommunitiesRecommendedForUser("1f37fb2a-b4d0-4119-9113-4677beb20ae2");
 
-		assertThat(recommendedCommunities).isNotNull();
-		List<RecommendedCommunity> recommendedCommunityList = recommendedCommunities.collect(toList());
-		assertThat(recommendedCommunityList).hasSize(2);
-		RecommendedCommunity recommendedCommunity = recommendedCommunityList.get(0);
-		assertThat(recommendedCommunity.getCommunity().getId()).isEqualTo("123");
-		assertThat(recommendedCommunity.getCommunity().getTitle()).isEqualTo("Java User Group");
-		assertThat(recommendedCommunity.getCommunity().getType()).isEqualTo(CommunityType.OPENED);
-		assertThat(recommendedCommunity.getCommunity().getDescription()).isEqualTo("Community for Java developers");
-		assertThat(recommendedCommunity.getCommunity().getLinks()).isEqualTo(Arrays.asList(
+		assertThat(communities).isNotNull();
+		List<Community> communityList = communities.collect(toList());
+		assertThat(communityList).hasSize(2);
+		Community community = communityList.get(0);
+		assertThat(community.getId()).isEqualTo("123");
+		assertThat(community.getTitle()).isEqualTo("Java User Group");
+		assertThat(community.getType()).isEqualTo(CommunityType.OPEN);
+		assertThat(community.getDescription()).isEqualTo("Community for Java developers");
+		assertThat(community.getLinks()).isEqualTo(Arrays.asList(
 				Link.builder()
 						.name("Facebook")
 						.href("https://www.facebook.com/java-user-group")
@@ -354,27 +285,19 @@ class CommunityQueryServiceTests {
 						.href("https://www.linkedin.com/java-user-group")
 						.build()
 		));
-		assertThat(recommendedCommunity.getCommunity().getManagers()).hasSize(1);
-		assertThat(recommendedCommunity.getCommunity().getManagers().get(0).getId()).isEqualTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2");
-		assertThat(recommendedCommunity.getCommunity().getManagers().get(0).getUserName()).isEqualTo("tester");
-		assertThat(recommendedCommunity.getCommunity().getMembers()).hasSize(1);
-		assertThat(recommendedCommunity.getCommunity().getMembers().get(0).getId()).isEqualTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2");
-		assertThat(recommendedCommunity.getCommunity().getMembers().get(0).getUserName()).isEqualTo("tester");
-		assertThat(recommendedCommunity.getCommunity().getSkills()).contains(Skill.builder()
+		assertThat(community.getSkills()).contains(Skill.builder()
 				.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
 				.name("Spring Boot")
 				.build(), Skill.builder()
 				.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
 				.name("Angular")
 				.build());
-		assertThat(recommendedCommunity.isRecommended()).isTrue();
-		assertThat(recommendedCommunity.getSkillCounter()).isEqualTo(2L);
-		recommendedCommunity = recommendedCommunityList.get(1);
-		assertThat(recommendedCommunity.getCommunity().getId()).isEqualTo("456");
-		assertThat(recommendedCommunity.getCommunity().getTitle()).isEqualTo("Scala User Group");
-		assertThat(recommendedCommunity.getCommunity().getType()).isEqualTo(CommunityType.OPENED);
-		assertThat(recommendedCommunity.getCommunity().getDescription()).isEqualTo("Community for Scala developers");
-		assertThat(recommendedCommunity.getCommunity().getLinks()).isEqualTo(Arrays.asList(
+		community = communityList.get(1);
+		assertThat(community.getId()).isEqualTo("456");
+		assertThat(community.getTitle()).isEqualTo("Scala User Group");
+		assertThat(community.getType()).isEqualTo(CommunityType.OPEN);
+		assertThat(community.getDescription()).isEqualTo("Community for Scala developers");
+		assertThat(community.getLinks()).isEqualTo(Arrays.asList(
 				Link.builder()
 						.name("Facebook")
 						.href("https://www.facebook.com/scala-user-group")
@@ -384,21 +307,54 @@ class CommunityQueryServiceTests {
 						.href("https://www.linkedin.com/scala-user-group")
 						.build()
 		));
-		assertThat(recommendedCommunity.getCommunity().getManagers()).hasSize(1);
-		assertThat(recommendedCommunity.getCommunity().getManagers().get(0).getId()).isEqualTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2");
-		assertThat(recommendedCommunity.getCommunity().getManagers().get(0).getUserName()).isEqualTo("tester");
-		assertThat(recommendedCommunity.getCommunity().getMembers()).hasSize(1);
-		assertThat(recommendedCommunity.getCommunity().getMembers().get(0).getId()).isEqualTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2");
-		assertThat(recommendedCommunity.getCommunity().getMembers().get(0).getUserName()).isEqualTo("tester");
-		assertThat(recommendedCommunity.getCommunity().getSkills()).contains(Skill.builder()
+		assertThat(community.getSkills()).contains(Skill.builder()
 				.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
 				.name("Spring Boot")
 				.build(), Skill.builder()
 				.id("10ea2af6-cd81-48e0-b339-0576d16b9d19")
 				.name("JavaScript")
 				.build());
-		assertThat(recommendedCommunity.isRecommended()).isFalse();
-		assertThat(recommendedCommunity.getSkillCounter()).isEqualTo(0L);
+	}
+
+	@DisplayName("Is user a community member?")
+	@Test
+	void isCommunityMember() {
+		given(communityRepository.isCommunityMember("123","456")).willReturn(true);
+		assertThat(communityQueryService.isCommunityMember("123", "456")).isTrue();
+	}
+
+	@DisplayName("User communities are retrieved.")
+	@Test
+	void userCommunitiesAreRetrieved() {
+		given(communityRepository.getUserCommunities("123")).willReturn(Stream.of(
+				Community.builder()
+				.id("abc")
+				.title("Java User Group")
+				.build(),
+				Community.builder()
+				.id("efd")
+				.title("Scala User Group")
+				.build()
+		));
+		final Stream<Community> communityStream = communityQueryService.getUserCommunities("123");
+		final List<Community> communities = communityStream.collect(toList());
+		assertThat(communities).contains(
+				Community.builder()
+						.id("abc")
+						.title("Java User Group")
+						.build(),
+				Community.builder()
+						.id("efd")
+						.title("Scala User Group")
+						.build()
+		);
+	}
+
+	@DisplayName("User has community manager role.")
+	@Test
+	void userHasCommunityManagerRole() {
+		given(communityRepository.isCommunityManager("123", "456")).willReturn(true);
+		assertThat(communityQueryService.hasCommunityManagerRole("123", "456")).isTrue();
 	}
 
 }

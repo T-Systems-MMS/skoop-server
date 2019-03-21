@@ -3,6 +3,7 @@ package io.knowledgeassets.myskills.server.userskill.query;
 import io.knowledgeassets.myskills.server.common.AbstractControllerTests;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.user.User;
+import io.knowledgeassets.myskills.server.user.query.UserPermissionQueryService;
 import io.knowledgeassets.myskills.server.userskill.UserSkill;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,6 +37,9 @@ class SkillUserQueryControllerTests extends AbstractControllerTests {
 
 	@MockBean
 	private UserSkillQueryService userSkillQueryService;
+
+	@MockBean
+	private UserPermissionQueryService userPermissionQueryService;
 
 	@Test
 	@DisplayName("Responds with the list of users related to a specific skill. The list contains the only authenticated user.")

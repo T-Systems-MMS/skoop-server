@@ -1,13 +1,8 @@
 package io.knowledgeassets.myskills.server.community.query;
 
-import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.community.CommunityResponse;
-import io.knowledgeassets.myskills.server.community.RecommendedCommunity;
-import io.knowledgeassets.myskills.server.community.RecommendedCommunityResponse;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.exception.enums.Model;
-import io.knowledgeassets.myskills.server.security.CurrentUserService;
-import io.knowledgeassets.myskills.server.user.User;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -19,8 +14,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -29,12 +22,9 @@ import static java.util.stream.Collectors.toList;
 public class CommunityQueryController {
 
 	private final CommunityQueryService communityQueryService;
-	private final CurrentUserService currentUserService;
 
-	public CommunityQueryController(CommunityQueryService communityQueryService,
-									CurrentUserService currentUserService) {
+	public CommunityQueryController(CommunityQueryService communityQueryService) {
 		this.communityQueryService = communityQueryService;
-		this.currentUserService = currentUserService;
 	}
 
 	@ApiOperation(value = "Get all communities",
@@ -47,10 +37,9 @@ public class CommunityQueryController {
 	})
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping(path = "/communities", produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<RecommendedCommunityResponse> getCommunities() {
-		final User currentUser = currentUserService.getCurrentUser();
-		return communityQueryService.getCommunitiesRecommendedForUser(currentUser.getId())
-				.map(convertRecommendedCommunityToRecommendedCommunityResponse(currentUser))
+	public List<CommunityResponse> getCommunities() {
+		return communityQueryService.getCommunities()
+				.map(CommunityResponse::of)
 				.collect(toList());
 	}
 
@@ -66,9 +55,8 @@ public class CommunityQueryController {
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping(path = "/communities/{communityId}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public CommunityResponse getCommunity(@PathVariable("communityId") String communityId) {
-		final User currentUser = currentUserService.getCurrentUser();
 		return communityQueryService.getCommunityById(communityId)
-				.map(convertCommunityToCommunityResponse(currentUser))
+				.map(CommunityResponse::of)
 				.orElseThrow(() -> {
 					String[] searchParamsMap = {"id", communityId};
 					return NoSuchResourceException.builder()
@@ -76,28 +64,6 @@ public class CommunityQueryController {
 							.searchParamsMap(searchParamsMap)
 							.build();
 				});
-	}
-
-	private Function<RecommendedCommunity, RecommendedCommunityResponse> convertRecommendedCommunityToRecommendedCommunityResponse(User currentUser) {
-		return (RecommendedCommunity c) -> {
-			if (c.getCommunity().getMembers() != null && c.getCommunity().getMembers().stream().map(User::getId).collect(Collectors.toSet()).contains(currentUser.getId())) {
-				return RecommendedCommunityResponse.of(c);
-			}
-			else {
-				return RecommendedCommunityResponse.simple(c);
-			}
-		};
-	}
-
-	private Function<Community, CommunityResponse> convertCommunityToCommunityResponse(User currentUser) {
-		return (Community c) -> {
-			if (c.getMembers() != null && c.getMembers().stream().map(User::getId).collect(Collectors.toSet()).contains(currentUser.getId())) {
-				return CommunityResponse.of(c);
-			}
-			else {
-				return CommunityResponse.simple(c);
-			}
-		};
 	}
 
 }

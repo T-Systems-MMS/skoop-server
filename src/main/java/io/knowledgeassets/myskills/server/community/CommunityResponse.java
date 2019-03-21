@@ -1,6 +1,8 @@
 package io.knowledgeassets.myskills.server.community;
 
+import io.knowledgeassets.myskills.server.communityuser.CommunityUser;
 import io.knowledgeassets.myskills.server.skill.SkillResponse;
+import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.user.UserSimpleResponse;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -9,7 +11,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static io.knowledgeassets.myskills.server.user.UserSimpleResponse.convertUserListToUserSimpleResponseList;
 import static io.knowledgeassets.myskills.server.skill.SkillResponse.convertSkillListToSkillResponseList;
@@ -43,9 +47,6 @@ public class CommunityResponse {
 	@ApiModelProperty("List of community managers.")
 	private List<UserSimpleResponse> managers;
 
-	@ApiModelProperty("List of community members.")
-	private List<UserSimpleResponse> members;
-
 	@ApiModelProperty("List of skills associated with a community.")
 	private List<SkillResponse> skills;
 
@@ -56,22 +57,18 @@ public class CommunityResponse {
 				.type(community.getType())
 				.description(community.getDescription())
 				.links(convertLinkListToLinkResponseList(community.getLinks()))
-				.managers(convertUserListToUserSimpleResponseList(community.getManagers()))
-				.members(convertUserListToUserSimpleResponseList(community.getMembers()))
+				.managers(convertUserListToUserSimpleResponseList(getManagers(community.getCommunityUsers())))
 				.skills(convertSkillListToSkillResponseList(community.getSkills()))
 				.build();
 	}
 
-	public static CommunityResponse simple(Community community) {
-		return CommunityResponse.builder()
-				.id(community.getId())
-				.title(community.getTitle())
-				.type(community.getType())
-				.description(community.getDescription())
-				.links(convertLinkListToLinkResponseList(community.getLinks()))
-				.managers(convertUserListToUserSimpleResponseList(community.getManagers()))
-				.skills(convertSkillListToSkillResponseList(community.getSkills()))
-				.build();
+	private static List<User> getManagers(List<CommunityUser> users) {
+		if (users == null) {
+			return Collections.emptyList();
+		} else {
+			return users.stream().filter(communityUser -> CommunityRole.MANAGER.equals(communityUser.getRole()))
+					.map(CommunityUser::getUser).collect(Collectors.toList());
+		}
 	}
 
 }

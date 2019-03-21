@@ -1,6 +1,7 @@
-package io.knowledgeassets.myskills.server.usernotification;
+package io.knowledgeassets.myskills.server.communityuser.registration;
 
 import io.knowledgeassets.myskills.server.community.Community;
+import io.knowledgeassets.myskills.server.communityuser.CommunityUser;
 import io.knowledgeassets.myskills.server.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,6 +11,7 @@ import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Property;
 import org.neo4j.ogm.annotation.Relationship;
+import org.neo4j.ogm.annotation.Transient;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -19,25 +21,26 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @NodeEntity
-public class UserNotification {
+public class CommunityUserRegistration {
 
 	@Id
 	@Property(name = "id")
 	private String id;
-
-	@Relationship(type = "INITIATED_BY", direction = Relationship.INCOMING)
-	private User initiator;
-	@Relationship(type = "RELATES_TO")
+	@Relationship(type = "community")
 	private Community community;
-	@Relationship(type = "SENT_TO")
-	private User recipient;
+	@Relationship(type = "registeredUser")
+	private User registeredUser;
 	@Property(name = "creationDatetime")
 	@NotNull
 	private LocalDateTime creationDatetime;
-	@Property(name = "status")
-	private UserNotificationStatus status;
-	@Property(name = "type")
-	@NotNull
-	private UserNotificationType type;
+	@Property("approvedByUser")
+	private Boolean approvedByUser;
+	@Property("approvedByCommunity")
+	private Boolean approvedByCommunity;
+	/**
+	 * Community-user relationship created in case registration was approved.
+	 */
+	@Transient
+	private CommunityUser communityUser;
 
 }

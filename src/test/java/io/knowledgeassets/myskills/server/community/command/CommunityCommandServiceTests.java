@@ -4,13 +4,14 @@ import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.community.CommunityRepository;
 import io.knowledgeassets.myskills.server.community.CommunityType;
 import io.knowledgeassets.myskills.server.community.Link;
+import io.knowledgeassets.myskills.server.communityuser.command.CommunityUserCommandService;
 import io.knowledgeassets.myskills.server.exception.DuplicateResourceException;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.security.CurrentUserService;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.skill.command.SkillCommandService;
 import io.knowledgeassets.myskills.server.user.User;
-import io.knowledgeassets.myskills.server.usernotification.command.UserNotificationCommandService;
+import io.knowledgeassets.myskills.server.communityuser.registration.command.CommunityUserRegistrationCommandService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,7 +20,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,8 +31,6 @@ import static org.hamcrest.core.AllOf.allOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import static org.mockito.BDDMockito.given;
-
-import static java.util.Collections.singletonList;
 
 @ExtendWith(MockitoExtension.class)
 class CommunityCommandServiceTests {
@@ -47,13 +45,16 @@ class CommunityCommandServiceTests {
 	private SkillCommandService skillCommandService;
 
 	@Mock
-	private UserNotificationCommandService userNotificationCommandService;
+	private CommunityUserCommandService communityUserCommandService;
+
+	@Mock
+	private CommunityUserRegistrationCommandService communityUserRegistrationCommandService;
 
 	private CommunityCommandService communityCommandService;
 
 	@BeforeEach
 	void setUp() {
-		communityCommandService = new CommunityCommandService(communityRepository, currentUserService, skillCommandService, userNotificationCommandService);
+		communityCommandService = new CommunityCommandService(communityRepository, currentUserService, skillCommandService, communityUserRegistrationCommandService, communityUserCommandService);
 	}
 
 	@Test
@@ -90,7 +91,7 @@ class CommunityCommandServiceTests {
 		given(communityRepository.save(argThat(allOf(
 				isA(Community.class),
 				hasProperty("title", is("Java User Group")),
-				hasProperty("type", is(CommunityType.OPENED)),
+				hasProperty("type", is(CommunityType.OPEN)),
 				hasProperty("description", is("Community for Java developers")),
 				hasProperty("links", hasItems(Link.builder()
 								.name("Facebook")
@@ -120,7 +121,7 @@ class CommunityCommandServiceTests {
 						Community.builder()
 								.id("123")
 								.title("Java User Group")
-								.type(CommunityType.OPENED)
+								.type(CommunityType.OPEN)
 								.description("Community for Java developers")
 								.links(Arrays.asList(
 										Link.builder()
@@ -132,14 +133,6 @@ class CommunityCommandServiceTests {
 												.href("https://www.linkedin.com/java-user-group")
 												.build()
 								))
-								.managers(singletonList(User.builder()
-										.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
-										.userName("tester")
-										.build()))
-								.members(singletonList(User.builder()
-										.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
-										.userName("tester")
-										.build()))
 								.skills(Arrays.asList(springBootSkill, angularSkill, Skill.builder()
 										.id("a3d55d3f-1215-4e8e-93f3-c06a5b9c2d56")
 										.name("Tomcat")
@@ -150,7 +143,7 @@ class CommunityCommandServiceTests {
 		Community community = communityCommandService.create(
 				Community.builder()
 						.title("Java User Group")
-						.type(CommunityType.OPENED)
+						.type(CommunityType.OPEN)
 						.description("Community for Java developers")
 						.links(Arrays.asList(
 								Link.builder()
@@ -180,18 +173,8 @@ class CommunityCommandServiceTests {
 		assertThat(community.getId()).isNotNull();
 		assertThat(community.getId()).isEqualTo("123");
 		assertThat(community.getTitle()).isEqualTo("Java User Group");
-		assertThat(community.getType()).isEqualTo(CommunityType.OPENED);
+		assertThat(community.getType()).isEqualTo(CommunityType.OPEN);
 		assertThat(community.getDescription()).isEqualTo("Community for Java developers");
-		assertThat(community.getManagers()).hasSize(1);
-		assertThat(community.getManagers().get(0)).isEqualTo(User.builder()
-				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
-				.userName("tester")
-				.build());
-		assertThat(community.getMembers()).hasSize(1);
-		assertThat(community.getMembers().get(0)).isEqualTo(User.builder()
-				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
-				.userName("tester")
-				.build());
 		assertThat(community.getSkills()).contains(
 				Skill.builder()
 						.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
@@ -214,7 +197,7 @@ class CommunityCommandServiceTests {
 				Community.builder()
 						.id("123")
 						.title("Java User Group")
-						.type(CommunityType.OPENED)
+						.type(CommunityType.OPEN)
 						.description("Community for Java developers")
 						.build()
 		));
@@ -222,7 +205,7 @@ class CommunityCommandServiceTests {
 				communityCommandService.create(
 						Community.builder()
 								.title("Java User Group")
-								.type(CommunityType.OPENED)
+								.type(CommunityType.OPEN)
 								.description("Community for Java developers")
 								.links(Arrays.asList(
 										Link.builder()
@@ -264,8 +247,7 @@ class CommunityCommandServiceTests {
 						.id("123")
 						.title("Java User Group")
 						.description("Community for Java developers")
-						.build(),
-				Collections.emptyList()
+						.build()
 		));
 	}
 
@@ -299,16 +281,8 @@ class CommunityCommandServiceTests {
 				Community.builder()
 						.id("123")
 						.title("Java User Group")
-						.type(CommunityType.OPENED)
+						.type(CommunityType.OPEN)
 						.description("Community for Java developers")
-						.managers(singletonList(User.builder()
-								.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
-								.userName("tester")
-								.build()))
-						.members(singletonList(User.builder()
-								.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
-								.userName("tester")
-								.build()))
 						.skills(Arrays.asList(springBootSkill, angularSkill))
 						.build()
 		));
@@ -316,7 +290,7 @@ class CommunityCommandServiceTests {
 				argThat(allOf(
 						isA(Community.class),
 						hasProperty("title", is("Java User Group")),
-						hasProperty("type", is(CommunityType.OPENED)),
+						hasProperty("type", is(CommunityType.OPEN)),
 						hasProperty("description", is("New community for Java developers")),
 						hasProperty("skills", hasItems(
 								Skill.builder()
@@ -338,16 +312,8 @@ class CommunityCommandServiceTests {
 						Community.builder()
 								.id("123")
 								.title("Java User Group")
-								.type(CommunityType.OPENED)
+								.type(CommunityType.OPEN)
 								.description("New community for Java developers")
-								.managers(singletonList(User.builder()
-										.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
-										.userName("tester")
-										.build()))
-								.members(singletonList(User.builder()
-										.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
-										.userName("tester")
-										.build()))
 								.skills(Arrays.asList(springBootSkill, angularSkill, Skill.builder()
 										.id("a3d55d3f-1215-4e8e-93f3-c06a5b9c2d56")
 										.name("Tomcat")
@@ -359,38 +325,18 @@ class CommunityCommandServiceTests {
 				Community.builder()
 						.id("123")
 						.title("Java User Group")
-						.type(CommunityType.OPENED)
+						.type(CommunityType.OPEN)
 						.description("New community for Java developers")
 						.skills(Arrays.asList(springBootSkill, angularSkill, tomcatSkill))
-						.build(),
-				Arrays.asList(
-						User.builder()
-								.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
-								.userName("firstTester")
-								.build(),
-						User.builder()
-								.id("d9d74c04-0ab0-479c-a1d7-d372990f11b6")
-								.userName("secondTester")
-								.build()
-				)
+						.build()
 		);
 
 		assertThat(community).isNotNull();
 		assertThat(community.getId()).isNotNull();
 		assertThat(community.getId()).isEqualTo("123");
 		assertThat(community.getTitle()).isEqualTo("Java User Group");
-		assertThat(community.getType()).isEqualTo(CommunityType.OPENED);
+		assertThat(community.getType()).isEqualTo(CommunityType.OPEN);
 		assertThat(community.getDescription()).isEqualTo("New community for Java developers");
-		assertThat(community.getManagers()).hasSize(1);
-		assertThat(community.getManagers().get(0)).isEqualTo(User.builder()
-				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
-				.userName("tester")
-				.build());
-		assertThat(community.getMembers()).hasSize(1);
-		assertThat(community.getMembers().get(0)).isEqualTo(User.builder()
-				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
-				.userName("tester")
-				.build());
 		assertThat(community.getSkills()).contains(Skill.builder()
 				.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
 				.name("Spring Boot")

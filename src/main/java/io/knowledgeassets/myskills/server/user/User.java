@@ -1,5 +1,6 @@
 package io.knowledgeassets.myskills.server.user;
 
+import io.knowledgeassets.myskills.server.communityuser.CommunityUser;
 import io.knowledgeassets.myskills.server.userproject.UserProject;
 import io.knowledgeassets.myskills.server.userskill.UserSkill;
 import lombok.*;
@@ -71,6 +72,11 @@ public class User {
 	@EqualsAndHashCode.Exclude
 	@Relationship(type = "USER_PROJECT", direction = UNDIRECTED)
 	private List<UserProject> userProjects;
+
+	@ToString.Exclude
+	@EqualsAndHashCode.Exclude
+	@Relationship(type = "COMMUNITY_USER", direction = UNDIRECTED)
+	private List<CommunityUser> communityUsers;
 
 	@ToString.Exclude
 	@EqualsAndHashCode.Exclude

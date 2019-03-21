@@ -1,7 +1,7 @@
 package io.knowledgeassets.myskills.server.community;
 
+import io.knowledgeassets.myskills.server.communityuser.CommunityUser;
 import io.knowledgeassets.myskills.server.skill.Skill;
-import io.knowledgeassets.myskills.server.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +17,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static org.neo4j.ogm.annotation.Relationship.UNDIRECTED;
 
 @Builder
 @Data
@@ -47,13 +49,8 @@ public class Community {
 
 	@ToString.Exclude
 	@EqualsAndHashCode.Exclude
-	@Relationship(type = "HAS_MEMBER", direction = Relationship.UNDIRECTED)
-	private List<User> members;
-
-	@ToString.Exclude
-	@EqualsAndHashCode.Exclude
-	@Relationship(type = "MANAGED_BY", direction = Relationship.UNDIRECTED)
-	private List<User> managers;
+	@Relationship(type = "COMMUNITY_USER", direction = UNDIRECTED)
+	private List<CommunityUser> communityUsers;
 
 	@ToString.Exclude
 	@EqualsAndHashCode.Exclude

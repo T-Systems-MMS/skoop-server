@@ -14,6 +14,8 @@ public enum Model {
 	USER_PROJECT("user project"),
 	PROJECT("project"),
 	COMMUNITY("community"),
+	COMMUNITY_USER("community user"),
+	USER_REGISTRATION("user registration"),
 
 	USER_SKILL_PRIORITY_REPORT("user skill priority report"),
 	USER_SKILL_PRIORITY_AGGREGATION_REPORT("user skill priority aggregation report"),
