@@ -84,15 +84,10 @@
 			<version>3.1.0</version>
 		</dependency>
 		<dependency>
-			<groupId>org.neo4j</groupId>
-			<artifactId>neo4j-jdbc-bolt</artifactId>
-			<version>3.4.0</version>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-jdbc</artifactId>
 		</dependency>
-		<!-- for java 11 compatibility -->
+		<!-- for java 11 compatibility as JAXB is not a part of JDK anymore -->
 		<!-- BEGIN -->
 		<dependency>
 			<groupId>javax.xml.bind</groupId>
@@ -171,6 +166,13 @@
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j</artifactId>
 			<version>${neo4j.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- to enable bolt driver within the embedded database -->
+		<dependency>
+			<groupId>org.neo4j</groupId>
+			<artifactId>neo4j-bolt</artifactId>
+			<version>3.4.11</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

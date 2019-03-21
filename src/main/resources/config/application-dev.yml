@@ -3,6 +3,8 @@ spring:
     neo4j:
       # Set database URI to local server.
       uri: 'bolt://localhost:7687'
+  datasource:
+    url: jdbc:neo4j:bolt://localhost:7687
 
 logging:
   level:

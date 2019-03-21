@@ -18,5 +18,4 @@ neo4j:
 
 spring:
   datasource:
-    url: jdbc:neo4j:http://localhost:7474
-    driver-class-name: org.neo4j.jdbc.http.HttpDriver
+    driver-class-name: org.neo4j.jdbc.bolt.BoltDriver

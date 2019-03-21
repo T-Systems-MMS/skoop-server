@@ -3,3 +3,11 @@ security:
     resourceserver:
       jwt:
         jwk-set-uri: https://auth.example.com/.well-known/jwks.json
+
+spring:
+  data:
+    neo4j:
+      # Set database URI to local embedded server with bolt connector available.
+      uri: 'bolt://localhost:7324'
+  datasource:
+    url: jdbc:neo4j:bolt://localhost:7324
