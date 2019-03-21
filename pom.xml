@@ -27,6 +27,10 @@
 		<neo4j.version>3.4.11</neo4j.version>
 		<jacoco.version>0.8.2</jacoco.version>
 		<apache.poi.version>4.0.1</apache.poi.version>
+		<jaxb.version>2.3.0</jaxb.version>
+		<javax.activation.version>1.1.1</javax.activation.version>
+		<liquigraph.version>3.1.0</liquigraph.version>
+		<neo4j.bolt.version>3.4.11</neo4j.bolt.version>
 	</properties>
 
 	<dependencies>
@@ -78,6 +82,38 @@
 			<artifactId>poi-ooxml</artifactId>
 			<version>${apache.poi.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.liquigraph</groupId>
+			<artifactId>liquigraph-spring-boot-starter</artifactId>
+			<version>${liquigraph.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-jdbc</artifactId>
+		</dependency>
+		<!-- for java 11 compatibility as JAXB is not a part of JDK anymore -->
+		<!-- BEGIN -->
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+			<version>${jaxb.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-impl</artifactId>
+			<version>${jaxb.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-core</artifactId>
+			<version>${jaxb.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.activation</groupId>
+			<artifactId>activation</artifactId>
+			<version>${javax.activation.version}</version>
+		</dependency>
+		<!-- END -->
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -134,6 +170,13 @@
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j</artifactId>
 			<version>${neo4j.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- to enable bolt driver within the embedded database -->
+		<dependency>
+			<groupId>org.neo4j</groupId>
+			<artifactId>neo4j-bolt</artifactId>
+			<version>${neo4j.bolt.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

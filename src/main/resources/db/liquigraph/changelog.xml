@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright 2014-2018 the original author or authors.
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+         http://www.apache.org/licenses/LICENSE-2.0
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+<changelog xmlns="http://www.liquigraph.org/schema/1.0/liquigraph.xsd">
+	<changeset id="indexes-update-1" author="Dmitry Lebedko">
+		<query>CREATE CONSTRAINT ON (`userpermission`:`UserPermission`) ASSERT `userpermission`.`id` IS UNIQUE</query>
+		<query>CREATE CONSTRAINT ON (`userskillreport`:`UserSkillReport`) ASSERT `userskillreport`.`id` IS UNIQUE</query>
+		<query>CREATE CONSTRAINT ON (`user`:`User`) ASSERT `user`.`id` IS UNIQUE</query>
+		<query>CREATE CONSTRAINT ON (`user`:`User`) ASSERT `user`.`userName` IS UNIQUE</query>
+		<query>CREATE CONSTRAINT ON (`related_to`:`RELATED_TO`) ASSERT `related_to`.`id` IS UNIQUE</query>
+		<query>CREATE CONSTRAINT ON (`skill`:`Skill`) ASSERT `skill`.`name` IS UNIQUE</query>
+		<query>CREATE CONSTRAINT ON (`skill`:`Skill`) ASSERT `skill`.`id` IS UNIQUE</query>
+		<query>CREATE CONSTRAINT ON (`skillgroup`:`SkillGroup`) ASSERT `skillgroup`.`name` IS UNIQUE</query>
+		<query>CREATE CONSTRAINT ON (`skillgroup`:`SkillGroup`) ASSERT `skillgroup`.`id` IS UNIQUE</query>
+		<query>CREATE CONSTRAINT ON (`userskillpriorityreport`:`UserSkillPriorityReport`) ASSERT `userskillpriorityreport`.`date` IS UNIQUE</query>
+		<query>CREATE CONSTRAINT ON (`userskillpriorityreport`:`UserSkillPriorityReport`) ASSERT `userskillpriorityreport`.`id` IS UNIQUE</query>
+		<query>CREATE CONSTRAINT ON (`userskillpriorityaggregationreport`:`UserSkillPriorityAggregationReport`) ASSERT `userskillpriorityaggregationreport`.`id` IS UNIQUE</query>
+	</changeset>
+</changelog>

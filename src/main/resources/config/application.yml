@@ -15,3 +15,7 @@ neo4j:
   migration:
     # Location for neo4j migration script:
     path: migration/generated_indexes.cql
+
+spring:
+  datasource:
+    driver-class-name: org.neo4j.jdbc.bolt.BoltDriver
