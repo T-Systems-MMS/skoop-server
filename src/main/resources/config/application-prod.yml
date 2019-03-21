@@ -15,7 +15,7 @@ spring:
       password: ${SPRING_DATA_NEO4J_PASSWORD}
       username: ${SPRING_DATA_NEO4J_USERNAME}
   datasource:
-    url: ${SPRING_DATA_NEO4j_JDBC_URI}
+    url: jdbc:neo4j:${SPRING_DATA_NEO4J_URI}
     username: ${SPRING_DATA_NEO4J_USERNAME}
     password: ${SPRING_DATA_NEO4J_PASSWORD}
 
