@@ -27,6 +27,10 @@
 		<neo4j.version>3.4.11</neo4j.version>
 		<jacoco.version>0.8.2</jacoco.version>
 		<apache.poi.version>4.0.1</apache.poi.version>
+		<jaxb.version>2.3.0</jaxb.version>
+		<javax.activation.version>1.1.1</javax.activation.version>
+		<liquigraph.version>3.1.0</liquigraph.version>
+		<neo4j.bolt.version>3.4.11</neo4j.bolt.version>
 	</properties>
 
 	<dependencies>
@@ -81,7 +85,7 @@
 		<dependency>
 			<groupId>org.liquigraph</groupId>
 			<artifactId>liquigraph-spring-boot-starter</artifactId>
-			<version>3.1.0</version>
+			<version>${liquigraph.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -92,22 +96,22 @@
 		<dependency>
 			<groupId>javax.xml.bind</groupId>
 			<artifactId>jaxb-api</artifactId>
-			<version>2.3.0</version>
+			<version>${jaxb.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-impl</artifactId>
-			<version>2.3.0</version>
+			<version>${jaxb.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-core</artifactId>
-			<version>2.3.0</version>
+			<version>${jaxb.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.activation</groupId>
 			<artifactId>activation</artifactId>
-			<version>1.1.1</version>
+			<version>${javax.activation.version}</version>
 		</dependency>
 		<!-- END -->
 
@@ -172,7 +176,7 @@
 		<dependency>
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j-bolt</artifactId>
-			<version>3.4.11</version>
+			<version>${neo4j.bolt.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
