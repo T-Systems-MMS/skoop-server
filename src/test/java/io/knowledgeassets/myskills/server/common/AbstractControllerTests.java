@@ -3,7 +3,6 @@ package io.knowledgeassets.myskills.server.common;
 import io.knowledgeassets.myskills.server.security.MethodSecurityConfiguration;
 import io.knowledgeassets.myskills.server.security.SecurityService;
 import io.knowledgeassets.myskills.server.user.UserPermissionScope;
-import io.knowledgeassets.myskills.server.user.query.UserPermissionQueryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -14,6 +13,7 @@ import java.util.Collection;
 import static java.util.Arrays.asList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.willReturn;
+import static org.mockito.Mockito.when;
 
 /**
  * Base class for all Spring {@link org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest} classes.
@@ -28,14 +28,17 @@ import static org.mockito.BDDMockito.willReturn;
 public abstract class AbstractControllerTests {
 	@MockBean
 	private JwtDecoder jwtDecoder;
-	@MockBean
-	protected UserPermissionQueryService userPermissionQueryService;
+
 	@MockBean
 	protected SecurityService securityService;
 
 	@BeforeEach
-	void prepareUserPermissions() {
-		willReturn(false).given(userPermissionQueryService).hasUserPermission(any(), any(), any());
+	void prepareSecurityService() {
+		willReturn(false).given(securityService).hasUserPermission(any(), any(), any());
+		willReturn(false).given(securityService).isCommunityManager(any());
+		willReturn(false).given(securityService).isCommunityManager(any(), any());
+		willReturn(false).given(securityService).isAuthenticatedUserId(any());
+		when(securityService.isAuthenticatedUserId(any(), any())).thenCallRealMethod();
 	}
 
 	protected UserConfigurationBuilder givenUser(String userId) {
@@ -63,7 +66,7 @@ public abstract class AbstractControllerTests {
 			public void forScopes(UserPermissionScope... scopes) {
 				for (UserPermissionScope scope : scopes) {
 					for (String authorizedUserId : authorizedUserIds) {
-						willReturn(true).given(userPermissionQueryService)
+						willReturn(true).given(securityService)
 								.hasUserPermission(userId, authorizedUserId, scope);
 					}
 				}

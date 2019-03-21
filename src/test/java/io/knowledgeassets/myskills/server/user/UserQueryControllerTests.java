@@ -1,6 +1,7 @@
 package io.knowledgeassets.myskills.server.user;
 
 import io.knowledgeassets.myskills.server.common.AbstractControllerTests;
+import io.knowledgeassets.myskills.server.user.query.UserPermissionQueryService;
 import io.knowledgeassets.myskills.server.user.query.UserQueryController;
 import io.knowledgeassets.myskills.server.user.query.UserQueryService;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,11 +32,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(UserQueryController.class)
 class UserQueryControllerTests extends AbstractControllerTests {
+
 	@Autowired
 	private MockMvc mockMvc;
 
 	@MockBean
 	private UserQueryService userQueryService;
+
+	@MockBean
+	private UserPermissionQueryService userPermissionQueryService;
 
 	private User owner;
 

@@ -2,7 +2,6 @@ package io.knowledgeassets.myskills.server.community.query;
 
 import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.community.CommunityRepository;
-import io.knowledgeassets.myskills.server.community.RecommendedCommunity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +24,7 @@ public class CommunityQueryService {
 	}
 
 	@Transactional(readOnly = true)
-	public Stream<RecommendedCommunity> getCommunitiesRecommendedForUser(String userId) {
+	public Stream<Community> getCommunitiesRecommendedForUser(String userId) {
 		return communityRepository.getRecommendedCommunities(userId);
 	}
 
@@ -36,7 +35,17 @@ public class CommunityQueryService {
 
 	@Transactional(readOnly = true)
 	public boolean hasCommunityManagerRole(String userId, String communityId) {
-		return communityRepository.hasCommunityManagerRole(userId, communityId);
+		return communityRepository.isCommunityManager(userId, communityId);
+	}
+
+	@Transactional(readOnly = true)
+	public boolean isCommunityMember(String userId, String communityId) {
+		return communityRepository.isCommunityMember(userId, communityId);
+	}
+
+	@Transactional(readOnly = true)
+	public Stream<Community> getUserCommunities(String userId) {
+		return communityRepository.getUserCommunities(userId);
 	}
 
 }

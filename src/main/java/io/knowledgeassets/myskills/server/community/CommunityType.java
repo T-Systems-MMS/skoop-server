@@ -1,6 +1,6 @@
 package io.knowledgeassets.myskills.server.community;
 
 public enum CommunityType {
-	OPENED,
+	OPEN,
 	CLOSED
 }
