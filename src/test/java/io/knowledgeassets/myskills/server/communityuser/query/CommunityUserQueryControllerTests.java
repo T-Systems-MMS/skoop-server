@@ -123,4 +123,65 @@ class CommunityUserQueryControllerTests extends AbstractControllerTests {
 				.andExpect(status().isForbidden());
 	}
 
+	@DisplayName("Gets user suggestions for the community.")
+	@Test
+	void getUserSuggestionsForCommunity() throws Exception {
+		final User tester = User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build();
+
+		given(communityUserQueryService.getUsersNotRelatedToCommunity("123", "doe")).willReturn(
+				Stream.of(
+						User.builder()
+								.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+								.userName("firstUser")
+								.firstName("John")
+								.lastName("Doe The First")
+								.email("firstUser@mail.com")
+								.coach(false)
+								.build(),
+						User.builder()
+								.id("2edc1229-b4d0-4119-9113-4677beb20ae2")
+								.userName("secondUser")
+								.firstName("John")
+								.lastName("Doe The Second")
+								.email("secondUser@mail.com")
+								.coach(false)
+								.build()
+				)
+		);
+
+		mockMvc.perform(get("/communities/123/user-suggestions")
+				.param("search", "doe")
+				.accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON)
+				.with(authentication(withUser(tester)))
+				.with(csrf()))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$[0].id", is(equalTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))))
+				.andExpect(jsonPath("$[0].userName", is(equalTo("firstUser"))))
+				.andExpect(jsonPath("$[0].firstName", is(equalTo("John"))))
+				.andExpect(jsonPath("$[0].lastName", is(equalTo("Doe The First"))))
+				.andExpect(jsonPath("$[0].email", is(equalTo("firstUser@mail.com"))))
+				.andExpect(jsonPath("$[0].coach", is(equalTo(false))))
+				.andExpect(jsonPath("$[1].id", is(equalTo("2edc1229-b4d0-4119-9113-4677beb20ae2"))))
+				.andExpect(jsonPath("$[1].userName", is(equalTo("secondUser"))))
+				.andExpect(jsonPath("$[1].firstName", is(equalTo("John"))))
+				.andExpect(jsonPath("$[1].lastName", is(equalTo("Doe The Second"))))
+				.andExpect(jsonPath("$[1].email", is(equalTo("secondUser@mail.com"))))
+				.andExpect(jsonPath("$[1].coach", is(equalTo(false))));
+	}
+
+	@DisplayName("Not authenticated user cannot get user suggestions for the community.")
+	@Test
+	void notAuthenticatedUserCannotGetUserSuggestionsForCommunity() throws Exception {
+		mockMvc.perform(get("/communities/123/user-suggestions")
+				.param("search", "doe")
+				.accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON)
+				.with(csrf()))
+				.andExpect(status().isUnauthorized());
+	}
+
 }

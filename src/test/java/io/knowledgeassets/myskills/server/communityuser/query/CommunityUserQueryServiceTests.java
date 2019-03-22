@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -162,6 +163,47 @@ class CommunityUserQueryServiceTests {
 	@Test
 	void exceptionIsThrownWhenCommunityIdIsNull() {
 		assertThrows(IllegalArgumentException.class, () -> communityUserQueryService.getCommunityUsers(null, CommunityRole.MEMBER));
+	}
+
+	@DisplayName("Get users not related to a community.")
+	@Test
+	void getUsersNotRelatedToCommunity() {
+		given(communityUserRepository.getUsersNotRelatedToCommunity("123", "doe")).willReturn(
+				Arrays.asList(
+						User.builder()
+								.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+								.userName("firstUser")
+								.firstName("John")
+								.lastName("Doe The First")
+								.build(),
+						User.builder()
+								.id("2edc1229-b4d0-4119-9113-4677beb20ae2")
+								.userName("secondUser")
+								.firstName("John")
+								.lastName("Doe The Second")
+								.build()
+				)
+		);
+		assertThat(communityUserQueryService.getUsersNotRelatedToCommunity("123", "doe")).containsExactly(
+				User.builder()
+						.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+						.userName("firstUser")
+						.firstName("John")
+						.lastName("Doe The First")
+						.build(),
+				User.builder()
+						.id("2edc1229-b4d0-4119-9113-4677beb20ae2")
+						.userName("secondUser")
+						.firstName("John")
+						.lastName("Doe The Second")
+						.build()
+		);
+	}
+
+	@DisplayName("Exception is thrown if community ID is null when getting users not related to a community.")
+	@Test
+	void exceptionIsThrownIfCommunityIdIsNullWhenGettingUsersNotRelatedToCommunity() {
+		assertThrows(IllegalArgumentException.class, () -> communityUserQueryService.getUsersNotRelatedToCommunity(null, null));
 	}
 
 }
