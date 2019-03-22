@@ -406,7 +406,7 @@ class CommunityUserRepositoryTests {
 
 		final Iterable<User> users = communityUserRepository.getUsersNotRelatedToCommunity("123", "dOe");
 		assertThat(users).hasSize(3);
-		assertThat(users).containsExactly(firstUser, thirdUser, fourthUser);
+		assertThat(users).containsExactlyInAnyOrder(firstUser, thirdUser, fourthUser);
 	}
 
 }
