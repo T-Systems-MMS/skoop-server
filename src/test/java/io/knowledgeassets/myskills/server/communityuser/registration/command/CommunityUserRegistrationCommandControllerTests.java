@@ -264,6 +264,127 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 
 	}
 
+	@DisplayName("The community member invites users to join an open community.")
+	@Test
+	void communityMemberInvitesUsersToJoinOpenCommunity() throws Exception {
+		final User tester = User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build();
+
+		given(securityService.isAuthenticatedUserId("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(true);
+		given(securityService.isCommunityMember("123")).willReturn(true);
+		given(securityService.isCommunityManager("123")).willReturn(false);
+
+		given(communityQueryService.getCommunityById("123")).willReturn(Optional.of(
+				Community.builder()
+						.id("123")
+						.title("Java User Group")
+						.type(CommunityType.OPEN)
+						.build()
+		));
+
+		given(userQueryService.getUsersByIds(Arrays.asList("abc", "def"))).willReturn(Stream.of(User.builder()
+						.id("abc")
+						.userName("firstUser")
+						.build(),
+				User.builder()
+						.id("def")
+						.userName("secondUser")
+						.build()
+		));
+
+		given(communityUserRegistrationCommandService.createUserRegistrationsOnBehalfOfCommunity(Arrays.asList(
+				User.builder()
+						.id("abc")
+						.userName("firstUser")
+						.build(),
+				User.builder()
+						.id("def")
+						.userName("secondUser")
+						.build()
+		), Community.builder()
+				.id("123")
+				.title("Java User Group")
+				.type(CommunityType.OPEN)
+				.build())).willReturn(Arrays.asList(CommunityUserRegistration.builder()
+						.registeredUser(User.builder()
+								.id("abc")
+								.userName("firstUser")
+								.build())
+						.approvedByCommunity(true)
+						.approvedByUser(false)
+						.build(),
+				CommunityUserRegistration.builder()
+						.registeredUser(User.builder()
+								.id("def")
+								.userName("secondUser")
+								.build())
+						.approvedByCommunity(true)
+						.approvedByUser(false)
+						.build()
+		));
+
+		final ClassPathResource body = new ClassPathResource("communityuser/registration/command/create-user-registrations.json");
+
+		try (InputStream is = body.getInputStream()) {
+
+			mockMvc.perform(post("/communities/123/user-registrations").content(is.readAllBytes())
+					.accept(MediaType.APPLICATION_JSON)
+					.contentType(MediaType.APPLICATION_JSON)
+					.with(authentication(withUser(tester))))
+					.andExpect(status().isCreated())
+					.andExpect(jsonPath("$[0].user.userName", is(equalTo("firstUser"))))
+					.andExpect(jsonPath("$[0].approvedByUser", is(equalTo(false))))
+					.andExpect(jsonPath("$[0].approvedByCommunity", is(equalTo(true))))
+					.andExpect(jsonPath("$[1].user.userName", is(equalTo("secondUser"))))
+					.andExpect(jsonPath("$[1].approvedByUser", is(equalTo(false))))
+					.andExpect(jsonPath("$[1].approvedByCommunity", is(equalTo(true))));
+		}
+	}
+
+	@DisplayName("The community member cannot invite himself to join an open community.")
+	@Test
+	void communityMemberCannotInviteHimselfToJoinOpenCommunity() throws Exception {
+		final User tester = User.builder()
+				.id("abc")
+				.userName("firstUser")
+				.build();
+
+		given(securityService.isAuthenticatedUserId("abc")).willReturn(true);
+		given(securityService.isCommunityMember("123")).willReturn(true);
+		given(securityService.isCommunityManager("123")).willReturn(false);
+
+		given(communityQueryService.getCommunityById("123")).willReturn(Optional.of(
+				Community.builder()
+						.id("123")
+						.title("Java User Group")
+						.type(CommunityType.OPEN)
+						.build()
+		));
+
+		given(userQueryService.getUsersByIds(Arrays.asList("abc", "def"))).willReturn(Stream.of(User.builder()
+						.id("abc")
+						.userName("firstUser")
+						.build(),
+				User.builder()
+						.id("def")
+						.userName("secondUser")
+						.build()
+		));
+
+		final ClassPathResource body = new ClassPathResource("communityuser/registration/command/create-user-registrations.json");
+
+		try (InputStream is = body.getInputStream()) {
+
+			mockMvc.perform(post("/communities/123/user-registrations").content(is.readAllBytes())
+					.accept(MediaType.APPLICATION_JSON)
+					.contentType(MediaType.APPLICATION_JSON)
+					.with(authentication(withUser(tester))))
+					.andExpect(status().isForbidden());
+		}
+	}
+
 	@DisplayName("NOT_FOUND status code is returned when community user registration is created for non existent community.")
 	@Test
 	void notFoundStatusIsReturnedWhenCommunityUserRegistrationIsCreatedForNonExistentCommunity() throws Exception {
