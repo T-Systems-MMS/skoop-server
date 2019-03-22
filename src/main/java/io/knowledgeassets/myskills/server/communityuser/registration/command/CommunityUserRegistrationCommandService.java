@@ -34,6 +34,12 @@ public class CommunityUserRegistrationCommandService {
 
 	@Transactional
 	public CommunityUserRegistration approve(CommunityUserRegistration registration, CommunityUserRegistrationApprovalCommand command) {
+		if (command.getApprovedByUser() != null && command.getApprovedByCommunity() != null) {
+			throw new IllegalArgumentException("No one can approve / decline both as community and user at the same time.");
+		}
+		if (command.getApprovedByUser() == null && command.getApprovedByCommunity() == null) {
+			throw new IllegalArgumentException("The command to approve user registration will not affect user registration as it have both flags set to null.");
+		}
 		if (command.getApprovedByCommunity() != null) {
 			registration.setApprovedByCommunity(command.getApprovedByCommunity());
 		}
@@ -62,7 +68,7 @@ public class CommunityUserRegistrationCommandService {
 		final List<CommunityUserRegistration> communityUserRegistrations = users.stream().map(user -> CommunityUserRegistration.builder()
 				.id(UUID.randomUUID().toString())
 				.approvedByCommunity(true)
-				.approvedByUser(false)
+				.approvedByUser(null)
 				.registeredUser(user)
 				.community(community)
 				.creationDatetime(now)
@@ -89,7 +95,7 @@ public class CommunityUserRegistrationCommandService {
 		CommunityUserRegistration communityUserRegistration = CommunityUserRegistration.builder()
 				.community(community)
 				.approvedByUser(true)
-				.approvedByCommunity(false)
+				.approvedByCommunity(null)
 				.registeredUser(currentUserService.getCurrentUser())
 				.id(UUID.randomUUID().toString())
 				.creationDatetime(LocalDateTime.now())

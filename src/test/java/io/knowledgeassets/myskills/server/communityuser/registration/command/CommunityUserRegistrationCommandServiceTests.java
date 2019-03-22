@@ -70,7 +70,7 @@ class CommunityUserRegistrationCommandServiceTests {
 														.build()
 										)),
 										hasProperty("approvedByCommunity", equalTo(true)),
-										hasProperty("approvedByUser", equalTo(false)),
+										hasProperty("approvedByUser", equalTo(null)),
 										hasProperty("registeredUser", equalTo(
 												User.builder()
 														.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
@@ -91,7 +91,7 @@ class CommunityUserRegistrationCommandServiceTests {
 														.build()
 										)),
 										hasProperty("approvedByCommunity", equalTo(true)),
-										hasProperty("approvedByUser", equalTo(false)),
+										hasProperty("approvedByUser", equalTo(null)),
 										hasProperty("registeredUser", equalTo(
 												User.builder()
 														.id("d9d74c04-0ab0-479c-a1d7-d372990f11b6")
@@ -117,7 +117,7 @@ class CommunityUserRegistrationCommandServiceTests {
 								.userName("Toni")
 								.build())
 						.approvedByCommunity(true)
-						.approvedByUser(false)
+						.approvedByUser(null)
 						.creationDatetime(LocalDateTime.of(2019, 1, 15, 20, 0))
 						.build(),
 				CommunityUserRegistration.builder()
@@ -129,7 +129,7 @@ class CommunityUserRegistrationCommandServiceTests {
 								.description("Community for Java developers")
 								.build())
 						.approvedByCommunity(true)
-						.approvedByUser(false)
+						.approvedByUser(null)
 						.registeredUser(User.builder()
 								.id("d9d74c04-0ab0-479c-a1d7-d372990f11b6")
 								.userName("Tina")
@@ -169,7 +169,7 @@ class CommunityUserRegistrationCommandServiceTests {
 				.build());
 		assertThat(communityUserRegistration.getCreationDatetime()).isOfAnyClassIn(LocalDateTime.class);
 		assertThat(communityUserRegistration.getApprovedByCommunity()).isTrue();
-		assertThat(communityUserRegistration.getApprovedByUser()).isFalse();
+		assertThat(communityUserRegistration.getApprovedByUser()).isNull();
 
 		communityUserRegistration = communityUserRegistrations.get(1);
 		assertThat(communityUserRegistration.getId()).isEqualTo("56ef4778-a084-4509-9a3e-80b7895cf7b0");
@@ -186,7 +186,7 @@ class CommunityUserRegistrationCommandServiceTests {
 				.build());
 		assertThat(communityUserRegistration.getCreationDatetime()).isOfAnyClassIn(LocalDateTime.class);
 		assertThat(communityUserRegistration.getApprovedByCommunity()).isTrue();
-		assertThat(communityUserRegistration.getApprovedByUser()).isFalse();
+		assertThat(communityUserRegistration.getApprovedByUser()).isNull();
 	}
 
 	@DisplayName("Exception is thrown when there are no users to invite.")
@@ -229,7 +229,7 @@ class CommunityUserRegistrationCommandServiceTests {
 								.build()
 				)),
 				hasProperty("approvedByUser", equalTo(true)),
-				hasProperty("approvedByCommunity", equalTo(false)),
+				hasProperty("approvedByCommunity", equalTo(null)),
 				hasProperty("registeredUser", equalTo(tester)),
 				hasProperty("id", isA(String.class)),
 				hasProperty("creationDatetime", isA(LocalDateTime.class))
@@ -242,7 +242,7 @@ class CommunityUserRegistrationCommandServiceTests {
 						.description("Community for Java developers")
 						.build())
 				.approvedByUser(true)
-				.approvedByCommunity(false)
+				.approvedByCommunity(null)
 				.registeredUser(tester)
 				.creationDatetime(LocalDateTime.of(2019, 1, 15, 20, 0))
 				.build()
@@ -258,7 +258,7 @@ class CommunityUserRegistrationCommandServiceTests {
 				.build());
 		assertThat(communityUserRegistration.getRegisteredUser()).isEqualTo(tester);
 		assertThat(communityUserRegistration.getApprovedByUser()).isTrue();
-		assertThat(communityUserRegistration.getApprovedByCommunity()).isFalse();
+		assertThat(communityUserRegistration.getApprovedByCommunity()).isNull();
 		assertThat(communityUserRegistration.getCreationDatetime()).isOfAnyClassIn(LocalDateTime.class);
 	}
 
@@ -434,6 +434,60 @@ class CommunityUserRegistrationCommandServiceTests {
 						.userName("tester")
 						.build()
 		);
+	}
+
+	@DisplayName("Exception is thrown when trying to approve as both community and user. No one can approve as both parties at the same time.")
+	@Test
+	void exceptionIsThrownWhenTryingToApproveAsBothParties() {
+		assertThrows(IllegalArgumentException.class, () -> communityUserRegistrationCommandService.approve(
+				CommunityUserRegistration.builder()
+						.approvedByCommunity(null)
+						.approvedByUser(true)
+						.registeredUser(User.builder()
+								.id("db87d46a-e4ca-451a-903b-e8533e0b924b")
+								.userName("tester")
+								.build())
+						.community(Community.builder()
+								.id("123")
+								.title("Java User Group")
+								.type(CommunityType.CLOSED)
+								.description("Community for Java developers")
+								.build())
+						.creationDatetime(LocalDateTime.of(2019, 1, 15, 20, 0))
+						.id("123")
+						.build(),
+				CommunityUserRegistrationApprovalCommand.builder()
+						.approvedByUser(true)
+						.approvedByCommunity(true)
+						.build()
+		));
+	}
+
+	@DisplayName("Exception is thrown when community user registration approval command has both flags set to null.")
+	@Test
+	void exceptionIsThrownWhenCommunityUserRegistrationApprovalCommandHasBothFlagsSetToNull() {
+		assertThrows(IllegalArgumentException.class, () -> communityUserRegistrationCommandService.approve(
+				CommunityUserRegistration.builder()
+						.approvedByCommunity(null)
+						.approvedByUser(true)
+						.registeredUser(User.builder()
+								.id("db87d46a-e4ca-451a-903b-e8533e0b924b")
+								.userName("tester")
+								.build())
+						.community(Community.builder()
+								.id("123")
+								.title("Java User Group")
+								.type(CommunityType.CLOSED)
+								.description("Community for Java developers")
+								.build())
+						.creationDatetime(LocalDateTime.of(2019, 1, 15, 20, 0))
+						.id("123")
+						.build(),
+				CommunityUserRegistrationApprovalCommand.builder()
+						.approvedByUser(null)
+						.approvedByCommunity(null)
+						.build()
+		));
 	}
 
 }

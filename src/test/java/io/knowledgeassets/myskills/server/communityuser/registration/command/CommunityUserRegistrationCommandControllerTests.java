@@ -30,6 +30,7 @@ import java.util.stream.Stream;
 import static io.knowledgeassets.myskills.server.common.JwtAuthenticationFactory.withUser;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -106,7 +107,7 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 								.userName("firstUser")
 								.build())
 						.approvedByCommunity(true)
-						.approvedByUser(false)
+						.approvedByUser(null)
 						.build(),
 				CommunityUserRegistration.builder()
 						.registeredUser(User.builder()
@@ -114,7 +115,7 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 								.userName("secondUser")
 								.build())
 						.approvedByCommunity(true)
-						.approvedByUser(false)
+						.approvedByUser(null)
 						.build()
 		));
 
@@ -128,10 +129,10 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 					.with(authentication(withUser(tester))))
 					.andExpect(status().isCreated())
 					.andExpect(jsonPath("$[0].user.userName", is(equalTo("firstUser"))))
-					.andExpect(jsonPath("$[0].approvedByUser", is(equalTo(false))))
+					.andExpect(jsonPath("$[0].approvedByUser", nullValue()))
 					.andExpect(jsonPath("$[0].approvedByCommunity", is(equalTo(true))))
 					.andExpect(jsonPath("$[1].user.userName", is(equalTo("secondUser"))))
-					.andExpect(jsonPath("$[1].approvedByUser", is(equalTo(false))))
+					.andExpect(jsonPath("$[1].approvedByUser", nullValue()))
 					.andExpect(jsonPath("$[1].approvedByCommunity", is(equalTo(true))));
 		}
 	}
@@ -174,7 +175,7 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 								.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 								.userName("tester")
 								.build())
-						.approvedByCommunity(false)
+						.approvedByCommunity(null)
 						.approvedByUser(true)
 						.build()
 		);
@@ -190,7 +191,7 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 					.andExpect(status().isCreated())
 					.andExpect(jsonPath("$[0].user.userName", is(equalTo("tester"))))
 					.andExpect(jsonPath("$[0].approvedByUser", is(equalTo(true))))
-					.andExpect(jsonPath("$[0].approvedByCommunity", is(equalTo(false))));
+					.andExpect(jsonPath("$[0].approvedByCommunity", nullValue()));
 		}
 
 	}
@@ -313,7 +314,7 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 								.userName("firstUser")
 								.build())
 						.approvedByCommunity(true)
-						.approvedByUser(false)
+						.approvedByUser(null)
 						.build(),
 				CommunityUserRegistration.builder()
 						.registeredUser(User.builder()
@@ -321,7 +322,7 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 								.userName("secondUser")
 								.build())
 						.approvedByCommunity(true)
-						.approvedByUser(false)
+						.approvedByUser(null)
 						.build()
 		));
 
@@ -335,10 +336,10 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 					.with(authentication(withUser(tester))))
 					.andExpect(status().isCreated())
 					.andExpect(jsonPath("$[0].user.userName", is(equalTo("firstUser"))))
-					.andExpect(jsonPath("$[0].approvedByUser", is(equalTo(false))))
+					.andExpect(jsonPath("$[0].approvedByUser", nullValue()))
 					.andExpect(jsonPath("$[0].approvedByCommunity", is(equalTo(true))))
 					.andExpect(jsonPath("$[1].user.userName", is(equalTo("secondUser"))))
-					.andExpect(jsonPath("$[1].approvedByUser", is(equalTo(false))))
+					.andExpect(jsonPath("$[1].approvedByUser", nullValue()))
 					.andExpect(jsonPath("$[1].approvedByCommunity", is(equalTo(true))));
 		}
 	}
@@ -477,7 +478,7 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 										.userName("tester")
 										.build())
 								.approvedByCommunity(true)
-								.approvedByUser(false)
+								.approvedByUser(null)
 								.creationDatetime(LocalDateTime.of(2019, 1, 20, 20,0))
 								.id("456")
 								.build()
@@ -499,7 +500,7 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 								.build())
 						.creationDatetime(LocalDateTime.of(2019, 1, 20, 20,0))
 						.approvedByCommunity(true)
-						.approvedByUser(false)
+						.approvedByUser(null)
 						.id("456")
 						.build(),
 				CommunityUserRegistrationApprovalCommand.builder()
@@ -558,7 +559,7 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 										.id("hd84ba8kju-b4d0-4119-9113-4677beb20ae2")
 										.userName("anotherTester")
 										.build())
-								.approvedByCommunity(false)
+								.approvedByCommunity(null)
 								.approvedByUser(true)
 								.creationDatetime(LocalDateTime.of(2019, 1, 20, 20,0))
 								.id("456")
@@ -580,7 +581,7 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 								.userName("anotherTester")
 								.build())
 						.creationDatetime(LocalDateTime.of(2019, 1, 20, 20,0))
-						.approvedByCommunity(false)
+						.approvedByCommunity(null)
 						.approvedByUser(true)
 						.id("456")
 						.build(),
