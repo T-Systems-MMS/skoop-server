@@ -83,6 +83,11 @@ public class CommunityUserRegistrationCommandController {
 		final List<CommunityUserRegistrationResponse> result;
 		if (securityService.isCommunityManager(communityId)) {
 			result = communityUserRegistrationCommandService.createUserRegistrationsOnBehalfOfCommunity(users, community).stream().map(CommunityUserRegistrationResponse::of).collect(Collectors.toList());
+		} else if (CommunityType.OPEN.equals(community.getType()) && securityService.isCommunityMember(communityId)) {
+			if (users.stream().anyMatch(user -> securityService.isAuthenticatedUserId(user.getId()))) {
+				throw new UserCommunityException("The authenticated user cannot invite herself / himself to join a community.");
+			}
+			result = communityUserRegistrationCommandService.createUserRegistrationsOnBehalfOfCommunity(users, community).stream().map(CommunityUserRegistrationResponse::of).collect(Collectors.toList());
 		} else if (request.getUserIds().size() == 1 && securityService.isAuthenticatedUserId(request.getUserIds().get(0))) {
 			if (CommunityType.OPEN.equals(community.getType())) {
 				// user is added as member immediately because registrations for open communities can be regarded as "auto-approved by the community
