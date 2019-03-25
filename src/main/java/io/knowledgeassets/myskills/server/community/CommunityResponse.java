@@ -51,6 +51,9 @@ public class CommunityResponse {
 	private List<SkillResponse> skills;
 
 	public static CommunityResponse of(Community community) {
+		if (community == null) {
+			return null;
+		}
 		return CommunityResponse.builder()
 				.id(community.getId())
 				.title(community.getTitle())

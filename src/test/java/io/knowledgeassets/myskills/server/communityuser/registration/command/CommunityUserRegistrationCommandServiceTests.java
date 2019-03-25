@@ -5,6 +5,7 @@ import io.knowledgeassets.myskills.server.community.CommunityType;
 import io.knowledgeassets.myskills.server.communityuser.command.CommunityUserCommandService;
 import io.knowledgeassets.myskills.server.communityuser.registration.CommunityUserRegistration;
 import io.knowledgeassets.myskills.server.communityuser.registration.CommunityUserRegistrationRepository;
+import io.knowledgeassets.myskills.server.notification.command.NotificationCommandService;
 import io.knowledgeassets.myskills.server.security.CurrentUserService;
 import io.knowledgeassets.myskills.server.user.User;
 import org.hamcrest.Matchers;
@@ -40,15 +41,18 @@ class CommunityUserRegistrationCommandServiceTests {
 	@Mock
 	private CurrentUserService currentUserService;
 
-	private CommunityUserRegistrationCommandService communityUserRegistrationCommandService;
-
 	@Mock
 	private CommunityUserCommandService communityUserCommandService;
+
+	@Mock
+	private NotificationCommandService notificationCommandService;
+
+	private CommunityUserRegistrationCommandService communityUserRegistrationCommandService;
 
 	@BeforeEach
 	void setUp() {
 		this.communityUserRegistrationCommandService = new CommunityUserRegistrationCommandService(communityUserRegistrationRepository,
-				currentUserService, communityUserCommandService);
+				currentUserService, communityUserCommandService, notificationCommandService);
 	}
 
 	@DisplayName("Test if users are invited.")
