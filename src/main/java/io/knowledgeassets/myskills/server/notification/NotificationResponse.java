@@ -29,7 +29,7 @@ public class NotificationResponse {
 	private LocalDateTime creationDatetime;
 
 	@ApiModelProperty("Type of the notification.")
-	private NotificationType notificationType;
+	private NotificationType type;
 
 	@ApiModelProperty("Registration the notification is associated with.")
 	private CommunityUserRegistrationResponse registration;
@@ -41,7 +41,7 @@ public class NotificationResponse {
 		return NotificationResponse.builder()
 				.id(notification.getId())
 				.creationDatetime(notification.getCreationDatetime())
-				.notificationType(notification.getType())
+				.type(notification.getType())
 				.registration(CommunityUserRegistrationResponse.of(notification.getRegistration()))
 				.attributes(new HashMap<>())
 				.build();

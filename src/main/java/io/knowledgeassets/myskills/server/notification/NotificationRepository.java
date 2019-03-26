@@ -15,9 +15,9 @@ public interface NotificationRepository extends Neo4jRepository<Notification, St
 	 * @param userId - user ID
 	 * @return notifications
 	 */
-	@Query("MATCH (n:Notification)-[:USER_RECIPIENT]->(:User {id: '6a9e8ced-f82f-4704-9348-f1f35e95dd5f'}) " +
+	@Query("MATCH (n:Notification)-[:USER_RECIPIENT]->(:User {id: {userId}}) " +
 			" WITH collect(n) AS notifications " +
-			" MATCH (n:Notification)-[:COMMUNITY_RECIPIENT]->(c:Community)<-[:COMMUNITY_USER {role:'MANAGER'}]-(:User {id: '6a9e8ced-f82f-4704-9348-f1f35e95dd5f'}) " +
+			" MATCH (n:Notification)-[:COMMUNITY_RECIPIENT]->(c:Community)<-[:COMMUNITY_USER {role:'MANAGER'}]-(:User {id: {userId}}) " +
 			" WITH notifications + collect(n) AS notifications " +
 			" UNWIND notifications as n " +
 			" OPTIONAL MATCH (n)-[r1:ATTACHED_TO]->(registration:CommunityUserRegistration)-[r4:registeredUser]-(registeredUser:User) " +

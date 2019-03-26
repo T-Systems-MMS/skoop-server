@@ -1,5 +1,7 @@
 package io.knowledgeassets.myskills.server.notification;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum NotificationType {
 
 	INVITATION_TO_JOIN_COMMUNITY("INVITATION_TO_JOIN_COMMUNITY"),
@@ -11,6 +13,9 @@ public enum NotificationType {
 	COMMUNITY_DELETED("COMMUNITY_DELETED"),
 	ACCEPTANCE_TO_COMMUNITY("ACCEPTANCE_TO_COMMUNITY");
 
+	/**
+	 * The field to decouple enum values and their business representation.
+	 */
 	private final String name;
 
 	NotificationType(String name) {
@@ -21,8 +26,10 @@ public enum NotificationType {
 		return name;
 	}
 
+	@JsonValue
 	@Override
 	public String toString() {
 		return name;
 	}
+
 }
