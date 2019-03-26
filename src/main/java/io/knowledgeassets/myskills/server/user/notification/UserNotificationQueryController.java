@@ -1,7 +1,9 @@
 package io.knowledgeassets.myskills.server.user.notification;
 
-import io.knowledgeassets.myskills.server.community.query.CommunityQueryService;
-import io.knowledgeassets.myskills.server.notification.NotificationResponse;
+import io.knowledgeassets.myskills.server.notification.AbstractNotificationResponse;
+import io.knowledgeassets.myskills.server.communityuser.registration.notification.CommunityUserRegistrationNotificationResponse;
+import io.knowledgeassets.myskills.server.notification.Notification;
+import io.knowledgeassets.myskills.server.notification.NotificationType;
 import io.knowledgeassets.myskills.server.notification.query.NotificationQueryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -14,12 +16,21 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Api(tags = "UserNotifications")
 @RestController
 public class UserNotificationQueryController {
+
+	private static final Map<NotificationType, Function<Notification, AbstractNotificationResponse>> MAPPERS = new HashMap<>() {{
+		put(NotificationType.REQUEST_TO_JOIN_COMMUNITY, CommunityUserRegistrationNotificationResponse::of);
+		put(NotificationType.INVITATION_TO_JOIN_COMMUNITY, CommunityUserRegistrationNotificationResponse::of);
+		put(NotificationType.ACCEPTANCE_TO_COMMUNITY, CommunityUserRegistrationNotificationResponse::of);
+	}};
 
 	private final NotificationQueryService notificationQueryService;
 
@@ -39,9 +50,9 @@ public class UserNotificationQueryController {
 	})
 	@PreAuthorize("isAuthenticated() && isPrincipalUserId(#userId)")
 	@GetMapping(path = "/users/{userId}/notifications", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<NotificationResponse>> getUserNotifications(@PathVariable("userId") String userId) {
+	public ResponseEntity<List<AbstractNotificationResponse>> getUserNotifications(@PathVariable("userId") String userId) {
 		return ResponseEntity.ok(notificationQueryService.getUserNotifications(userId)
-				.map(NotificationResponse::of).collect(Collectors.toList()));
+				.map(n -> MAPPERS.get(n.getType()).apply(n)).collect(Collectors.toList()));
 	}
 
 }
