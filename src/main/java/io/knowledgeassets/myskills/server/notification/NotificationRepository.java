@@ -18,6 +18,7 @@ public interface NotificationRepository extends Neo4jRepository<Notification, St
 	@Query("OPTIONAL MATCH (n:Notification)-[:CAUSED_BY]->(registration:CommunityUserRegistration)-[:registeredUser]->(registeredUser:User {id: {userId}}) " +
 			" WITH collect(n) AS notifications " +
 			" OPTIONAL MATCH (n:Notification)-[:CAUSED_BY]->(registration:CommunityUserRegistration)-[:community]->(c:Community)<-[:COMMUNITY_USER {role:'MANAGER'}]-(:User {id: {userId}}) " +
+			" WHERE n.type IN ['REQUEST_TO_JOIN_COMMUNITY'] " +
 			" WITH notifications + collect(n) AS notifications " +
 			" UNWIND notifications as n " +
 			" OPTIONAL MATCH (n)-[r1:CAUSED_BY]->(registration:CommunityUserRegistration)-[r2:registeredUser]->(registeredUser:User) " +
