@@ -33,7 +33,7 @@ public class Notification {
 
 	@ToString.Exclude
 	@EqualsAndHashCode.Exclude
-	@Relationship(type = "ATTACHED_TO")
+	@Relationship(type = "CAUSED_BY")
 	private CommunityUserRegistration registration;
 
 }
