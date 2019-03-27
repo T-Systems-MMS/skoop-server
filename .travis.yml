@@ -1,6 +1,6 @@
 addons:
   sonarcloud:
-    organization: "knowledgeassets"
+    organization: "t-systems-mms"
     token:
       secure: $SONAR_TOKEN
 language: java

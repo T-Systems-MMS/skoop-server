@@ -1,4 +1,4 @@
-= MySkills Server
+= SKOOP Server
 Georg Wittberger <georg.wittberger@gmail.com>
 v0.0.1, 2018-12-23
 
@@ -18,7 +18,7 @@ A lightweight web application to capture, manage and analyze skills of users and
 
 === Introduction
 
-MySkills Server is a Java web application implementing the backend of the MySkills ecosystem. This server has no graphical user interface. It exposes a REST API to allow clients (e.g. the _MySkills WebApp_) to interact with the various MySkills functionalities via network. The server takes care of persistently storing the data of the MySkills domain model in a separate database.
+SKOOP Server is a Java web application implementing the backend of the SKOOP ecosystem. This server has no graphical user interface. It exposes a REST API to allow clients (e.g. the _SKOOP WebApp_) to interact with the various SKOOP functionalities via network. The server takes care of persistently storing the data of the SKOOP domain model in a separate database.
 
 === System requirements
 
@@ -48,7 +48,7 @@ The final executable JAR file is produced in the `target` subdirectory.
 
 === Running the executable JAR file
 
-After completing the Maven build you can run the MySkills Server like a simple Java application:
+After completing the Maven build you can run the SKOOP Server like a simple Java application:
 
     java -jar target/myskills-server-0.0.1-SNAPSHOT.jar
 
@@ -89,13 +89,13 @@ Once the application has started the API documentation should be available at ht
 
 === Call for contributors
 
-Become a contributor to MySkills by joining our KnowledgeAssets organization! Everyone can help, from UX designer over software developers and testers to documentation writers. Get involved and be part of a great community project!
+Become a contributor to SKOOP by joining our KnowledgeAssets organization! Everyone can help, from UX designer over software developers and testers to documentation writers. Get involved and be part of a great community project!
 
 Interested? Contact georg.wittberger (at) gmail.com
 
 === Technology overview
 
-As described in the introduction the MySkills Server is a pure server application with no graphical user interface. The project makes use of the following noteworthy frameworks:
+As described in the introduction the SKOOP Server is a pure server application with no graphical user interface. The project makes use of the following noteworthy frameworks:
 
 * https://spring.io/projects/spring-boot[Spring Boot]: Provides the basis for the Java web application. Within the application itself it faciliates the configuration of the Spring application context. Furthermore, we use the Spring Boot Maven plugin to build the executable JAR file including an embedded Tomcat server.
 * https://spring.io/projects/spring-framework[Spring Web MVC]: The REST API provided by the application is implemented using Spring Web MVC controllers. We use that synchronous variant instead of WebFlux at the moment.
@@ -107,7 +107,7 @@ As described in the introduction the MySkills Server is a pure server applicatio
 
 === Setting up the Neo4j database
 
-MySkills Server requires a https://neo4j.com/[Neo4j] database for persistent storage.
+SKOOP Server requires a https://neo4j.com/[Neo4j] database for persistent storage.
 
 Option 1: You can download the database server https://neo4j.com/download-center/#releases[directly from the website] and install it on your system.
 
@@ -146,7 +146,7 @@ docker stop neo4j
 
 Visit http://localhost:7474/ to view the Neo4j browser.
 
-_Note: The `dev` profile of the MySkills Server assumes that the `bolt` endpoint of Neo4j is available at `localhost:7687`. The database server must be accessible when starting the MySkills Server._
+_Note: The `dev` profile of the SKOOP Server assumes that the `bolt` endpoint of Neo4j is available at `localhost:7687`. The database server must be accessible when starting the SKOOP Server._
 
 === Configuring annotation processors
 
@@ -173,7 +173,7 @@ _Note: You should enable the Spring profile `dev` to activate some configuration
 
 === Configuring test users
 
-MySkills Server requires an external OpenID Connect provider to generate ID token which can be used to authorize API requests.
+SKOOP Server requires an external OpenID Connect provider to generate ID token which can be used to authorize API requests.
 
 During development a local https://www.keycloak.org/[KeyCloak] server is recommended to manage test users and create access token.
 
@@ -215,9 +215,9 @@ Visit http://localhost:9000/auth/ to configure the KeyCloak server.
 
 There is an export of a suitable test realm in `tools/keycloak/myskills-realm.json` which can be imported into the KeyCloak server. Simply log in to the administration console, select "Add realm" and upload the JSON file.
 
-The test realm comes with a preconfigured client for MySkills but contains no test users. *You have to create users manually within the `MySkills` realm.*
+The test realm comes with a preconfigured client for SKOOP but contains no test users. *You have to create users manually within the `MySkills` realm.*
 
-_Note: The `dev` profile of the MySkills Server assumes that the KeyCloak server is available at `localhost:9000` and contains a realm named `MySkills`. The KeyCloak server must be accessible when starting the MySkills Server._
+_Note: The `dev` profile of the SKOOP Server assumes that the KeyCloak server is available at `localhost:9000` and contains a realm named `MySkills`. The KeyCloak server must be accessible when starting the SKOOP Server._
 
 === Testing the application
 
@@ -241,13 +241,13 @@ Open the Swagger UI of the running application: http://localhost:8080/swagger-ui
 
 === Architecture overview
 
-Fundamentally, the MySkills Server is based on the conventions of the https://spring.io/projects/spring-boot[Spring Boot] framework. If you are familiar with that framework you should have an easy start with the project.
+Fundamentally, the SKOOP Server is based on the conventions of the https://spring.io/projects/spring-boot[Spring Boot] framework. If you are familiar with that framework you should have an easy start with the project.
 
 ==== Source code structure
 
 The base package `io.knowledgeassets.myskills.server` contains several sub-packages with focus on specific parts of the domain model. For example, `io.knowledgeassets.myskills.server.skill` contains everything related to skills as a domain object, including entity classes, data repositories, service implementations and controllers for the corresponding REST API.
 
-_A basic design principle of MySkills Server is the application of the CQRS pattern (Command Query Responsibility Segregation)._
+_A basic design principle of SKOOP Server is the application of the CQRS pattern (Command Query Responsibility Segregation)._
 
 In short words, all read access to the domain model is strictly separated from the write access. This segregation is made explicit by the separate `command` and `query` packages inside each domain package. For example:
 

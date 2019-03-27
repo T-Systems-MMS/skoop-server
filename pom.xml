@@ -22,6 +22,7 @@
 	</description>
 
 	<properties>
+		<sonar.projectKey>T-Systems-MMS_skoop-server</sonar.projectKey>
 		<java.version>11</java.version>
 		<springfox-swagger2.version>2.9.2</springfox-swagger2.version>
 		<neo4j.version>3.4.11</neo4j.version>
