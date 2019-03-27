@@ -16,8 +16,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @ApiModel(
-		value = "CommunityUserRegistrationNotificationResponse",
-		description = "This holds notification data about user registration. It is used to transfer user registration notification data to a client."
+		value = "RequestToJoinCommunityNotificationResponse",
+		description = "This holds notification data about user registration when the user sent request to join a community. " +
+				" It is used to transfer user registration notification data to a client."
 )
 public class RequestToJoinCommunityNotificationResponse extends AbstractNotificationResponse {
 

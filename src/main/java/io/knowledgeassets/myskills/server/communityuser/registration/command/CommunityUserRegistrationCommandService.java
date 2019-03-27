@@ -20,6 +20,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static java.util.Objects.requireNonNull;
+
 @Service
 public class CommunityUserRegistrationCommandService {
 
@@ -32,10 +34,10 @@ public class CommunityUserRegistrationCommandService {
 												   CurrentUserService currentUserService,
 												   CommunityUserCommandService communityUserCommandService,
 												   NotificationCommandService notificationCommandService) {
-		this.communityUserRegistrationRepository = communityUserRegistrationRepository;
-		this.currentUserService = currentUserService;
-		this.communityUserCommandService = communityUserCommandService;
-		this.notificationCommandService = notificationCommandService;
+		this.communityUserRegistrationRepository = requireNonNull(communityUserRegistrationRepository);
+		this.currentUserService = requireNonNull(currentUserService);
+		this.communityUserCommandService = requireNonNull(communityUserCommandService);
+		this.notificationCommandService = requireNonNull(notificationCommandService);
 	}
 
 	@Transactional
@@ -59,7 +61,7 @@ public class CommunityUserRegistrationCommandService {
 		}
 		if (Boolean.TRUE.equals(communityUserRegistration.getApprovedByCommunity()) &&
 				Boolean.TRUE.equals(communityUserRegistration.getApprovedByUser()) &&
-				Boolean.TRUE.equals(command.getApprovedByCommunity())) {
+				registration.getApprovedByCommunity() == null) {
 			notificationCommandService.save(Notification.builder()
 					.id(UUID.randomUUID().toString())
 					.type(NotificationType.ACCEPTANCE_TO_COMMUNITY)
