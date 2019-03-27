@@ -48,6 +48,7 @@ public class CommunityUserRegistrationCommandService {
 		if (command.getApprovedByUser() == null && command.getApprovedByCommunity() == null) {
 			throw new IllegalArgumentException("The command to approve user registration will not affect user registration as it have both flags set to null.");
 		}
+		final boolean isAcceptanceToCommunity = registration.getApprovedByCommunity() == null && Boolean.TRUE.equals(command.getApprovedByCommunity());
 		if (command.getApprovedByCommunity() != null) {
 			registration.setApprovedByCommunity(command.getApprovedByCommunity());
 		}
@@ -61,7 +62,7 @@ public class CommunityUserRegistrationCommandService {
 		}
 		if (Boolean.TRUE.equals(communityUserRegistration.getApprovedByCommunity()) &&
 				Boolean.TRUE.equals(communityUserRegistration.getApprovedByUser()) &&
-				registration.getApprovedByCommunity() == null) {
+				isAcceptanceToCommunity) {
 			notificationCommandService.save(Notification.builder()
 					.id(UUID.randomUUID().toString())
 					.type(NotificationType.ACCEPTANCE_TO_COMMUNITY)
