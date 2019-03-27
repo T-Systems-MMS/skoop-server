@@ -136,7 +136,6 @@ class NotificationRepositoryTests {
 				.id("abc")
 				.creationDatetime(LocalDateTime.of(2019, 3, 26, 10, 0))
 				.type(NotificationType.INVITATION_TO_JOIN_COMMUNITY)
-				.userRecipient(communityManager)
 				.registration(firstRegistration)
 				.build());
 
@@ -146,7 +145,6 @@ class NotificationRepositoryTests {
 				.id("def")
 				.creationDatetime(LocalDateTime.of(2019, 3, 26, 11, 0))
 				.type(NotificationType.REQUEST_TO_JOIN_COMMUNITY)
-				.communityRecipient(javascriptUserGroup)
 				.registration(secondRegistration)
 				.build()
 		);
@@ -157,7 +155,6 @@ class NotificationRepositoryTests {
 				.id("ghi")
 				.creationDatetime(LocalDateTime.of(2019, 3, 27, 11, 0))
 				.type(NotificationType.REQUEST_TO_JOIN_COMMUNITY)
-				.communityRecipient(frontendDevelopers)
 				.registration(thirdRegistration)
 				.build()
 		);
@@ -169,7 +166,6 @@ class NotificationRepositoryTests {
 		assertThat(notification.getId()).isEqualTo("def");
 		assertThat(notification.getCreationDatetime()).isEqualTo(LocalDateTime.of(2019, 3, 26, 11, 0));
 		assertThat(notification.getType()).isEqualTo(NotificationType.REQUEST_TO_JOIN_COMMUNITY);
-		assertThat(notification.getCommunityRecipient()).isEqualTo(javascriptUserGroup);
 		assertThat(notification.getRegistration()).isNotNull();
 		assertThat(notification.getRegistration().getApprovedByUser()).isTrue();
 		assertThat(notification.getRegistration().getApprovedByCommunity()).isNull();
@@ -182,7 +178,6 @@ class NotificationRepositoryTests {
 		assertThat(notification.getId()).isEqualTo("abc");
 		assertThat(notification.getCreationDatetime()).isEqualTo(LocalDateTime.of(2019, 3, 26, 10, 0));
 		assertThat(notification.getType()).isEqualTo(NotificationType.INVITATION_TO_JOIN_COMMUNITY);
-		assertThat(notification.getUserRecipient()).isEqualTo(communityManager);
 		assertThat(notification.getRegistration()).isNotNull();
 		assertThat(notification.getRegistration().getApprovedByUser()).isNull();
 		assertThat(notification.getRegistration().getApprovedByCommunity()).isTrue();
@@ -228,7 +223,6 @@ class NotificationRepositoryTests {
 				.id("abc")
 				.creationDatetime(LocalDateTime.of(2019, 3, 26, 10, 0))
 				.type(NotificationType.INVITATION_TO_JOIN_COMMUNITY)
-				.userRecipient(commonUser)
 				.registration(firstRegistration)
 				.build());
 
@@ -240,7 +234,6 @@ class NotificationRepositoryTests {
 		assertThat(notification.getId()).isEqualTo("abc");
 		assertThat(notification.getCreationDatetime()).isEqualTo(LocalDateTime.of(2019, 3, 26, 10, 0));
 		assertThat(notification.getType()).isEqualTo(NotificationType.INVITATION_TO_JOIN_COMMUNITY);
-		assertThat(notification.getUserRecipient()).isEqualTo(commonUser);
 		assertThat(notification.getRegistration()).isNotNull();
 		assertThat(notification.getRegistration().getApprovedByUser()).isNull();
 		assertThat(notification.getRegistration().getApprovedByCommunity()).isTrue();
@@ -304,7 +297,6 @@ class NotificationRepositoryTests {
 				.id("def")
 				.creationDatetime(LocalDateTime.of(2019, 3, 26, 11, 0))
 				.type(NotificationType.REQUEST_TO_JOIN_COMMUNITY)
-				.communityRecipient(javascriptUserGroup)
 				.registration(firstRegistration)
 				.build()
 		);
@@ -316,7 +308,6 @@ class NotificationRepositoryTests {
 		assertThat(notification.getId()).isEqualTo("def");
 		assertThat(notification.getCreationDatetime()).isEqualTo(LocalDateTime.of(2019, 3, 26, 11, 0));
 		assertThat(notification.getType()).isEqualTo(NotificationType.REQUEST_TO_JOIN_COMMUNITY);
-		assertThat(notification.getCommunityRecipient()).isEqualTo(javascriptUserGroup);
 		assertThat(notification.getRegistration()).isNotNull();
 		assertThat(notification.getRegistration().getApprovedByUser()).isTrue();
 		assertThat(notification.getRegistration().getApprovedByCommunity()).isNull();

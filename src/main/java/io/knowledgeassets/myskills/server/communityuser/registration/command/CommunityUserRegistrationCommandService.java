@@ -64,7 +64,6 @@ public class CommunityUserRegistrationCommandService {
 					.id(UUID.randomUUID().toString())
 					.type(NotificationType.ACCEPTANCE_TO_COMMUNITY)
 					.creationDatetime(LocalDateTime.now())
-					.userRecipient(communityUserRegistration.getRegisteredUser())
 					.registration(communityUserRegistration)
 					.build()
 			);
@@ -99,7 +98,6 @@ public class CommunityUserRegistrationCommandService {
 				.id(UUID.randomUUID().toString())
 				.registration(registration)
 				.creationDatetime(LocalDateTime.now())
-				.userRecipient(registration.getRegisteredUser())
 				.type(NotificationType.INVITATION_TO_JOIN_COMMUNITY)
 				.build()
 		).forEach(notificationCommandService::save);
@@ -132,7 +130,6 @@ public class CommunityUserRegistrationCommandService {
 		notificationCommandService.save(Notification.builder()
 				.id(UUID.randomUUID().toString())
 				.registration(registration)
-				.communityRecipient(registration.getCommunity())
 				.creationDatetime(LocalDateTime.now())
 				.type(NotificationType.REQUEST_TO_JOIN_COMMUNITY)
 				.build()

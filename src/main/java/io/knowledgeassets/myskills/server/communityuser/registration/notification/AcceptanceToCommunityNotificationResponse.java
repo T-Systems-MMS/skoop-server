@@ -16,24 +16,24 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @ApiModel(
-		value = "CommunityUserRegistrationNotificationResponse",
+		value = "AcceptanceToCommunityNotificationResponse",
 		description = "This holds notification data about user registration. It is used to transfer user registration notification data to a client."
 )
-public class CommunityUserRegistrationNotificationResponse extends AbstractNotificationResponse {
+public class AcceptanceToCommunityNotificationResponse extends AbstractNotificationResponse {
 
 	@ApiModelProperty("Registration the notification is associated with.")
 	private CommunityUserRegistrationResponse registration;
 
 	@Builder
-	public CommunityUserRegistrationNotificationResponse(String id,
-														 LocalDateTime creationDatetime,
-														 CommunityUserRegistrationResponse registration) {
+	public AcceptanceToCommunityNotificationResponse(String id,
+													 LocalDateTime creationDatetime,
+													 CommunityUserRegistrationResponse registration) {
 		super(id, creationDatetime);
 		this.registration = registration;
 	}
 
-	public static CommunityUserRegistrationNotificationResponse of(Notification notification) {
-		return CommunityUserRegistrationNotificationResponse.builder()
+	public static AcceptanceToCommunityNotificationResponse of(Notification notification) {
+		return AcceptanceToCommunityNotificationResponse.builder()
 				.id(notification.getId())
 				.creationDatetime(notification.getCreationDatetime())
 				.registration(CommunityUserRegistrationResponse.of(notification.getRegistration()))

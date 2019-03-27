@@ -1,8 +1,6 @@
 package io.knowledgeassets.myskills.server.notification;
 
-import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.communityuser.registration.CommunityUserRegistration;
-import io.knowledgeassets.myskills.server.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,16 +30,6 @@ public class Notification {
 
 	@Property(name = "creationDatetime")
 	private LocalDateTime creationDatetime;
-
-	@ToString.Exclude
-	@EqualsAndHashCode.Exclude
-	@Relationship(type = "USER_RECIPIENT")
-	private User userRecipient;
-
-	@ToString.Exclude
-	@EqualsAndHashCode.Exclude
-	@Relationship(type = "COMMUNITY_RECIPIENT")
-	private Community communityRecipient;
 
 	@ToString.Exclude
 	@EqualsAndHashCode.Exclude

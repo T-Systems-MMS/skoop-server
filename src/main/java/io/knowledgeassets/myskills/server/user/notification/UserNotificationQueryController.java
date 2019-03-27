@@ -1,7 +1,9 @@
 package io.knowledgeassets.myskills.server.user.notification;
 
+import io.knowledgeassets.myskills.server.communityuser.registration.notification.AcceptanceToCommunityNotificationResponse;
+import io.knowledgeassets.myskills.server.communityuser.registration.notification.InvitationToJoinCommunityNotificationResponse;
 import io.knowledgeassets.myskills.server.notification.AbstractNotificationResponse;
-import io.knowledgeassets.myskills.server.communityuser.registration.notification.CommunityUserRegistrationNotificationResponse;
+import io.knowledgeassets.myskills.server.communityuser.registration.notification.RequestToJoinCommunityNotificationResponse;
 import io.knowledgeassets.myskills.server.notification.Notification;
 import io.knowledgeassets.myskills.server.notification.NotificationType;
 import io.knowledgeassets.myskills.server.notification.query.NotificationQueryService;
@@ -27,9 +29,9 @@ import java.util.stream.Collectors;
 public class UserNotificationQueryController {
 
 	private static final Map<NotificationType, Function<Notification, AbstractNotificationResponse>> MAPPERS = new HashMap<>() {{
-		put(NotificationType.REQUEST_TO_JOIN_COMMUNITY, CommunityUserRegistrationNotificationResponse::of);
-		put(NotificationType.INVITATION_TO_JOIN_COMMUNITY, CommunityUserRegistrationNotificationResponse::of);
-		put(NotificationType.ACCEPTANCE_TO_COMMUNITY, CommunityUserRegistrationNotificationResponse::of);
+		put(NotificationType.REQUEST_TO_JOIN_COMMUNITY, RequestToJoinCommunityNotificationResponse::of);
+		put(NotificationType.INVITATION_TO_JOIN_COMMUNITY, InvitationToJoinCommunityNotificationResponse::of);
+		put(NotificationType.ACCEPTANCE_TO_COMMUNITY, AcceptanceToCommunityNotificationResponse::of);
 	}};
 
 	private final NotificationQueryService notificationQueryService;

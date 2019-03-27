@@ -2,7 +2,8 @@ package io.knowledgeassets.myskills.server.notification;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import io.knowledgeassets.myskills.server.communityuser.registration.notification.CommunityUserRegistrationNotificationResponse;
+import io.knowledgeassets.myskills.server.communityuser.registration.notification.InvitationToJoinCommunityNotificationResponse;
+import io.knowledgeassets.myskills.server.communityuser.registration.notification.RequestToJoinCommunityNotificationResponse;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -10,9 +11,11 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({
-		@JsonSubTypes.Type(value = CommunityUserRegistrationNotificationResponse.class)
+		@JsonSubTypes.Type(value = RequestToJoinCommunityNotificationResponse.class),
+		@JsonSubTypes.Type(value = InvitationToJoinCommunityNotificationResponse.class),
+		@JsonSubTypes.Type(value = RequestToJoinCommunityNotificationResponse.class)
 })
 @ApiModel(
 		value = "AbstractNotificationResponse",

@@ -15,12 +15,12 @@ public interface NotificationRepository extends Neo4jRepository<Notification, St
 	 * @param userId - user ID
 	 * @return notifications
 	 */
-	@Query("OPTIONAL MATCH (n:Notification)-[:USER_RECIPIENT]->(:User {id: {userId}}) " +
+	@Query("OPTIONAL MATCH (n:Notification)-[r1:ATTACHED_TO]->(registration:CommunityUserRegistration)-[r4:registeredUser]->(registeredUser:User {id: {userId}}) " +
 			" WITH collect(n) AS notifications " +
-			" OPTIONAL MATCH (n:Notification)-[:COMMUNITY_RECIPIENT]->(c:Community)<-[:COMMUNITY_USER {role:'MANAGER'}]-(:User {id: {userId}}) " +
+			" OPTIONAL MATCH (n:Notification)-[r1:ATTACHED_TO]->(registration:CommunityUserRegistration)-[r4:community]->(c:Community)<-[:COMMUNITY_USER {role:'MANAGER'}]-(:User {id: {userId}}) " +
 			" WITH notifications + collect(n) AS notifications " +
 			" UNWIND notifications as n " +
-			" OPTIONAL MATCH (n)-[r1:ATTACHED_TO]->(registration:CommunityUserRegistration)-[r4:registeredUser]-(registeredUser:User) " +
+			" OPTIONAL MATCH (n)-[r1:ATTACHED_TO]->(registration:CommunityUserRegistration)-[r4:registeredUser]->(registeredUser:User) " +
 			" WITH n, r1, registration, registeredUser, r4 " +
 			" OPTIONAL MATCH (n)-[r2:USER_RECIPIENT]->(user:User) " +
 			" WITH n, r1, registration, r2, user, registeredUser, r4 " +
