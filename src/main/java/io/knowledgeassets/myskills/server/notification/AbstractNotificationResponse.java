@@ -19,7 +19,9 @@ import java.time.LocalDateTime;
 })
 @ApiModel(
 		value = "AbstractNotificationResponse",
-		description = "This holds notification data. It is used to transfer notification data to a client."
+		description = "This holds notification data. It is used to transfer notification data to a client. The field \"type\" is not documented here as it is added by Jackson automatically. " +
+				" The type field indicates actual type the notification belongs to. " +
+				" The possible values of the type field are: RequestToJoinCommunityNotificationResponse, InvitationToJoinCommunityNotificationResponse, AcceptanceToCommunityNotificationResponse."
 )
 public abstract class AbstractNotificationResponse {
 

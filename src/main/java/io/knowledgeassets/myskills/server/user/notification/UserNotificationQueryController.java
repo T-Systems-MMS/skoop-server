@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -28,11 +28,13 @@ import java.util.stream.Collectors;
 @RestController
 public class UserNotificationQueryController {
 
-	private static final Map<NotificationType, Function<Notification, AbstractNotificationResponse>> MAPPERS = new HashMap<>() {{
-		put(NotificationType.REQUEST_TO_JOIN_COMMUNITY, RequestToJoinCommunityNotificationResponse::of);
-		put(NotificationType.INVITATION_TO_JOIN_COMMUNITY, InvitationToJoinCommunityNotificationResponse::of);
-		put(NotificationType.ACCEPTANCE_TO_COMMUNITY, AcceptanceToCommunityNotificationResponse::of);
-	}};
+	private static final Map<NotificationType, Function<Notification, AbstractNotificationResponse>> MAPPERS = new EnumMap<>(NotificationType.class);
+
+	static {
+		MAPPERS.put(NotificationType.REQUEST_TO_JOIN_COMMUNITY, RequestToJoinCommunityNotificationResponse::of);
+		MAPPERS.put(NotificationType.INVITATION_TO_JOIN_COMMUNITY, InvitationToJoinCommunityNotificationResponse::of);
+		MAPPERS.put(NotificationType.ACCEPTANCE_TO_COMMUNITY, AcceptanceToCommunityNotificationResponse::of);
+	}
 
 	private final NotificationQueryService notificationQueryService;
 
@@ -42,7 +44,7 @@ public class UserNotificationQueryController {
 
 	@ApiOperation(
 			value = "Gets all user notifications.",
-			notes = "Gets all user notifications."
+			notes = "Gets all user notifications. A notification has type field indicating what kind of notification it is. See AbstractNotificationResponse documentation for details."
 	)
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "Successful execution"),
