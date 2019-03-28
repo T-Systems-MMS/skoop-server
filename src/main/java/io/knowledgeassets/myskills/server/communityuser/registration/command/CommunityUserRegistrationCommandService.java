@@ -3,6 +3,9 @@ package io.knowledgeassets.myskills.server.communityuser.registration.command;
 import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.community.CommunityRole;
 import io.knowledgeassets.myskills.server.communityuser.command.CommunityUserCommandService;
+import io.knowledgeassets.myskills.server.notification.Notification;
+import io.knowledgeassets.myskills.server.notification.NotificationType;
+import io.knowledgeassets.myskills.server.notification.command.NotificationCommandService;
 import io.knowledgeassets.myskills.server.security.CurrentUserService;
 import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.communityuser.registration.CommunityUserRegistration;
@@ -17,19 +20,24 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static java.util.Objects.requireNonNull;
+
 @Service
 public class CommunityUserRegistrationCommandService {
 
 	private final CommunityUserRegistrationRepository communityUserRegistrationRepository;
 	private final CurrentUserService currentUserService;
 	private final CommunityUserCommandService communityUserCommandService;
+	private final NotificationCommandService notificationCommandService;
 
 	public CommunityUserRegistrationCommandService(CommunityUserRegistrationRepository communityUserRegistrationRepository,
 												   CurrentUserService currentUserService,
-												   CommunityUserCommandService communityUserCommandService) {
-		this.communityUserRegistrationRepository = communityUserRegistrationRepository;
-		this.currentUserService = currentUserService;
-		this.communityUserCommandService = communityUserCommandService;
+												   CommunityUserCommandService communityUserCommandService,
+												   NotificationCommandService notificationCommandService) {
+		this.communityUserRegistrationRepository = requireNonNull(communityUserRegistrationRepository);
+		this.currentUserService = requireNonNull(currentUserService);
+		this.communityUserCommandService = requireNonNull(communityUserCommandService);
+		this.notificationCommandService = requireNonNull(notificationCommandService);
 	}
 
 	@Transactional
@@ -40,6 +48,7 @@ public class CommunityUserRegistrationCommandService {
 		if (command.getApprovedByUser() == null && command.getApprovedByCommunity() == null) {
 			throw new IllegalArgumentException("The command to approve user registration will not affect user registration as it have both flags set to null.");
 		}
+		final boolean isAcceptanceToCommunity = registration.getApprovedByCommunity() == null && Boolean.TRUE.equals(command.getApprovedByCommunity());
 		if (command.getApprovedByCommunity() != null) {
 			registration.setApprovedByCommunity(command.getApprovedByCommunity());
 		}
@@ -47,8 +56,20 @@ public class CommunityUserRegistrationCommandService {
 			registration.setApprovedByUser(command.getApprovedByUser());
 		}
 		final CommunityUserRegistration communityUserRegistration = communityUserRegistrationRepository.save(registration);
-		if (communityUserRegistration.getApprovedByCommunity() && communityUserRegistration.getApprovedByUser()) {
+		if (Boolean.TRUE.equals(communityUserRegistration.getApprovedByCommunity()) &&
+				Boolean.TRUE.equals(communityUserRegistration.getApprovedByUser())) {
 			communityUserRegistration.setCommunityUser(communityUserCommandService.create(registration.getCommunity(), registration.getRegisteredUser(), CommunityRole.MEMBER));
+		}
+		if (Boolean.TRUE.equals(communityUserRegistration.getApprovedByCommunity()) &&
+				Boolean.TRUE.equals(communityUserRegistration.getApprovedByUser()) &&
+				isAcceptanceToCommunity) {
+			notificationCommandService.save(Notification.builder()
+					.id(UUID.randomUUID().toString())
+					.type(NotificationType.ACCEPTANCE_TO_COMMUNITY)
+					.creationDatetime(LocalDateTime.now())
+					.registration(communityUserRegistration)
+					.build()
+			);
 		}
 		return communityUserRegistration;
 	}
@@ -74,8 +95,16 @@ public class CommunityUserRegistrationCommandService {
 				.creationDatetime(now)
 				.build()
 		).collect(Collectors.toList());
-		return StreamSupport.stream(communityUserRegistrationRepository.saveAll(communityUserRegistrations).spliterator(), false)
+		List<CommunityUserRegistration> registrations = StreamSupport.stream(communityUserRegistrationRepository.saveAll(communityUserRegistrations).spliterator(), false)
 				.collect(Collectors.toList());
+		registrations.stream().map(registration -> Notification.builder()
+				.id(UUID.randomUUID().toString())
+				.registration(registration)
+				.creationDatetime(LocalDateTime.now())
+				.type(NotificationType.INVITATION_TO_JOIN_COMMUNITY)
+				.build()
+		).forEach(notificationCommandService::save);
+		return registrations;
 	}
 
 	/**
@@ -100,7 +129,15 @@ public class CommunityUserRegistrationCommandService {
 				.id(UUID.randomUUID().toString())
 				.creationDatetime(LocalDateTime.now())
 				.build();
-		return communityUserRegistrationRepository.save(communityUserRegistration);
+		final CommunityUserRegistration registration = communityUserRegistrationRepository.save(communityUserRegistration);
+		notificationCommandService.save(Notification.builder()
+				.id(UUID.randomUUID().toString())
+				.registration(registration)
+				.creationDatetime(LocalDateTime.now())
+				.type(NotificationType.REQUEST_TO_JOIN_COMMUNITY)
+				.build()
+		);
+		return registration;
 	}
 
 }

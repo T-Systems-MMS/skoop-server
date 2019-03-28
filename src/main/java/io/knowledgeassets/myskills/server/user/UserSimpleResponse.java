@@ -37,6 +37,9 @@ public class UserSimpleResponse {
 	private Boolean coach;
 
 	public static UserSimpleResponse of(User user) {
+		if (user == null) {
+			return null;
+		}
 		return UserSimpleResponse.builder()
 				.id(user.getId())
 				.userName(user.getUserName())
