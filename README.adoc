@@ -66,7 +66,7 @@ We do not offer public Docker images at the moment but you can create your own a
 
 ----
 docker build \
-  -t myskills/server:latest \
+  -t skoop/server:latest \
   --build-arg JAR_FILE=target/myskills-server-0.0.1-SNAPSHOT.jar \
   .
 ----
@@ -75,10 +75,10 @@ Then you can start the container as usual:
 
 ----
 docker run \
-  --name myskills \
+  --name skoop-server \
   --rm \
   -p 8080:8080 \
-  myskills/server:latest
+  skoop/server:latest
 ----
 
 === Testing the setup
