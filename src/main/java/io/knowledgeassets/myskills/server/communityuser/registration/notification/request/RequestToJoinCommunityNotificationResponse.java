@@ -1,8 +1,7 @@
-package io.knowledgeassets.myskills.server.communityuser.registration.notification;
+package io.knowledgeassets.myskills.server.communityuser.registration.notification.request;
 
 import io.knowledgeassets.myskills.server.communityuser.registration.CommunityUserRegistrationResponse;
 import io.knowledgeassets.myskills.server.notification.AbstractNotificationResponse;
-import io.knowledgeassets.myskills.server.notification.Notification;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -33,7 +32,7 @@ public class RequestToJoinCommunityNotificationResponse extends AbstractNotifica
 		this.registration = registration;
 	}
 
-	public static RequestToJoinCommunityNotificationResponse of(Notification notification) {
+	public static RequestToJoinCommunityNotificationResponse of(RequestToJoinCommunityNotification notification) {
 		return RequestToJoinCommunityNotificationResponse.builder()
 				.id(notification.getId())
 				.creationDatetime(notification.getCreationDatetime())

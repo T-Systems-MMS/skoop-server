@@ -1,16 +1,12 @@
 package io.knowledgeassets.myskills.server.user.notification;
 
-import io.knowledgeassets.myskills.server.communityuser.registration.notification.AcceptanceToCommunityNotificationResponse;
-import io.knowledgeassets.myskills.server.communityuser.registration.notification.InvitationToJoinCommunityNotificationResponse;
 import io.knowledgeassets.myskills.server.notification.AbstractNotificationResponse;
-import io.knowledgeassets.myskills.server.communityuser.registration.notification.RequestToJoinCommunityNotificationResponse;
-import io.knowledgeassets.myskills.server.notification.Notification;
-import io.knowledgeassets.myskills.server.notification.NotificationType;
 import io.knowledgeassets.myskills.server.notification.query.NotificationQueryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,28 +14,23 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.EnumMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static java.util.Objects.requireNonNull;
 
 @Api(tags = "UserNotifications")
 @RestController
 public class UserNotificationQueryController {
 
-	private static final Map<NotificationType, Function<Notification, AbstractNotificationResponse>> MAPPERS = new EnumMap<>(NotificationType.class);
-
-	static {
-		MAPPERS.put(NotificationType.REQUEST_TO_JOIN_COMMUNITY, RequestToJoinCommunityNotificationResponse::of);
-		MAPPERS.put(NotificationType.INVITATION_TO_JOIN_COMMUNITY, InvitationToJoinCommunityNotificationResponse::of);
-		MAPPERS.put(NotificationType.ACCEPTANCE_TO_COMMUNITY, AcceptanceToCommunityNotificationResponse::of);
-	}
+	private final ConversionService conversionService;
 
 	private final NotificationQueryService notificationQueryService;
 
-	public UserNotificationQueryController(NotificationQueryService notificationQueryService) {
-		this.notificationQueryService = notificationQueryService;
+	public UserNotificationQueryController(NotificationQueryService notificationQueryService,
+										   ConversionService conversionService) {
+		this.notificationQueryService = requireNonNull(notificationQueryService);
+		this.conversionService = requireNonNull(conversionService);
 	}
 
 	@ApiOperation(
@@ -56,7 +47,7 @@ public class UserNotificationQueryController {
 	@GetMapping(path = "/users/{userId}/notifications", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<AbstractNotificationResponse>> getUserNotifications(@PathVariable("userId") String userId) {
 		return ResponseEntity.ok(notificationQueryService.getUserNotifications(userId)
-				.map(n -> MAPPERS.get(n.getType()).apply(n)).collect(Collectors.toList()));
+				.map(n -> conversionService.convert(n, AbstractNotificationResponse.class)).collect(Collectors.toList()));
 	}
 
 }

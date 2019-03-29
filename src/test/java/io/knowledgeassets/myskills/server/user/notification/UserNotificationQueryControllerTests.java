@@ -3,9 +3,11 @@ package io.knowledgeassets.myskills.server.user.notification;
 import io.knowledgeassets.myskills.server.common.AbstractControllerTests;
 import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.community.CommunityType;
+import io.knowledgeassets.myskills.server.communityuser.notification.kickout.UserKickedOutFromCommunityNotification;
+import io.knowledgeassets.myskills.server.communityuser.notification.leaving.UserLeftCommunityNotification;
 import io.knowledgeassets.myskills.server.communityuser.registration.CommunityUserRegistration;
-import io.knowledgeassets.myskills.server.notification.Notification;
-import io.knowledgeassets.myskills.server.notification.NotificationType;
+import io.knowledgeassets.myskills.server.communityuser.registration.notification.invitation.InvitationToJoinCommunityNotification;
+import io.knowledgeassets.myskills.server.communityuser.registration.notification.request.RequestToJoinCommunityNotification;
 import io.knowledgeassets.myskills.server.notification.query.NotificationQueryService;
 import io.knowledgeassets.myskills.server.user.User;
 import org.junit.jupiter.api.DisplayName;
@@ -48,9 +50,8 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 				.build();
 
 		given(notificationQueryService.getUserNotifications("56ef4778-a084-4509-9a3e-80b7895cf7b0")).willReturn(Stream.of(
-				Notification.builder()
+				InvitationToJoinCommunityNotification.builder()
 						.id("123")
-						.type(NotificationType.INVITATION_TO_JOIN_COMMUNITY)
 						.creationDatetime(LocalDateTime.of(2019, 3, 27, 9, 34))
 						.registration(CommunityUserRegistration.builder()
 								.approvedByUser(null)
@@ -67,9 +68,8 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 								)
 								.build())
 						.build(),
-				Notification.builder()
+				RequestToJoinCommunityNotification.builder()
 						.id("456")
-						.type(NotificationType.REQUEST_TO_JOIN_COMMUNITY)
 						.creationDatetime(LocalDateTime.of(2019, 3, 27, 10, 34))
 						.registration(CommunityUserRegistration.builder()
 								.approvedByUser(true)
@@ -85,6 +85,30 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 										.build()
 								)
 								.build())
+						.build(),
+				UserKickedOutFromCommunityNotification.builder()
+						.id("789")
+						.creationDatetime(LocalDateTime.of(2019, 3, 25, 10, 0))
+						.user(tester)
+						.community(Community.builder()
+								.id("773e8cce-fc06-4a62-a23e-58b52c097600")
+								.title("Community the user was kicked out from")
+								.type(CommunityType.CLOSED)
+								.build()
+						)
+						.build(),
+				UserLeftCommunityNotification.builder()
+						.id("901")
+						.creationDatetime(LocalDateTime.of(2019, 3, 21, 15, 30))
+						.community(Community.builder()
+								.id("7d616eaa-8a09-420a-b4f2-99b74b360308")
+								.type(CommunityType.CLOSED)
+								.title("AnotherCommunity")
+								.build())
+						.user(User.builder()
+								.id("fddd5bdd-8931-4eb6-a875-b52e10e07d35")
+								.userName("UserLeftCommunity")
+								.build())
 						.build()
 		));
 
@@ -93,7 +117,7 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 				.with(authentication(withUser(tester))))
 				.andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-				.andExpect(jsonPath("$.length()", is(equalTo(2))))
+				.andExpect(jsonPath("$.length()", is(equalTo(4))))
 				.andExpect(jsonPath("$[0].id", is(equalTo("123"))))
 				.andExpect(jsonPath("$[0].type", is(equalTo("InvitationToJoinCommunityNotificationResponse"))))
 				.andExpect(jsonPath("$[0].creationDatetime", is(equalTo("2019-03-27T09:34:00"))))
@@ -113,7 +137,23 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[1].registration.user.userName", is(equalTo("anotherTester"))))
 				.andExpect(jsonPath("$[1].registration.community.id", is(equalTo("7d616eaa-8a09-420a-b4f2-99b74b360308"))))
 				.andExpect(jsonPath("$[1].registration.community.type", is(equalTo("CLOSED"))))
-				.andExpect(jsonPath("$[1].registration.community.title", is(equalTo("AnotherCommunity"))));
+				.andExpect(jsonPath("$[1].registration.community.title", is(equalTo("AnotherCommunity"))))
+				.andExpect(jsonPath("$[2].id", is(equalTo("789"))))
+				.andExpect(jsonPath("$[2].type", is(equalTo("UserKickedOutFromCommunityNotificationResponse"))))
+				.andExpect(jsonPath("$[2].creationDatetime", is(equalTo("2019-03-25T10:00:00"))))
+				.andExpect(jsonPath("$[2].user.id", is(equalTo("56ef4778-a084-4509-9a3e-80b7895cf7b0"))))
+				.andExpect(jsonPath("$[2].user.userName", is(equalTo("tester"))))
+				.andExpect(jsonPath("$[2].community.id", is(equalTo("773e8cce-fc06-4a62-a23e-58b52c097600"))))
+				.andExpect(jsonPath("$[2].community.title", is(equalTo("Community the user was kicked out from"))))
+				.andExpect(jsonPath("$[2].community.type", is(equalTo("CLOSED"))))
+				.andExpect(jsonPath("$[3].id", is(equalTo("901"))))
+				.andExpect(jsonPath("$[3].type", is(equalTo("UserLeftCommunityNotificationResponse"))))
+				.andExpect(jsonPath("$[3].creationDatetime", is(equalTo("2019-03-21T15:30:00"))))
+				.andExpect(jsonPath("$[3].user.id", is(equalTo("fddd5bdd-8931-4eb6-a875-b52e10e07d35"))))
+				.andExpect(jsonPath("$[3].user.userName", is(equalTo("UserLeftCommunity"))))
+				.andExpect(jsonPath("$[3].community.id", is(equalTo("7d616eaa-8a09-420a-b4f2-99b74b360308"))))
+				.andExpect(jsonPath("$[3].community.title", is(equalTo("AnotherCommunity"))))
+				.andExpect(jsonPath("$[3].community.type", is(equalTo("CLOSED"))));
 	}
 
 	@DisplayName("Not authenticated user cannot get notifications.")

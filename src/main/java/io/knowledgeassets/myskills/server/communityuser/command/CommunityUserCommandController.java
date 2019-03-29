@@ -146,7 +146,11 @@ public class CommunityUserCommandController {
 			throw new UserCommunityException("The authenticated user must be either a community manager or the one who is leaving the community. " +
 					"And if authenticated user is a community manager she / he cannot remove herself / himself from the community.");
 		} else {
-			communityUserCommandService.remove(communityId, userId);
+			if (securityService.isCommunityManager(communityId)) {
+				communityUserCommandService.kickoutUser(communityId, userId);
+			} else {
+				communityUserCommandService.leaveCommunity(communityId, userId);
+			}
 			return ResponseEntity.noContent().build();
 		}
 	}

@@ -3,10 +3,13 @@ package io.knowledgeassets.myskills.server.notification.query;
 
 import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.community.CommunityType;
+import io.knowledgeassets.myskills.server.communityuser.notification.kickout.UserKickedOutFromCommunityNotification;
+import io.knowledgeassets.myskills.server.communityuser.notification.leaving.UserLeftCommunityNotification;
 import io.knowledgeassets.myskills.server.communityuser.registration.CommunityUserRegistration;
+import io.knowledgeassets.myskills.server.communityuser.registration.notification.invitation.InvitationToJoinCommunityNotification;
+import io.knowledgeassets.myskills.server.communityuser.registration.notification.request.RequestToJoinCommunityNotification;
 import io.knowledgeassets.myskills.server.notification.Notification;
 import io.knowledgeassets.myskills.server.notification.NotificationRepository;
-import io.knowledgeassets.myskills.server.notification.NotificationType;
 import io.knowledgeassets.myskills.server.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -38,9 +41,8 @@ class NotificationQueryServiceTests {
 	@Test
 	void getsUserNotifications() {
 		given(notificationRepository.getUserNotifications("abc")).willReturn(Stream.of(
-				Notification.builder()
+				InvitationToJoinCommunityNotification.builder()
 						.id("123")
-						.type(NotificationType.INVITATION_TO_JOIN_COMMUNITY)
 						.creationDatetime(LocalDateTime.of(2019, 3, 27, 9, 34))
 						.registration(CommunityUserRegistration.builder()
 								.approvedByUser(null)
@@ -57,9 +59,8 @@ class NotificationQueryServiceTests {
 								)
 								.build())
 						.build(),
-				Notification.builder()
+				RequestToJoinCommunityNotification.builder()
 						.id("456")
-						.type(NotificationType.REQUEST_TO_JOIN_COMMUNITY)
 						.creationDatetime(LocalDateTime.of(2019, 3, 27, 10, 34))
 						.registration(CommunityUserRegistration.builder()
 								.approvedByUser(true)
@@ -74,6 +75,33 @@ class NotificationQueryServiceTests {
 										.title("AnotherCommunity")
 										.build()
 								)
+								.build())
+						.build(),
+				UserKickedOutFromCommunityNotification.builder()
+						.id("def")
+						.creationDatetime(LocalDateTime.of(2019, 3, 25, 10, 0))
+						.user(User.builder()
+								.id("abc")
+								.userName("tester")
+								.build())
+						.community(Community.builder()
+								.id("145")
+								.title("JavaScript User Group")
+								.type(CommunityType.CLOSED)
+								.build()
+						)
+						.build(),
+				UserLeftCommunityNotification.builder()
+						.id("zyx")
+						.creationDatetime(LocalDateTime.of(2019, 3, 21, 15, 30))
+						.community(Community.builder()
+								.id("xyz")
+								.type(CommunityType.CLOSED)
+								.title("AnotherCommunity")
+								.build())
+						.user(User.builder()
+								.id("0123")
+								.userName("UserLeftCommunity")
 								.build())
 						.build()
 		));
@@ -81,9 +109,8 @@ class NotificationQueryServiceTests {
 		final Stream<Notification> notificationStream = this.notificationQueryService.getUserNotifications("abc");
 
 		assertThat(notificationStream).containsExactly(
-				Notification.builder()
+				InvitationToJoinCommunityNotification.builder()
 						.id("123")
-						.type(NotificationType.INVITATION_TO_JOIN_COMMUNITY)
 						.creationDatetime(LocalDateTime.of(2019, 3, 27, 9, 34))
 						.registration(CommunityUserRegistration.builder()
 								.approvedByUser(null)
@@ -100,9 +127,8 @@ class NotificationQueryServiceTests {
 								)
 								.build())
 						.build(),
-				Notification.builder()
+				RequestToJoinCommunityNotification.builder()
 						.id("456")
-						.type(NotificationType.REQUEST_TO_JOIN_COMMUNITY)
 						.creationDatetime(LocalDateTime.of(2019, 3, 27, 10, 34))
 						.registration(CommunityUserRegistration.builder()
 								.approvedByUser(true)
@@ -117,6 +143,33 @@ class NotificationQueryServiceTests {
 										.title("AnotherCommunity")
 										.build()
 								)
+								.build())
+						.build(),
+				UserKickedOutFromCommunityNotification.builder()
+						.id("def")
+						.creationDatetime(LocalDateTime.of(2019, 3, 25, 10, 0))
+						.user(User.builder()
+								.id("abc")
+								.userName("tester")
+								.build())
+						.community(Community.builder()
+								.id("145")
+								.title("JavaScript User Group")
+								.type(CommunityType.CLOSED)
+								.build()
+						)
+						.build(),
+				UserLeftCommunityNotification.builder()
+						.id("zyx")
+						.creationDatetime(LocalDateTime.of(2019, 3, 21, 15, 30))
+						.community(Community.builder()
+								.id("xyz")
+								.type(CommunityType.CLOSED)
+								.title("AnotherCommunity")
+								.build())
+						.user(User.builder()
+								.id("0123")
+								.userName("UserLeftCommunity")
 								.build())
 						.build()
 		);
