@@ -16,9 +16,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @ApiModel(
-		value = "UserKickedOutFromCommunityNotificationResponse",
-		description = "This holds notification data about user kicked out event. " +
-				"It is used to transfer user kicked out notification data to a client."
+		value = "UserLeftCommunityNotificationResponse",
+		description = "This holds notification data about user left community event. " +
+				"It is used to transfer user left community notification data to a client."
 )
 public class UserLeftCommunityNotificationResponse extends AbstractNotificationResponse {
 
