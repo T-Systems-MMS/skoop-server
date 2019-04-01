@@ -2,6 +2,7 @@ package io.knowledgeassets.myskills.server.notification.query;
 
 
 import io.knowledgeassets.myskills.server.community.Community;
+import io.knowledgeassets.myskills.server.community.CommunityDeletedNotification;
 import io.knowledgeassets.myskills.server.community.CommunityType;
 import io.knowledgeassets.myskills.server.communityuser.UserKickedOutFromCommunityNotification;
 import io.knowledgeassets.myskills.server.communityuser.UserLeftCommunityNotification;
@@ -21,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDateTime;
 import java.util.stream.Stream;
 
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
@@ -103,6 +105,15 @@ class NotificationQueryServiceTests {
 								.id("0123")
 								.userName("UserLeftCommunity")
 								.build())
+						.build(),
+				CommunityDeletedNotification.builder()
+						.id("iop")
+						.creationDatetime(LocalDateTime.of(2019, 1, 3, 10, 0))
+						.communityName("Deleted community")
+						.recipients(singletonList(User.builder()
+								.id("abc")
+								.userName("tester")
+								.build()))
 						.build()
 		));
 
@@ -171,6 +182,15 @@ class NotificationQueryServiceTests {
 								.id("0123")
 								.userName("UserLeftCommunity")
 								.build())
+						.build(),
+				CommunityDeletedNotification.builder()
+						.id("iop")
+						.creationDatetime(LocalDateTime.of(2019, 1, 3, 10, 0))
+						.communityName("Deleted community")
+						.recipients(singletonList(User.builder()
+								.id("abc")
+								.userName("tester")
+								.build()))
 						.build()
 		);
 	}

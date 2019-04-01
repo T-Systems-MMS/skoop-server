@@ -2,6 +2,7 @@ package io.knowledgeassets.myskills.server.user.notification;
 
 import io.knowledgeassets.myskills.server.common.AbstractControllerTests;
 import io.knowledgeassets.myskills.server.community.Community;
+import io.knowledgeassets.myskills.server.community.CommunityDeletedNotification;
 import io.knowledgeassets.myskills.server.community.CommunityType;
 import io.knowledgeassets.myskills.server.communityuser.UserKickedOutFromCommunityNotification;
 import io.knowledgeassets.myskills.server.communityuser.UserLeftCommunityNotification;
@@ -22,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.stream.Stream;
 
 import static io.knowledgeassets.myskills.server.common.JwtAuthenticationFactory.withUser;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
@@ -109,6 +111,12 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 								.id("fddd5bdd-8931-4eb6-a875-b52e10e07d35")
 								.userName("UserLeftCommunity")
 								.build())
+						.build(),
+				CommunityDeletedNotification.builder()
+						.id("902")
+						.creationDatetime(LocalDateTime.of(2019, 1, 3, 10, 0))
+						.communityName("Deleted community")
+						.recipients(singletonList(tester))
 						.build()
 		));
 
@@ -117,7 +125,7 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 				.with(authentication(withUser(tester))))
 				.andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-				.andExpect(jsonPath("$.length()", is(equalTo(4))))
+				.andExpect(jsonPath("$.length()", is(equalTo(5))))
 				.andExpect(jsonPath("$[0].id", is(equalTo("123"))))
 				.andExpect(jsonPath("$[0].type", is(equalTo("InvitationToJoinCommunityNotificationResponse"))))
 				.andExpect(jsonPath("$[0].creationDatetime", is(equalTo("2019-03-27T09:34:00"))))
@@ -153,7 +161,11 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[3].user.userName", is(equalTo("UserLeftCommunity"))))
 				.andExpect(jsonPath("$[3].community.id", is(equalTo("7d616eaa-8a09-420a-b4f2-99b74b360308"))))
 				.andExpect(jsonPath("$[3].community.title", is(equalTo("AnotherCommunity"))))
-				.andExpect(jsonPath("$[3].community.type", is(equalTo("CLOSED"))));
+				.andExpect(jsonPath("$[3].community.type", is(equalTo("CLOSED"))))
+				.andExpect(jsonPath("$[4].id", is(equalTo("902"))))
+				.andExpect(jsonPath("$[4].type", is(equalTo("CommunityDeletedNotificationResponse"))))
+				.andExpect(jsonPath("$[4].creationDatetime", is(equalTo("2019-01-03T10:00:00"))))
+				.andExpect(jsonPath("$[4].communityName", is(equalTo("Deleted community"))));
 	}
 
 	@DisplayName("Not authenticated user cannot get notifications.")

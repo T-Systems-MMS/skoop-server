@@ -3,10 +3,14 @@ package io.knowledgeassets.myskills.server.community.command;
 import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.community.CommunityRepository;
 import io.knowledgeassets.myskills.server.community.CommunityRole;
+import io.knowledgeassets.myskills.server.community.CommunityDeletedNotification;
+import io.knowledgeassets.myskills.server.communityuser.CommunityUser;
 import io.knowledgeassets.myskills.server.communityuser.command.CommunityUserCommandService;
+import io.knowledgeassets.myskills.server.communityuser.query.CommunityUserQueryService;
 import io.knowledgeassets.myskills.server.exception.DuplicateResourceException;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.exception.enums.Model;
+import io.knowledgeassets.myskills.server.notification.command.NotificationCommandService;
 import io.knowledgeassets.myskills.server.security.CurrentUserService;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.skill.command.SkillCommandService;
@@ -20,9 +24,11 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+import static java.util.Objects.requireNonNull;
 
 @Service
 public class CommunityCommandService {
@@ -32,17 +38,23 @@ public class CommunityCommandService {
 	private final SkillCommandService skillCommandService;
 	private final CommunityUserRegistrationCommandService communityUserRegistrationCommandService;
 	private final CommunityUserCommandService communityUserCommandService;
+	private final CommunityUserQueryService communityUserQueryService;
+	private final NotificationCommandService notificationCommandService;
 
 	public CommunityCommandService(CommunityRepository communityRepository,
 								   CurrentUserService currentUserService,
 								   SkillCommandService skillCommandService,
 								   CommunityUserRegistrationCommandService communityUserRegistrationCommandService,
-								   CommunityUserCommandService communityUserCommandService) {
-		this.communityRepository = communityRepository;
-		this.currentUserService = currentUserService;
-		this.skillCommandService = skillCommandService;
-		this.communityUserRegistrationCommandService = communityUserRegistrationCommandService;
-		this.communityUserCommandService = communityUserCommandService;
+								   CommunityUserCommandService communityUserCommandService,
+								   CommunityUserQueryService communityUserQueryService,
+								   NotificationCommandService notificationCommandService) {
+		this.communityRepository = requireNonNull(communityRepository);
+		this.currentUserService = requireNonNull(currentUserService);
+		this.skillCommandService = requireNonNull(skillCommandService);
+		this.communityUserRegistrationCommandService = requireNonNull(communityUserRegistrationCommandService);
+		this.communityUserCommandService = requireNonNull(communityUserCommandService);
+		this.communityUserQueryService = requireNonNull(communityUserQueryService);
+		this.notificationCommandService = requireNonNull(notificationCommandService);
 	}
 
 	@Transactional
@@ -91,7 +103,15 @@ public class CommunityCommandService {
 					.searchParamsMap(searchParamsMap)
 					.build();
 		});
+		Stream<CommunityUser> communityMembers = communityUserQueryService.getCommunityUsers(id, CommunityRole.MEMBER);
 		communityRepository.delete(community);
+		notificationCommandService.save(CommunityDeletedNotification.builder()
+				.id(UUID.randomUUID().toString())
+				.communityName(community.getTitle())
+				.creationDatetime(LocalDateTime.now())
+				.recipients(communityMembers.map(CommunityUser::getUser).collect(toList()))
+				.build()
+		);
 	}
 
 	private List<Skill> createNonExistentSkills(Community community) {

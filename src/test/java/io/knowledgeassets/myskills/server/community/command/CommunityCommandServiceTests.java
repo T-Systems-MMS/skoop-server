@@ -5,8 +5,10 @@ import io.knowledgeassets.myskills.server.community.CommunityRepository;
 import io.knowledgeassets.myskills.server.community.CommunityType;
 import io.knowledgeassets.myskills.server.community.Link;
 import io.knowledgeassets.myskills.server.communityuser.command.CommunityUserCommandService;
+import io.knowledgeassets.myskills.server.communityuser.query.CommunityUserQueryService;
 import io.knowledgeassets.myskills.server.exception.DuplicateResourceException;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
+import io.knowledgeassets.myskills.server.notification.command.NotificationCommandService;
 import io.knowledgeassets.myskills.server.security.CurrentUserService;
 import io.knowledgeassets.myskills.server.skill.Skill;
 import io.knowledgeassets.myskills.server.skill.command.SkillCommandService;
@@ -50,11 +52,23 @@ class CommunityCommandServiceTests {
 	@Mock
 	private CommunityUserRegistrationCommandService communityUserRegistrationCommandService;
 
+	@Mock
+	private CommunityUserQueryService communityUserQueryService;
+
+	@Mock
+	private NotificationCommandService notificationCommandService;
+
 	private CommunityCommandService communityCommandService;
 
 	@BeforeEach
 	void setUp() {
-		communityCommandService = new CommunityCommandService(communityRepository, currentUserService, skillCommandService, communityUserRegistrationCommandService, communityUserCommandService);
+		communityCommandService = new CommunityCommandService(communityRepository,
+				currentUserService,
+				skillCommandService,
+				communityUserRegistrationCommandService,
+				communityUserCommandService,
+				communityUserQueryService,
+				notificationCommandService);
 	}
 
 	@Test
