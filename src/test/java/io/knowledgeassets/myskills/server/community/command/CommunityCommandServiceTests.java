@@ -2,8 +2,10 @@ package io.knowledgeassets.myskills.server.community.command;
 
 import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.community.CommunityRepository;
+import io.knowledgeassets.myskills.server.community.CommunityRole;
 import io.knowledgeassets.myskills.server.community.CommunityType;
 import io.knowledgeassets.myskills.server.community.Link;
+import io.knowledgeassets.myskills.server.communityuser.CommunityUser;
 import io.knowledgeassets.myskills.server.communityuser.command.CommunityUserCommandService;
 import io.knowledgeassets.myskills.server.communityuser.query.CommunityUserQueryService;
 import io.knowledgeassets.myskills.server.exception.DuplicateResourceException;
@@ -21,8 +23,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItems;
@@ -31,6 +35,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isA;
 import static org.hamcrest.core.AllOf.allOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import static org.mockito.BDDMockito.given;
 
@@ -243,6 +248,43 @@ class CommunityCommandServiceTests {
 										.build()
 						)
 				));
+	}
+
+	@DisplayName("Delete community.")
+	@Test
+	void deleteCommunity() {
+		given(communityRepository.findById("123")).willReturn(Optional.of(
+				Community.builder()
+				.id("123")
+				.title("Java User Group")
+				.type(CommunityType.CLOSED)
+				.build()
+		));
+		given(communityUserQueryService.getCommunityUsers("123", CommunityRole.MEMBER))
+				.willReturn(
+						Stream.of(
+								CommunityUser.builder()
+										.role(CommunityRole.MEMBER)
+										.user(
+												User.builder()
+														.id("abc")
+														.userName("tester")
+														.build()
+										)
+										.community(
+												Community.builder()
+														.id("123")
+														.title("Java User Group")
+														.type(CommunityType.CLOSED)
+														.build()
+										)
+										.id(1L)
+										.creationDate(LocalDateTime.of(2019, 3, 10, 9, 0))
+										.lastModifiedDate(LocalDateTime.of(2019, 3, 10, 9, 0))
+										.build()
+						)
+				);
+		assertDoesNotThrow(() -> communityCommandService.delete("123"));
 	}
 
 	@Test
