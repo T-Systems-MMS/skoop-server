@@ -1,4 +1,4 @@
-package io.knowledgeassets.myskills.server.communityuser.notification.kickout;
+package io.knowledgeassets.myskills.server.communityuser;
 
 import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.notification.Notification;

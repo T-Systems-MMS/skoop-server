@@ -1,4 +1,4 @@
-package io.knowledgeassets.myskills.server.communityuser.registration.notification.invitation;
+package io.knowledgeassets.myskills.server.communityuser.registration;
 
 import io.knowledgeassets.myskills.server.notification.AbstractNotificationResponse;
 import org.springframework.core.convert.converter.Converter;
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 public class InvitationToJoinCommunityNotificationConverter implements Converter<InvitationToJoinCommunityNotification, AbstractNotificationResponse> {
 
 	@Override
-	public AbstractNotificationResponse convert(InvitationToJoinCommunityNotification notification) {
+	public InvitationToJoinCommunityNotificationResponse convert(InvitationToJoinCommunityNotification notification) {
 		return InvitationToJoinCommunityNotificationResponse.of(notification);
 	}
 }

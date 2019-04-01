@@ -1,6 +1,6 @@
-package io.knowledgeassets.myskills.server.communityuser.registration.notification.invitation;
+package io.knowledgeassets.myskills.server.communityuser.registration;
 
-import io.knowledgeassets.myskills.server.communityuser.registration.CommunityUserRegistrationResponse;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.knowledgeassets.myskills.server.notification.AbstractNotificationResponse;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 		description = "This holds notification data about user registration when the user was invited to join a community. " +
 				"It is used to transfer user registration notification data to a client."
 )
+@JsonTypeName("InvitationToJoinCommunityNotificationResponse")
 public class InvitationToJoinCommunityNotificationResponse extends AbstractNotificationResponse {
 
 	@ApiModelProperty("Registration the notification is associated with.")

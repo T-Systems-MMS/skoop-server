@@ -1,4 +1,4 @@
-package io.knowledgeassets.myskills.server.communityuser.registration.notification.invitation;
+package io.knowledgeassets.myskills.server.communityuser.registration;
 
 import io.knowledgeassets.myskills.server.communityuser.registration.CommunityUserRegistration;
 import io.knowledgeassets.myskills.server.notification.Notification;
@@ -13,13 +13,13 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class InvitationToJoinCommunityNotification extends Notification {
+public class AcceptanceToCommunityNotification extends Notification {
 
 	@Relationship(type = "CAUSED_BY")
 	private CommunityUserRegistration registration;
 
 	@Builder
-	public InvitationToJoinCommunityNotification(String id, LocalDateTime creationDatetime, CommunityUserRegistration registration) {
+	public AcceptanceToCommunityNotification(String id, LocalDateTime creationDatetime, CommunityUserRegistration registration) {
 		super(id, creationDatetime);
 		this.registration = registration;
 	}

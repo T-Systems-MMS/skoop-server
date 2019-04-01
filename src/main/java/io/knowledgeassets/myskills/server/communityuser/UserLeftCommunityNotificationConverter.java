@@ -1,4 +1,4 @@
-package io.knowledgeassets.myskills.server.communityuser.notification.leaving;
+package io.knowledgeassets.myskills.server.communityuser;
 
 import io.knowledgeassets.myskills.server.notification.AbstractNotificationResponse;
 import org.springframework.core.convert.converter.Converter;

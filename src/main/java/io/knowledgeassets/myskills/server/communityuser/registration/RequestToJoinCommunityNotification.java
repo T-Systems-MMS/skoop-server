@@ -1,4 +1,4 @@
-package io.knowledgeassets.myskills.server.communityuser.registration.notification.request;
+package io.knowledgeassets.myskills.server.communityuser.registration;
 
 import io.knowledgeassets.myskills.server.communityuser.registration.CommunityUserRegistration;
 import io.knowledgeassets.myskills.server.notification.Notification;

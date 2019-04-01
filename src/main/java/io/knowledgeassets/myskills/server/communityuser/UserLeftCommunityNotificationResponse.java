@@ -1,5 +1,6 @@
-package io.knowledgeassets.myskills.server.communityuser.notification.kickout;
+package io.knowledgeassets.myskills.server.communityuser;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.knowledgeassets.myskills.server.community.CommunityResponse;
 import io.knowledgeassets.myskills.server.notification.AbstractNotificationResponse;
 import io.knowledgeassets.myskills.server.user.UserSimpleResponse;
@@ -16,11 +17,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @ApiModel(
-		value = "UserKickedOutFromCommunityNotificationResponse",
-		description = "This holds notification data about user kicked out event. " +
-				"It is used to transfer user kicked out notification data to a client."
+		value = "UserLeftCommunityNotificationResponse",
+		description = "This holds notification data about user left community event. " +
+				"It is used to transfer user left community notification data to a client."
 )
-public class UserKickedOutFromCommunityNotificationResponse extends AbstractNotificationResponse {
+@JsonTypeName("UserLeftCommunityNotificationResponse")
+public class UserLeftCommunityNotificationResponse extends AbstractNotificationResponse {
 
 	@ApiModelProperty("The community user kicked from.")
 	private CommunityResponse community;
@@ -29,14 +31,14 @@ public class UserKickedOutFromCommunityNotificationResponse extends AbstractNoti
 	private UserSimpleResponse user;
 
 	@Builder
-	public UserKickedOutFromCommunityNotificationResponse(String id, LocalDateTime creationDatetime, CommunityResponse community, UserSimpleResponse user) {
+	public UserLeftCommunityNotificationResponse(String id, LocalDateTime creationDatetime, CommunityResponse community, UserSimpleResponse user) {
 		super(id, creationDatetime);
 		this.community = community;
 		this.user = user;
 	}
 
-	public static UserKickedOutFromCommunityNotificationResponse of(UserKickedOutFromCommunityNotification notification) {
-		return UserKickedOutFromCommunityNotificationResponse.builder()
+	public static UserLeftCommunityNotificationResponse of(UserLeftCommunityNotification notification) {
+		return UserLeftCommunityNotificationResponse.builder()
 				.id(notification.getId())
 				.creationDatetime(notification.getCreationDatetime())
 				.community(CommunityResponse.of(notification.getCommunity()))

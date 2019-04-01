@@ -3,11 +3,11 @@ package io.knowledgeassets.myskills.server.notification.query;
 
 import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.community.CommunityType;
-import io.knowledgeassets.myskills.server.communityuser.notification.kickout.UserKickedOutFromCommunityNotification;
-import io.knowledgeassets.myskills.server.communityuser.notification.leaving.UserLeftCommunityNotification;
+import io.knowledgeassets.myskills.server.communityuser.UserKickedOutFromCommunityNotification;
+import io.knowledgeassets.myskills.server.communityuser.UserLeftCommunityNotification;
 import io.knowledgeassets.myskills.server.communityuser.registration.CommunityUserRegistration;
-import io.knowledgeassets.myskills.server.communityuser.registration.notification.invitation.InvitationToJoinCommunityNotification;
-import io.knowledgeassets.myskills.server.communityuser.registration.notification.request.RequestToJoinCommunityNotification;
+import io.knowledgeassets.myskills.server.communityuser.registration.InvitationToJoinCommunityNotification;
+import io.knowledgeassets.myskills.server.communityuser.registration.RequestToJoinCommunityNotification;
 import io.knowledgeassets.myskills.server.notification.Notification;
 import io.knowledgeassets.myskills.server.notification.NotificationRepository;
 import io.knowledgeassets.myskills.server.user.User;
