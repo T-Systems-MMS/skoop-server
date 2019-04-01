@@ -1,8 +1,7 @@
-package io.knowledgeassets.myskills.server.communityuser.registration.notification;
+package io.knowledgeassets.myskills.server.communityuser.registration;
 
-import io.knowledgeassets.myskills.server.communityuser.registration.CommunityUserRegistrationResponse;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.knowledgeassets.myskills.server.notification.AbstractNotificationResponse;
-import io.knowledgeassets.myskills.server.notification.Notification;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -20,6 +19,7 @@ import java.time.LocalDateTime;
 		description = "This holds notification data about user registration when a user was let to join a community." +
 				" It is used to transfer user registration notification data to a client."
 )
+@JsonTypeName("AcceptanceToCommunityNotificationResponse")
 public class AcceptanceToCommunityNotificationResponse extends AbstractNotificationResponse {
 
 	@ApiModelProperty("Registration the notification is associated with.")
@@ -33,7 +33,7 @@ public class AcceptanceToCommunityNotificationResponse extends AbstractNotificat
 		this.registration = registration;
 	}
 
-	public static AcceptanceToCommunityNotificationResponse of(Notification notification) {
+	public static AcceptanceToCommunityNotificationResponse of(AcceptanceToCommunityNotification notification) {
 		return AcceptanceToCommunityNotificationResponse.builder()
 				.id(notification.getId())
 				.creationDatetime(notification.getCreationDatetime())

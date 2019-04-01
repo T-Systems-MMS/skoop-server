@@ -4,24 +4,32 @@ import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.community.CommunityRole;
 import io.knowledgeassets.myskills.server.communityuser.CommunityUser;
 import io.knowledgeassets.myskills.server.communityuser.CommunityUserRepository;
+import io.knowledgeassets.myskills.server.communityuser.UserKickedOutFromCommunityNotification;
+import io.knowledgeassets.myskills.server.communityuser.UserLeftCommunityNotification;
 import io.knowledgeassets.myskills.server.exception.DuplicateResourceException;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.exception.enums.Model;
+import io.knowledgeassets.myskills.server.notification.NotificationRepository;
 import io.knowledgeassets.myskills.server.user.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 
 @Service
 public class CommunityUserCommandService {
 
 	private final CommunityUserRepository communityUserRepository;
+	private final NotificationRepository notificationRepository;
 
-	public CommunityUserCommandService(CommunityUserRepository communityUserRepository) {
-		this.communityUserRepository = communityUserRepository;
+	public CommunityUserCommandService(CommunityUserRepository communityUserRepository,
+									   NotificationRepository notificationRepository) {
+		this.communityUserRepository = requireNonNull(communityUserRepository);
+		this.notificationRepository = requireNonNull(notificationRepository);
 	}
 
 	/**
@@ -109,19 +117,47 @@ public class CommunityUserCommandService {
 	}
 
 	/**
-	 * Authenticated user leaves the community.
-	 * @param communityId - id of the community to leave
-	 * @param userId - user id
+	 * Kicks out the user from the community.
+	 * @param communityId community ID
+	 * @param userId user ID
 	 */
 	@Transactional
-	public void remove(String communityId, String userId) {
+	public void kickoutUser(String communityId, String userId) {
+		final CommunityUser communityUser = remove(communityId, userId);
+		notificationRepository.save(UserKickedOutFromCommunityNotification.builder()
+				.id(UUID.randomUUID().toString())
+				.creationDatetime(LocalDateTime.now())
+				.community(communityUser.getCommunity())
+				.user(communityUser.getUser())
+				.build()
+		);
+	}
+
+	/**
+	 * The user leaves the community.
+	 * @param communityId community ID
+	 * @param userId user ID
+	 */
+	@Transactional
+	public void leaveCommunity(String communityId, String userId) {
+		final CommunityUser communityUser = remove(communityId, userId);
+		notificationRepository.save(UserLeftCommunityNotification.builder()
+				.id(UUID.randomUUID().toString())
+				.creationDatetime(LocalDateTime.now())
+				.community(communityUser.getCommunity())
+				.user(communityUser.getUser())
+				.build()
+		);
+	}
+
+	private CommunityUser remove(String communityId, String userId) {
 		if (communityId == null) {
 			throw new IllegalArgumentException("Community ID cannot be null");
 		}
 		if (userId == null) {
 			throw new IllegalArgumentException("User ID cannot be null.");
 		}
-		CommunityUser communityUser = communityUserRepository.findByUserIdAndCommunityId(userId, communityId).orElseThrow(() -> {
+		final CommunityUser communityUser = communityUserRepository.findByUserIdAndCommunityId(userId, communityId).orElseThrow(() -> {
 			String[] searchParamsMap = {"communityId", communityId, "userId", userId};
 			return NoSuchResourceException.builder()
 					.model(Model.USER)
@@ -129,6 +165,7 @@ public class CommunityUserCommandService {
 					.build();
 		});
 		communityUserRepository.delete(communityUser);
+		return communityUser;
 	}
 
 }

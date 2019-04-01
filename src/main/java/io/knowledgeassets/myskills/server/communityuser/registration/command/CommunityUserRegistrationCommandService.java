@@ -3,8 +3,9 @@ package io.knowledgeassets.myskills.server.communityuser.registration.command;
 import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.community.CommunityRole;
 import io.knowledgeassets.myskills.server.communityuser.command.CommunityUserCommandService;
-import io.knowledgeassets.myskills.server.notification.Notification;
-import io.knowledgeassets.myskills.server.notification.NotificationType;
+import io.knowledgeassets.myskills.server.communityuser.registration.AcceptanceToCommunityNotification;
+import io.knowledgeassets.myskills.server.communityuser.registration.InvitationToJoinCommunityNotification;
+import io.knowledgeassets.myskills.server.communityuser.registration.RequestToJoinCommunityNotification;
 import io.knowledgeassets.myskills.server.notification.command.NotificationCommandService;
 import io.knowledgeassets.myskills.server.security.CurrentUserService;
 import io.knowledgeassets.myskills.server.user.User;
@@ -63,9 +64,8 @@ public class CommunityUserRegistrationCommandService {
 		if (Boolean.TRUE.equals(communityUserRegistration.getApprovedByCommunity()) &&
 				Boolean.TRUE.equals(communityUserRegistration.getApprovedByUser()) &&
 				isAcceptanceToCommunity) {
-			notificationCommandService.save(Notification.builder()
+			notificationCommandService.save(AcceptanceToCommunityNotification.builder()
 					.id(UUID.randomUUID().toString())
-					.type(NotificationType.ACCEPTANCE_TO_COMMUNITY)
 					.creationDatetime(LocalDateTime.now())
 					.registration(communityUserRegistration)
 					.build()
@@ -97,11 +97,10 @@ public class CommunityUserRegistrationCommandService {
 		).collect(Collectors.toList());
 		List<CommunityUserRegistration> registrations = StreamSupport.stream(communityUserRegistrationRepository.saveAll(communityUserRegistrations).spliterator(), false)
 				.collect(Collectors.toList());
-		registrations.stream().map(registration -> Notification.builder()
+		registrations.stream().map(registration -> InvitationToJoinCommunityNotification.builder()
 				.id(UUID.randomUUID().toString())
 				.registration(registration)
 				.creationDatetime(LocalDateTime.now())
-				.type(NotificationType.INVITATION_TO_JOIN_COMMUNITY)
 				.build()
 		).forEach(notificationCommandService::save);
 		return registrations;
@@ -130,11 +129,10 @@ public class CommunityUserRegistrationCommandService {
 				.creationDatetime(LocalDateTime.now())
 				.build();
 		final CommunityUserRegistration registration = communityUserRegistrationRepository.save(communityUserRegistration);
-		notificationCommandService.save(Notification.builder()
+		notificationCommandService.save(RequestToJoinCommunityNotification.builder()
 				.id(UUID.randomUUID().toString())
 				.registration(registration)
 				.creationDatetime(LocalDateTime.now())
-				.type(NotificationType.REQUEST_TO_JOIN_COMMUNITY)
 				.build()
 		);
 		return registration;
