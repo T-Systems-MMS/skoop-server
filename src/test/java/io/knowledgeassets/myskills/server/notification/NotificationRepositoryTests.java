@@ -1,6 +1,7 @@
 package io.knowledgeassets.myskills.server.notification;
 
 import io.knowledgeassets.myskills.server.community.Community;
+import io.knowledgeassets.myskills.server.community.CommunityDeletedNotification;
 import io.knowledgeassets.myskills.server.community.CommunityRepository;
 import io.knowledgeassets.myskills.server.community.CommunityRole;
 import io.knowledgeassets.myskills.server.community.CommunityType;
@@ -24,6 +25,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static java.util.stream.Collectors.toList;
+import static java.util.Collections.singletonList;
 
 @DataNeo4jTest
 class NotificationRepositoryTests {
@@ -171,9 +173,17 @@ class NotificationRepositoryTests {
 				.build()
 		);
 
+		notificationRepository.save(CommunityDeletedNotification.builder()
+				.id("iop")
+				.creationDatetime(LocalDateTime.of(2019, 1, 3, 10, 0))
+				.communityName("Deleted community")
+				.recipients(singletonList(communityManager))
+				.build()
+		);
+
 		final List<Notification> notifications = notificationRepository.getUserNotifications("123").collect(toList());
 
-		assertThat(notifications).hasSize(3);
+		assertThat(notifications).hasSize(4);
 		Notification notification = notifications.get(0);
 		assertThat(notification.getId()).isEqualTo("def");
 		assertThat(notification.getCreationDatetime()).isEqualTo(LocalDateTime.of(2019, 3, 26, 11, 0));
@@ -214,6 +224,14 @@ class NotificationRepositoryTests {
 				.id("0123")
 				.userName("UserLeftCommunity")
 				.build());
+
+		notification = notifications.get(3);
+		assertThat(notification.getId()).isEqualTo("iop");
+		assertThat(notification.getCreationDatetime()).isEqualTo(LocalDateTime.of(2019, 1, 3, 10, 0));
+		assertThat(notification).isInstanceOf(CommunityDeletedNotification.class);
+		final CommunityDeletedNotification communityDeletedNotification = (CommunityDeletedNotification) notification;
+		assertThat(communityDeletedNotification.getCommunityName()).isEqualTo("Deleted community");
+		assertThat(communityDeletedNotification.getRecipients()).contains(communityManager);
 	}
 
 	@DisplayName("Get notifications sent to the user.")
@@ -263,9 +281,17 @@ class NotificationRepositoryTests {
 				.build()
 		);
 
+		notificationRepository.save(CommunityDeletedNotification.builder()
+				.id("iop")
+				.creationDatetime(LocalDateTime.of(2019, 1, 3, 10, 0))
+				.communityName("Deleted community")
+				.recipients(singletonList(commonUser))
+				.build()
+		);
+
 		final List<Notification> notifications = notificationRepository.getUserNotifications("123").collect(toList());
 
-		assertThat(notifications).hasSize(2);
+		assertThat(notifications).hasSize(3);
 
 		Notification notification = notifications.get(0);
 		assertThat(notification.getId()).isEqualTo("abc");
@@ -295,6 +321,14 @@ class NotificationRepositoryTests {
 				.title("JavaScript User Group")
 				.type(CommunityType.CLOSED)
 				.build());
+
+		notification = notifications.get(2);
+		assertThat(notification.getId()).isEqualTo("iop");
+		assertThat(notification.getCreationDatetime()).isEqualTo(LocalDateTime.of(2019, 1, 3, 10, 0));
+		assertThat(notification).isInstanceOf(CommunityDeletedNotification.class);
+		final CommunityDeletedNotification communityDeletedNotification = (CommunityDeletedNotification) notification;
+		assertThat(communityDeletedNotification.getCommunityName()).isEqualTo("Deleted community");
+		assertThat(communityDeletedNotification.getRecipients()).contains(commonUser);
 	}
 
 	@DisplayName("Get notifications sent to the communities the user is the manager of.")
