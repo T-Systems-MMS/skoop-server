@@ -3,7 +3,10 @@ package io.knowledgeassets.myskills.server.common;
 import io.knowledgeassets.myskills.server.security.MethodSecurityConfiguration;
 import io.knowledgeassets.myskills.server.security.SecurityService;
 import io.knowledgeassets.myskills.server.user.UserPermissionScope;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.neo4j.ogm.session.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -32,6 +35,9 @@ public abstract class AbstractControllerTests {
 	@MockBean
 	protected SecurityService securityService;
 
+	@Autowired
+	private SessionFactory sessionFactory;
+
 	@BeforeEach
 	void prepareSecurityService() {
 		willReturn(false).given(securityService).hasUserPermission(any(), any(), any());
@@ -39,6 +45,13 @@ public abstract class AbstractControllerTests {
 		willReturn(false).given(securityService).isCommunityManager(any(), any());
 		willReturn(false).given(securityService).isAuthenticatedUserId(any());
 		when(securityService.isAuthenticatedUserId(any(), any())).thenCallRealMethod();
+	}
+
+	@AfterEach
+	void shutdown() {
+		if (sessionFactory != null) {
+			sessionFactory.close();
+		}
 	}
 
 	protected UserConfigurationBuilder givenUser(String userId) {
