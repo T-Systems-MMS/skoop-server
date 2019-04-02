@@ -3,7 +3,6 @@ package io.knowledgeassets.myskills.server.communityuser;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.knowledgeassets.myskills.server.community.CommunityResponse;
 import io.knowledgeassets.myskills.server.notification.AbstractNotificationResponse;
-import io.knowledgeassets.myskills.server.user.UserSimpleResponse;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -27,14 +26,10 @@ public class UserKickedOutFromCommunityNotificationResponse extends AbstractNoti
 	@ApiModelProperty("The community user kicked from.")
 	private CommunityResponse community;
 
-	@ApiModelProperty("User kicked out from a community.")
-	private UserSimpleResponse user;
-
 	@Builder
-	public UserKickedOutFromCommunityNotificationResponse(String id, LocalDateTime creationDatetime, CommunityResponse community, UserSimpleResponse user) {
+	public UserKickedOutFromCommunityNotificationResponse(String id, LocalDateTime creationDatetime, CommunityResponse community) {
 		super(id, creationDatetime);
 		this.community = community;
-		this.user = user;
 	}
 
 	public static UserKickedOutFromCommunityNotificationResponse of(UserKickedOutFromCommunityNotification notification) {
@@ -42,7 +37,6 @@ public class UserKickedOutFromCommunityNotificationResponse extends AbstractNoti
 				.id(notification.getId())
 				.creationDatetime(notification.getCreationDatetime())
 				.community(CommunityResponse.of(notification.getCommunity()))
-				.user(UserSimpleResponse.of(notification.getUser()))
 				.build();
 	}
 

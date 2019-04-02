@@ -149,8 +149,6 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[2].id", is(equalTo("789"))))
 				.andExpect(jsonPath("$[2].type", is(equalTo("UserKickedOutFromCommunityNotificationResponse"))))
 				.andExpect(jsonPath("$[2].creationDatetime", is(equalTo("2019-03-25T10:00:00"))))
-				.andExpect(jsonPath("$[2].user.id", is(equalTo("56ef4778-a084-4509-9a3e-80b7895cf7b0"))))
-				.andExpect(jsonPath("$[2].user.userName", is(equalTo("tester"))))
 				.andExpect(jsonPath("$[2].community.id", is(equalTo("773e8cce-fc06-4a62-a23e-58b52c097600"))))
 				.andExpect(jsonPath("$[2].community.title", is(equalTo("Community the user was kicked out from"))))
 				.andExpect(jsonPath("$[2].community.type", is(equalTo("CLOSED"))))
