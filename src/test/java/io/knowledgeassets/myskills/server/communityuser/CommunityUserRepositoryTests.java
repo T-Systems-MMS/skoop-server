@@ -515,23 +515,9 @@ class CommunityUserRepositoryTests {
 						.lastModifiedDate(LocalDateTime.of(2019, 1, 15, 20, 0))
 						.build(),
 				CommunityUser.builder()
-						.community(javaUserGroup)
-						.user(other)
-						.role(CommunityRole.MEMBER)
-						.creationDate(LocalDateTime.of(2019, 1, 15, 20, 0))
-						.lastModifiedDate(LocalDateTime.of(2019, 1, 15, 20, 0))
-						.build(),
-				CommunityUser.builder()
 						.community(frontendDevelopers)
 						.user(other)
 						.role(CommunityRole.MANAGER)
-						.creationDate(LocalDateTime.of(2019, 1, 15, 20, 0))
-						.lastModifiedDate(LocalDateTime.of(2019, 1, 15, 20, 0))
-						.build(),
-				CommunityUser.builder()
-						.community(frontendDevelopers)
-						.user(other)
-						.role(CommunityRole.MEMBER)
 						.creationDate(LocalDateTime.of(2019, 1, 15, 20, 0))
 						.lastModifiedDate(LocalDateTime.of(2019, 1, 15, 20, 0))
 						.build(),
@@ -546,13 +532,6 @@ class CommunityUserRepositoryTests {
 						.community(dotnetDevelopers)
 						.user(other)
 						.role(CommunityRole.MANAGER)
-						.creationDate(LocalDateTime.of(2019, 1, 15, 20, 0))
-						.lastModifiedDate(LocalDateTime.of(2019, 1, 15, 20, 0))
-						.build(),
-				CommunityUser.builder()
-						.community(dotnetDevelopers)
-						.user(other)
-						.role(CommunityRole.MEMBER)
 						.creationDate(LocalDateTime.of(2019, 1, 15, 20, 0))
 						.lastModifiedDate(LocalDateTime.of(2019, 1, 15, 20, 0))
 						.build()
