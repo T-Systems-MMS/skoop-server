@@ -144,7 +144,10 @@ class CommunityUserRepositoryTests {
 		communityUserRepository.saveAll(Arrays.asList(
 				CommunityUser.builder()
 						.community(dotNetUserGroup)
-						.user(tester)
+						.user(User.builder()
+								.id("abc")
+								.userName("commonUser")
+								.build())
 						.role(CommunityRole.MEMBER)
 						.creationDate(LocalDateTime.of(2019, 1, 15, 20, 0))
 						.lastModifiedDate(LocalDateTime.of(2019, 1, 15, 20, 0))
@@ -204,21 +207,7 @@ class CommunityUserRepositoryTests {
 				CommunityUser.builder()
 						.community(javaUserGroup)
 						.user(tester)
-						.role(CommunityRole.MEMBER)
-						.creationDate(LocalDateTime.of(2019, 1, 15, 20, 0))
-						.lastModifiedDate(LocalDateTime.of(2019, 1, 15, 20, 0))
-						.build(),
-				CommunityUser.builder()
-						.community(javaUserGroup)
-						.user(tester)
 						.role(CommunityRole.MANAGER)
-						.creationDate(LocalDateTime.of(2019, 1, 15, 20, 0))
-						.lastModifiedDate(LocalDateTime.of(2019, 1, 15, 20, 0))
-						.build(),
-				CommunityUser.builder()
-						.community(javaUserGroup)
-						.user(anotherTester)
-						.role(CommunityRole.MEMBER)
 						.creationDate(LocalDateTime.of(2019, 1, 15, 20, 0))
 						.lastModifiedDate(LocalDateTime.of(2019, 1, 15, 20, 0))
 						.build(),
@@ -233,20 +222,13 @@ class CommunityUserRepositoryTests {
 						.community(dotNetUserGroup)
 						.user(anotherTester)
 						.role(CommunityRole.MANAGER)
-						.creationDate(LocalDateTime.of(2019, 1, 15, 20, 0))
-						.lastModifiedDate(LocalDateTime.of(2019, 1, 15, 20, 0))
-						.build(),
-				CommunityUser.builder()
-						.community(dotNetUserGroup)
-						.user(anotherTester)
-						.role(CommunityRole.MEMBER)
 						.creationDate(LocalDateTime.of(2019, 1, 15, 20, 0))
 						.lastModifiedDate(LocalDateTime.of(2019, 1, 15, 20, 0))
 						.build()
 		));
 		final Stream<CommunityUser> communityUserStream = communityUserRepository.findByCommunityId("123");
 		final List<CommunityUser> communityUserList = communityUserStream.collect(Collectors.toList());
-		assertThat(communityUserList).hasSize(4);
+		assertThat(communityUserList).hasSize(2);
 		assertThat(communityUserList).containsExactlyInAnyOrder(
 				IteratorUtils.toList(communityUsers.iterator()).stream().filter(cu -> "123".equals(cu.getCommunity().getId())).toArray(CommunityUser[]::new));
 	}
@@ -276,20 +258,16 @@ class CommunityUserRepositoryTests {
 				CommunityUser.builder()
 						.community(javaUserGroup)
 						.user(tester)
-						.role(CommunityRole.MEMBER)
-						.creationDate(LocalDateTime.of(2019, 1, 15, 20, 0))
-						.lastModifiedDate(LocalDateTime.of(2019, 1, 15, 20, 0))
-						.build(),
-				CommunityUser.builder()
-						.community(javaUserGroup)
-						.user(tester)
 						.role(CommunityRole.MANAGER)
 						.creationDate(LocalDateTime.of(2019, 1, 15, 20, 0))
 						.lastModifiedDate(LocalDateTime.of(2019, 1, 15, 20, 0))
 						.build(),
 				CommunityUser.builder()
 						.community(javaUserGroup)
-						.user(anotherTester)
+						.user(User.builder()
+								.id("abc")
+								.userName("commonUser")
+								.build())
 						.role(CommunityRole.MEMBER)
 						.creationDate(LocalDateTime.of(2019, 1, 15, 20, 0))
 						.lastModifiedDate(LocalDateTime.of(2019, 1, 15, 20, 0))
@@ -537,23 +515,9 @@ class CommunityUserRepositoryTests {
 						.lastModifiedDate(LocalDateTime.of(2019, 1, 15, 20, 0))
 						.build(),
 				CommunityUser.builder()
-						.community(javaUserGroup)
-						.user(other)
-						.role(CommunityRole.MEMBER)
-						.creationDate(LocalDateTime.of(2019, 1, 15, 20, 0))
-						.lastModifiedDate(LocalDateTime.of(2019, 1, 15, 20, 0))
-						.build(),
-				CommunityUser.builder()
 						.community(frontendDevelopers)
 						.user(other)
 						.role(CommunityRole.MANAGER)
-						.creationDate(LocalDateTime.of(2019, 1, 15, 20, 0))
-						.lastModifiedDate(LocalDateTime.of(2019, 1, 15, 20, 0))
-						.build(),
-				CommunityUser.builder()
-						.community(frontendDevelopers)
-						.user(other)
-						.role(CommunityRole.MEMBER)
 						.creationDate(LocalDateTime.of(2019, 1, 15, 20, 0))
 						.lastModifiedDate(LocalDateTime.of(2019, 1, 15, 20, 0))
 						.build(),
@@ -568,13 +532,6 @@ class CommunityUserRepositoryTests {
 						.community(dotnetDevelopers)
 						.user(other)
 						.role(CommunityRole.MANAGER)
-						.creationDate(LocalDateTime.of(2019, 1, 15, 20, 0))
-						.lastModifiedDate(LocalDateTime.of(2019, 1, 15, 20, 0))
-						.build(),
-				CommunityUser.builder()
-						.community(dotnetDevelopers)
-						.user(other)
-						.role(CommunityRole.MEMBER)
 						.creationDate(LocalDateTime.of(2019, 1, 15, 20, 0))
 						.lastModifiedDate(LocalDateTime.of(2019, 1, 15, 20, 0))
 						.build()

@@ -71,7 +71,6 @@ public class CommunityCommandService {
 		community.setSkills(createNonExistentSkills(community));
 		final Community c = communityRepository.save(community);
 		communityUserCommandService.create(c, currentUserService.getCurrentUser(), CommunityRole.MANAGER);
-		communityUserCommandService.create(c, currentUserService.getCurrentUser(), CommunityRole.MEMBER);
 		if (!CollectionUtils.isEmpty(invitedUsers)) {
 			communityUserRegistrationCommandService.createUserRegistrationsOnBehalfOfCommunity(invitedUsers, c);
 		}
@@ -103,7 +102,7 @@ public class CommunityCommandService {
 					.searchParamsMap(searchParamsMap)
 					.build();
 		});
-		Stream<CommunityUser> communityMembers = communityUserQueryService.getCommunityUsers(id, CommunityRole.MEMBER);
+		Stream<CommunityUser> communityMembers = communityUserQueryService.getCommunityUsers(id, null);
 		communityRepository.delete(community);
 		notificationCommandService.save(CommunityDeletedNotification.builder()
 				.id(UUID.randomUUID().toString())

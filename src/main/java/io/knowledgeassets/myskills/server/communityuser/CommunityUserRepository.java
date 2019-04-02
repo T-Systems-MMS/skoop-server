@@ -29,7 +29,7 @@ public interface CommunityUserRepository extends Neo4jRepository<CommunityUser, 
 	Iterable<User> getUsersNotRelatedToCommunity(@Param("communityId") String communityId, @Param("search") String search);
 
 	@Query("MATCH (community:Community {id: {communityId}})-[:RELATES_TO]-(skill:Skill)-[r:RELATED_TO]-(user:User) " +
-			" WHERE r.priority >= 2 AND NOT (community)-[:COMMUNITY_USER {role:'MEMBER'}]-(user) " +
+			" WHERE r.priority >= 2 AND NOT (community)-[:COMMUNITY_USER]-(user) " +
 			" RETURN user")
 	Iterable<User> getUsersRecommendedToBeInvitedToJoinCommunity(@Param("communityId") String communityId);
 
