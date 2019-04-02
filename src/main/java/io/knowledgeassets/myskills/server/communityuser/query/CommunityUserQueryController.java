@@ -63,8 +63,8 @@ public class CommunityUserQueryController {
 		}
 	}
 
-	@ApiOperation(value = "Gets users who are not member of the community.",
-			notes = "Gets users who are not member of the community. The endpoint can be used to choose users to invite to join community.")
+	@ApiOperation(value = "Gets users who are not members of the community.",
+			notes = "Gets users who are not members of the community. The endpoint can be used to choose users to invite to join community.")
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "Successful execution"),
 			@ApiResponse(code = 400, message = "Invalid input data, e.g. missing mandatory data or community name exists"),
@@ -78,6 +78,22 @@ public class CommunityUserQueryController {
 																				@RequestParam(name = "search", required = false) String search) {
 		return ResponseEntity.ok(communityUserQueryService
 				.getUsersNotRelatedToCommunity(communityId, search).map(UserSimpleResponse::of).collect(toList()));
+	}
+
+	@ApiOperation(value = "Gets users who are not members of the community and are recommended to be invited.",
+			notes = "Gets users who are not member of the community and are recommended to be invited.")
+	@ApiResponses({
+			@ApiResponse(code = 200, message = "Successful execution"),
+			@ApiResponse(code = 400, message = "Invalid input data, e.g. missing mandatory data or community name exists"),
+			@ApiResponse(code = 401, message = "Invalid authentication"),
+			@ApiResponse(code = 403, message = "Insufficient privileges to perform this operation"),
+			@ApiResponse(code = 500, message = "Error during execution")
+	})
+	@GetMapping(path = "/communities/{communityId}/recommended-users")
+	@PreAuthorize("isAuthenticated()")
+	public ResponseEntity<List<UserSimpleResponse>> getUsersRecommendedToBeInvitedToJoinCommunity(@PathVariable("communityId") String communityId) {
+		return ResponseEntity.ok(communityUserQueryService
+				.getUsersRecommendedToBeInvitedToJoinCommunity(communityId).map(UserSimpleResponse::of).collect(toList()));
 	}
 
 }

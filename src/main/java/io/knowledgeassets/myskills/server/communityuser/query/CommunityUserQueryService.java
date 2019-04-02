@@ -37,7 +37,15 @@ public class CommunityUserQueryService {
 		if (StringUtils.isEmpty(communityId)) {
 			throw new IllegalArgumentException("Community ID cannot be empty.");
 		}
-		return  StreamSupport.stream(communityUserRepository.getUsersNotRelatedToCommunity(communityId, search).spliterator(), false);
+		return StreamSupport.stream(communityUserRepository.getUsersNotRelatedToCommunity(communityId, search).spliterator(), false);
+	}
+
+	@Transactional(readOnly = true)
+	public Stream<User> getUsersRecommendedToBeInvitedToJoinCommunity(String communityId) {
+		if (StringUtils.isEmpty(communityId)) {
+			throw new IllegalArgumentException("Community ID cannot be empty.");
+		}
+		return StreamSupport.stream(communityUserRepository.getUsersRecommendedToBeInvitedToJoinCommunity(communityId).spliterator(), false);
 	}
 
 }
