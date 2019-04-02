@@ -4,8 +4,12 @@ import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.community.CommunityRepository;
 import io.knowledgeassets.myskills.server.community.CommunityRole;
 import io.knowledgeassets.myskills.server.community.CommunityType;
+import io.knowledgeassets.myskills.server.skill.Skill;
+import io.knowledgeassets.myskills.server.skill.SkillRepository;
 import io.knowledgeassets.myskills.server.user.User;
 import io.knowledgeassets.myskills.server.user.UserRepository;
+import io.knowledgeassets.myskills.server.userskill.UserSkill;
+import io.knowledgeassets.myskills.server.userskill.UserSkillRepository;
 import org.apache.commons.collections4.IteratorUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,9 +20,11 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataNeo4jTest
@@ -29,6 +35,12 @@ class CommunityUserRepositoryTests {
 
 	@Autowired
 	private CommunityRepository communityRepository;
+
+	@Autowired
+	private SkillRepository skillRepository;
+
+	@Autowired
+	private UserSkillRepository userSkillRepository;
 
 	@Autowired
 	private UserRepository userRepository;
@@ -407,6 +419,169 @@ class CommunityUserRepositoryTests {
 		final Iterable<User> users = communityUserRepository.getUsersNotRelatedToCommunity("123", "dOe");
 		assertThat(users).hasSize(3);
 		assertThat(users).containsExactlyInAnyOrder(firstUser, thirdUser, fourthUser);
+	}
+
+	@DisplayName("Gets users recommended to be invited to join a community.")
+	@Test
+	void getUsersRecommendedToBeInvitedToJoinCommunity() {
+
+		Skill angular = Skill.builder()
+				.id("323c89ae-8407-4ac1-8f79-89456e79a328")
+				.name("Angular")
+				.description("JavaScript Framework")
+				.build();
+		angular = skillRepository.save(angular);
+		Skill springBoot = Skill.builder()
+				.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
+				.name("Spring Boot")
+				.description("Java Application Framework")
+				.build();
+		springBoot = skillRepository.save(springBoot);
+		Skill springSecurity = Skill.builder()
+				.id("bd309237-80a2-44de-9552-1dfe760866d1")
+				.name("Spring Security")
+				.description("Java Security Framework")
+				.build();
+		springSecurity = skillRepository.save(springSecurity);
+
+		User tester = User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build();
+		tester = userRepository.save(tester);
+		User other = User.builder()
+				.id("f1228ec5-59ba-4ace-809b-1fbff60888d0")
+				.userName("other")
+				.build();
+		other = userRepository.save(other);
+		User commonUser = User.builder()
+				.id("d49357af-d88a-47aa-a381-15044065574b")
+				.userName("commonUser")
+				.build();
+
+		UserSkill testerAngular = UserSkill.builder()
+				.user(tester)
+				.skill(angular)
+				.currentLevel(1)
+				.desiredLevel(2)
+				.priority(3)
+				.build();
+		userSkillRepository.save(testerAngular);
+		UserSkill commonUserAngular = UserSkill.builder()
+				.user(commonUser)
+				.skill(angular)
+				.currentLevel(1)
+				.desiredLevel(2)
+				.priority(2)
+				.build();
+		userSkillRepository.save(commonUserAngular);
+		UserSkill testerSpringBoot = UserSkill.builder()
+				.user(tester)
+				.skill(springBoot)
+				.currentLevel(2)
+				.desiredLevel(3)
+				.priority(4)
+				.build();
+		userSkillRepository.save(testerSpringBoot);
+
+		userSkillRepository.save(UserSkill.builder()
+				.user(other)
+				.skill(springBoot)
+				.currentLevel(1)
+				.desiredLevel(2)
+				.priority(3)
+				.build());
+		userSkillRepository.save(UserSkill.builder()
+				.user(other)
+				.skill(springSecurity)
+				.currentLevel(2)
+				.desiredLevel(3)
+				.priority(4)
+				.build());
+
+		Community javaUserGroup = communityRepository.save(
+				Community.builder()
+						.id("123")
+						.title("Java User Group")
+						.description("Group for Java developers")
+						.skills(Arrays.asList(springBoot, angular))
+						.type(CommunityType.OPEN)
+						.build()
+		);
+
+		Community frontendDevelopers = communityRepository.save(
+				Community.builder()
+						.id(UUID.randomUUID().toString())
+						.title("Frontend developers")
+						.description("Group for frontend developers")
+						.skills(singletonList(angular))
+						.type(CommunityType.OPEN)
+						.build()
+		);
+
+		Community dotnetDevelopers = communityRepository.save(
+				Community.builder()
+						.id(UUID.randomUUID().toString())
+						.title(".NET developers")
+						.description("Group for .NET developers")
+						.type(CommunityType.OPEN)
+						.build()
+		);
+
+		communityUserRepository.saveAll(Arrays.asList(
+				CommunityUser.builder()
+						.community(javaUserGroup)
+						.user(other)
+						.role(CommunityRole.MANAGER)
+						.creationDate(LocalDateTime.of(2019, 1, 15, 20, 0))
+						.lastModifiedDate(LocalDateTime.of(2019, 1, 15, 20, 0))
+						.build(),
+				CommunityUser.builder()
+						.community(javaUserGroup)
+						.user(other)
+						.role(CommunityRole.MEMBER)
+						.creationDate(LocalDateTime.of(2019, 1, 15, 20, 0))
+						.lastModifiedDate(LocalDateTime.of(2019, 1, 15, 20, 0))
+						.build(),
+				CommunityUser.builder()
+						.community(frontendDevelopers)
+						.user(other)
+						.role(CommunityRole.MANAGER)
+						.creationDate(LocalDateTime.of(2019, 1, 15, 20, 0))
+						.lastModifiedDate(LocalDateTime.of(2019, 1, 15, 20, 0))
+						.build(),
+				CommunityUser.builder()
+						.community(frontendDevelopers)
+						.user(other)
+						.role(CommunityRole.MEMBER)
+						.creationDate(LocalDateTime.of(2019, 1, 15, 20, 0))
+						.lastModifiedDate(LocalDateTime.of(2019, 1, 15, 20, 0))
+						.build(),
+				CommunityUser.builder()
+						.community(frontendDevelopers)
+						.user(tester)
+						.role(CommunityRole.MEMBER)
+						.creationDate(LocalDateTime.of(2019, 1, 15, 20, 0))
+						.lastModifiedDate(LocalDateTime.of(2019, 1, 15, 20, 0))
+						.build(),
+				CommunityUser.builder()
+						.community(dotnetDevelopers)
+						.user(other)
+						.role(CommunityRole.MANAGER)
+						.creationDate(LocalDateTime.of(2019, 1, 15, 20, 0))
+						.lastModifiedDate(LocalDateTime.of(2019, 1, 15, 20, 0))
+						.build(),
+				CommunityUser.builder()
+						.community(dotnetDevelopers)
+						.user(other)
+						.role(CommunityRole.MEMBER)
+						.creationDate(LocalDateTime.of(2019, 1, 15, 20, 0))
+						.lastModifiedDate(LocalDateTime.of(2019, 1, 15, 20, 0))
+						.build()
+		));
+
+		final Iterable<User> users = communityUserRepository.getUsersRecommendedToBeInvitedToJoinCommunity("123");
+		assertThat(users).containsExactlyInAnyOrder(tester, commonUser);
 	}
 
 }

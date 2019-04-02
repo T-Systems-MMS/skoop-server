@@ -206,4 +206,45 @@ class CommunityUserQueryServiceTests {
 		assertThrows(IllegalArgumentException.class, () -> communityUserQueryService.getUsersNotRelatedToCommunity(null, null));
 	}
 
+	@DisplayName("Gets users recommended to be invited to join a community.")
+	@Test
+	void getUsersRecommendedToBeInvitedToJoinCommunity() {
+		given(communityUserRepository.getUsersRecommendedToBeInvitedToJoinCommunity("123")).willReturn(
+				Arrays.asList(
+						User.builder()
+								.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+								.userName("firstUser")
+								.firstName("John")
+								.lastName("Doe The First")
+								.build(),
+						User.builder()
+								.id("2edc1229-b4d0-4119-9113-4677beb20ae2")
+								.userName("secondUser")
+								.firstName("John")
+								.lastName("Doe The Second")
+								.build()
+				)
+		);
+		assertThat(communityUserQueryService.getUsersRecommendedToBeInvitedToJoinCommunity("123")).containsExactly(
+				User.builder()
+						.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+						.userName("firstUser")
+						.firstName("John")
+						.lastName("Doe The First")
+						.build(),
+				User.builder()
+						.id("2edc1229-b4d0-4119-9113-4677beb20ae2")
+						.userName("secondUser")
+						.firstName("John")
+						.lastName("Doe The Second")
+						.build()
+		);
+	}
+
+	@DisplayName("Exception is thrown if community ID is null when getting users recommended to be invited to join a community.")
+	@Test
+	void exceptionIsThrownIfCommunityIdIsNullWhenGettingUsersRecommendedToInviteToJoinCommunity() {
+		assertThrows(IllegalArgumentException.class, () -> communityUserQueryService.getUsersRecommendedToBeInvitedToJoinCommunity(null));
+	}
+
 }
