@@ -80,23 +80,15 @@
 
 		<query>MATCH (c:Community {title: 'MySkills developers'}), (u:User {userName: 'frwt'})
 			CREATE (u)-[:COMMUNITY_USER {role: 'MANAGER', creationDate: toString(localdatetime()), lastModifiedDate: toString(localdatetime())}]->(c)</query>
-		<query>MATCH (c:Community {title: 'MySkills developers'}), (u:User {userName: 'frwt'})
-			CREATE (u)-[:COMMUNITY_USER {role: 'MEMBER', creationDate: toString(localdatetime()), lastModifiedDate: toString(localdatetime())}]->(c)</query>
 
 		<query>MATCH (c:Community {title: 'Dmitry\'s community'}), (u:User {userName: 'dmle'})
 			CREATE (u)-[:COMMUNITY_USER {role: 'MANAGER', creationDate: toString(localdatetime()), lastModifiedDate: toString(localdatetime())}]->(c)</query>
-		<query>MATCH (c:Community {title: 'Dmitry\'s community'}), (u:User {userName: 'dmle'})
-			CREATE (u)-[:COMMUNITY_USER {role: 'MEMBER', creationDate: toString(localdatetime()), lastModifiedDate: toString(localdatetime())}]->(c)</query>
 
 		<query>MATCH (c:Community {title: 'Sveta\'s community'}), (u:User {userName: 'sviv'})
 			CREATE (u)-[:COMMUNITY_USER {role: 'MANAGER', creationDate: toString(localdatetime()), lastModifiedDate: toString(localdatetime())}]->(c)</query>
-		<query>MATCH (c:Community {title: 'Sveta\'s community'}), (u:User {userName: 'sviv'})
-			CREATE (u)-[:COMMUNITY_USER {role: 'MEMBER', creationDate: toString(localdatetime()), lastModifiedDate: toString(localdatetime())}]->(c)</query>
 
 		<query>MATCH (c:Community {title: 'Franziska\'s community'}), (u:User {userName: 'frwt'})
 			CREATE (u)-[:COMMUNITY_USER {role: 'MANAGER', creationDate: toString(localdatetime()), lastModifiedDate: toString(localdatetime())}]->(c)</query>
-		<query>MATCH (c:Community {title: 'Franziska\'s community'}), (u:User {userName: 'frwt'})
-			CREATE (u)-[:COMMUNITY_USER {role: 'MEMBER', creationDate: toString(localdatetime()), lastModifiedDate: toString(localdatetime())}]->(c)</query>
 
 		<query>MATCH (p:Project {name: 'MySkills'}), (u:User {userName: 'dmle'})
 			CREATE (u)-[:USER_PROJECT {role: 'Developer', tasks: 'Development and testing.', startDate: '2019-01-09', endDate: '2019-03-31',

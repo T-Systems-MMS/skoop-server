@@ -260,7 +260,7 @@ class CommunityCommandServiceTests {
 				.type(CommunityType.CLOSED)
 				.build()
 		));
-		given(communityUserQueryService.getCommunityUsers("123", CommunityRole.MEMBER))
+		given(communityUserQueryService.getCommunityUsers("123", null))
 				.willReturn(
 						Stream.of(
 								CommunityUser.builder()

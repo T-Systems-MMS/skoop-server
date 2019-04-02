@@ -18,7 +18,7 @@ public interface CommunityRepository extends Neo4jRepository<Community, String>,
 			"RETURN COUNT(user) > 0")
 	Boolean isCommunityManager(@Param("userId") String userId, @Param("communityId") String communityId);
 
-	@Query("MATCH (:Community {id:{communityId}})-[:COMMUNITY_USER {role:'MEMBER'}]-(user:User {id:{userId}}) " +
+	@Query("MATCH (:Community {id:{communityId}})-[:COMMUNITY_USER]-(user:User {id:{userId}}) " +
 			"RETURN COUNT(user) > 0")
 	Boolean isCommunityMember(@Param("userId") String userId, @Param("communityId") String communityId);
 
