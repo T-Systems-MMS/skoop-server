@@ -8,6 +8,7 @@ import io.knowledgeassets.myskills.server.communityuser.CommunityUserRepository;
 import io.knowledgeassets.myskills.server.exception.DuplicateResourceException;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.notification.NotificationRepository;
+import io.knowledgeassets.myskills.server.notification.command.NotificationCommandService;
 import io.knowledgeassets.myskills.server.user.User;
 import org.hamcrest.core.AllOf;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,11 +41,14 @@ class CommunityUserCommandServiceTests {
 	@Mock
 	private NotificationRepository notificationRepository;
 
+	@Mock
+	private NotificationCommandService notificationCommandService;
+
 	private CommunityUserCommandService communityUserCommandService;
 
 	@BeforeEach
 	void setUp() {
-		this.communityUserCommandService = new CommunityUserCommandService(communityUserRepository, notificationRepository);
+		this.communityUserCommandService = new CommunityUserCommandService(communityUserRepository, notificationRepository, notificationCommandService);
 	}
 
 	@Test

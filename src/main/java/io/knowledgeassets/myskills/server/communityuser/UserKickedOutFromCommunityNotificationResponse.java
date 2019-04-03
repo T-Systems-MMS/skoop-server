@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 		description = "This holds notification data about user kicked out event. " +
 				"It is used to transfer user kicked out notification data to a client."
 )
-@JsonTypeName("UserKickedOutFromCommunityNotificationResponse")
+@JsonTypeName("UserKickedOutFromCommunityNotification")
 public class UserKickedOutFromCommunityNotificationResponse extends AbstractNotificationResponse {
 
 	@ApiModelProperty("The community user kicked from.")

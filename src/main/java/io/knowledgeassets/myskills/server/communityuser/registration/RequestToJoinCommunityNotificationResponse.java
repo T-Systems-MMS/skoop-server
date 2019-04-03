@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 		description = "This holds notification data about user registration when the user sent request to join a community. " +
 				" It is used to transfer user registration notification data to a client."
 )
-@JsonTypeName("RequestToJoinCommunityNotificationResponse")
+@JsonTypeName("RequestToJoinCommunityNotification")
 public class RequestToJoinCommunityNotificationResponse extends AbstractNotificationResponse {
 
 	@ApiModelProperty("Registration the notification is associated with.")

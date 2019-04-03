@@ -4,12 +4,14 @@ import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.community.CommunityRole;
 import io.knowledgeassets.myskills.server.communityuser.CommunityUser;
 import io.knowledgeassets.myskills.server.communityuser.CommunityUserRepository;
+import io.knowledgeassets.myskills.server.communityuser.CommunityUserRoleChangedNotification;
 import io.knowledgeassets.myskills.server.communityuser.UserKickedOutFromCommunityNotification;
 import io.knowledgeassets.myskills.server.communityuser.UserLeftCommunityNotification;
 import io.knowledgeassets.myskills.server.exception.DuplicateResourceException;
 import io.knowledgeassets.myskills.server.exception.NoSuchResourceException;
 import io.knowledgeassets.myskills.server.exception.enums.Model;
 import io.knowledgeassets.myskills.server.notification.NotificationRepository;
+import io.knowledgeassets.myskills.server.notification.command.NotificationCommandService;
 import io.knowledgeassets.myskills.server.user.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,11 +27,14 @@ public class CommunityUserCommandService {
 
 	private final CommunityUserRepository communityUserRepository;
 	private final NotificationRepository notificationRepository;
+	private final NotificationCommandService notificationCommandService;
 
 	public CommunityUserCommandService(CommunityUserRepository communityUserRepository,
-									   NotificationRepository notificationRepository) {
+									   NotificationRepository notificationRepository,
+									   NotificationCommandService notificationCommandService) {
 		this.communityUserRepository = requireNonNull(communityUserRepository);
 		this.notificationRepository = requireNonNull(notificationRepository);
+		this.notificationCommandService = requireNonNull(notificationCommandService);
 	}
 
 	/**
@@ -112,7 +117,16 @@ public class CommunityUserCommandService {
 		} else {
 			communityUser.setRole(role);
 			communityUser.setLastModifiedDate(LocalDateTime.now());
-			return communityUserRepository.save(communityUser);
+			final CommunityUser result = communityUserRepository.save(communityUser);
+			notificationCommandService.save(CommunityUserRoleChangedNotification.builder()
+					.id(UUID.randomUUID().toString())
+					.communityName(communityUser.getCommunity().getTitle())
+					.creationDatetime(LocalDateTime.now())
+					.role(result.getRole())
+					.user(result.getUser())
+					.build()
+			);
+			return result;
 		}
 	}
 

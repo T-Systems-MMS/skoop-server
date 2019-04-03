@@ -1,5 +1,6 @@
 package io.knowledgeassets.myskills.server.community;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.knowledgeassets.myskills.server.notification.AbstractNotificationResponse;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 		description = "This holds notification data about community deletion. " +
 				"It is used to transfer community deleted notification data to a client."
 )
+@JsonTypeName("CommunityDeletedNotification")
 public class CommunityDeletedNotificationResponse extends AbstractNotificationResponse {
 
 	@ApiModelProperty("Name of deleted community.")
