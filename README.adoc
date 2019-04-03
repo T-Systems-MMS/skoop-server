@@ -50,14 +50,14 @@ The final executable JAR file is produced in the `target` subdirectory.
 
 After completing the Maven build you can run the SKOOP Server like a simple Java application:
 
-    java -jar target/myskills-server-0.0.1-SNAPSHOT.jar
+    java -jar target/skoop-server-0.0.1-SNAPSHOT.jar
 
 Configuration properties to customize the URIs of database and authorization server can be passed as command line arguments:
 
 ----
-java -jar target/myskills-server-0.0.1-SNAPSHOT.jar \
+java -jar target/skoop-server-0.0.1-SNAPSHOT.jar \
   --spring.data.neo4j.uri=bolt://192.168.99.100:7687 \
-  --security.oauth2.resourceserver.jwt.issuer-uri=http://192.168.99.100:9000/auth/realms/MySkills
+  --security.oauth2.resourceserver.jwt.issuer-uri=http://192.168.99.100:9000/auth/realms/SKOOP
 ----
 
 === Running as Docker container
@@ -67,7 +67,7 @@ We do not offer public Docker images at the moment but you can create your own a
 ----
 docker build \
   -t skoop/server:latest \
-  --build-arg JAR_FILE=target/myskills-server-0.0.1-SNAPSHOT.jar \
+  --build-arg JAR_FILE=target/skoop-server-0.0.1-SNAPSHOT.jar \
   .
 ----
 
@@ -163,9 +163,9 @@ Install the https://marketplace.visualstudio.com/items?itemName=GabrielBB.vscode
 
 === Running the application from the IDE
 
-You can run the application by using the Java class `io.knowledgeassets.myskills.server.MySkillsServerApplication` as main class in a usual Java launch configuration.
+You can run the application by using the Java class `SkoopServerApplication` as main class in a usual Java launch configuration.
 
-For IntelliJ IDEA right-click on this class and select `Run 'MySkillsServer....main()'` from the context menu.
+For IntelliJ IDEA right-click on this class and select `Run 'SkoopServer....main()'` from the context menu.
 
 For Visual Studio Code a launch configuration is already included in the repository.
 
@@ -213,11 +213,11 @@ docker stop keycloak
 
 Visit http://localhost:9000/auth/ to configure the KeyCloak server.
 
-There is an export of a suitable test realm in `tools/keycloak/myskills-realm.json` which can be imported into the KeyCloak server. Simply log in to the administration console, select "Add realm" and upload the JSON file.
+There is an export of a suitable test realm in `tools/keycloak/skoop-realm.json` which can be imported into the KeyCloak server. Simply log in to the administration console, select "Add realm" and upload the JSON file.
 
-The test realm comes with a preconfigured client for SKOOP but contains no test users. *You have to create users manually within the `MySkills` realm.*
+The test realm comes with a preconfigured client for SKOOP but contains no test users. *You have to create users manually within the `SKOOP` realm.*
 
-_Note: The `dev` profile of the SKOOP Server assumes that the KeyCloak server is available at `localhost:9000` and contains a realm named `MySkills`. The KeyCloak server must be accessible when starting the SKOOP Server._
+_Note: The `dev` profile of the SKOOP Server assumes that the KeyCloak server is available at `localhost:9000` and contains a realm named `SKOOP`. The KeyCloak server must be accessible when starting the SKOOP Server._
 
 === Testing the application
 
@@ -233,7 +233,7 @@ To generate JaCoCo test coverage report it is necessary to run `prepare-package`
 
 After the phase has been completed JaCoCo test coverage report can be found in `target/site/jacoco/index.html`.
 
-Travis CI uploads JaCoCo test coverage reports to https://codecov.io[codecov.io]. Uploaded reports can be found https://codecov.io/gh/KnowledgeAssets/myskills-server[here].
+Travis CI uploads JaCoCo test coverage reports to https://codecov.io[codecov.io]. Uploaded reports can be found https://codecov.io/gh/T-Systems-MMS/skoop-server[here].
 
 === Exploring the API
 
@@ -245,16 +245,16 @@ Fundamentally, the SKOOP Server is based on the conventions of the https://sprin
 
 ==== Source code structure
 
-The base package `io.knowledgeassets.myskills.server` contains several sub-packages with focus on specific parts of the domain model. For example, `io.knowledgeassets.myskills.server.skill` contains everything related to skills as a domain object, including entity classes, data repositories, service implementations and controllers for the corresponding REST API.
+The base package `com.tsmms.skoop` contains several sub-packages with focus on specific parts of the domain model. For example, `com.tsmms.skoop.skill` contains everything related to skills as a domain object, including entity classes, data repositories, service implementations and controllers for the corresponding REST API.
 
 _A basic design principle of SKOOP Server is the application of the CQRS pattern (Command Query Responsibility Segregation)._
 
 In short words, all read access to the domain model is strictly separated from the write access. This segregation is made explicit by the separate `command` and `query` packages inside each domain package. For example:
 
-* `io.knowledgeassets.myskills.server.skill.command`: Contains all the code dedicated to modifications of skills
+* `com.tsmms.skoop.skill.command`: Contains all the code dedicated to modifications of skills
 ** Service implementation with methods representing the commands which alter the state of the domain model
 ** Controller implementation which provides POST, PUT and DELETE operations to modify the domain model
-* `io.knowledgeassets.myskills.server.skill.query`: Contains all the code dedicated to reading skills
+* `com.tsmms.skoop.skill.query`: Contains all the code dedicated to reading skills
 ** Service implementation with methods to lookup domain objects and compile different views on the domain model
 ** Controller implementation which provides GET operations to request views on the domain model
 

@@ -1,7 +1,7 @@
 {
-	"azp": "myskills",
+	"azp": "skoop",
 	"resource_access": {
-		"myskills": {
+		"skoop": {
 			"roles": ["ADMIN", "USER"]
 		}
 	},
