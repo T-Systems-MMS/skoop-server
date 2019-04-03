@@ -43,9 +43,9 @@ public class CommunityUserCommandService {
 	public CommunityUser create(Community community, User user, CommunityRole role) {
 		checkArguments(community, user, role);
 		final LocalDateTime now = LocalDateTime.now();
-		communityUserRepository.findByUserIdAndCommunityIdAndRole(user.getId(), community.getId(), role).ifPresent(communityUser -> {
+		communityUserRepository.findByUserIdAndCommunityId(user.getId(), community.getId()).ifPresent(communityUser -> {
 			throw DuplicateResourceException.builder()
-					.message(format("The relationship between user '%s' and community '%s' with the role '%s' already exists", community.getTitle(), user.getUserName(), role.toString()))
+					.message(format("The relationship between user '%s' and community '%s' already exists", community.getTitle(), user.getUserName()))
 					.build();
 		});
 		return communityUserRepository.save(CommunityUser.builder()

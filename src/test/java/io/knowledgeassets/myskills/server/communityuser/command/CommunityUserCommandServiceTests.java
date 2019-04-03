@@ -220,7 +220,7 @@ class CommunityUserCommandServiceTests {
 	@DisplayName("Exception is thrown if community user relationship already exists when creating community user relationship.")
 	@Test
 	void exceptionIsThrownIfCommunityUserRelationshipAlreadyExistsWhenCreatingCommunityUserRelationship() {
-		given(communityUserRepository.findByUserIdAndCommunityIdAndRole("1f37fb2a-b4d0-4119-9113-4677beb20ae2", "123", CommunityRole.MEMBER))
+		given(communityUserRepository.findByUserIdAndCommunityId("1f37fb2a-b4d0-4119-9113-4677beb20ae2", "123"))
 				.willReturn(Optional.of(
 						CommunityUser.builder()
 								.community(Community.builder()
