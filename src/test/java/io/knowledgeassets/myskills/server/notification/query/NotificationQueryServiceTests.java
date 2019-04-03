@@ -3,7 +3,9 @@ package io.knowledgeassets.myskills.server.notification.query;
 
 import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.community.CommunityDeletedNotification;
+import io.knowledgeassets.myskills.server.community.CommunityRole;
 import io.knowledgeassets.myskills.server.community.CommunityType;
+import io.knowledgeassets.myskills.server.communityuser.CommunityUserRoleChangedNotification;
 import io.knowledgeassets.myskills.server.communityuser.UserKickedOutFromCommunityNotification;
 import io.knowledgeassets.myskills.server.communityuser.UserLeftCommunityNotification;
 import io.knowledgeassets.myskills.server.communityuser.registration.CommunityUserRegistration;
@@ -114,6 +116,16 @@ class NotificationQueryServiceTests {
 								.id("abc")
 								.userName("tester")
 								.build()))
+						.build(),
+				CommunityUserRoleChangedNotification.builder()
+						.id("yyy")
+						.role(CommunityRole.MANAGER)
+						.communityName("Community the role has been changed in")
+						.creationDatetime(LocalDateTime.of(2018, 4, 3, 12, 0))
+						.user(User.builder()
+								.id("abc")
+								.userName("tester")
+								.build())
 						.build()
 		));
 
@@ -191,6 +203,16 @@ class NotificationQueryServiceTests {
 								.id("abc")
 								.userName("tester")
 								.build()))
+						.build(),
+				CommunityUserRoleChangedNotification.builder()
+						.id("yyy")
+						.role(CommunityRole.MANAGER)
+						.communityName("Community the role has been changed in")
+						.creationDatetime(LocalDateTime.of(2018, 4, 3, 12, 0))
+						.user(User.builder()
+								.id("abc")
+								.userName("tester")
+								.build())
 						.build()
 		);
 	}

@@ -7,6 +7,7 @@ import io.knowledgeassets.myskills.server.community.CommunityRole;
 import io.knowledgeassets.myskills.server.community.CommunityType;
 import io.knowledgeassets.myskills.server.communityuser.CommunityUser;
 import io.knowledgeassets.myskills.server.communityuser.CommunityUserRepository;
+import io.knowledgeassets.myskills.server.communityuser.CommunityUserRoleChangedNotification;
 import io.knowledgeassets.myskills.server.communityuser.UserKickedOutFromCommunityNotification;
 import io.knowledgeassets.myskills.server.communityuser.UserLeftCommunityNotification;
 import io.knowledgeassets.myskills.server.communityuser.registration.CommunityUserRegistration;
@@ -162,6 +163,15 @@ class NotificationRepositoryTests {
 				.build()
 		);
 
+		notificationRepository.save(CommunityUserRoleChangedNotification.builder()
+				.id("yyy")
+				.role(CommunityRole.MANAGER)
+				.communityName("Community the role has been changed in.")
+				.creationDatetime(LocalDateTime.of(2018, 4, 3, 12, 0))
+				.user(communityManager)
+				.build()
+		);
+
 		notificationRepository.save(UserLeftCommunityNotification.builder()
 				.id("zyx")
 				.creationDatetime(LocalDateTime.of(2019, 3, 21, 15, 30))
@@ -183,7 +193,7 @@ class NotificationRepositoryTests {
 
 		final List<Notification> notifications = notificationRepository.getUserNotifications("123").collect(toList());
 
-		assertThat(notifications).hasSize(4);
+		assertThat(notifications).hasSize(5);
 		Notification notification = notifications.get(0);
 		assertThat(notification.getId()).isEqualTo("def");
 		assertThat(notification.getCreationDatetime()).isEqualTo(LocalDateTime.of(2019, 3, 26, 11, 0));
@@ -232,6 +242,15 @@ class NotificationRepositoryTests {
 		final CommunityDeletedNotification communityDeletedNotification = (CommunityDeletedNotification) notification;
 		assertThat(communityDeletedNotification.getCommunityName()).isEqualTo("Deleted community");
 		assertThat(communityDeletedNotification.getRecipients()).contains(communityManager);
+
+		notification = notifications.get(4);
+		assertThat(notification.getId()).isEqualTo("yyy");
+		assertThat(notification.getCreationDatetime()).isEqualTo(LocalDateTime.of(2018, 4, 3, 12, 0));
+		assertThat(notification).isInstanceOf(CommunityUserRoleChangedNotification.class);
+		final CommunityUserRoleChangedNotification communityUserRoleChangedNotification = (CommunityUserRoleChangedNotification) notification;
+		assertThat(communityUserRoleChangedNotification.getRole()).isEqualTo(CommunityRole.MANAGER);
+		assertThat(communityUserRoleChangedNotification.getCommunityName()).isEqualTo("Community the role has been changed in.");
+		assertThat(communityUserRoleChangedNotification.getUser()).isEqualTo(communityManager);
 	}
 
 	@DisplayName("Get notifications sent to the user.")
@@ -289,9 +308,18 @@ class NotificationRepositoryTests {
 				.build()
 		);
 
+		notificationRepository.save(CommunityUserRoleChangedNotification.builder()
+				.id("yyy")
+				.role(CommunityRole.MANAGER)
+				.communityName("Community the role has been changed in")
+				.creationDatetime(LocalDateTime.of(2018, 4, 3, 12, 0))
+				.user(commonUser)
+				.build()
+		);
+
 		final List<Notification> notifications = notificationRepository.getUserNotifications("123").collect(toList());
 
-		assertThat(notifications).hasSize(3);
+		assertThat(notifications).hasSize(4);
 
 		Notification notification = notifications.get(0);
 		assertThat(notification.getId()).isEqualTo("abc");
@@ -329,6 +357,15 @@ class NotificationRepositoryTests {
 		final CommunityDeletedNotification communityDeletedNotification = (CommunityDeletedNotification) notification;
 		assertThat(communityDeletedNotification.getCommunityName()).isEqualTo("Deleted community");
 		assertThat(communityDeletedNotification.getRecipients()).contains(commonUser);
+
+		notification = notifications.get(3);
+		assertThat(notification.getId()).isEqualTo("yyy");
+		assertThat(notification.getCreationDatetime()).isEqualTo(LocalDateTime.of(2018, 4, 3, 12, 0));
+		assertThat(notification).isInstanceOf(CommunityUserRoleChangedNotification.class);
+		final CommunityUserRoleChangedNotification communityUserRoleChangedNotification = (CommunityUserRoleChangedNotification) notification;
+		assertThat(communityUserRoleChangedNotification.getRole()).isEqualTo(CommunityRole.MANAGER);
+		assertThat(communityUserRoleChangedNotification.getCommunityName()).isEqualTo("Community the role has been changed in");
+		assertThat(communityUserRoleChangedNotification.getUser()).isEqualTo(commonUser);
 	}
 
 	@DisplayName("Get notifications sent to the communities the user is the manager of.")

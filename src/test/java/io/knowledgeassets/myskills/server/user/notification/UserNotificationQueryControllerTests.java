@@ -3,7 +3,9 @@ package io.knowledgeassets.myskills.server.user.notification;
 import io.knowledgeassets.myskills.server.common.AbstractControllerTests;
 import io.knowledgeassets.myskills.server.community.Community;
 import io.knowledgeassets.myskills.server.community.CommunityDeletedNotification;
+import io.knowledgeassets.myskills.server.community.CommunityRole;
 import io.knowledgeassets.myskills.server.community.CommunityType;
+import io.knowledgeassets.myskills.server.communityuser.CommunityUserRoleChangedNotification;
 import io.knowledgeassets.myskills.server.communityuser.UserKickedOutFromCommunityNotification;
 import io.knowledgeassets.myskills.server.communityuser.UserLeftCommunityNotification;
 import io.knowledgeassets.myskills.server.communityuser.registration.CommunityUserRegistration;
@@ -117,6 +119,13 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 						.creationDatetime(LocalDateTime.of(2019, 1, 3, 10, 0))
 						.communityName("Deleted community")
 						.recipients(singletonList(tester))
+						.build(),
+				CommunityUserRoleChangedNotification.builder()
+						.id("yyy")
+						.role(CommunityRole.MANAGER)
+						.communityName("Community the role has been changed in")
+						.creationDatetime(LocalDateTime.of(2018, 4, 3, 12, 0))
+						.user(tester)
 						.build()
 		));
 
@@ -125,9 +134,9 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 				.with(authentication(withUser(tester))))
 				.andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-				.andExpect(jsonPath("$.length()", is(equalTo(5))))
+				.andExpect(jsonPath("$.length()", is(equalTo(6))))
 				.andExpect(jsonPath("$[0].id", is(equalTo("123"))))
-				.andExpect(jsonPath("$[0].type", is(equalTo("InvitationToJoinCommunityNotificationResponse"))))
+				.andExpect(jsonPath("$[0].type", is(equalTo("InvitationToJoinCommunityNotification"))))
 				.andExpect(jsonPath("$[0].creationDatetime", is(equalTo("2019-03-27T09:34:00"))))
 				.andExpect(jsonPath("$[0].registration.approvedByUser", nullValue()))
 				.andExpect(jsonPath("$[0].registration.approvedByCommunity", is(equalTo(true))))
@@ -137,7 +146,7 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[0].registration.community.type", is(equalTo("CLOSED"))))
 				.andExpect(jsonPath("$[0].registration.community.title", is(equalTo("Community"))))
 				.andExpect(jsonPath("$[1].id", is(equalTo("456"))))
-				.andExpect(jsonPath("$[1].type", is(equalTo("RequestToJoinCommunityNotificationResponse"))))
+				.andExpect(jsonPath("$[1].type", is(equalTo("RequestToJoinCommunityNotification"))))
 				.andExpect(jsonPath("$[1].creationDatetime", is(equalTo("2019-03-27T10:34:00"))))
 				.andExpect(jsonPath("$[1].registration.approvedByUser", is(equalTo(true))))
 				.andExpect(jsonPath("$[1].registration.approvedByCommunity", nullValue()))
@@ -147,13 +156,13 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[1].registration.community.type", is(equalTo("CLOSED"))))
 				.andExpect(jsonPath("$[1].registration.community.title", is(equalTo("AnotherCommunity"))))
 				.andExpect(jsonPath("$[2].id", is(equalTo("789"))))
-				.andExpect(jsonPath("$[2].type", is(equalTo("UserKickedOutFromCommunityNotificationResponse"))))
+				.andExpect(jsonPath("$[2].type", is(equalTo("UserKickedOutFromCommunityNotification"))))
 				.andExpect(jsonPath("$[2].creationDatetime", is(equalTo("2019-03-25T10:00:00"))))
 				.andExpect(jsonPath("$[2].community.id", is(equalTo("773e8cce-fc06-4a62-a23e-58b52c097600"))))
 				.andExpect(jsonPath("$[2].community.title", is(equalTo("Community the user was kicked out from"))))
 				.andExpect(jsonPath("$[2].community.type", is(equalTo("CLOSED"))))
 				.andExpect(jsonPath("$[3].id", is(equalTo("901"))))
-				.andExpect(jsonPath("$[3].type", is(equalTo("UserLeftCommunityNotificationResponse"))))
+				.andExpect(jsonPath("$[3].type", is(equalTo("UserLeftCommunityNotification"))))
 				.andExpect(jsonPath("$[3].creationDatetime", is(equalTo("2019-03-21T15:30:00"))))
 				.andExpect(jsonPath("$[3].user.id", is(equalTo("fddd5bdd-8931-4eb6-a875-b52e10e07d35"))))
 				.andExpect(jsonPath("$[3].user.userName", is(equalTo("UserLeftCommunity"))))
@@ -161,9 +170,14 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[3].community.title", is(equalTo("AnotherCommunity"))))
 				.andExpect(jsonPath("$[3].community.type", is(equalTo("CLOSED"))))
 				.andExpect(jsonPath("$[4].id", is(equalTo("902"))))
-				.andExpect(jsonPath("$[4].type", is(equalTo("CommunityDeletedNotificationResponse"))))
+				.andExpect(jsonPath("$[4].type", is(equalTo("CommunityDeletedNotification"))))
 				.andExpect(jsonPath("$[4].creationDatetime", is(equalTo("2019-01-03T10:00:00"))))
-				.andExpect(jsonPath("$[4].communityName", is(equalTo("Deleted community"))));
+				.andExpect(jsonPath("$[4].communityName", is(equalTo("Deleted community"))))
+				.andExpect(jsonPath("$[5].id", is(equalTo("yyy"))))
+				.andExpect(jsonPath("$[5].type", is(equalTo("CommunityUserRoleChangedNotification"))))
+				.andExpect(jsonPath("$[5].creationDatetime", is(equalTo("2018-04-03T12:00:00"))))
+				.andExpect(jsonPath("$[5].communityName", is(equalTo("Community the role has been changed in"))))
+				.andExpect(jsonPath("$[5].role", is(equalTo("MANAGER"))));
 	}
 
 	@DisplayName("Not authenticated user cannot get notifications.")

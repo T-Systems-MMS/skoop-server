@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 		description = "This holds notification data about user left community event. " +
 				"It is used to transfer user left community notification data to a client."
 )
-@JsonTypeName("UserLeftCommunityNotificationResponse")
+@JsonTypeName("UserLeftCommunityNotification")
 public class UserLeftCommunityNotificationResponse extends AbstractNotificationResponse {
 
 	@ApiModelProperty("The community user kicked from.")
