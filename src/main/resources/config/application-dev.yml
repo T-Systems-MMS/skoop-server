@@ -9,11 +9,11 @@ spring:
 logging:
   level:
     root: INFO
-    io.knowledgeassets.myskills.server: DEBUG
+    com.tsmms.skoop: DEBUG
 
 security:
   oauth2:
     resourceserver:
       jwt:
         # Set issuer URI to local server.
-        issuer-uri: 'http://localhost:9000/auth/realms/MySkills'
+        issuer-uri: 'http://localhost:9000/auth/realms/SKOOP'
