@@ -1,4 +1,4 @@
-package com.tsmms.skoop.community;
+package com.tsmms.skoop.community.link;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
