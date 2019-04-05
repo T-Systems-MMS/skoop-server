@@ -1,5 +1,6 @@
 package com.tsmms.skoop.community;
 
+import com.tsmms.skoop.community.link.Link;
 import com.tsmms.skoop.skill.Skill;
 import com.tsmms.skoop.skill.SkillRepository;
 import com.tsmms.skoop.user.User;

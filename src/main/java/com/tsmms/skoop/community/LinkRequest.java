@@ -17,6 +17,8 @@ import lombok.NoArgsConstructor;
 )
 public class LinkRequest {
 
+	@ApiModelProperty("Link ID.")
+	private Long id;
 	@ApiModelProperty("Name of a link.")
 	private String name;
 	@ApiModelProperty("Hyper reference of a link.")

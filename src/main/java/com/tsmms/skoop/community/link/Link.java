@@ -1,4 +1,4 @@
-package com.tsmms.skoop.community;
+package com.tsmms.skoop.community.link;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

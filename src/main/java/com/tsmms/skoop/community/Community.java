@@ -1,5 +1,6 @@
 package com.tsmms.skoop.community;
 
+import com.tsmms.skoop.community.link.Link;
 import com.tsmms.skoop.communityuser.CommunityUser;
 import com.tsmms.skoop.skill.Skill;
 import lombok.AllArgsConstructor;
@@ -37,7 +38,7 @@ public class Community {
 	private CommunityType type;
 	@Property(name = "description")
 	private String description;
-	@Relationship(type = "HAS_LINK", direction = Relationship.UNDIRECTED)
+	@Relationship(type = "HAS_LINK")
 	private List<Link> links;
 	@NotNull
 	@Property(name = "creationDate")
