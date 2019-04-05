@@ -52,7 +52,7 @@ class CommunityUserRegistrationCommandServiceTests {
 	@BeforeEach
 	void setUp() {
 		this.communityUserRegistrationCommandService = new CommunityUserRegistrationCommandService(communityUserRegistrationRepository,
-				currentUserService, communityUserCommandService, notificationCommandService);
+				communityUserCommandService, notificationCommandService);
 	}
 
 	@DisplayName("Test if users are invited.")
@@ -213,7 +213,7 @@ class CommunityUserRegistrationCommandServiceTests {
 				.userName("tester")
 				.build();
 
-		given(currentUserService.getCurrentUser()).willReturn(tester);
+		// given(currentUserService.getCurrentUser()).willReturn(tester);
 
 		Community community = Community.builder()
 				.id("123")

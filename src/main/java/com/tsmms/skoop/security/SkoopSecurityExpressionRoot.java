@@ -1,6 +1,7 @@
 package com.tsmms.skoop.security;
 
 import com.tsmms.skoop.user.UserPermissionScope;
+import com.tsmms.skoop.user.query.UserPermissionQueryService;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
 import org.springframework.security.core.Authentication;
@@ -10,11 +11,12 @@ public class SkoopSecurityExpressionRoot extends SecurityExpressionRoot implemen
 	private Object filterObject;
 	private Object returnObject;
 	private Object target;
-	private final SecurityService securityService;
+	private final UserPermissionQueryService userPermissionQueryService;
 
-	public SkoopSecurityExpressionRoot(Authentication authentication, SecurityService securityService) {
+	public SkoopSecurityExpressionRoot(Authentication authentication,
+									   UserPermissionQueryService userPermissionQueryService) {
 		super(authentication);
-		this.securityService = securityService;
+		this.userPermissionQueryService = userPermissionQueryService;
 	}
 
 	/**
@@ -29,7 +31,7 @@ public class SkoopSecurityExpressionRoot extends SecurityExpressionRoot implemen
 		Object principal = getPrincipal();
 		if (principal instanceof Jwt) {
 			String userIdClaim = ((Jwt) principal).getClaimAsString(JwtClaims.SKOOP_USER_ID);
-			return securityService.isAuthenticatedUserId(userIdClaim, userId);
+			return userId == null && userIdClaim == null || userId != null && userId.equals(userIdClaim);
 		}
 		return false;
 	}
@@ -49,7 +51,7 @@ public class SkoopSecurityExpressionRoot extends SecurityExpressionRoot implemen
 		Object principal = getPrincipal();
 		if (principal instanceof Jwt) {
 			String userIdClaim = ((Jwt) principal).getClaimAsString(JwtClaims.SKOOP_USER_ID);
-			return securityService.hasUserPermission(ownerId, userIdClaim, UserPermissionScope.valueOf(scope));
+			return userPermissionQueryService.hasUserPermission(ownerId, userIdClaim, UserPermissionScope.valueOf(scope));
 		}
 		return false;
 	}

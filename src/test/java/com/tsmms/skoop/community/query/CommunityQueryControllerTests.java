@@ -70,7 +70,7 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 				.name("JavaScript")
 				.build();
 
-		given(currentUserService.getCurrentUser()).willReturn(owner);
+		// given(currentUserService.getCurrentUser()).willReturn(owner);
 
 		given(communityQueryService.getCommunities()).willReturn(
 				Stream.of(
@@ -177,7 +177,7 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 				.name("Angular")
 				.build();
 
-		given(currentUserService.getCurrentUser()).willReturn(owner);
+		// given(currentUserService.getCurrentUser()).willReturn(owner);
 
 		given(communityQueryService.getCommunityById("456")).willReturn(
 				Optional.of(

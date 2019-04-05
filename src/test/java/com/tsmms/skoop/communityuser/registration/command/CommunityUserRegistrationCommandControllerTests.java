@@ -86,7 +86,7 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 						.build()
 		));
 
-		given(securityService.isCommunityManager("123")).willReturn(true);
+		given(communityQueryService.hasCommunityManagerRole(tester.getId(), "123")).willReturn(true);
 
 		given(communityUserRegistrationCommandService.createUserRegistrationsOnBehalfOfCommunity(Arrays.asList(
 				User.builder()
@@ -146,8 +146,6 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 				.userName("tester")
 				.build();
 
-		given(securityService.isAuthenticatedUserId("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(true);
-
 		given(userQueryService.getUsersByIds(Collections.singletonList("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))).willReturn(Stream.of(User.builder()
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
@@ -204,8 +202,6 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
 				.build();
-
-		given(securityService.isAuthenticatedUserId("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(true);
 
 		given(userQueryService.getUsersByIds(Collections.singletonList("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))).willReturn(Stream.of(User.builder()
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
@@ -273,9 +269,8 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 				.userName("tester")
 				.build();
 
-		given(securityService.isAuthenticatedUserId("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(true);
-		given(securityService.isCommunityMember("123")).willReturn(true);
-		given(securityService.isCommunityManager("123")).willReturn(false);
+		given(communityQueryService.isCommunityMember(tester.getId(), "123")).willReturn(true);
+		given(communityQueryService.hasCommunityManagerRole(tester.getId(), "123")).willReturn(false);
 
 		given(communityQueryService.getCommunityById("123")).willReturn(Optional.of(
 				Community.builder()
@@ -352,9 +347,8 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 				.userName("firstUser")
 				.build();
 
-		given(securityService.isAuthenticatedUserId("abc")).willReturn(true);
-		given(securityService.isCommunityMember("123")).willReturn(true);
-		given(securityService.isCommunityManager("123")).willReturn(false);
+		given(communityQueryService.isCommunityMember(tester.getId(), "123")).willReturn(true);
+		given(communityQueryService.hasCommunityManagerRole(tester.getId(), "123")).willReturn(false);
 
 		given(communityQueryService.getCommunityById("123")).willReturn(Optional.of(
 				Community.builder()
@@ -406,7 +400,7 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 
 		given(communityQueryService.getCommunityById("123")).willReturn(Optional.empty());
 
-		given(securityService.isCommunityManager("123")).willReturn(true);
+		given(communityQueryService.hasCommunityManagerRole(tester.getId(), "123")).willReturn(true);
 
 		final ClassPathResource body = new ClassPathResource("communityuser/registration/command/create-user-registrations.json");
 
@@ -441,8 +435,7 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 						.build()
 		));
 
-		given(securityService.isCommunityManager("123")).willReturn(false);
-		given(securityService.isAuthenticatedUserId("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(false);
+		given(communityQueryService.hasCommunityManagerRole(tester.getId(), "123")).willReturn(false);
 
 		final ClassPathResource body = new ClassPathResource("communityuser/registration/command/create-user-registration.json");
 
@@ -484,8 +477,6 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 								.build()
 				)
 		);
-
-		given(securityService.isAuthenticatedUserId("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(true);
 
 		given(communityUserRegistrationCommandService.approve(
 				CommunityUserRegistration.builder()
@@ -567,7 +558,7 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 				)
 		);
 
-		given(securityService.isCommunityManager("123")).willReturn(true);
+		given(communityQueryService.hasCommunityManagerRole(tester.getId(), "123")).willReturn(true);
 
 		given(communityUserRegistrationCommandService.approve(
 				CommunityUserRegistration.builder()
@@ -661,13 +652,12 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 				)
 		);
 
-		given(securityService.isCommunityManager("123")).willReturn(false);
-		given(securityService.isAuthenticatedUserId("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(false);
-
 		final User tester = User.builder()
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
 				.build();
+
+		given(communityQueryService.hasCommunityManagerRole(tester.getId(), "123")).willReturn(false);
 
 		final ClassPathResource body = new ClassPathResource("communityuser/registration/command/update-user-registration.json");
 		try (InputStream is = body.getInputStream()) {
