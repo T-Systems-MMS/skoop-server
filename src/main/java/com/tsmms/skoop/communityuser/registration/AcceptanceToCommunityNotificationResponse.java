@@ -25,12 +25,17 @@ public class AcceptanceToCommunityNotificationResponse extends AbstractNotificat
 	@ApiModelProperty("Registration the notification is associated with.")
 	private CommunityUserRegistrationResponse registration;
 
+	@ApiModelProperty("Community name. It should be used by a client in case there is no reference to the community.")
+	private String communityName;
+
 	@Builder
 	public AcceptanceToCommunityNotificationResponse(String id,
 													 LocalDateTime creationDatetime,
-													 CommunityUserRegistrationResponse registration) {
+													 CommunityUserRegistrationResponse registration,
+													 String communityName) {
 		super(id, creationDatetime);
 		this.registration = registration;
+		this.communityName = communityName;
 	}
 
 	public static AcceptanceToCommunityNotificationResponse of(AcceptanceToCommunityNotification notification) {
@@ -38,6 +43,7 @@ public class AcceptanceToCommunityNotificationResponse extends AbstractNotificat
 				.id(notification.getId())
 				.creationDatetime(notification.getCreationDatetime())
 				.registration(CommunityUserRegistrationResponse.of(notification.getRegistration()))
+				.communityName(notification.getCommunityName())
 				.build();
 	}
 

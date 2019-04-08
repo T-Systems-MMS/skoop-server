@@ -144,6 +144,7 @@ class NotificationRepositoryTests {
 				.id("abc")
 				.creationDatetime(LocalDateTime.of(2019, 3, 26, 10, 0))
 				.registration(firstRegistration)
+				.communityName("Java User Group")
 				.build());
 
 		// notification that commonUser sent request to join "JavaScript User Group". It will be shown to communityManager.
@@ -152,6 +153,7 @@ class NotificationRepositoryTests {
 				.id("def")
 				.creationDatetime(LocalDateTime.of(2019, 3, 26, 11, 0))
 				.registration(secondRegistration)
+				.communityName("JavaScript User Group")
 				.build()
 		);
 
@@ -161,6 +163,7 @@ class NotificationRepositoryTests {
 				.id("ghi")
 				.creationDatetime(LocalDateTime.of(2019, 3, 27, 11, 0))
 				.registration(thirdRegistration)
+				.communityName("Frontend developers")
 				.build()
 		);
 
@@ -181,6 +184,7 @@ class NotificationRepositoryTests {
 						.id("0123")
 						.userName("UserLeftCommunity")
 						.build())
+				.communityName("JavaScript User Group")
 				.build()
 		);
 
@@ -207,6 +211,7 @@ class NotificationRepositoryTests {
 		assertThat(requestToJoinCommunityNotification.getRegistration().getRegisteredUser()).isEqualTo(commonUser);
 		assertThat(requestToJoinCommunityNotification.getRegistration().getId()).isEqualTo("123456");
 		assertThat(requestToJoinCommunityNotification.getRegistration().getCreationDatetime()).isEqualTo(LocalDateTime.of(2019, 3, 26, 11, 0));
+		assertThat(requestToJoinCommunityNotification.getCommunityName()).isEqualTo("JavaScript User Group");
 
 		notification = notifications.get(1);
 		assertThat(notification.getId()).isEqualTo("abc");
@@ -224,6 +229,7 @@ class NotificationRepositoryTests {
 		assertThat(invitationToJoinCommunityNotification.getRegistration().getRegisteredUser()).isEqualTo(communityManager);
 		assertThat(invitationToJoinCommunityNotification.getRegistration().getId()).isEqualTo("654321");
 		assertThat(invitationToJoinCommunityNotification.getRegistration().getCreationDatetime()).isEqualTo(LocalDateTime.of(2019, 3, 26, 10, 0));
+		assertThat(invitationToJoinCommunityNotification.getCommunityName()).isEqualTo("Java User Group");
 
 		notification = notifications.get(2);
 		assertThat(notification.getId()).isEqualTo("zyx");
@@ -235,6 +241,7 @@ class NotificationRepositoryTests {
 				.id("0123")
 				.userName("UserLeftCommunity")
 				.build());
+		assertThat(userLeftCommunityNotification.getCommunityName()).isEqualTo("JavaScript User Group");
 
 		notification = notifications.get(3);
 		assertThat(notification.getId()).isEqualTo("iop");
@@ -286,6 +293,7 @@ class NotificationRepositoryTests {
 				.id("abc")
 				.creationDatetime(LocalDateTime.of(2019, 3, 26, 10, 0))
 				.registration(firstRegistration)
+				.communityName("Java User Group")
 				.build());
 
 		notificationRepository.save(UserKickedOutFromCommunityNotification.builder()
@@ -298,6 +306,7 @@ class NotificationRepositoryTests {
 						.type(CommunityType.CLOSED)
 						.build()
 				)
+				.communityName("JavaScript User Group")
 				.build()
 		);
 
@@ -338,6 +347,7 @@ class NotificationRepositoryTests {
 		assertThat(invitationToJoinCommunityNotification.getRegistration().getRegisteredUser()).isEqualTo(commonUser);
 		assertThat(invitationToJoinCommunityNotification.getRegistration().getId()).isEqualTo("654321");
 		assertThat(invitationToJoinCommunityNotification.getRegistration().getCreationDatetime()).isEqualTo(LocalDateTime.of(2019, 3, 26, 10, 0));
+		assertThat(invitationToJoinCommunityNotification.getCommunityName()).isEqualTo("Java User Group");
 
 		notification = notifications.get(1);
 		assertThat(notification.getId()).isEqualTo("def");
@@ -350,6 +360,7 @@ class NotificationRepositoryTests {
 				.title("JavaScript User Group")
 				.type(CommunityType.CLOSED)
 				.build());
+		assertThat(userKickedOutFromCommunityNotification.getCommunityName()).isEqualTo("JavaScript User Group");
 
 		notification = notifications.get(2);
 		assertThat(notification.getId()).isEqualTo("iop");
@@ -419,6 +430,7 @@ class NotificationRepositoryTests {
 				.id("def")
 				.creationDatetime(LocalDateTime.of(2019, 3, 26, 11, 0))
 				.registration(firstRegistration)
+				.communityName("JavaScript User Group")
 				.build()
 		);
 
@@ -437,6 +449,7 @@ class NotificationRepositoryTests {
 		assertThat(requestToJoinCommunityNotification.getRegistration().getRegisteredUser()).isEqualTo(commonUser);
 		assertThat(requestToJoinCommunityNotification.getRegistration().getId()).isEqualTo("123456");
 		assertThat(requestToJoinCommunityNotification.getRegistration().getCreationDatetime()).isEqualTo(LocalDateTime.of(2019, 3, 26, 11, 0));
+		assertThat(requestToJoinCommunityNotification.getCommunityName()).isEqualTo("JavaScript User Group");
 	}
 
 }

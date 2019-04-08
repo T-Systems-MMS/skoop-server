@@ -68,6 +68,7 @@ public class CommunityUserRegistrationCommandService {
 					.id(UUID.randomUUID().toString())
 					.creationDatetime(LocalDateTime.now())
 					.registration(communityUserRegistration)
+					.communityName(communityUserRegistration.getCommunity().getTitle())
 					.build()
 			);
 		}
@@ -101,6 +102,7 @@ public class CommunityUserRegistrationCommandService {
 				.id(UUID.randomUUID().toString())
 				.registration(registration)
 				.creationDatetime(LocalDateTime.now())
+				.communityName(registration.getCommunity().getTitle())
 				.build()
 		).forEach(notificationCommandService::save);
 		return registrations;
@@ -132,6 +134,7 @@ public class CommunityUserRegistrationCommandService {
 		notificationCommandService.save(RequestToJoinCommunityNotification.builder()
 				.id(UUID.randomUUID().toString())
 				.registration(registration)
+				.communityName(registration.getCommunity().getTitle())
 				.creationDatetime(LocalDateTime.now())
 				.build()
 		);
