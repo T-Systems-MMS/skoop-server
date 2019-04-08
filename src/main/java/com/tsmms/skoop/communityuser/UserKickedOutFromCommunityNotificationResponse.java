@@ -26,10 +26,15 @@ public class UserKickedOutFromCommunityNotificationResponse extends AbstractNoti
 	@ApiModelProperty("The community user kicked from.")
 	private CommunityResponse community;
 
+	@ApiModelProperty("Community name. It should be used by a client in case there is no reference to the community.")
+	private String communityName;
+
 	@Builder
-	public UserKickedOutFromCommunityNotificationResponse(String id, LocalDateTime creationDatetime, CommunityResponse community) {
+	public UserKickedOutFromCommunityNotificationResponse(String id, LocalDateTime creationDatetime, CommunityResponse community,
+														  String communityName) {
 		super(id, creationDatetime);
 		this.community = community;
+		this.communityName = communityName;
 	}
 
 	public static UserKickedOutFromCommunityNotificationResponse of(UserKickedOutFromCommunityNotification notification) {
@@ -37,6 +42,7 @@ public class UserKickedOutFromCommunityNotificationResponse extends AbstractNoti
 				.id(notification.getId())
 				.creationDatetime(notification.getCreationDatetime())
 				.community(CommunityResponse.of(notification.getCommunity()))
+				.communityName(notification.getCommunityName())
 				.build();
 	}
 

@@ -143,6 +143,7 @@ public class CommunityUserCommandService {
 				.creationDatetime(LocalDateTime.now())
 				.community(communityUser.getCommunity())
 				.user(communityUser.getUser())
+				.communityName(communityUser.getCommunity().getTitle())
 				.build()
 		);
 	}
@@ -160,6 +161,7 @@ public class CommunityUserCommandService {
 				.creationDatetime(LocalDateTime.now())
 				.community(communityUser.getCommunity())
 				.user(communityUser.getUser())
+				.communityName(communityUser.getCommunity().getTitle())
 				.build()
 		);
 	}

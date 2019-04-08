@@ -62,6 +62,7 @@ class NotificationQueryServiceTests {
 										.build()
 								)
 								.build())
+						.communityName("Community")
 						.build(),
 				RequestToJoinCommunityNotification.builder()
 						.id("456")
@@ -80,6 +81,7 @@ class NotificationQueryServiceTests {
 										.build()
 								)
 								.build())
+						.communityName("AnotherCommunity")
 						.build(),
 				UserKickedOutFromCommunityNotification.builder()
 						.id("def")
@@ -94,6 +96,7 @@ class NotificationQueryServiceTests {
 								.type(CommunityType.CLOSED)
 								.build()
 						)
+						.communityName("JavaScript User Group")
 						.build(),
 				UserLeftCommunityNotification.builder()
 						.id("zyx")
@@ -107,6 +110,7 @@ class NotificationQueryServiceTests {
 								.id("0123")
 								.userName("UserLeftCommunity")
 								.build())
+						.communityName("AnotherCommunity")
 						.build(),
 				CommunityDeletedNotification.builder()
 						.id("iop")
@@ -149,6 +153,7 @@ class NotificationQueryServiceTests {
 										.build()
 								)
 								.build())
+						.communityName("Community")
 						.build(),
 				RequestToJoinCommunityNotification.builder()
 						.id("456")
@@ -167,6 +172,7 @@ class NotificationQueryServiceTests {
 										.build()
 								)
 								.build())
+						.communityName("AnotherCommunity")
 						.build(),
 				UserKickedOutFromCommunityNotification.builder()
 						.id("def")
@@ -181,6 +187,7 @@ class NotificationQueryServiceTests {
 								.type(CommunityType.CLOSED)
 								.build()
 						)
+						.communityName("JavaScript User Group")
 						.build(),
 				UserLeftCommunityNotification.builder()
 						.id("zyx")
@@ -194,6 +201,7 @@ class NotificationQueryServiceTests {
 								.id("0123")
 								.userName("UserLeftCommunity")
 								.build())
+						.communityName("AnotherCommunity")
 						.build(),
 				CommunityDeletedNotification.builder()
 						.id("iop")

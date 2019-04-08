@@ -52,6 +52,7 @@ class NotificationCommandServiceTests {
 								.build()
 						)
 						.build())
+				.communityName("Community")
 				.build()
 		)).willReturn(InvitationToJoinCommunityNotification.builder()
 				.id("123")
@@ -70,6 +71,7 @@ class NotificationCommandServiceTests {
 								.build()
 						)
 						.build())
+				.communityName("Community")
 				.build());
 
 		final Notification notification = this.notificationCommandService.save(InvitationToJoinCommunityNotification.builder()
@@ -89,6 +91,7 @@ class NotificationCommandServiceTests {
 								.build()
 						)
 						.build())
+				.communityName("Community")
 				.build());
 
 		assertThat(notification.getId()).isEqualTo("123");
@@ -102,6 +105,7 @@ class NotificationCommandServiceTests {
 		assertThat(invitationToJoinCommunityNotification.getRegistration().getCommunity().getId()).isEqualTo("cba");
 		assertThat(invitationToJoinCommunityNotification.getRegistration().getCommunity().getType()).isEqualTo(CommunityType.CLOSED);
 		assertThat(invitationToJoinCommunityNotification.getRegistration().getCommunity().getTitle()).isEqualTo("Community");
+		assertThat(invitationToJoinCommunityNotification.getCommunityName()).isEqualTo("Community");
 	}
 
 }

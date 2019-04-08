@@ -9,6 +9,7 @@ import com.tsmms.skoop.community.CommunityType;
 import com.tsmms.skoop.communityuser.CommunityUserRoleChangedNotification;
 import com.tsmms.skoop.communityuser.UserKickedOutFromCommunityNotification;
 import com.tsmms.skoop.communityuser.UserLeftCommunityNotification;
+import com.tsmms.skoop.communityuser.registration.AcceptanceToCommunityNotification;
 import com.tsmms.skoop.communityuser.registration.CommunityUserRegistration;
 import com.tsmms.skoop.communityuser.registration.InvitationToJoinCommunityNotification;
 import com.tsmms.skoop.communityuser.registration.RequestToJoinCommunityNotification;
@@ -71,6 +72,7 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 										.build()
 								)
 								.build())
+						.communityName("Community")
 						.build(),
 				RequestToJoinCommunityNotification.builder()
 						.id("456")
@@ -89,6 +91,7 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 										.build()
 								)
 								.build())
+						.communityName("AnotherCommunity")
 						.build(),
 				UserKickedOutFromCommunityNotification.builder()
 						.id("789")
@@ -100,6 +103,7 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 								.type(CommunityType.CLOSED)
 								.build()
 						)
+						.communityName("Community the user was kicked out from")
 						.build(),
 				UserLeftCommunityNotification.builder()
 						.id("901")
@@ -113,6 +117,7 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 								.id("fddd5bdd-8931-4eb6-a875-b52e10e07d35")
 								.userName("UserLeftCommunity")
 								.build())
+						.communityName("AnotherCommunity")
 						.build(),
 				CommunityDeletedNotification.builder()
 						.id("902")
@@ -126,6 +131,25 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 						.communityName("Community the role has been changed in")
 						.creationDatetime(LocalDateTime.of(2018, 4, 3, 12, 0))
 						.user(tester)
+						.build(),
+				AcceptanceToCommunityNotification.builder()
+						.communityName("Community the user was accepted in")
+						.creationDatetime(LocalDateTime.of(2018, 4, 3, 12, 0))
+						.id("zzz")
+						.registration(CommunityUserRegistration.builder()
+								.approvedByUser(true)
+								.approvedByCommunity(true)
+								.registeredUser(User.builder()
+										.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
+										.userName("tester")
+										.build())
+								.community(Community.builder()
+										.id("999913dc-a10d-4c85-8613-abe0fa0cf210")
+										.type(CommunityType.CLOSED)
+										.title("Community the user was accepted in")
+										.build()
+								)
+								.build())
 						.build()
 		));
 
@@ -134,7 +158,7 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 				.with(authentication(JwtAuthenticationFactory.withUser(tester))))
 				.andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-				.andExpect(jsonPath("$.length()", is(equalTo(6))))
+				.andExpect(jsonPath("$.length()", is(equalTo(7))))
 				.andExpect(jsonPath("$[0].id", is(equalTo("123"))))
 				.andExpect(jsonPath("$[0].type", is(equalTo("InvitationToJoinCommunityNotification"))))
 				.andExpect(jsonPath("$[0].creationDatetime", is(equalTo("2019-03-27T09:34:00"))))
@@ -145,6 +169,7 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[0].registration.community.id", is(equalTo("836713dc-a10d-4c85-8613-abe0fa0cf210"))))
 				.andExpect(jsonPath("$[0].registration.community.type", is(equalTo("CLOSED"))))
 				.andExpect(jsonPath("$[0].registration.community.title", is(equalTo("Community"))))
+				.andExpect(jsonPath("$[0].communityName", is(equalTo("Community"))))
 				.andExpect(jsonPath("$[1].id", is(equalTo("456"))))
 				.andExpect(jsonPath("$[1].type", is(equalTo("RequestToJoinCommunityNotification"))))
 				.andExpect(jsonPath("$[1].creationDatetime", is(equalTo("2019-03-27T10:34:00"))))
@@ -155,12 +180,14 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[1].registration.community.id", is(equalTo("7d616eaa-8a09-420a-b4f2-99b74b360308"))))
 				.andExpect(jsonPath("$[1].registration.community.type", is(equalTo("CLOSED"))))
 				.andExpect(jsonPath("$[1].registration.community.title", is(equalTo("AnotherCommunity"))))
+				.andExpect(jsonPath("$[1].communityName", is(equalTo("AnotherCommunity"))))
 				.andExpect(jsonPath("$[2].id", is(equalTo("789"))))
 				.andExpect(jsonPath("$[2].type", is(equalTo("UserKickedOutFromCommunityNotification"))))
 				.andExpect(jsonPath("$[2].creationDatetime", is(equalTo("2019-03-25T10:00:00"))))
 				.andExpect(jsonPath("$[2].community.id", is(equalTo("773e8cce-fc06-4a62-a23e-58b52c097600"))))
 				.andExpect(jsonPath("$[2].community.title", is(equalTo("Community the user was kicked out from"))))
 				.andExpect(jsonPath("$[2].community.type", is(equalTo("CLOSED"))))
+				.andExpect(jsonPath("$[2].communityName", is(equalTo("Community the user was kicked out from"))))
 				.andExpect(jsonPath("$[3].id", is(equalTo("901"))))
 				.andExpect(jsonPath("$[3].type", is(equalTo("UserLeftCommunityNotification"))))
 				.andExpect(jsonPath("$[3].creationDatetime", is(equalTo("2019-03-21T15:30:00"))))
@@ -169,6 +196,7 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[3].community.id", is(equalTo("7d616eaa-8a09-420a-b4f2-99b74b360308"))))
 				.andExpect(jsonPath("$[3].community.title", is(equalTo("AnotherCommunity"))))
 				.andExpect(jsonPath("$[3].community.type", is(equalTo("CLOSED"))))
+				.andExpect(jsonPath("$[3].communityName", is(equalTo("AnotherCommunity"))))
 				.andExpect(jsonPath("$[4].id", is(equalTo("902"))))
 				.andExpect(jsonPath("$[4].type", is(equalTo("CommunityDeletedNotification"))))
 				.andExpect(jsonPath("$[4].creationDatetime", is(equalTo("2019-01-03T10:00:00"))))
@@ -177,7 +205,18 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[5].type", is(equalTo("CommunityUserRoleChangedNotification"))))
 				.andExpect(jsonPath("$[5].creationDatetime", is(equalTo("2018-04-03T12:00:00"))))
 				.andExpect(jsonPath("$[5].communityName", is(equalTo("Community the role has been changed in"))))
-				.andExpect(jsonPath("$[5].role", is(equalTo("MANAGER"))));
+				.andExpect(jsonPath("$[5].role", is(equalTo("MANAGER"))))
+				.andExpect(jsonPath("$[6].id", is(equalTo("zzz"))))
+				.andExpect(jsonPath("$[6].type", is(equalTo("AcceptanceToCommunityNotification"))))
+				.andExpect(jsonPath("$[6].creationDatetime", is(equalTo("2018-04-03T12:00:00"))))
+				.andExpect(jsonPath("$[6].communityName", is(equalTo("Community the user was accepted in"))))
+				.andExpect(jsonPath("$[6].registration.approvedByUser", is(equalTo(true))))
+				.andExpect(jsonPath("$[6].registration.approvedByCommunity", is(equalTo(true))))
+				.andExpect(jsonPath("$[6].registration.user.id", is(equalTo("56ef4778-a084-4509-9a3e-80b7895cf7b0"))))
+				.andExpect(jsonPath("$[6].registration.user.userName", is(equalTo("tester"))))
+				.andExpect(jsonPath("$[6].registration.community.id", is(equalTo("999913dc-a10d-4c85-8613-abe0fa0cf210"))))
+				.andExpect(jsonPath("$[6].registration.community.type", is(equalTo("CLOSED"))))
+				.andExpect(jsonPath("$[6].registration.community.title", is(equalTo("Community the user was accepted in"))));
 	}
 
 	@DisplayName("Not authenticated user cannot get notifications.")
