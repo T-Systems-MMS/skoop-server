@@ -4,7 +4,8 @@ import com.tsmms.skoop.community.Community;
 import com.tsmms.skoop.community.CommunityRepository;
 import com.tsmms.skoop.community.CommunityRole;
 import com.tsmms.skoop.community.CommunityType;
-import com.tsmms.skoop.community.Link;
+import com.tsmms.skoop.community.link.Link;
+import com.tsmms.skoop.community.link.command.LinkCommandService;
 import com.tsmms.skoop.exception.DuplicateResourceException;
 import com.tsmms.skoop.exception.NoSuchResourceException;
 import com.tsmms.skoop.security.CurrentUserService;
@@ -66,6 +67,9 @@ class CommunityCommandServiceTests {
 	@Mock
 	private NotificationCommandService notificationCommandService;
 
+	@Mock
+	private LinkCommandService linkCommandService;
+
 	private CommunityCommandService communityCommandService;
 
 	@BeforeEach
@@ -76,7 +80,8 @@ class CommunityCommandServiceTests {
 				communityUserRegistrationCommandService,
 				communityUserCommandService,
 				communityUserQueryService,
-				notificationCommandService);
+				notificationCommandService,
+				linkCommandService);
 	}
 
 	@Test

@@ -5,7 +5,7 @@ import com.tsmms.skoop.exception.NoSuchResourceException;
 import com.tsmms.skoop.exception.UserCommunityException;
 import com.tsmms.skoop.community.CommunityRequest;
 import com.tsmms.skoop.community.CommunityResponse;
-import com.tsmms.skoop.community.Link;
+import com.tsmms.skoop.community.link.Link;
 import com.tsmms.skoop.exception.enums.Model;
 import com.tsmms.skoop.security.SecurityService;
 import com.tsmms.skoop.skill.Skill;
@@ -158,6 +158,7 @@ public class CommunityCommandController {
 			return Collections.emptyList();
 		}
 		return communityRequest.getLinks().stream().map(linkRequest -> Link.builder()
+				.id(linkRequest.getId())
 				.name(linkRequest.getName())
 				.href(linkRequest.getHref())
 				.build()

@@ -1,4 +1,4 @@
-package com.tsmms.skoop.community;
+package com.tsmms.skoop.community.link;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -22,6 +22,8 @@ import static java.util.stream.Collectors.toList;
 )
 public class LinkResponse {
 
+	@ApiModelProperty("Link ID.")
+	private Long id;
 	@ApiModelProperty("Name of a link.")
 	private String name;
 	@ApiModelProperty("Hyper reference of a link.")
@@ -32,6 +34,7 @@ public class LinkResponse {
 			return Collections.emptyList();
 		}
 		return links.stream().map(l -> LinkResponse.builder()
+				.id(l.getId())
 				.name(l.getName())
 				.href(l.getHref())
 				.build()

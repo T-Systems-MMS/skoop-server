@@ -1,6 +1,7 @@
 package com.tsmms.skoop.community.command;
 
 import com.tsmms.skoop.community.CommunityDeletedNotification;
+import com.tsmms.skoop.community.link.command.LinkCommandService;
 import com.tsmms.skoop.exception.DuplicateResourceException;
 import com.tsmms.skoop.exception.NoSuchResourceException;
 import com.tsmms.skoop.community.Community;
@@ -40,6 +41,7 @@ public class CommunityCommandService {
 	private final CommunityUserCommandService communityUserCommandService;
 	private final CommunityUserQueryService communityUserQueryService;
 	private final NotificationCommandService notificationCommandService;
+	private final LinkCommandService linkCommandService;
 
 	public CommunityCommandService(CommunityRepository communityRepository,
 								   CurrentUserService currentUserService,
@@ -47,7 +49,8 @@ public class CommunityCommandService {
 								   CommunityUserRegistrationCommandService communityUserRegistrationCommandService,
 								   CommunityUserCommandService communityUserCommandService,
 								   CommunityUserQueryService communityUserQueryService,
-								   NotificationCommandService notificationCommandService) {
+								   NotificationCommandService notificationCommandService,
+								   LinkCommandService linkCommandService) {
 		this.communityRepository = requireNonNull(communityRepository);
 		this.currentUserService = requireNonNull(currentUserService);
 		this.skillCommandService = requireNonNull(skillCommandService);
@@ -55,6 +58,7 @@ public class CommunityCommandService {
 		this.communityUserCommandService = requireNonNull(communityUserCommandService);
 		this.communityUserQueryService = requireNonNull(communityUserQueryService);
 		this.notificationCommandService = requireNonNull(notificationCommandService);
+		this.linkCommandService = requireNonNull(linkCommandService);
 	}
 
 	@Transactional
@@ -86,11 +90,20 @@ public class CommunityCommandService {
 					.searchParamsMap(searchParamsMap)
 					.build();
 		});
-		community.setCreationDate(p.getCreationDate());
-		community.setLastModifiedDate(LocalDateTime.now());
-		community.setCommunityUsers(p.getCommunityUsers());
-		community.setSkills(createNonExistentSkills(community));
-		return communityRepository.save(community);
+		p.setLastModifiedDate(LocalDateTime.now());
+		p.setType(community.getType());
+		p.setTitle(community.getTitle());
+		p.setDescription(community.getDescription());
+		p.setSkills(createNonExistentSkills(community));
+		if (p.getLinks() != null) {
+			p.getLinks().forEach(link -> {
+				if (!community.getLinks().contains(link)) {
+					linkCommandService.delete(link);
+				}
+			});
+		}
+		p.setLinks(community.getLinks());
+		return communityRepository.save(p);
 	}
 
 	@Transactional
