@@ -3,7 +3,9 @@ package com.tsmms.skoop.user.notification;
 import com.tsmms.skoop.common.AbstractControllerTests;
 import com.tsmms.skoop.common.JwtAuthenticationFactory;
 import com.tsmms.skoop.community.Community;
+import com.tsmms.skoop.community.CommunityChangedNotification;
 import com.tsmms.skoop.community.CommunityDeletedNotification;
+import com.tsmms.skoop.community.CommunityDetails;
 import com.tsmms.skoop.community.CommunityRole;
 import com.tsmms.skoop.community.CommunityType;
 import com.tsmms.skoop.communityuser.CommunityUserRoleChangedNotification;
@@ -24,9 +26,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.stream.Stream;
 
 import static java.util.Collections.singletonList;
+import static org.hamcrest.Matchers.array;
+import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
@@ -150,6 +157,13 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 										.build()
 								)
 								.build())
+						.build(),
+				CommunityChangedNotification.builder()
+						.id("ttt")
+						.communityName("Changed community")
+						.creationDatetime(LocalDateTime.of(2017, 1, 3, 10, 0))
+						.recipients(singletonList(tester))
+						.communityDetails(new HashSet<>(Arrays.asList(CommunityDetails.DESCRIPTION, CommunityDetails.TYPE)))
 						.build()
 		));
 
@@ -158,7 +172,7 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 				.with(authentication(JwtAuthenticationFactory.withUser(tester))))
 				.andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-				.andExpect(jsonPath("$.length()", is(equalTo(7))))
+				.andExpect(jsonPath("$.length()", is(equalTo(8))))
 				.andExpect(jsonPath("$[0].id", is(equalTo("123"))))
 				.andExpect(jsonPath("$[0].type", is(equalTo("InvitationToJoinCommunityNotification"))))
 				.andExpect(jsonPath("$[0].creationDatetime", is(equalTo("2019-03-27T09:34:00"))))
@@ -216,7 +230,12 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[6].registration.user.userName", is(equalTo("tester"))))
 				.andExpect(jsonPath("$[6].registration.community.id", is(equalTo("999913dc-a10d-4c85-8613-abe0fa0cf210"))))
 				.andExpect(jsonPath("$[6].registration.community.type", is(equalTo("CLOSED"))))
-				.andExpect(jsonPath("$[6].registration.community.title", is(equalTo("Community the user was accepted in"))));
+				.andExpect(jsonPath("$[6].registration.community.title", is(equalTo("Community the user was accepted in"))))
+				.andExpect(jsonPath("$[7].id", is(equalTo("ttt"))))
+				.andExpect(jsonPath("$[7].type", is(equalTo("CommunityChangedNotification"))))
+				.andExpect(jsonPath("$[7].creationDatetime", is(equalTo("2017-01-03T10:00:00"))))
+				.andExpect(jsonPath("$[7].communityName", is(equalTo("Changed community"))))
+				.andExpect(jsonPath("$[7].communityDetails", containsInAnyOrder(CommunityDetails.DESCRIPTION.toString(), CommunityDetails.TYPE.toString())));
 	}
 
 	@DisplayName("Not authenticated user cannot get notifications.")

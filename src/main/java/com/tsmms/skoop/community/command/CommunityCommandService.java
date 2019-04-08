@@ -1,6 +1,8 @@
 package com.tsmms.skoop.community.command;
 
+import com.tsmms.skoop.community.CommunityChangedNotification;
 import com.tsmms.skoop.community.CommunityDeletedNotification;
+import com.tsmms.skoop.community.CommunityDetails;
 import com.tsmms.skoop.community.link.command.LinkCommandService;
 import com.tsmms.skoop.exception.DuplicateResourceException;
 import com.tsmms.skoop.exception.NoSuchResourceException;
@@ -17,13 +19,16 @@ import com.tsmms.skoop.skill.Skill;
 import com.tsmms.skoop.skill.command.SkillCommandService;
 import com.tsmms.skoop.user.User;
 import com.tsmms.skoop.communityuser.registration.command.CommunityUserRegistrationCommandService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -90,20 +95,57 @@ public class CommunityCommandService {
 					.searchParamsMap(searchParamsMap)
 					.build();
 		});
+		final Set<CommunityDetails> changedCommunityDetails = new TreeSet<>();
 		p.setLastModifiedDate(LocalDateTime.now());
-		p.setType(community.getType());
-		p.setTitle(community.getTitle());
-		p.setDescription(community.getDescription());
-		p.setSkills(createNonExistentSkills(community));
-		if (p.getLinks() != null) {
-			p.getLinks().forEach(link -> {
-				if (!community.getLinks().contains(link)) {
-					linkCommandService.delete(link);
-				}
-			});
+		if (!p.getType().equals(community.getType())) {
+			changedCommunityDetails.add(CommunityDetails.TYPE);
+			p.setType(community.getType());
 		}
-		p.setLinks(community.getLinks());
-		return communityRepository.save(p);
+		final String oldCommunityName = p.getTitle();
+		if (!p.getTitle().equals(community.getTitle())) {
+			changedCommunityDetails.add(CommunityDetails.NAME);
+			p.setTitle(community.getTitle());
+		}
+		if (!p.getDescription().equals(community.getDescription())) {
+			changedCommunityDetails.add(CommunityDetails.DESCRIPTION);
+			p.setDescription(community.getDescription());
+		}
+		if (!CollectionUtils.isEqualCollection(
+				Optional.ofNullable(p.getSkills()).orElse(Collections.emptyList()),
+				Optional.ofNullable(community.getSkills()).orElse(Collections.emptyList()))) {
+			changedCommunityDetails.add(CommunityDetails.SKILLS);
+			p.setSkills(createNonExistentSkills(community));
+		}
+		if (!CollectionUtils.isEqualCollection(
+				Optional.ofNullable(p.getLinks()).orElse(Collections.emptyList()),
+				Optional.ofNullable(community.getLinks()).orElse(Collections.emptyList()))) {
+			if (p.getLinks() != null) {
+				if (community.getLinks() == null) {
+					linkCommandService.delete(p.getLinks());
+				}
+				else {
+					p.getLinks().forEach(link -> {
+						if (!community.getLinks().contains(link)) {
+							linkCommandService.delete(link);
+						}
+					});
+				}
+			}
+			p.setLinks(community.getLinks());
+			changedCommunityDetails.add(CommunityDetails.LINKS);
+		}
+		final Community result = communityRepository.save(p);
+		if (!changedCommunityDetails.isEmpty()) {
+			notificationCommandService.save(CommunityChangedNotification.builder()
+					.id(UUID.randomUUID().toString())
+					.creationDatetime(LocalDateTime.now())
+					.communityDetails(changedCommunityDetails)
+					.communityName(oldCommunityName)
+					.recipients(communityUserQueryService.getCommunityUsers(community.getId(), null).map(CommunityUser::getUser).collect(toList()))
+					.build()
+			);
+		}
+		return result;
 	}
 
 	@Transactional
