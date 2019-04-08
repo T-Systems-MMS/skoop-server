@@ -20,4 +20,9 @@ public class LinkCommandService {
 	public void delete(Link link) {
 		linkRepository.delete(link);
 	}
+
+	@Transactional
+	public void delete(Iterable<? extends Link> links) {
+		linkRepository.deleteAll(links);
+	}
 }

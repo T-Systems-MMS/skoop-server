@@ -29,6 +29,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -316,8 +317,8 @@ class CommunityCommandServiceTests {
 	}
 
 	@Test
-	@DisplayName("Tests if community is updated")
-	void testIfCommunityIsUpdated() {
+	@DisplayName("Update community.")
+	void updateCommunity() {
 
 		final Skill springBootSkill = Skill.builder()
 				.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
@@ -348,13 +349,18 @@ class CommunityCommandServiceTests {
 						.type(CommunityType.OPEN)
 						.description("Community for Java developers")
 						.skills(Arrays.asList(springBootSkill, angularSkill))
+						.links(Collections.singletonList(Link.builder()
+								.name("jira")
+								.href("https://www.oldjira.com")
+								.build()
+						))
 						.build()
 		));
 		given(communityRepository.save(
 				argThat(allOf(
 						isA(Community.class),
-						hasProperty("title", is("Java User Group")),
-						hasProperty("type", is(CommunityType.OPEN)),
+						hasProperty("title", is("New java User Group")),
+						hasProperty("type", is(CommunityType.CLOSED)),
 						hasProperty("description", is("New community for Java developers")),
 						hasProperty("skills", hasItems(
 								Skill.builder()
@@ -369,39 +375,56 @@ class CommunityCommandServiceTests {
 										.id("a3d55d3f-1215-4e8e-93f3-c06a5b9c2d56")
 										.name("Tomcat")
 										.build()
+						)),
+						hasProperty("links", hasItems(
+								Link.builder()
+										.name("jira")
+										.href("https://www.newjira.com")
+										.build()
 						))
 				))
 		))
 				.willReturn(
 						Community.builder()
 								.id("123")
-								.title("Java User Group")
-								.type(CommunityType.OPEN)
+								.title("New java User Group")
+								.type(CommunityType.CLOSED)
 								.description("New community for Java developers")
 								.skills(Arrays.asList(springBootSkill, angularSkill, Skill.builder()
 										.id("a3d55d3f-1215-4e8e-93f3-c06a5b9c2d56")
 										.name("Tomcat")
 										.build()))
+								.links(Collections.singletonList(Link.builder()
+										.id(12L)
+										.name("jira")
+										.href("https://www.newjira.com")
+										.build()
+								))
 								.build()
 				);
 
 		Community community = communityCommandService.update(
 				Community.builder()
 						.id("123")
-						.title("Java User Group")
-						.type(CommunityType.OPEN)
+						.title("New java User Group")
+						.type(CommunityType.CLOSED)
 						.description("New community for Java developers")
 						.skills(Arrays.asList(springBootSkill, angularSkill, tomcatSkill))
+						.links(Collections.singletonList(Link.builder()
+								.name("jira")
+								.href("https://www.newjira.com")
+								.build()
+						))
 						.build()
 		);
 
 		assertThat(community).isNotNull();
 		assertThat(community.getId()).isNotNull();
 		assertThat(community.getId()).isEqualTo("123");
-		assertThat(community.getTitle()).isEqualTo("Java User Group");
-		assertThat(community.getType()).isEqualTo(CommunityType.OPEN);
+		assertThat(community.getTitle()).isEqualTo("New java User Group");
+		assertThat(community.getType()).isEqualTo(CommunityType.CLOSED);
 		assertThat(community.getDescription()).isEqualTo("New community for Java developers");
-		Assertions.assertThat(community.getSkills()).contains(Skill.builder()
+		assertThat(community.getSkills()).contains(Skill.builder()
 				.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
 				.name("Spring Boot")
 				.build(), Skill.builder()
@@ -410,6 +433,11 @@ class CommunityCommandServiceTests {
 				.build(), Skill.builder()
 				.id("a3d55d3f-1215-4e8e-93f3-c06a5b9c2d56")
 				.name("Tomcat")
+				.build());
+		assertThat(community.getLinks()).contains(Link.builder()
+				.id(12L)
+				.name("jira")
+				.href("https://www.newjira.com")
 				.build());
 	}
 
