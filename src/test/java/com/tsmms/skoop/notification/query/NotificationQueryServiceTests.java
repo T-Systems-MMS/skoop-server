@@ -143,6 +143,10 @@ class NotificationQueryServiceTests {
 								.id("abc")
 								.userName("tester")
 								.build()))
+						.community(Community.builder()
+								.id("123456789")
+								.title("Changed community")
+								.build())
 						.communityDetails(new HashSet<>(Arrays.asList(CommunityDetails.DESCRIPTION, CommunityDetails.TYPE)))
 						.build()
 		));
@@ -244,6 +248,10 @@ class NotificationQueryServiceTests {
 								.id("abc")
 								.userName("tester")
 								.build()))
+						.community(Community.builder()
+								.id("123456789")
+								.title("Changed community")
+								.build())
 						.communityDetails(new HashSet<>(Arrays.asList(CommunityDetails.DESCRIPTION, CommunityDetails.TYPE)))
 						.build()
 		);

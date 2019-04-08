@@ -206,6 +206,11 @@ class NotificationRepositoryTests {
 				.creationDatetime(LocalDateTime.of(2017, 1, 3, 10, 0))
 				.recipients(singletonList(communityManager))
 				.communityDetails(new HashSet<>(Arrays.asList(CommunityDetails.DESCRIPTION, CommunityDetails.TYPE)))
+				.community(Community.builder()
+						.id("123456789")
+						.title("Changed community")
+						.build()
+				)
 				.build()
 		);
 
@@ -281,6 +286,10 @@ class NotificationRepositoryTests {
 		assertThat(communityChangedNotification.getRecipients()).isEqualTo(singletonList(communityManager));
 		assertThat(communityChangedNotification.getCommunityDetails()).containsExactlyInAnyOrder(CommunityDetails.DESCRIPTION, CommunityDetails.TYPE);
 		assertThat(communityChangedNotification.getCommunityName()).isEqualTo("Changed community");
+		assertThat(communityChangedNotification.getCommunity()).isEqualTo(Community.builder()
+				.id("123456789")
+				.title("Changed community")
+				.build());
 	}
 
 	@DisplayName("Get notifications sent to the user.")
@@ -354,6 +363,10 @@ class NotificationRepositoryTests {
 				.communityName("Changed community")
 				.creationDatetime(LocalDateTime.of(2017, 1, 3, 10, 0))
 				.recipients(singletonList(commonUser))
+				.community(Community.builder()
+						.id("123456789")
+						.title("Changed community")
+						.build())
 				.communityDetails(new HashSet<>(Arrays.asList(CommunityDetails.DESCRIPTION, CommunityDetails.TYPE)))
 				.build()
 		);
@@ -418,6 +431,10 @@ class NotificationRepositoryTests {
 		assertThat(communityChangedNotification.getRecipients()).isEqualTo(singletonList(commonUser));
 		assertThat(communityChangedNotification.getCommunityDetails()).containsExactlyInAnyOrder(CommunityDetails.DESCRIPTION, CommunityDetails.TYPE);
 		assertThat(communityChangedNotification.getCommunityName()).isEqualTo("Changed community");
+		assertThat(communityChangedNotification.getCommunity()).isEqualTo(Community.builder()
+				.id("123456789")
+				.title("Changed community")
+				.build());
 	}
 
 	@DisplayName("Get notifications sent to the communities the user is the manager of.")

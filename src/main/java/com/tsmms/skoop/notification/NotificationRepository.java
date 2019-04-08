@@ -34,8 +34,10 @@ public interface NotificationRepository extends Neo4jRepository<Notification, St
 			" WITH n, r1, registration, r2, registeredUser " +
 			" OPTIONAL MATCH (registration)-[r3:community]->(c:Community) " +
 			" WITH n, r1, registration, r2, registeredUser, r3, c " +
-			" OPTIONAL MATCH (user:User)<-[r4:USER]-(n)-[r5:COMMUNITY]->(community:Community) " +
-			" RETURN n, r1, registration, r2, registeredUser, r3, c, user, r4, r5, community " +
+			" OPTIONAL MATCH (n)-[r4:COMMUNITY]->(community:Community) " +
+			" WITH n, r1, registration, r2, registeredUser, r3, c, r4, community " +
+			" OPTIONAL MATCH (n)-[r5:USER]->(user:User) " +
+			" RETURN n, r1, registration, r2, registeredUser, r3, c, r4, community, r5, user " +
 			" ORDER BY n.creationDatetime DESC")
 	Stream<Notification> getUserNotifications(@Param("userId") String userId);
 

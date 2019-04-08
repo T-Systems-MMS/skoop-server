@@ -23,6 +23,9 @@ import java.util.Set;
 @JsonTypeName("CommunityChangedNotification")
 public class CommunityChangedNotificationResponse extends AbstractNotificationResponse {
 
+	@ApiModelProperty("Changed community.")
+	private CommunityResponse community;
+
 	@ApiModelProperty("Community name.")
 	private String communityName;
 
@@ -32,10 +35,12 @@ public class CommunityChangedNotificationResponse extends AbstractNotificationRe
 	@Builder
 	public CommunityChangedNotificationResponse(String id, LocalDateTime creationDatetime,
 												String communityName,
-												Set<CommunityDetails> communityDetails) {
+												Set<CommunityDetails> communityDetails,
+												CommunityResponse community) {
 		super(id, creationDatetime);
 		this.communityName = communityName;
 		this.communityDetails = communityDetails;
+		this.community = community;
 	}
 
 	public static CommunityChangedNotificationResponse of(CommunityChangedNotification notification) {
@@ -44,6 +49,7 @@ public class CommunityChangedNotificationResponse extends AbstractNotificationRe
 				.creationDatetime(notification.getCreationDatetime())
 				.communityName(notification.getCommunityName())
 				.communityDetails(notification.getCommunityDetails())
+				.community(CommunityResponse.of(notification.getCommunity()))
 				.build();
 	}
 

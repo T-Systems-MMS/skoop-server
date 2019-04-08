@@ -164,6 +164,10 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 						.creationDatetime(LocalDateTime.of(2017, 1, 3, 10, 0))
 						.recipients(singletonList(tester))
 						.communityDetails(new HashSet<>(Arrays.asList(CommunityDetails.DESCRIPTION, CommunityDetails.TYPE)))
+						.community(Community.builder()
+								.id("123456789")
+								.title("Changed community")
+								.build())
 						.build()
 		));
 
@@ -235,7 +239,9 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[7].type", is(equalTo("CommunityChangedNotification"))))
 				.andExpect(jsonPath("$[7].creationDatetime", is(equalTo("2017-01-03T10:00:00"))))
 				.andExpect(jsonPath("$[7].communityName", is(equalTo("Changed community"))))
-				.andExpect(jsonPath("$[7].communityDetails", containsInAnyOrder(CommunityDetails.DESCRIPTION.toString(), CommunityDetails.TYPE.toString())));
+				.andExpect(jsonPath("$[7].communityDetails", containsInAnyOrder(CommunityDetails.DESCRIPTION.toString(), CommunityDetails.TYPE.toString())))
+				.andExpect(jsonPath("$[7].community.id", is(equalTo("123456789"))))
+				.andExpect(jsonPath("$[7].community.title", is(equalTo("Changed community"))));
 	}
 
 	@DisplayName("Not authenticated user cannot get notifications.")

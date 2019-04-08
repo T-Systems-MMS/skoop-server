@@ -27,15 +27,20 @@ public class CommunityChangedNotification extends Notification {
 	@Relationship(type = "RECIPIENT")
 	private List<User> recipients;
 
+	@Relationship(type = "COMMUNITY")
+	private Community community;
+
 	@Builder
 	public CommunityChangedNotification(String id, LocalDateTime creationDatetime,
 										String communityName,
 										Set<CommunityDetails> communityDetails,
-										List<User> recipients) {
+										List<User> recipients,
+										Community community) {
 		super(id, creationDatetime);
 		this.communityName = communityName;
 		this.communityDetails = communityDetails;
 		this.recipients = recipients;
+		this.community = community;
 	}
 
 }

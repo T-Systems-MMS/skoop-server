@@ -141,6 +141,7 @@ public class CommunityCommandService {
 					.creationDatetime(LocalDateTime.now())
 					.communityDetails(changedCommunityDetails)
 					.communityName(oldCommunityName)
+					.community(result)
 					.recipients(communityUserQueryService.getCommunityUsers(community.getId(), null).map(CommunityUser::getUser).collect(toList()))
 					.build()
 			);
