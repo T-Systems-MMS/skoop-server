@@ -61,6 +61,9 @@
 		<query>MATCH (u:User {userName: 'frwt'}), (s:Skill {name: 'Project Management'}) CREATE (u)-[:RELATED_TO {currentLevel: 3, desiredLevel: 4, priority: 1}]->(s)</query>
 		<query>MATCH (u:User {userName: 'rju'}), (s:Skill {name: 'Project Management'}) CREATE (u)-[:RELATED_TO {currentLevel: 3, desiredLevel: 4, priority: 1}]->(s)</query>
 		<query>MATCH (u:User {userName: 'phin'}), (s:Skill {name: 'Project Management'}) CREATE (u)-[:RELATED_TO {currentLevel: 3, desiredLevel: 4, priority: 1}]->(s)</query>
+		<query>MATCH (u:User {userName: 'us1'}), (s:Skill {name: 'Spring Boot'}) CREATE (u)-[:RELATED_TO {currentLevel: 2, desiredLevel: 3, priority: 2}]->(s)</query>
+		<query>MATCH (u:User {userName: 'us2'}), (s:Skill {name: 'Spring Boot'}) CREATE (u)-[:RELATED_TO {currentLevel: 2, desiredLevel: 3, priority: 2}]->(s)</query>
+		<query>MATCH (u:User {userName: 'us3'}), (s:Skill {name: 'Spring Boot'}) CREATE (u)-[:RELATED_TO {currentLevel: 2, desiredLevel: 3, priority: 2}]->(s)</query>
 
 		<query>CREATE (:Project {id: randomUUID(), name: 'SKOOP', creationDate: toString(localdatetime()), lastModifiedDate: toString(localdatetime()),
 			description: 'SKOOP project is intended to encourage knowledge sharing between employees of a company and help to organize communities of different interests.',
@@ -92,6 +95,8 @@
 
 		<query>MATCH (c:Community {title: 'SKOOP developers'}), (s:Skill {name: 'Spring Boot'}) CREATE (c)-[:RELATES_TO]->(s)</query>
 		<query>MATCH (c:Community {title: 'SKOOP developers'}), (s:Skill {name: 'Java'}) CREATE (c)-[:RELATES_TO]->(s)</query>
+
+		<query>MATCH (c:Community {title: 'Sveta\'s community'}), (s:Skill {name: 'Spring Boot'}) CREATE (c)-[:RELATES_TO]->(s)</query>
 
 		<query>MATCH (c:Community {title: 'SKOOP developers'}), (u:User {userName: 'frwt'})
 			CREATE (u)-[:COMMUNITY_USER {role: 'MANAGER', creationDate: toString(localdatetime()), lastModifiedDate: toString(localdatetime())}]->(c)</query>
