@@ -46,6 +46,11 @@
 		<query>CREATE (:User {id: randomUUID(), firstName: 'Dmitry', lastName: 'Dmitry\'s surname', userName: 'dmle', coach: false, email: 'dmle@mail.com', referenceId: randomUUID()})</query>
 		<query>CREATE (:User {id: randomUUID(), firstName: 'Sveta', lastName: 'Sveta\'s surname', userName: 'sviv', coach: false, email: 'sviv@mail.com', referenceId: randomUUID()})</query>
 		<query>CREATE (:User {id: randomUUID(), firstName: 'Franziska', lastName: 'Franziska\'s surname', userName: 'frwt', coach: false, email: 'frwt@mail.com', referenceId: randomUUID()})</query>
+		<query>CREATE (:User {id: randomUUID(), firstName: 'Rainer', lastName: 'Rainer\'s surname', userName: 'rju', coach: false, email: 'rju@mail.com', referenceId: randomUUID()})</query>
+		<query>CREATE (:User {id: randomUUID(), firstName: 'Phoebe', lastName: 'Phoebe\'s surname', userName: 'phin', coach: false, email: 'phin@mail.com', referenceId: randomUUID()})</query>
+		<query>CREATE (:User {id: randomUUID(), firstName: 'First user', lastName: 'First user\'s surname', userName: 'us1', coach: false, email: 'us1@mail.com', referenceId: randomUUID()})</query>
+		<query>CREATE (:User {id: randomUUID(), firstName: 'Second user', lastName: 'Second user\'s surname', userName: 'us2', coach: false, email: 'us2@mail.com', referenceId: randomUUID()})</query>
+		<query>CREATE (:User {id: randomUUID(), firstName: 'Third user', lastName: 'Third user\'s surname', userName: 'us3', coach: false, email: 'us3@mail.com', referenceId: randomUUID()})</query>
 
 		<query>MATCH (u:User {userName: 'dmle'}), (s:Skill {name: 'Spring Boot'}) CREATE (u)-[:RELATED_TO {currentLevel: 1, desiredLevel: 2, priority: 2}]->(s)</query>
 		<query>MATCH (u:User {userName: 'dmle'}), (s:Skill {name: 'Java'}) CREATE (u)-[:RELATED_TO {currentLevel: 2, desiredLevel: 3, priority: 1}]->(s)</query>
@@ -54,6 +59,8 @@
 		<query>MATCH (u:User {userName: 'sviv'}), (s:Skill {name: 'Java'}) CREATE (u)-[:RELATED_TO {currentLevel: 2, desiredLevel: 3, priority: 1}]->(s)</query>
 		<query>MATCH (u:User {userName: 'sviv'}), (s:Skill {name: 'JavaScript'}) CREATE (u)-[:RELATED_TO {currentLevel: 2, desiredLevel: 3, priority: 1}]->(s)</query>
 		<query>MATCH (u:User {userName: 'frwt'}), (s:Skill {name: 'Project Management'}) CREATE (u)-[:RELATED_TO {currentLevel: 3, desiredLevel: 4, priority: 1}]->(s)</query>
+		<query>MATCH (u:User {userName: 'rju'}), (s:Skill {name: 'Project Management'}) CREATE (u)-[:RELATED_TO {currentLevel: 3, desiredLevel: 4, priority: 1}]->(s)</query>
+		<query>MATCH (u:User {userName: 'phin'}), (s:Skill {name: 'Project Management'}) CREATE (u)-[:RELATED_TO {currentLevel: 3, desiredLevel: 4, priority: 1}]->(s)</query>
 
 		<query>CREATE (:Project {id: randomUUID(), name: 'SKOOP', creationDate: toString(localdatetime()), lastModifiedDate: toString(localdatetime()),
 			description: 'SKOOP project is intended to encourage knowledge sharing between employees of a company and help to organize communities of different interests.',
@@ -75,6 +82,14 @@
 			description: 'Franziska\'s closed community.',
 			type: 'CLOSED', creationDate: toString(localdatetime()), lastModifiedDate: toString(localdatetime())})</query>
 
+		<query>CREATE (c:Community {id: randomUUID(), title: 'Rainer\'s community',
+			description: 'Rainer\'s closed community.',
+			type: 'CLOSED', creationDate: toString(localdatetime()), lastModifiedDate: toString(localdatetime())})</query>
+
+		<query>CREATE (c:Community {id: randomUUID(), title: 'Phoebe\'s community',
+			description: 'Phoebe\'s closed community.',
+			type: 'CLOSED', creationDate: toString(localdatetime()), lastModifiedDate: toString(localdatetime())})</query>
+
 		<query>MATCH (c:Community {title: 'SKOOP developers'}), (s:Skill {name: 'Spring Boot'}) CREATE (c)-[:RELATES_TO]->(s)</query>
 		<query>MATCH (c:Community {title: 'SKOOP developers'}), (s:Skill {name: 'Java'}) CREATE (c)-[:RELATES_TO]->(s)</query>
 
@@ -90,6 +105,12 @@
 		<query>MATCH (c:Community {title: 'Franziska\'s community'}), (u:User {userName: 'frwt'})
 			CREATE (u)-[:COMMUNITY_USER {role: 'MANAGER', creationDate: toString(localdatetime()), lastModifiedDate: toString(localdatetime())}]->(c)</query>
 
+		<query>MATCH (c:Community {title: 'Rainer\'s community'}), (u:User {userName: 'rju'})
+			CREATE (u)-[:COMMUNITY_USER {role: 'MANAGER', creationDate: toString(localdatetime()), lastModifiedDate: toString(localdatetime())}]->(c)</query>
+
+		<query>MATCH (c:Community {title: 'Phoebe\'s community'}), (u:User {userName: 'phin'})
+			CREATE (u)-[:COMMUNITY_USER {role: 'MANAGER', creationDate: toString(localdatetime()), lastModifiedDate: toString(localdatetime())}]->(c)</query>
+
 		<query>MATCH (p:Project {name: 'SKOOP'}), (u:User {userName: 'dmle'})
 			CREATE (u)-[:USER_PROJECT {role: 'Developer', tasks: 'Development and testing.', startDate: '2019-01-09', endDate: '2019-03-31',
 			creationDate: toString(localdatetime()), lastModifiedDate: toString(localdatetime())}]->(p)</query>
@@ -100,6 +121,14 @@
 
 		<query>MATCH (p:Project {name: 'SKOOP'}), (u:User {userName: 'frwt'})
 			CREATE (u)-[:USER_PROJECT {role: 'Product owner', tasks: 'Product ownership and declaring of requirements.', startDate: '2019-01-09', endDate: '2019-03-31',
+			creationDate: toString(localdatetime()), lastModifiedDate: toString(localdatetime())}]->(p)</query>
+
+		<query>MATCH (p:Project {name: 'SKOOP'}), (u:User {userName: 'rju'})
+			CREATE (u)-[:USER_PROJECT {role: 'Project manager', tasks: 'Project management.', startDate: '2019-01-09', endDate: '2019-03-31',
+			creationDate: toString(localdatetime()), lastModifiedDate: toString(localdatetime())}]->(p)</query>
+
+		<query>MATCH (p:Project {name: 'SKOOP'}), (u:User {userName: 'phin'})
+			CREATE (u)-[:USER_PROJECT {role: 'Project manager', tasks: 'Project management.', startDate: '2019-01-09', endDate: '2019-03-31',
 			creationDate: toString(localdatetime()), lastModifiedDate: toString(localdatetime())}]->(p)</query>
 
 		<query>CREATE (:Link {name: 'GitHub WebApp Repository', href: 'https://github.com/T-Systems-MMS/skoop-webapp'})</query>
