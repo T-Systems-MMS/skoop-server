@@ -28,6 +28,7 @@ import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.isA;
 import static org.hamcrest.core.AllOf.allOf;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
@@ -492,6 +493,33 @@ class CommunityUserRegistrationCommandServiceTests {
 						.approvedByCommunity(null)
 						.build()
 		));
+	}
+
+	@DisplayName("Deletes community user registrations.")
+	@Test
+	void deletesCommunityUserRegistrations() {
+		assertDoesNotThrow(() -> communityUserRegistrationCommandService.delete(Arrays.asList(CommunityUserRegistration.builder()
+				.approvedByCommunity(null)
+				.approvedByUser(true)
+				.registeredUser(User.builder()
+						.id("db87d46a-e4ca-451a-903b-e8533e0b924b")
+						.userName("tester")
+						.build())
+				.community(Community.builder()
+						.id("123")
+						.title("Java User Group")
+						.type(CommunityType.CLOSED)
+						.description("Community for Java developers")
+						.build())
+				.creationDatetime(LocalDateTime.of(2019, 1, 15, 20, 0))
+				.id("123")
+				.build())));
+	}
+
+	@DisplayName("Throws exception when null is passed as collection to delete community user registrations.")
+	@Test
+	void throwsExceptionWhenNullIsPassedAsCollectionToDeleteCommunityUserRegistrations() {
+		assertThrows(IllegalArgumentException.class, () -> communityUserRegistrationCommandService.delete(null));
 	}
 
 }
