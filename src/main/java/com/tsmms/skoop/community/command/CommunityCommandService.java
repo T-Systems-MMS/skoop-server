@@ -4,6 +4,9 @@ import com.tsmms.skoop.community.CommunityChangedNotification;
 import com.tsmms.skoop.community.CommunityDeletedNotification;
 import com.tsmms.skoop.community.CommunityDetails;
 import com.tsmms.skoop.community.link.command.LinkCommandService;
+import com.tsmms.skoop.communityuser.registration.CommunityUserRegistration;
+import com.tsmms.skoop.communityuser.registration.command.CommunityUserRegistrationApprovalCommand;
+import com.tsmms.skoop.communityuser.registration.query.CommunityUserRegistrationQueryService;
 import com.tsmms.skoop.exception.DuplicateResourceException;
 import com.tsmms.skoop.exception.NoSuchResourceException;
 import com.tsmms.skoop.community.Community;
@@ -25,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -47,6 +51,7 @@ public class CommunityCommandService {
 	private final CommunityUserQueryService communityUserQueryService;
 	private final NotificationCommandService notificationCommandService;
 	private final LinkCommandService linkCommandService;
+	private final CommunityUserRegistrationQueryService communityUserRegistrationQueryService;
 
 	public CommunityCommandService(CommunityRepository communityRepository,
 								   CurrentUserService currentUserService,
@@ -55,7 +60,8 @@ public class CommunityCommandService {
 								   CommunityUserCommandService communityUserCommandService,
 								   CommunityUserQueryService communityUserQueryService,
 								   NotificationCommandService notificationCommandService,
-								   LinkCommandService linkCommandService) {
+								   LinkCommandService linkCommandService,
+								   CommunityUserRegistrationQueryService communityUserRegistrationQueryService) {
 		this.communityRepository = requireNonNull(communityRepository);
 		this.currentUserService = requireNonNull(currentUserService);
 		this.skillCommandService = requireNonNull(skillCommandService);
@@ -64,6 +70,7 @@ public class CommunityCommandService {
 		this.communityUserQueryService = requireNonNull(communityUserQueryService);
 		this.notificationCommandService = requireNonNull(notificationCommandService);
 		this.linkCommandService = requireNonNull(linkCommandService);
+		this.communityUserRegistrationQueryService = requireNonNull(communityUserRegistrationQueryService);
 	}
 
 	@Transactional
@@ -158,15 +165,47 @@ public class CommunityCommandService {
 					.searchParamsMap(searchParamsMap)
 					.build();
 		});
-		Stream<CommunityUser> communityMembers = communityUserQueryService.getCommunityUsers(id, null);
+
+		// at first we have to send the notifications and change status of registrations
+		// since as soon as the community is deleted it is not possible to traverse graph properly
+
+		sendCommunityDeletedNotifications(community);
+
+		deletePendingInvitationsToJoinCommunity(community);
+
+		declinePendingUserRequests(community);
+
 		communityRepository.delete(community);
+	}
+
+	private void sendCommunityDeletedNotifications(Community community) {
+		final List<User> recipients = new LinkedList<>();
+
+		final Stream<CommunityUser> communityMembers = communityUserQueryService.getCommunityUsers(community.getId(), null);
+		final Stream<CommunityUserRegistration> pendingUserRequests = communityUserRegistrationQueryService.getPendingUserRequestsToJoinCommunity(community.getId());
+
+		Stream.concat(communityMembers.map(CommunityUser::getUser), pendingUserRequests.map(CommunityUserRegistration::getRegisteredUser))
+				.distinct().forEach(recipients::add);
+
 		notificationCommandService.save(CommunityDeletedNotification.builder()
 				.id(UUID.randomUUID().toString())
 				.communityName(community.getTitle())
 				.creationDatetime(LocalDateTime.now())
-				.recipients(communityMembers.map(CommunityUser::getUser).collect(toList()))
+				.recipients(recipients)
 				.build()
 		);
+	}
+
+	private void declinePendingUserRequests(Community community) {
+		final Stream<CommunityUserRegistration> pendingUserRequests = communityUserRegistrationQueryService.getPendingUserRequestsToJoinCommunity(community.getId());
+		pendingUserRequests.forEach(pendingUserRequest -> communityUserRegistrationCommandService.approve(pendingUserRequest, CommunityUserRegistrationApprovalCommand.builder()
+				.approvedByCommunity(false)
+				.build()));
+	}
+
+	private void deletePendingInvitationsToJoinCommunity(Community community) {
+		final Stream<CommunityUserRegistration> pendingInvitations = communityUserRegistrationQueryService.getPendingInvitationsToJoinCommunity(community.getId());
+		communityUserRegistrationCommandService.delete(pendingInvitations.collect(toList()));
 	}
 
 	private List<Skill> createNonExistentSkills(Community community) {

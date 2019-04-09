@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -139,6 +140,16 @@ public class CommunityUserRegistrationCommandService {
 				.build()
 		);
 		return registration;
+	}
+
+	@Transactional
+	public void delete(Collection<CommunityUserRegistration> communityUserRegistrations) {
+		if (communityUserRegistrations == null) {
+			throw new IllegalArgumentException("The collection with community user registrations cannot be null.");
+		}
+		if (!communityUserRegistrations.isEmpty()) {
+			communityUserRegistrationRepository.deleteAll(communityUserRegistrations);
+		}
 	}
 
 }
