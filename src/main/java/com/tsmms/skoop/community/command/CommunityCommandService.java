@@ -1,6 +1,12 @@
 package com.tsmms.skoop.community.command;
 
+import com.tsmms.skoop.community.CommunityChangedNotification;
 import com.tsmms.skoop.community.CommunityDeletedNotification;
+import com.tsmms.skoop.community.CommunityDetails;
+import com.tsmms.skoop.community.link.command.LinkCommandService;
+import com.tsmms.skoop.communityuser.registration.CommunityUserRegistration;
+import com.tsmms.skoop.communityuser.registration.command.CommunityUserRegistrationApprovalCommand;
+import com.tsmms.skoop.communityuser.registration.query.CommunityUserRegistrationQueryService;
 import com.tsmms.skoop.exception.DuplicateResourceException;
 import com.tsmms.skoop.exception.NoSuchResourceException;
 import com.tsmms.skoop.community.Community;
@@ -16,14 +22,18 @@ import com.tsmms.skoop.skill.Skill;
 import com.tsmms.skoop.skill.command.SkillCommandService;
 import com.tsmms.skoop.user.User;
 import com.tsmms.skoop.communityuser.registration.command.CommunityUserRegistrationCommandService;
+import org.apache.commons.collections4.CollectionUtils;
 import com.tsmms.skoop.user.query.UserQueryService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -41,6 +51,8 @@ public class CommunityCommandService {
 	private final CommunityUserCommandService communityUserCommandService;
 	private final CommunityUserQueryService communityUserQueryService;
 	private final NotificationCommandService notificationCommandService;
+	private final LinkCommandService linkCommandService;
+	private final CommunityUserRegistrationQueryService communityUserRegistrationQueryService;
 	private final UserQueryService userQueryService;
 
 	public CommunityCommandService(CommunityRepository communityRepository,
@@ -50,6 +62,8 @@ public class CommunityCommandService {
 								   CommunityUserCommandService communityUserCommandService,
 								   CommunityUserQueryService communityUserQueryService,
 								   NotificationCommandService notificationCommandService,
+								   LinkCommandService linkCommandService,
+								   CommunityUserRegistrationQueryService communityUserRegistrationQueryService,
 								   UserQueryService userQueryService) {
 		this.communityRepository = requireNonNull(communityRepository);
 		this.currentUserService = requireNonNull(currentUserService);
@@ -58,6 +72,8 @@ public class CommunityCommandService {
 		this.communityUserCommandService = requireNonNull(communityUserCommandService);
 		this.communityUserQueryService = requireNonNull(communityUserQueryService);
 		this.notificationCommandService = requireNonNull(notificationCommandService);
+		this.linkCommandService = requireNonNull(linkCommandService);
+		this.communityUserRegistrationQueryService = requireNonNull(communityUserRegistrationQueryService);
 		this.userQueryService = requireNonNull(userQueryService);
 	}
 
@@ -94,11 +110,58 @@ public class CommunityCommandService {
 					.searchParamsMap(searchParamsMap)
 					.build();
 		});
-		community.setCreationDate(p.getCreationDate());
-		community.setLastModifiedDate(LocalDateTime.now());
-		community.setCommunityUsers(p.getCommunityUsers());
-		community.setSkills(createNonExistentSkills(community));
-		return communityRepository.save(community);
+		final Set<CommunityDetails> changedCommunityDetails = new TreeSet<>();
+		p.setLastModifiedDate(LocalDateTime.now());
+		if (!p.getType().equals(community.getType())) {
+			changedCommunityDetails.add(CommunityDetails.TYPE);
+			p.setType(community.getType());
+		}
+		final String oldCommunityName = p.getTitle();
+		if (!p.getTitle().equals(community.getTitle())) {
+			changedCommunityDetails.add(CommunityDetails.NAME);
+			p.setTitle(community.getTitle());
+		}
+		if (!p.getDescription().equals(community.getDescription())) {
+			changedCommunityDetails.add(CommunityDetails.DESCRIPTION);
+			p.setDescription(community.getDescription());
+		}
+		if (!CollectionUtils.isEqualCollection(
+				Optional.ofNullable(p.getSkills()).orElse(Collections.emptyList()),
+				Optional.ofNullable(community.getSkills()).orElse(Collections.emptyList()))) {
+			changedCommunityDetails.add(CommunityDetails.SKILLS);
+			p.setSkills(createNonExistentSkills(community));
+		}
+		if (!CollectionUtils.isEqualCollection(
+				Optional.ofNullable(p.getLinks()).orElse(Collections.emptyList()),
+				Optional.ofNullable(community.getLinks()).orElse(Collections.emptyList()))) {
+			if (p.getLinks() != null) {
+				if (community.getLinks() == null) {
+					linkCommandService.delete(p.getLinks());
+				}
+				else {
+					p.getLinks().forEach(link -> {
+						if (!community.getLinks().contains(link)) {
+							linkCommandService.delete(link);
+						}
+					});
+				}
+			}
+			p.setLinks(community.getLinks());
+			changedCommunityDetails.add(CommunityDetails.LINKS);
+		}
+		final Community result = communityRepository.save(p);
+		if (!changedCommunityDetails.isEmpty()) {
+			notificationCommandService.save(CommunityChangedNotification.builder()
+					.id(UUID.randomUUID().toString())
+					.creationDatetime(LocalDateTime.now())
+					.communityDetails(changedCommunityDetails)
+					.communityName(oldCommunityName)
+					.community(result)
+					.recipients(communityUserQueryService.getCommunityUsers(community.getId(), null).map(CommunityUser::getUser).collect(toList()))
+					.build()
+			);
+		}
+		return result;
 	}
 
 	@Transactional
@@ -110,15 +173,47 @@ public class CommunityCommandService {
 					.searchParamsMap(searchParamsMap)
 					.build();
 		});
-		Stream<CommunityUser> communityMembers = communityUserQueryService.getCommunityUsers(id, null);
+
+		// at first we have to send the notifications and change status of registrations
+		// since as soon as the community is deleted it is not possible to traverse graph properly
+
+		sendCommunityDeletedNotifications(community);
+
+		deletePendingInvitationsToJoinCommunity(community);
+
+		declinePendingUserRequests(community);
+
 		communityRepository.delete(community);
+	}
+
+	private void sendCommunityDeletedNotifications(Community community) {
+		final List<User> recipients = new LinkedList<>();
+
+		final Stream<CommunityUser> communityMembers = communityUserQueryService.getCommunityUsers(community.getId(), null);
+		final Stream<CommunityUserRegistration> pendingUserRequests = communityUserRegistrationQueryService.getPendingUserRequestsToJoinCommunity(community.getId());
+
+		Stream.concat(communityMembers.map(CommunityUser::getUser), pendingUserRequests.map(CommunityUserRegistration::getRegisteredUser))
+				.distinct().forEach(recipients::add);
+
 		notificationCommandService.save(CommunityDeletedNotification.builder()
 				.id(UUID.randomUUID().toString())
 				.communityName(community.getTitle())
 				.creationDatetime(LocalDateTime.now())
-				.recipients(communityMembers.map(CommunityUser::getUser).collect(toList()))
+				.recipients(recipients)
 				.build()
 		);
+	}
+
+	private void declinePendingUserRequests(Community community) {
+		final Stream<CommunityUserRegistration> pendingUserRequests = communityUserRegistrationQueryService.getPendingUserRequestsToJoinCommunity(community.getId());
+		pendingUserRequests.forEach(pendingUserRequest -> communityUserRegistrationCommandService.approve(pendingUserRequest, CommunityUserRegistrationApprovalCommand.builder()
+				.approvedByCommunity(false)
+				.build()));
+	}
+
+	private void deletePendingInvitationsToJoinCommunity(Community community) {
+		final Stream<CommunityUserRegistration> pendingInvitations = communityUserRegistrationQueryService.getPendingInvitationsToJoinCommunity(community.getId());
+		communityUserRegistrationCommandService.delete(pendingInvitations.collect(toList()));
 	}
 
 	private List<Skill> createNonExistentSkills(Community community) {

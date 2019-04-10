@@ -1,5 +1,6 @@
 package com.tsmms.skoop.community;
 
+import com.tsmms.skoop.community.link.LinkResponse;
 import com.tsmms.skoop.communityuser.CommunityUser;
 import com.tsmms.skoop.skill.SkillResponse;
 import com.tsmms.skoop.user.User;
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 
 import static com.tsmms.skoop.user.UserSimpleResponse.convertUserListToUserSimpleResponseList;
 import static com.tsmms.skoop.skill.SkillResponse.convertSkillListToSkillResponseList;
-import static com.tsmms.skoop.community.LinkResponse.convertLinkListToLinkResponseList;
+import static com.tsmms.skoop.community.link.LinkResponse.convertLinkListToLinkResponseList;
 
 @Data
 @Builder

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 public class CommunityUserRegistrationQueryService {
@@ -25,6 +26,22 @@ public class CommunityUserRegistrationQueryService {
 	public Optional<CommunityUserRegistration> getPendingUserRequestToJoinCommunity(String userId, String communityId) {
 		return communityUserRegistrationRepository
 				.findByRegisteredUserIdAndCommunityIdAndApprovedByUserIsTrueAndApprovedByCommunityIsNull(userId, communityId);
+	}
+
+	@Transactional(readOnly = true)
+	public Stream<CommunityUserRegistration> getPendingUserRequestsToJoinCommunity(String communityId) {
+		if (communityId == null) {
+			throw new IllegalArgumentException("Community ID cannot be null.");
+		}
+		return communityUserRegistrationRepository.findByCommunityIdAndApprovedByUserIsTrueAndApprovedByCommunityIsNull(communityId);
+	}
+
+	@Transactional(readOnly = true)
+	public Stream<CommunityUserRegistration> getPendingInvitationsToJoinCommunity(String communityId) {
+		if (communityId == null) {
+			throw new IllegalArgumentException("Community ID cannot be null.");
+		}
+		return communityUserRegistrationRepository.findByCommunityIdAndApprovedByUserIsNullAndApprovedByCommunityIsTrue(communityId);
 	}
 
 }

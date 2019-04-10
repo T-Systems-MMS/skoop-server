@@ -38,9 +38,6 @@ class SkillUserQueryControllerTests extends AbstractControllerTests {
 	@MockBean
 	private UserSkillQueryService userSkillQueryService;
 
-	@MockBean
-	private UserPermissionQueryService userPermissionQueryService;
-
 	@Test
 	@DisplayName("Responds with the list of users related to a specific skill. The list contains the only authenticated user.")
 	void testGettingAuthorizedUserRelatedToSpecificSkill() throws Exception {

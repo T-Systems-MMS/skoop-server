@@ -14,9 +14,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class CommunityUserRegistrationQueryServiceTests {
@@ -108,6 +110,103 @@ class CommunityUserRegistrationQueryServiceTests {
 				.build());
 		assertThat(registration.getApprovedByCommunity()).isFalse();
 		assertThat(registration.getApprovedByUser()).isTrue();
+	}
+
+	@DisplayName("Gets pending invitations to join community.")
+	@Test
+	void getsPendingInvitationsToJoinCommunity() {
+		given(communityUserRegistrationRepository.findByCommunityIdAndApprovedByUserIsNullAndApprovedByCommunityIsTrue("123")).willReturn(
+			Stream.of(
+					CommunityUserRegistration.builder()
+							.approvedByCommunity(true)
+							.approvedByUser(null)
+							.community(Community.builder()
+									.title("Java User Group")
+									.id("123")
+									.type(CommunityType.OPEN)
+									.build())
+							.registeredUser(User.builder()
+									.id("456")
+									.userName("tester")
+									.build())
+							.id("abc")
+							.creationDatetime(LocalDateTime.of(2019, 1, 20, 10, 0))
+							.build()
+			)
+		);
+		final Stream<CommunityUserRegistration> communityUserRegistrationStream = communityUserRegistrationQueryService.getPendingInvitationsToJoinCommunity("123");
+		assertThat(communityUserRegistrationStream).containsExactlyInAnyOrder(
+				CommunityUserRegistration.builder()
+						.approvedByCommunity(true)
+						.approvedByUser(null)
+						.community(Community.builder()
+								.title("Java User Group")
+								.id("123")
+								.type(CommunityType.OPEN)
+								.build())
+						.registeredUser(User.builder()
+								.id("456")
+								.userName("tester")
+								.build())
+						.id("abc")
+						.creationDatetime(LocalDateTime.of(2019, 1, 20, 10, 0))
+						.build()
+		);
+	}
+
+	@DisplayName("Throws exception if null is passed as community id when getting pending invitations to join community.")
+	@Test
+	void throwsExceptionIfNullIsPassedAsCommunityIdWhenGettingPendingInvitationsToJoinCommunity() {
+		assertThrows(IllegalArgumentException.class, () -> communityUserRegistrationQueryService.getPendingInvitationsToJoinCommunity(null));
+	}
+
+	@DisplayName("Gets pending user requests to join community.")
+	@Test
+	void getsPendingUserRequestsToJoinCommunity() {
+		given(communityUserRegistrationRepository.findByCommunityIdAndApprovedByUserIsTrueAndApprovedByCommunityIsNull("123")).willReturn(
+				Stream.of(
+						CommunityUserRegistration.builder()
+								.approvedByCommunity(null)
+								.approvedByUser(true)
+								.community(Community.builder()
+										.title("Java User Group")
+										.id("123")
+										.type(CommunityType.OPEN)
+										.build())
+								.registeredUser(User.builder()
+										.id("456")
+										.userName("tester")
+										.build())
+								.id("abc")
+								.creationDatetime(LocalDateTime.of(2019, 1, 20, 10, 0))
+								.build()
+				)
+		);
+		final Stream<CommunityUserRegistration> communityUserRegistrationStream = communityUserRegistrationQueryService.getPendingUserRequestsToJoinCommunity("123");
+		assertThat(communityUserRegistrationStream).containsExactlyInAnyOrder(
+				CommunityUserRegistration.builder()
+						.approvedByCommunity(null)
+						.approvedByUser(true)
+						.community(Community.builder()
+								.title("Java User Group")
+								.id("123")
+								.type(CommunityType.OPEN)
+								.build())
+						.registeredUser(User.builder()
+								.id("456")
+								.userName("tester")
+								.build())
+						.id("abc")
+						.creationDatetime(LocalDateTime.of(2019, 1, 20, 10, 0))
+						.build()
+		);
+	}
+
+
+	@DisplayName("Throws exception if null is passed as community id when getting pending user requests to join community.")
+	@Test
+	void throwsExceptionIfNullIsPassedAsCommunityIdWhenGettingPendingUserRequestsToJoinCommunity() {
+		assertThrows(IllegalArgumentException.class, () -> communityUserRegistrationQueryService.getPendingUserRequestsToJoinCommunity(null));
 	}
 
 }

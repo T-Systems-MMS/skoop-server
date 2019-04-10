@@ -2,7 +2,9 @@ package com.tsmms.skoop.notification.query;
 
 
 import com.tsmms.skoop.community.Community;
+import com.tsmms.skoop.community.CommunityChangedNotification;
 import com.tsmms.skoop.community.CommunityDeletedNotification;
+import com.tsmms.skoop.community.CommunityDetails;
 import com.tsmms.skoop.community.CommunityRole;
 import com.tsmms.skoop.community.CommunityType;
 import com.tsmms.skoop.communityuser.CommunityUserRoleChangedNotification;
@@ -22,6 +24,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.stream.Stream;
 
 import static java.util.Collections.singletonList;
@@ -62,6 +66,7 @@ class NotificationQueryServiceTests {
 										.build()
 								)
 								.build())
+						.communityName("Community")
 						.build(),
 				RequestToJoinCommunityNotification.builder()
 						.id("456")
@@ -80,6 +85,7 @@ class NotificationQueryServiceTests {
 										.build()
 								)
 								.build())
+						.communityName("AnotherCommunity")
 						.build(),
 				UserKickedOutFromCommunityNotification.builder()
 						.id("def")
@@ -94,6 +100,7 @@ class NotificationQueryServiceTests {
 								.type(CommunityType.CLOSED)
 								.build()
 						)
+						.communityName("JavaScript User Group")
 						.build(),
 				UserLeftCommunityNotification.builder()
 						.id("zyx")
@@ -107,6 +114,7 @@ class NotificationQueryServiceTests {
 								.id("0123")
 								.userName("UserLeftCommunity")
 								.build())
+						.communityName("AnotherCommunity")
 						.build(),
 				CommunityDeletedNotification.builder()
 						.id("iop")
@@ -126,6 +134,20 @@ class NotificationQueryServiceTests {
 								.id("abc")
 								.userName("tester")
 								.build())
+						.build(),
+				CommunityChangedNotification.builder()
+						.id("ttt")
+						.communityName("Changed community")
+						.creationDatetime(LocalDateTime.of(2017, 1, 3, 10, 0))
+						.recipients(singletonList(User.builder()
+								.id("abc")
+								.userName("tester")
+								.build()))
+						.community(Community.builder()
+								.id("123456789")
+								.title("Changed community")
+								.build())
+						.communityDetails(new HashSet<>(Arrays.asList(CommunityDetails.DESCRIPTION, CommunityDetails.TYPE)))
 						.build()
 		));
 
@@ -149,6 +171,7 @@ class NotificationQueryServiceTests {
 										.build()
 								)
 								.build())
+						.communityName("Community")
 						.build(),
 				RequestToJoinCommunityNotification.builder()
 						.id("456")
@@ -167,6 +190,7 @@ class NotificationQueryServiceTests {
 										.build()
 								)
 								.build())
+						.communityName("AnotherCommunity")
 						.build(),
 				UserKickedOutFromCommunityNotification.builder()
 						.id("def")
@@ -181,6 +205,7 @@ class NotificationQueryServiceTests {
 								.type(CommunityType.CLOSED)
 								.build()
 						)
+						.communityName("JavaScript User Group")
 						.build(),
 				UserLeftCommunityNotification.builder()
 						.id("zyx")
@@ -194,6 +219,7 @@ class NotificationQueryServiceTests {
 								.id("0123")
 								.userName("UserLeftCommunity")
 								.build())
+						.communityName("AnotherCommunity")
 						.build(),
 				CommunityDeletedNotification.builder()
 						.id("iop")
@@ -213,6 +239,20 @@ class NotificationQueryServiceTests {
 								.id("abc")
 								.userName("tester")
 								.build())
+						.build(),
+				CommunityChangedNotification.builder()
+						.id("ttt")
+						.communityName("Changed community")
+						.creationDatetime(LocalDateTime.of(2017, 1, 3, 10, 0))
+						.recipients(singletonList(User.builder()
+								.id("abc")
+								.userName("tester")
+								.build()))
+						.community(Community.builder()
+								.id("123456789")
+								.title("Changed community")
+								.build())
+						.communityDetails(new HashSet<>(Arrays.asList(CommunityDetails.DESCRIPTION, CommunityDetails.TYPE)))
 						.build()
 		);
 	}

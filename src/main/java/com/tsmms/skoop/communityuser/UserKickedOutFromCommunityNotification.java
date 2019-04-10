@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.neo4j.ogm.annotation.Property;
 import org.neo4j.ogm.annotation.Relationship;
 
 import java.time.LocalDateTime;
@@ -21,10 +22,15 @@ public class UserKickedOutFromCommunityNotification extends Notification {
 	@Relationship(type = "COMMUNITY")
 	private Community community;
 
+	@Property(name = "communityName")
+	private String communityName;
+
 	@Builder
-	public UserKickedOutFromCommunityNotification(String id, LocalDateTime creationDatetime, User user, Community community) {
+	public UserKickedOutFromCommunityNotification(String id, LocalDateTime creationDatetime, User user, Community community,
+												  String communityName) {
 		super(id, creationDatetime);
 		this.user = user;
 		this.community = community;
+		this.communityName = communityName;
 	}
 }

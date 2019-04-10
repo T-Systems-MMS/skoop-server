@@ -1,5 +1,6 @@
 package com.tsmms.skoop.community;
 
+import com.tsmms.skoop.community.link.LinkRequest;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;

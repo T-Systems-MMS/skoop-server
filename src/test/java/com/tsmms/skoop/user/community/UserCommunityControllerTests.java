@@ -5,7 +5,7 @@ import com.tsmms.skoop.common.JwtAuthenticationFactory;
 import com.tsmms.skoop.community.Community;
 import com.tsmms.skoop.community.CommunityRole;
 import com.tsmms.skoop.community.CommunityType;
-import com.tsmms.skoop.community.Link;
+import com.tsmms.skoop.community.link.Link;
 import com.tsmms.skoop.community.query.CommunityQueryService;
 import com.tsmms.skoop.skill.Skill;
 import com.tsmms.skoop.user.User;

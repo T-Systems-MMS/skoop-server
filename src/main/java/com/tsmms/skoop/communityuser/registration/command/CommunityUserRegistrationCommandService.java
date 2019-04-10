@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -68,6 +69,7 @@ public class CommunityUserRegistrationCommandService {
 					.id(UUID.randomUUID().toString())
 					.creationDatetime(LocalDateTime.now())
 					.registration(communityUserRegistration)
+					.communityName(communityUserRegistration.getCommunity().getTitle())
 					.build()
 			);
 		}
@@ -101,6 +103,7 @@ public class CommunityUserRegistrationCommandService {
 				.id(UUID.randomUUID().toString())
 				.registration(registration)
 				.creationDatetime(LocalDateTime.now())
+				.communityName(registration.getCommunity().getTitle())
 				.build()
 		).forEach(notificationCommandService::save);
 		return registrations;
@@ -132,10 +135,21 @@ public class CommunityUserRegistrationCommandService {
 		notificationCommandService.save(RequestToJoinCommunityNotification.builder()
 				.id(UUID.randomUUID().toString())
 				.registration(registration)
+				.communityName(registration.getCommunity().getTitle())
 				.creationDatetime(LocalDateTime.now())
 				.build()
 		);
 		return registration;
+	}
+
+	@Transactional
+	public void delete(Collection<CommunityUserRegistration> communityUserRegistrations) {
+		if (communityUserRegistrations == null) {
+			throw new IllegalArgumentException("The collection with community user registrations cannot be null.");
+		}
+		if (!communityUserRegistrations.isEmpty()) {
+			communityUserRegistrationRepository.deleteAll(communityUserRegistrations);
+		}
 	}
 
 }
