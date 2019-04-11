@@ -10,6 +10,8 @@ logging:
   level:
     root: INFO
     com.tsmms.skoop: DEBUG
+    # Set Neo4j logging to audit queries to the database
+    org.neo4j.ogm.drivers.bolt: DEBUG
 
 security:
   oauth2:

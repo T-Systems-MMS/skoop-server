@@ -4,6 +4,8 @@ logging:
     root: WARN
     # Set SKOOP log level to info by default.
     com.tsmms.skoop: INFO
+    # Set Neo4j logging to audit queries to the database
+    org.neo4j.ogm.drivers.bolt: DEBUG
   # Default log file name.
   file: logs/skoop-server.log
 
