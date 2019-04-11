@@ -41,9 +41,6 @@ public abstract class AbstractControllerTests {
 	@Autowired
 	protected CurrentUserService currentUserService;
 
-//	@MockBean
-//	protected SecurityService securityService;
-
 	@BeforeEach
 	void prepareSecurityService() {
 		willReturn(false).given(userPermissionQueryService).hasUserPermission(any(), any(), any());
