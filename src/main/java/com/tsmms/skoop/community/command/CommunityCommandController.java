@@ -1,13 +1,14 @@
 package com.tsmms.skoop.community.command;
 
 import com.tsmms.skoop.community.Community;
+import com.tsmms.skoop.community.query.CommunityQueryService;
 import com.tsmms.skoop.exception.NoSuchResourceException;
 import com.tsmms.skoop.exception.UserCommunityException;
 import com.tsmms.skoop.community.CommunityRequest;
 import com.tsmms.skoop.community.CommunityResponse;
 import com.tsmms.skoop.community.link.Link;
 import com.tsmms.skoop.exception.enums.Model;
-import com.tsmms.skoop.security.SecurityService;
+import com.tsmms.skoop.security.CurrentUserService;
 import com.tsmms.skoop.skill.Skill;
 import com.tsmms.skoop.skill.query.SkillQueryService;
 import com.tsmms.skoop.user.User;
@@ -43,16 +44,19 @@ public class CommunityCommandController {
 	private final CommunityCommandService communityCommandService;
 	private final UserQueryService userQueryService;
 	private final SkillQueryService skillQueryService;
-	private final SecurityService securityService;
+	private final CommunityQueryService communityQueryService;
+	private final CurrentUserService currentUserService;
 
 	public CommunityCommandController(CommunityCommandService communityCommandService,
 									  UserQueryService userQueryService,
 									  SkillQueryService skillQueryService,
-									  SecurityService securityService) {
+									  CurrentUserService currentUserService,
+									  CommunityQueryService communityQueryService) {
 		this.communityCommandService = communityCommandService;
 		this.userQueryService = userQueryService;
 		this.skillQueryService = skillQueryService;
-		this.securityService = securityService;
+		this.communityQueryService = communityQueryService;
+		this.currentUserService = currentUserService;
 	}
 
 	@ApiOperation(value = "Create new community",
@@ -89,7 +93,7 @@ public class CommunityCommandController {
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<CommunityResponse> update(@PathVariable("communityId") String communityId, @Valid @RequestBody CommunityRequest request) {
-		if (!securityService.isCommunityManager(communityId)) {
+		if (!communityQueryService.hasCommunityManagerRole(currentUserService.getCurrentUserId(), communityId)) {
 			throw new UserCommunityException("The user has to be a community manager to alter the community.");
 		}
 		final Community community = convertCommunityRequestToCommunityDomain(request);
@@ -110,7 +114,7 @@ public class CommunityCommandController {
 	@PreAuthorize("isAuthenticated()")
 	@DeleteMapping(path = "/communities/{communityId}")
 	public ResponseEntity<Void> delete(@PathVariable("communityId") String communityId) {
-		if (!securityService.isCommunityManager(communityId)) {
+		if (!communityQueryService.hasCommunityManagerRole(currentUserService.getCurrentUserId(), communityId)) {
 			throw new UserCommunityException("The user has to be a community manager to delete the community.");
 		}
 		communityCommandService.delete(communityId);

@@ -1,6 +1,7 @@
 package com.tsmms.skoop.communityuser.query;
 
 import com.tsmms.skoop.community.CommunityRole;
+import com.tsmms.skoop.community.query.CommunityQueryService;
 import com.tsmms.skoop.user.User;
 import com.tsmms.skoop.common.AbstractControllerTests;
 import com.tsmms.skoop.communityuser.CommunityUser;
@@ -30,6 +31,9 @@ class CommunityUserQueryControllerTests extends AbstractControllerTests {
 	@MockBean
 	private CommunityUserQueryService communityUserQueryService;
 
+	@MockBean
+	private CommunityQueryService communityQueryService;
+
 	@Autowired
 	private MockMvc mockMvc;
 
@@ -42,8 +46,7 @@ class CommunityUserQueryControllerTests extends AbstractControllerTests {
 				.userName("tester")
 				.build();
 
-		given(securityService.isCommunityManager("123")).willReturn(true);
-		given(securityService.isCommunityMember("123")).willReturn(true);
+		given(communityQueryService.isCommunityMember(tester.getId(), "123")).willReturn(true);
 
 		given(communityUserQueryService.getCommunityUsers("123", null))
 				.willReturn(Stream.of(CommunityUser.builder()
@@ -79,8 +82,7 @@ class CommunityUserQueryControllerTests extends AbstractControllerTests {
 				.userName("tester")
 				.build();
 
-		given(securityService.isCommunityManager("123")).willReturn(true);
-		given(securityService.isCommunityMember("123")).willReturn(true);
+		given(communityQueryService.isCommunityMember(tester.getId(), "123")).willReturn(true);
 
 		given(communityUserQueryService.getCommunityUsers("123", CommunityRole.MEMBER))
 				.willReturn(
@@ -111,8 +113,7 @@ class CommunityUserQueryControllerTests extends AbstractControllerTests {
 				.userName("tester")
 				.build();
 
-		given(securityService.isCommunityManager("123")).willReturn(false);
-		given(securityService.isCommunityMember("123")).willReturn(false);
+		given(communityQueryService.isCommunityMember(tester.getId(), "123")).willReturn(false);
 
 		mockMvc.perform(get("/communities/123/users")
 				.param("role", "MEMBER")

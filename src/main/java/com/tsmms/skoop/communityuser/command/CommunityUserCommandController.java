@@ -9,7 +9,7 @@ import com.tsmms.skoop.communityuser.registration.command.CommunityUserRegistrat
 import com.tsmms.skoop.communityuser.registration.query.CommunityUserRegistrationQueryService;
 import com.tsmms.skoop.exception.NoSuchResourceException;
 import com.tsmms.skoop.exception.UserCommunityException;
-import com.tsmms.skoop.security.SecurityService;
+import com.tsmms.skoop.security.CurrentUserService;
 import com.tsmms.skoop.user.User;
 import com.tsmms.skoop.user.query.UserQueryService;
 import com.tsmms.skoop.communityuser.CommunityUserResponse;
@@ -38,20 +38,20 @@ import java.util.Optional;
 public class CommunityUserCommandController {
 
 	private final CommunityUserCommandService communityUserCommandService;
-	private final SecurityService securityService;
+	private final CurrentUserService currentUserService;
 	private final CommunityQueryService communityQueryService;
 	private final UserQueryService userQueryService;
 	private final CommunityUserRegistrationQueryService communityUserRegistrationQueryService;
 	private final CommunityUserRegistrationCommandService communityUserRegistrationCommandService;
 
 	public CommunityUserCommandController(CommunityUserCommandService communityUserCommandService,
-										  SecurityService securityService,
+										  CurrentUserService currentUserService,
 										  CommunityQueryService communityQueryService,
 										  UserQueryService userQueryService,
 										  CommunityUserRegistrationQueryService communityUserRegistrationQueryService,
 										  CommunityUserRegistrationCommandService communityUserRegistrationCommandService) {
 		this.communityUserCommandService = communityUserCommandService;
-		this.securityService = securityService;
+		this.currentUserService = currentUserService;
 		this.communityQueryService = communityQueryService;
 		this.userQueryService = userQueryService;
 		this.communityUserRegistrationQueryService = communityUserRegistrationQueryService;
@@ -86,10 +86,10 @@ public class CommunityUserCommandController {
 					.build();
 		});
 		final Optional<CommunityUserRegistration> communityUserRegistration = communityUserRegistrationQueryService.getPendingUserRequestToJoinCommunity(request.getUserId(), communityId);
-		if (securityService.isAuthenticatedUserId(request.getUserId()) && CommunityType.OPEN.equals(community.getType())) {
+		if (currentUserService.isAuthenticatedUserId(request.getUserId()) && CommunityType.OPEN.equals(community.getType())) {
 			return ResponseEntity.status(HttpStatus.CREATED)
 					.body(CommunityUserResponse.of(communityUserCommandService.create(community, user, CommunityRole.MEMBER)));
-		} else if (securityService.isCommunityManager(communityId) && CommunityType.CLOSED.equals(community.getType())) {
+		} else if (communityQueryService.hasCommunityManagerRole(currentUserService.getCurrentUserId(), communityId) && CommunityType.CLOSED.equals(community.getType())) {
 			if (communityUserRegistration.isPresent()) {
 				final CommunityUserRegistration registration = communityUserRegistrationCommandService.approve(communityUserRegistration.get(), CommunityUserRegistrationApprovalCommand.builder()
 						.approvedByCommunity(true)
@@ -120,7 +120,7 @@ public class CommunityUserCommandController {
 	public ResponseEntity<CommunityUserResponse> changeCommunityUserRole(@PathVariable("communityId") String communityId,
 																 @PathVariable("userId") String userId,
 																 @RequestBody CommunityUserUpdateRequest request) {
-		if (!securityService.isCommunityManager(communityId)) {
+		if (!communityQueryService.hasCommunityManagerRole(currentUserService.getCurrentUserId(), communityId)) {
 			throw new UserCommunityException("The user has to be a community manager to alter other user's membership.");
 		} else {
 			return ResponseEntity.status(HttpStatus.OK).body(CommunityUserResponse.of(communityUserCommandService.update(communityId, userId, request.getRole())));
@@ -141,12 +141,12 @@ public class CommunityUserCommandController {
 	public ResponseEntity<Void> removeUserFromCommunity(
 			@PathVariable("communityId") String communityId,
 			@PathVariable("userId") String userId) {
-		if ((!securityService.isCommunityManager(communityId) && !securityService.isAuthenticatedUserId(userId)) ||
-				(securityService.isCommunityManager(communityId) && securityService.isAuthenticatedUserId(userId))) {
+		if ((!communityQueryService.hasCommunityManagerRole(currentUserService.getCurrentUserId(), communityId) && !currentUserService.isAuthenticatedUserId(userId)) ||
+				(communityQueryService.hasCommunityManagerRole(currentUserService.getCurrentUserId(), communityId) && currentUserService.isAuthenticatedUserId(userId))) {
 			throw new UserCommunityException("The authenticated user must be either a community manager or the one who is leaving the community. " +
 					"And if authenticated user is a community manager she / he cannot remove herself / himself from the community.");
 		} else {
-			if (securityService.isCommunityManager(communityId)) {
+			if (communityQueryService.hasCommunityManagerRole(currentUserService.getCurrentUserId(), communityId)) {
 				communityUserCommandService.kickoutUser(communityId, userId);
 			} else {
 				communityUserCommandService.leaveCommunity(communityId, userId);

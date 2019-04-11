@@ -1,8 +1,9 @@
 package com.tsmms.skoop.communityuser.query;
 
 import com.tsmms.skoop.community.CommunityRole;
+import com.tsmms.skoop.community.query.CommunityQueryService;
 import com.tsmms.skoop.exception.UserCommunityException;
-import com.tsmms.skoop.security.SecurityService;
+import com.tsmms.skoop.security.CurrentUserService;
 import com.tsmms.skoop.user.UserSimpleResponse;
 import com.tsmms.skoop.communityuser.CommunityUserResponse;
 import io.swagger.annotations.Api;
@@ -27,12 +28,15 @@ import static java.util.stream.Collectors.toList;
 public class CommunityUserQueryController {
 
 	private final CommunityUserQueryService communityUserQueryService;
-	private final SecurityService securityService;
+	private final CommunityQueryService communityQueryService;
+	private final CurrentUserService currentUserService;
 
 	public CommunityUserQueryController(CommunityUserQueryService communityUserQueryService,
-										SecurityService securityService) {
+										CommunityQueryService communityQueryService,
+										CurrentUserService currentUserService) {
 		this.communityUserQueryService = requireNonNull(communityUserQueryService);
-		this.securityService = securityService;
+		this.currentUserService = requireNonNull(currentUserService);
+		this.communityQueryService = requireNonNull(communityQueryService);
 	}
 
 
@@ -49,7 +53,7 @@ public class CommunityUserQueryController {
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<List<CommunityUserResponse>> getCommunityUsers(@PathVariable("communityId") String communityId,
 																		 @RequestParam(name = "role", required = false) String role) {
-		if (securityService.isCommunityMember(communityId) || securityService.isCommunityManager(communityId)) {
+		if (communityQueryService.isCommunityMember(currentUserService.getCurrentUserId(), communityId)) {
 			final CommunityRole communityRole;
 			if (!StringUtils.isEmpty(role)) {
 				communityRole = CommunityRole.valueOf(role);

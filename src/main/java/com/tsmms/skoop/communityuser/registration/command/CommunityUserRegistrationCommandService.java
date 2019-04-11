@@ -2,9 +2,6 @@ package com.tsmms.skoop.communityuser.registration.command;
 
 import com.tsmms.skoop.community.Community;
 import com.tsmms.skoop.community.CommunityRole;
-import com.tsmms.skoop.exception.NoSuchResourceException;
-import com.tsmms.skoop.exception.enums.Model;
-import com.tsmms.skoop.security.CurrentUserService;
 import com.tsmms.skoop.user.User;
 import com.tsmms.skoop.communityuser.command.CommunityUserCommandService;
 import com.tsmms.skoop.communityuser.registration.AcceptanceToCommunityNotification;
@@ -13,7 +10,6 @@ import com.tsmms.skoop.communityuser.registration.RequestToJoinCommunityNotifica
 import com.tsmms.skoop.notification.command.NotificationCommandService;
 import com.tsmms.skoop.communityuser.registration.CommunityUserRegistration;
 import com.tsmms.skoop.communityuser.registration.CommunityUserRegistrationRepository;
-import com.tsmms.skoop.user.query.UserQueryService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;

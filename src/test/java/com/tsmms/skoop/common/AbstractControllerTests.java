@@ -2,7 +2,6 @@ package com.tsmms.skoop.common;
 
 import com.tsmms.skoop.security.CurrentUserService;
 import com.tsmms.skoop.security.MethodSecurityConfiguration;
-import com.tsmms.skoop.security.SecurityService;
 import com.tsmms.skoop.user.UserPermissionScope;
 import com.tsmms.skoop.user.query.UserPermissionQueryService;
 import org.junit.jupiter.api.AfterEach;
@@ -10,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.neo4j.ogm.session.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 
@@ -19,7 +17,6 @@ import java.util.Collection;
 import static java.util.Arrays.asList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.willReturn;
-import static org.mockito.Mockito.when;
 
 /**
  * Base class for all Spring {@link org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest} classes.
@@ -44,8 +41,8 @@ public abstract class AbstractControllerTests {
 	@Autowired
 	protected CurrentUserService currentUserService;
 
-	@MockBean
-	protected SecurityService securityService;
+//	@MockBean
+//	protected SecurityService securityService;
 
 	@BeforeEach
 	void prepareSecurityService() {
