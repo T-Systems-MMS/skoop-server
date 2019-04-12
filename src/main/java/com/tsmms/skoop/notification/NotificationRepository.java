@@ -41,4 +41,7 @@ public interface NotificationRepository extends Neo4jRepository<Notification, St
 			" ORDER BY n.creationDatetime DESC")
 	Stream<Notification> getUserNotifications(@Param("userId") String userId);
 
+	@Query("MATCH (n:Notification)-[:CAUSED_BY]->(registration:CommunityUserRegistration {id: {registrationId}}) RETURN n")
+	Stream<Notification> findByRegistrationId(@Param("registrationId") String registrationId);
+
 }

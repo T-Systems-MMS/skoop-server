@@ -5,6 +5,8 @@ import com.tsmms.skoop.notification.NotificationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
+
 import static java.util.Objects.requireNonNull;
 
 @Service
@@ -19,6 +21,16 @@ public class NotificationCommandService {
 	@Transactional
 	public Notification save(Notification notification) {
 		return notificationRepository.save(notification);
+	}
+
+	@Transactional
+	public void delete(Notification notification) {
+		notificationRepository.delete(notification);
+	}
+
+	@Transactional
+	public void delete(Collection<Notification> notifications) {
+		notificationRepository.deleteAll(notifications);
 	}
 
 }

@@ -2,6 +2,7 @@ package com.tsmms.skoop.communityuser.registration.command;
 
 import com.tsmms.skoop.community.Community;
 import com.tsmms.skoop.community.CommunityType;
+import com.tsmms.skoop.notification.query.NotificationQueryService;
 import com.tsmms.skoop.user.User;
 import com.tsmms.skoop.communityuser.command.CommunityUserCommandService;
 import com.tsmms.skoop.communityuser.registration.CommunityUserRegistration;
@@ -44,12 +45,15 @@ class CommunityUserRegistrationCommandServiceTests {
 	@Mock
 	private NotificationCommandService notificationCommandService;
 
+	@Mock
+	private NotificationQueryService notificationQueryService;
+
 	private CommunityUserRegistrationCommandService communityUserRegistrationCommandService;
 
 	@BeforeEach
 	void setUp() {
 		this.communityUserRegistrationCommandService = new CommunityUserRegistrationCommandService(communityUserRegistrationRepository,
-				communityUserCommandService, notificationCommandService);
+				communityUserCommandService, notificationCommandService, notificationQueryService);
 	}
 
 	@DisplayName("Test if users are invited.")
@@ -420,6 +424,90 @@ class CommunityUserRegistrationCommandServiceTests {
 		assertThat(registration.getId()).isEqualTo("123");
 		assertThat(registration.getApprovedByUser()).isTrue();
 		assertThat(registration.getApprovedByCommunity()).isTrue();
+		assertThat(registration.getCreationDatetime()).isEqualTo(LocalDateTime.of(2019, 1, 15, 20, 0));
+		assertThat(registration.getCommunity()).isEqualTo(Community.builder()
+				.id("123")
+				.title("Java User Group")
+				.type(CommunityType.CLOSED)
+				.description("Community for Java developers")
+				.build());
+		assertThat(registration.getRegisteredUser()).isEqualTo(
+				User.builder()
+						.id("db87d46a-e4ca-451a-903b-e8533e0b924b")
+						.userName("tester")
+						.build()
+		);
+	}
+
+	@DisplayName("Decline community user registration on behalf of user.")
+	@Test
+	void declineOnBehalfOfUser() {
+		final CommunityUserRegistration registration = communityUserRegistrationCommandService.approve(CommunityUserRegistration.builder()
+						.approvedByCommunity(true)
+						.approvedByUser(null)
+						.registeredUser(User.builder()
+								.id("db87d46a-e4ca-451a-903b-e8533e0b924b")
+								.userName("tester")
+								.build())
+						.community(Community.builder()
+								.id("123")
+								.title("Java User Group")
+								.type(CommunityType.CLOSED)
+								.description("Community for Java developers")
+								.build())
+						.creationDatetime(LocalDateTime.of(2019, 1, 15, 20, 0))
+						.id("123")
+						.build(),
+				CommunityUserRegistrationApprovalCommand.builder()
+						.approvedByUser(false)
+						.approvedByCommunity(null)
+						.build()
+		);
+		assertThat(registration.getId()).isEqualTo("123");
+		assertThat(registration.getApprovedByUser()).isFalse();
+		assertThat(registration.getApprovedByCommunity()).isTrue();
+		assertThat(registration.getCreationDatetime()).isEqualTo(LocalDateTime.of(2019, 1, 15, 20, 0));
+		assertThat(registration.getCommunity()).isEqualTo(Community.builder()
+				.id("123")
+				.title("Java User Group")
+				.type(CommunityType.CLOSED)
+				.description("Community for Java developers")
+				.build());
+		assertThat(registration.getRegisteredUser()).isEqualTo(
+				User.builder()
+						.id("db87d46a-e4ca-451a-903b-e8533e0b924b")
+						.userName("tester")
+						.build()
+		);
+	}
+
+	@DisplayName("Decline community user registration on behalf of community.")
+	@Test
+	void declineOnBehalfOfCommunity() {
+		final CommunityUserRegistration registration = communityUserRegistrationCommandService.approve(CommunityUserRegistration.builder()
+						.approvedByCommunity(null)
+						.approvedByUser(true)
+						.registeredUser(User.builder()
+								.id("db87d46a-e4ca-451a-903b-e8533e0b924b")
+								.userName("tester")
+								.build())
+						.community(Community.builder()
+								.id("123")
+								.title("Java User Group")
+								.type(CommunityType.CLOSED)
+								.description("Community for Java developers")
+								.build())
+						.creationDatetime(LocalDateTime.of(2019, 1, 15, 20, 0))
+						.id("123")
+						.build(),
+				CommunityUserRegistrationApprovalCommand.builder()
+						.approvedByUser(null)
+						.approvedByCommunity(false)
+						.build()
+		);
+		assertThat(registration.getId()).isEqualTo("123");
+		assertThat(registration.getApprovedByUser()).isTrue();
+		assertThat(registration.getApprovedByCommunity()).isFalse();
 		assertThat(registration.getCreationDatetime()).isEqualTo(LocalDateTime.of(2019, 1, 15, 20, 0));
 		assertThat(registration.getCommunity()).isEqualTo(Community.builder()
 				.id("123")

@@ -2,6 +2,8 @@ package com.tsmms.skoop.communityuser.registration.command;
 
 import com.tsmms.skoop.community.Community;
 import com.tsmms.skoop.community.CommunityRole;
+import com.tsmms.skoop.notification.Notification;
+import com.tsmms.skoop.notification.query.NotificationQueryService;
 import com.tsmms.skoop.user.User;
 import com.tsmms.skoop.communityuser.command.CommunityUserCommandService;
 import com.tsmms.skoop.communityuser.registration.AcceptanceToCommunityNotification;
@@ -29,13 +31,16 @@ public class CommunityUserRegistrationCommandService {
 	private final CommunityUserRegistrationRepository communityUserRegistrationRepository;
 	private final CommunityUserCommandService communityUserCommandService;
 	private final NotificationCommandService notificationCommandService;
+	private final NotificationQueryService notificationQueryService;
 
 	public CommunityUserRegistrationCommandService(CommunityUserRegistrationRepository communityUserRegistrationRepository,
 												   CommunityUserCommandService communityUserCommandService,
-												   NotificationCommandService notificationCommandService) {
+												   NotificationCommandService notificationCommandService,
+												   NotificationQueryService notificationQueryService) {
 		this.communityUserRegistrationRepository = requireNonNull(communityUserRegistrationRepository);
 		this.communityUserCommandService = requireNonNull(communityUserCommandService);
 		this.notificationCommandService = requireNonNull(notificationCommandService);
+		this.notificationQueryService = requireNonNull(notificationQueryService);
 	}
 
 	@Transactional
@@ -53,23 +58,38 @@ public class CommunityUserRegistrationCommandService {
 		if (command.getApprovedByUser() != null) {
 			registration.setApprovedByUser(command.getApprovedByUser());
 		}
+		if (Boolean.FALSE.equals(registration.getApprovedByUser()) || Boolean.FALSE.equals(registration.getApprovedByCommunity())) {
+			deleteToDosConnectedWithCommunityUserRegistration(registration);
+			communityUserRegistrationRepository.delete(registration);
+			return registration;
+		}
 		final CommunityUserRegistration communityUserRegistration = communityUserRegistrationRepository.save(registration);
 		if (Boolean.TRUE.equals(communityUserRegistration.getApprovedByCommunity()) &&
 				Boolean.TRUE.equals(communityUserRegistration.getApprovedByUser())) {
 			communityUserRegistration.setCommunityUser(communityUserCommandService.create(registration.getCommunity(), registration.getRegisteredUser(), CommunityRole.MEMBER));
 		}
 		if (Boolean.TRUE.equals(communityUserRegistration.getApprovedByCommunity()) &&
-				Boolean.TRUE.equals(communityUserRegistration.getApprovedByUser()) &&
-				isAcceptanceToCommunity) {
-			notificationCommandService.save(AcceptanceToCommunityNotification.builder()
-					.id(UUID.randomUUID().toString())
-					.creationDatetime(LocalDateTime.now())
-					.registration(communityUserRegistration)
-					.communityName(communityUserRegistration.getCommunity().getTitle())
-					.build()
-			);
+				Boolean.TRUE.equals(communityUserRegistration.getApprovedByUser())) {
+			deleteToDosConnectedWithCommunityUserRegistration(communityUserRegistration);
+			if (isAcceptanceToCommunity) {
+				notificationCommandService.save(AcceptanceToCommunityNotification.builder()
+						.id(UUID.randomUUID().toString())
+						.creationDatetime(LocalDateTime.now())
+						.registration(communityUserRegistration)
+						.communityName(communityUserRegistration.getCommunity().getTitle())
+						.build()
+				);
+			} else {
+				communityUserRegistrationRepository.delete(communityUserRegistration);
+			}
 		}
 		return communityUserRegistration;
+	}
+
+	private void deleteToDosConnectedWithCommunityUserRegistration(CommunityUserRegistration communityUserRegistration) {
+		final List<Notification> notifications = notificationQueryService.getNotificationsByCommunityUserRegistrationId(communityUserRegistration.getId())
+				.collect(Collectors.toList());
+		notificationCommandService.delete(notifications);
 	}
 
 	/**

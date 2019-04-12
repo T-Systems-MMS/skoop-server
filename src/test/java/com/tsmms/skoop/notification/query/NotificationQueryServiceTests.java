@@ -257,4 +257,56 @@ class NotificationQueryServiceTests {
 		);
 	}
 
+	@DisplayName("Gets notifications by community user registration ID.")
+	@Test
+	void getsNotificationByCommunityUserRegistrationId() {
+		given(notificationRepository.findByRegistrationId("abc")).willReturn(
+				Stream.of(
+						InvitationToJoinCommunityNotification.builder()
+								.id("123")
+								.creationDatetime(LocalDateTime.of(2019, 3, 27, 9, 34))
+								.registration(CommunityUserRegistration.builder()
+										.id("abc")
+										.approvedByUser(null)
+										.approvedByCommunity(true)
+										.registeredUser(User.builder()
+												.id("abc")
+												.userName("tester")
+												.build())
+										.community(Community.builder()
+												.id("cba")
+												.type(CommunityType.CLOSED)
+												.title("Community")
+												.build()
+										)
+										.build())
+								.communityName("Community")
+								.build()
+				)
+		);
+		final Stream<Notification> notificationStream = notificationQueryService.getNotificationsByCommunityUserRegistrationId("abc");
+		assertThat(notificationStream).containsExactlyInAnyOrder(
+				InvitationToJoinCommunityNotification.builder()
+						.id("123")
+						.creationDatetime(LocalDateTime.of(2019, 3, 27, 9, 34))
+						.registration(CommunityUserRegistration.builder()
+								.id("abc")
+								.approvedByUser(null)
+								.approvedByCommunity(true)
+								.registeredUser(User.builder()
+										.id("abc")
+										.userName("tester")
+										.build())
+								.community(Community.builder()
+										.id("cba")
+										.type(CommunityType.CLOSED)
+										.title("Community")
+										.build()
+								)
+								.build())
+						.communityName("Community")
+						.build()
+		);
+	}
+
 }
