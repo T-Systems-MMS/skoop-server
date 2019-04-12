@@ -81,7 +81,7 @@ public class CommunityUserRegistrationCommandController {
 					.build();
 		});
 		final List<CommunityUserRegistrationResponse> result;
-		if (communityQueryService.hasCommunityManagerRole(currentUserService.getCurrentUserId(), communityId)) {
+		if (communityQueryService.isCommunityManager(currentUserService.getCurrentUserId(), communityId)) {
 			result = communityUserRegistrationCommandService.createUserRegistrationsOnBehalfOfCommunity(users, community).stream().map(CommunityUserRegistrationResponse::of).collect(Collectors.toList());
 		} else if (CommunityType.OPEN.equals(community.getType()) && communityQueryService.isCommunityMember(currentUserService.getCurrentUserId(), communityId)) {
 			if (users.stream().anyMatch(user -> currentUserService.isAuthenticatedUserId(user.getId()))) {
@@ -130,7 +130,7 @@ public class CommunityUserRegistrationCommandController {
 					.build();
 		});
 		final CommunityUserRegistrationApprovalCommand command = request.command();
-		if (communityQueryService.hasCommunityManagerRole(currentUserService.getCurrentUserId(), communityId)) {
+		if (communityQueryService.isCommunityManager(currentUserService.getCurrentUserId(), communityId)) {
 			command.setApprovedByUser(null);
 			return ResponseEntity.ok(CommunityUserRegistrationResponse.of(communityUserRegistrationCommandService.approve(registration, command)));
 		} else if (currentUserService.isAuthenticatedUserId(registration.getRegisteredUser().getId())) {

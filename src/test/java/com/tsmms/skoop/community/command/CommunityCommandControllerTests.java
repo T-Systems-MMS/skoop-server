@@ -261,7 +261,7 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 				.userName("tester")
 				.build();
 
-		given(communityQueryService.hasCommunityManagerRole(owner.getId(), "123")).willReturn(true);
+		given(communityQueryService.isCommunityManager(owner.getId(), "123")).willReturn(true);
 
 		given(skillQueryService.findByNameIgnoreCase("Spring Boot")).willReturn(
 				Optional.of(
@@ -410,7 +410,7 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
 				.build();
-		given(communityQueryService.hasCommunityManagerRole(owner.getId(), "123")).willReturn(false);
+		given(communityQueryService.isCommunityManager(owner.getId(), "123")).willReturn(false);
 		final ClassPathResource body = new ClassPathResource("community/update-community.json");
 		try (final InputStream is = body.getInputStream()) {
 			mockMvc.perform(put("/communities/123")
@@ -430,7 +430,7 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
 				.build();
-		given(communityQueryService.hasCommunityManagerRole(owner.getId(), "123")).willReturn(true);
+		given(communityQueryService.isCommunityManager(owner.getId(), "123")).willReturn(true);
 		mockMvc.perform(delete("/communities/123")
 				.with(authentication(withUser(owner))))
 				.andExpect(status().isNoContent());
@@ -443,7 +443,7 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
 				.build();
-		given(communityQueryService.hasCommunityManagerRole(owner.getId(), "123")).willReturn(false);
+		given(communityQueryService.isCommunityManager(owner.getId(), "123")).willReturn(false);
 		mockMvc.perform(delete("/communities/123")
 				.with(authentication(withUser(owner, "ADMIN"))))
 				.andExpect(status().isForbidden());

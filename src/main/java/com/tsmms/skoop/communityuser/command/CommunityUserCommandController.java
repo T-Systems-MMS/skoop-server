@@ -89,7 +89,7 @@ public class CommunityUserCommandController {
 		if (currentUserService.isAuthenticatedUserId(request.getUserId()) && CommunityType.OPEN.equals(community.getType())) {
 			return ResponseEntity.status(HttpStatus.CREATED)
 					.body(CommunityUserResponse.of(communityUserCommandService.create(community, user, CommunityRole.MEMBER)));
-		} else if (communityQueryService.hasCommunityManagerRole(currentUserService.getCurrentUserId(), communityId) && CommunityType.CLOSED.equals(community.getType())) {
+		} else if (communityQueryService.isCommunityManager(currentUserService.getCurrentUserId(), communityId) && CommunityType.CLOSED.equals(community.getType())) {
 			if (communityUserRegistration.isPresent()) {
 				final CommunityUserRegistration registration = communityUserRegistrationCommandService.approve(communityUserRegistration.get(), CommunityUserRegistrationApprovalCommand.builder()
 						.approvedByCommunity(true)
@@ -120,7 +120,7 @@ public class CommunityUserCommandController {
 	public ResponseEntity<CommunityUserResponse> changeCommunityUserRole(@PathVariable("communityId") String communityId,
 																 @PathVariable("userId") String userId,
 																 @RequestBody CommunityUserUpdateRequest request) {
-		if (!communityQueryService.hasCommunityManagerRole(currentUserService.getCurrentUserId(), communityId)) {
+		if (!communityQueryService.isCommunityManager(currentUserService.getCurrentUserId(), communityId)) {
 			throw new UserCommunityException("The user has to be a community manager to alter other user's membership.");
 		} else {
 			return ResponseEntity.status(HttpStatus.OK).body(CommunityUserResponse.of(communityUserCommandService.update(communityId, userId, request.getRole())));
@@ -141,12 +141,12 @@ public class CommunityUserCommandController {
 	public ResponseEntity<Void> removeUserFromCommunity(
 			@PathVariable("communityId") String communityId,
 			@PathVariable("userId") String userId) {
-		if ((!communityQueryService.hasCommunityManagerRole(currentUserService.getCurrentUserId(), communityId) && !currentUserService.isAuthenticatedUserId(userId)) ||
-				(communityQueryService.hasCommunityManagerRole(currentUserService.getCurrentUserId(), communityId) && currentUserService.isAuthenticatedUserId(userId))) {
+		if ((!communityQueryService.isCommunityManager(currentUserService.getCurrentUserId(), communityId) && !currentUserService.isAuthenticatedUserId(userId)) ||
+				(communityQueryService.isCommunityManager(currentUserService.getCurrentUserId(), communityId) && currentUserService.isAuthenticatedUserId(userId))) {
 			throw new UserCommunityException("The authenticated user must be either a community manager or the one who is leaving the community. " +
 					"And if authenticated user is a community manager she / he cannot remove herself / himself from the community.");
 		} else {
-			if (communityQueryService.hasCommunityManagerRole(currentUserService.getCurrentUserId(), communityId)) {
+			if (communityQueryService.isCommunityManager(currentUserService.getCurrentUserId(), communityId)) {
 				communityUserCommandService.kickoutUser(communityId, userId);
 			} else {
 				communityUserCommandService.leaveCommunity(communityId, userId);

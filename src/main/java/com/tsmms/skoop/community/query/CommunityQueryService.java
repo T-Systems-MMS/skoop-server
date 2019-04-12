@@ -34,7 +34,7 @@ public class CommunityQueryService {
 	}
 
 	@Transactional(readOnly = true)
-	public boolean hasCommunityManagerRole(String userId, String communityId) {
+	public boolean isCommunityManager(String userId, String communityId) {
 		return communityRepository.isCommunityManager(userId, communityId);
 	}
 

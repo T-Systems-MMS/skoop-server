@@ -28,16 +28,7 @@ public class CurrentUserService {
 	 * @return <code>true</code> if the given user ID equals the user ID of the authenticated user.
 	 */
 	public boolean isAuthenticatedUserId(String userId) {
-		return isAuthenticatedUserId(getCurrentUserId(), userId);
-	}
-	/**
-	 * Checks whether the given user ID equals the user ID of the authenticated user.
-	 *
-	 * @param authenticatedUserId User ID of the authenticated user.
-	 * @param userId User ID to check against the authenticated user.
-	 * @return <code>true</code> if the given user ID equals the user ID of the authenticated user.
-	 */
-	public boolean isAuthenticatedUserId(String authenticatedUserId, String userId) {
+		final String authenticatedUserId = getCurrentUserId();
 		return userId == null && authenticatedUserId == null || userId != null && userId.equals(authenticatedUserId);
 	}
 

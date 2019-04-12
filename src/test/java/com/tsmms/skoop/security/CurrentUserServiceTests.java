@@ -5,7 +5,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class CurrentUserServiceTests {
@@ -26,7 +25,7 @@ class CurrentUserServiceTests {
 	@DisplayName("Authenticated user ID is the expected one.")
 	@Test
 	void isAuthenticatedUserIdEqualToExpectedId() {
-		assertThat(currentUserService.isAuthenticatedUserId("123", "123")).isTrue();
+		assertThrows(UserNotAuthenticatedException.class, () -> currentUserService.isAuthenticatedUserId("123"));
 	}
 
 }

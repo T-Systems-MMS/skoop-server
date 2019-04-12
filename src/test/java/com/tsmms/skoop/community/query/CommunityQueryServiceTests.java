@@ -355,7 +355,7 @@ class CommunityQueryServiceTests {
 	@Test
 	void userHasCommunityManagerRole() {
 		given(communityRepository.isCommunityManager("123", "456")).willReturn(true);
-		assertThat(communityQueryService.hasCommunityManagerRole("123", "456")).isTrue();
+		assertThat(communityQueryService.isCommunityManager("123", "456")).isTrue();
 	}
 
 }
