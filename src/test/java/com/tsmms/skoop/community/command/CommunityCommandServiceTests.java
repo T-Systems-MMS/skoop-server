@@ -18,6 +18,7 @@ import com.tsmms.skoop.communityuser.command.CommunityUserCommandService;
 import com.tsmms.skoop.communityuser.query.CommunityUserQueryService;
 import com.tsmms.skoop.notification.command.NotificationCommandService;
 import com.tsmms.skoop.communityuser.registration.command.CommunityUserRegistrationCommandService;
+import com.tsmms.skoop.user.query.UserQueryService;
 import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
 import org.hamcrest.core.AllOf;
@@ -75,6 +76,9 @@ class CommunityCommandServiceTests {
 	@Mock
 	private CommunityUserRegistrationQueryService communityUserRegistrationQueryService;
 
+	@Mock
+	private UserQueryService userQueryService;
+
 	private CommunityCommandService communityCommandService;
 
 	@BeforeEach
@@ -87,16 +91,20 @@ class CommunityCommandServiceTests {
 				communityUserQueryService,
 				notificationCommandService,
 				linkCommandService,
-				communityUserRegistrationQueryService);
+				communityUserRegistrationQueryService,
+				userQueryService);
 	}
 
 	@Test
 	@DisplayName("Tests if community is created.")
 	void testIfCommunityIsCreated() {
-		given(currentUserService.getCurrentUser()).willReturn(User.builder()
-				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
-				.userName("tester")
-				.build());
+		given(userQueryService.getUserById("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(Optional.of(
+				User.builder()
+						.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+						.userName("tester")
+						.build()
+		));
+		given(currentUserService.getCurrentUserId()).willReturn("1f37fb2a-b4d0-4119-9113-4677beb20ae2");
 		given(communityRepository.findByTitleIgnoreCase("Java User Group")).willReturn(Optional.empty());
 
 		final Skill springBootSkill = Skill.builder()

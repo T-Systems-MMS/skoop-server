@@ -23,6 +23,7 @@ import com.tsmms.skoop.skill.command.SkillCommandService;
 import com.tsmms.skoop.user.User;
 import com.tsmms.skoop.communityuser.registration.command.CommunityUserRegistrationCommandService;
 import org.apache.commons.collections4.CollectionUtils;
+import com.tsmms.skoop.user.query.UserQueryService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,6 +53,7 @@ public class CommunityCommandService {
 	private final NotificationCommandService notificationCommandService;
 	private final LinkCommandService linkCommandService;
 	private final CommunityUserRegistrationQueryService communityUserRegistrationQueryService;
+	private final UserQueryService userQueryService;
 
 	public CommunityCommandService(CommunityRepository communityRepository,
 								   CurrentUserService currentUserService,
@@ -61,7 +63,8 @@ public class CommunityCommandService {
 								   CommunityUserQueryService communityUserQueryService,
 								   NotificationCommandService notificationCommandService,
 								   LinkCommandService linkCommandService,
-								   CommunityUserRegistrationQueryService communityUserRegistrationQueryService) {
+								   CommunityUserRegistrationQueryService communityUserRegistrationQueryService,
+								   UserQueryService userQueryService) {
 		this.communityRepository = requireNonNull(communityRepository);
 		this.currentUserService = requireNonNull(currentUserService);
 		this.skillCommandService = requireNonNull(skillCommandService);
@@ -71,6 +74,7 @@ public class CommunityCommandService {
 		this.notificationCommandService = requireNonNull(notificationCommandService);
 		this.linkCommandService = requireNonNull(linkCommandService);
 		this.communityUserRegistrationQueryService = requireNonNull(communityUserRegistrationQueryService);
+		this.userQueryService = requireNonNull(userQueryService);
 	}
 
 	@Transactional
@@ -86,7 +90,11 @@ public class CommunityCommandService {
 		community.setId(UUID.randomUUID().toString());
 		community.setSkills(createNonExistentSkills(community));
 		final Community c = communityRepository.save(community);
-		communityUserCommandService.create(c, currentUserService.getCurrentUser(), CommunityRole.MANAGER);
+		final User user = userQueryService.getUserById(currentUserService.getCurrentUserId()).orElseThrow(() -> NoSuchResourceException.builder()
+				.model(Model.USER)
+				.searchParamsMap(new String[]{"id", currentUserService.getCurrentUserId()})
+				.build());
+		communityUserCommandService.create(c, user, CommunityRole.MANAGER);
 		if (!CollectionUtils.isEmpty(invitedUsers)) {
 			communityUserRegistrationCommandService.createUserRegistrationsOnBehalfOfCommunity(invitedUsers, c);
 		}

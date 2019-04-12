@@ -38,9 +38,6 @@ class UserQueryControllerTests extends AbstractControllerTests {
 	@MockBean
 	private UserQueryService userQueryService;
 
-	@MockBean
-	private UserPermissionQueryService userPermissionQueryService;
-
 	private User owner;
 
 	@BeforeEach

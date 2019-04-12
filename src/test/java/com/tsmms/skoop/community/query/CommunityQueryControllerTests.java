@@ -39,9 +39,6 @@ import static java.util.Collections.singletonList;
 class CommunityQueryControllerTests extends AbstractControllerTests {
 
 	@MockBean
-	private CurrentUserService currentUserService;
-
-	@MockBean
 	private CommunityQueryService communityQueryService;
 
 	@Autowired
@@ -69,8 +66,6 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 				.id("10ea2af6-cd81-48e0-b339-0576d16b9d19")
 				.name("JavaScript")
 				.build();
-
-		given(currentUserService.getCurrentUser()).willReturn(owner);
 
 		given(communityQueryService.getCommunities()).willReturn(
 				Stream.of(
@@ -176,8 +171,6 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 				.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
 				.name("Angular")
 				.build();
-
-		given(currentUserService.getCurrentUser()).willReturn(owner);
 
 		given(communityQueryService.getCommunityById("456")).willReturn(
 				Optional.of(

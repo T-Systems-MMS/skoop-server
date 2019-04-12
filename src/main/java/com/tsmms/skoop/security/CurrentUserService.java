@@ -1,26 +1,16 @@
 package com.tsmms.skoop.security;
 
-import com.tsmms.skoop.exception.NoSuchResourceException;
 import com.tsmms.skoop.exception.UserNotAuthenticatedException;
-import com.tsmms.skoop.user.User;
-import com.tsmms.skoop.user.query.UserQueryService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
-import static com.tsmms.skoop.exception.enums.Model.USER;
 import static com.tsmms.skoop.security.JwtClaims.SKOOP_USER_ID;
 
 @Service
 public class CurrentUserService {
 
-	private final UserQueryService userQueryService;
-
-	public CurrentUserService(UserQueryService userQueryService) {
-		this.userQueryService = userQueryService;
-	}
-
-	public User getCurrentUser() {
+	public String getCurrentUserId() {
 		if (SecurityContextHolder.getContext().getAuthentication() == null) {
 			throw new UserNotAuthenticatedException();
 		}
@@ -28,11 +18,18 @@ public class CurrentUserService {
 		if (!(SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof Jwt)) {
 			throw new UserNotAuthenticatedException();
 		}
-		final String userId = ((Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getClaimAsString(SKOOP_USER_ID);
-		return userQueryService.getUserById(userId).orElseThrow(() -> NoSuchResourceException.builder()
-				.model(USER)
-				.searchParamsMap(new String[]{"id", userId})
-				.build());
+		return  ((Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getClaimAsString(SKOOP_USER_ID);
+	}
+
+	/**
+	 * Checks whether the given user ID equals the user ID of the authenticated user.
+	 *
+	 * @param userId User ID to check against the authenticated user.
+	 * @return <code>true</code> if the given user ID equals the user ID of the authenticated user.
+	 */
+	public boolean isAuthenticatedUserId(String userId) {
+		final String authenticatedUserId = getCurrentUserId();
+		return userId == null && authenticatedUserId == null || userId != null && userId.equals(authenticatedUserId);
 	}
 
 }

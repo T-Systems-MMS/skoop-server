@@ -1,8 +1,9 @@
 package com.tsmms.skoop.common;
 
+import com.tsmms.skoop.security.CurrentUserService;
 import com.tsmms.skoop.security.MethodSecurityConfiguration;
-import com.tsmms.skoop.security.SecurityService;
 import com.tsmms.skoop.user.UserPermissionScope;
+import com.tsmms.skoop.user.query.UserPermissionQueryService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.neo4j.ogm.session.SessionFactory;
@@ -16,7 +17,6 @@ import java.util.Collection;
 import static java.util.Arrays.asList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.willReturn;
-import static org.mockito.Mockito.when;
 
 /**
  * Base class for all Spring {@link org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest} classes.
@@ -27,24 +27,23 @@ import static org.mockito.Mockito.when;
  * </ul>
  * <p>Provides convenient builder methods to configure user permissions checked by method security.</p>
  */
-@Import({Neo4jSessionFactoryConfiguration.class, MethodSecurityConfiguration.class})
+@Import({Neo4jSessionFactoryConfiguration.class, MethodSecurityConfiguration.class, CurrentUserService.class})
 public abstract class AbstractControllerTests {
 	@MockBean
 	private JwtDecoder jwtDecoder;
 
 	@MockBean
-	protected SecurityService securityService;
+	protected UserPermissionQueryService userPermissionQueryService;
 
 	@Autowired
 	private SessionFactory sessionFactory;
 
+	@Autowired
+	protected CurrentUserService currentUserService;
+
 	@BeforeEach
 	void prepareSecurityService() {
-		willReturn(false).given(securityService).hasUserPermission(any(), any(), any());
-		willReturn(false).given(securityService).isCommunityManager(any());
-		willReturn(false).given(securityService).isCommunityManager(any(), any());
-		willReturn(false).given(securityService).isAuthenticatedUserId(any());
-		when(securityService.isAuthenticatedUserId(any(), any())).thenCallRealMethod();
+		willReturn(false).given(userPermissionQueryService).hasUserPermission(any(), any(), any());
 	}
 
 	@AfterEach
@@ -79,7 +78,7 @@ public abstract class AbstractControllerTests {
 			public void forScopes(UserPermissionScope... scopes) {
 				for (UserPermissionScope scope : scopes) {
 					for (String authorizedUserId : authorizedUserIds) {
-						willReturn(true).given(securityService)
+						willReturn(true).given(userPermissionQueryService)
 								.hasUserPermission(userId, authorizedUserId, scope);
 					}
 				}

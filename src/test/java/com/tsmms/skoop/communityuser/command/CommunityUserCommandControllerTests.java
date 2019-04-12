@@ -73,8 +73,7 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 
 		given(communityQueryService.getCommunityById("123")).willReturn(Optional.of(community));
 
-		given(securityService.isAuthenticatedUserId(tester.getId())).willReturn(true);
-		given(securityService.isCommunityManager("123")).willReturn(false);
+		given(communityQueryService.isCommunityManager(tester.getId(),"123")).willReturn(false);
 
 		given(userQueryService.getUserById("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(Optional.of(tester));
 
@@ -171,8 +170,7 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 				.type(CommunityType.CLOSED)
 				.build()));
 
-		given(securityService.isAuthenticatedUserId("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(true);
-		given(securityService.isCommunityManager("123")).willReturn(false);
+		given(communityQueryService.isCommunityManager("1f37fb2a-b4d0-4119-9113-4677beb20ae2", "123")).willReturn(false);
 
 		given(userQueryService.getUserById("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(Optional.of(tester));
 
@@ -211,8 +209,7 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 						.build()
 		));
 
-		given(securityService.isCommunityManager("123")).willReturn(true);
-		given(securityService.isAuthenticatedUserId("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(false);
+		given(communityQueryService.isCommunityManager("1f37fb2a-b4d0-4119-9113-4677beb20ae2", "123")).willReturn(true);
 
 		given(communityUserRegistrationQueryService.getPendingUserRequestToJoinCommunity("1f37fb2a-b4d0-4119-9113-4677beb20ae2", "123"))
 				.willReturn(Optional.empty());
@@ -252,8 +249,7 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 						.build()
 		));
 
-		given(securityService.isCommunityManager("123")).willReturn(true);
-		given(securityService.isAuthenticatedUserId("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(false);
+		given(communityQueryService.isCommunityManager("abcdefgh-b4d0-4119-9113-4677beb20ae2", "123")).willReturn(true);
 
 		given(communityUserRegistrationQueryService.getPendingUserRequestToJoinCommunity("1f37fb2a-b4d0-4119-9113-4677beb20ae2", "123"))
 				.willReturn(Optional.of(
@@ -353,7 +349,7 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 				.userName("tester")
 				.build();
 
-		given(securityService.isCommunityManager( "123")).willReturn(true);
+		given(communityQueryService.isCommunityManager(owner.getId(), "123")).willReturn(true);
 
 		given(communityUserCommandService.update("123", "4f09647e-c7d3-4aa6-ab3d-0faff66b951f", CommunityRole.MANAGER)).willReturn(
 				CommunityUser.builder()
@@ -389,7 +385,7 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 				.userName("tester")
 				.build();
 
-		given(securityService.isCommunityManager("1f37fb2a-b4d0-4119-9113-4677beb20ae2", "123")).willReturn(true);
+		given(communityQueryService.isCommunityManager("1f37fb2a-b4d0-4119-9113-4677beb20ae2", "123")).willReturn(true);
 
 		final ClassPathResource body = new ClassPathResource("community/command/change-community-user-role.json");
 
@@ -444,7 +440,7 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 				.userName("tester")
 				.build();
 
-		given(securityService.isCommunityManager("1f37fb2a-b4d0-4119-9113-4677beb20ae2", "123")).willReturn(true);
+		given(communityQueryService.isCommunityManager("1f37fb2a-b4d0-4119-9113-4677beb20ae2", "123")).willReturn(true);
 
 		final ClassPathResource body = new ClassPathResource("community/command/change-community-user-role-invalid.json");
 
@@ -473,8 +469,7 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 				.userName("tester")
 				.build();
 
-		given(securityService.isAuthenticatedUserId("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(true);
-		given(securityService.isCommunityManager("123")).willReturn(false);
+		given(communityQueryService.isCommunityManager(owner.getId(), "123")).willReturn(false);
 
 		mockMvc.perform(delete("/communities/123/users/1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.with(authentication(withUser(owner))))
@@ -496,8 +491,7 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 				.userName("tester")
 				.build();
 
-		given(securityService.isCommunityManager( "123")).willReturn(true);
-		given(securityService.isAuthenticatedUserId("a396d5a8-a6b1-4c71-9498-a16e655dae2e")).willReturn(false);
+		given(communityQueryService.isCommunityManager(owner.getId(), "123")).willReturn(true);
 
 		mockMvc.perform(delete("/communities/123/users/a396d5a8-a6b1-4c71-9498-a16e655dae2e")
 				.with(authentication(withUser(owner))))
@@ -512,8 +506,7 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 				.userName("tester")
 				.build();
 
-		given(securityService.isCommunityManager( "123")).willReturn(true);
-		given(securityService.isAuthenticatedUserId("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(true);
+		given(communityQueryService.isCommunityManager(owner.getId(), "123")).willReturn(true);
 
 		mockMvc.perform(delete("/communities/123/users/1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.with(authentication(withUser(owner))))
@@ -528,8 +521,7 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 				.userName("tester")
 				.build();
 
-		given(securityService.isCommunityManager( "123")).willReturn(false);
-		given(securityService.isAuthenticatedUserId("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(false);
+		given(communityQueryService.isCommunityManager(owner.getId(), "123")).willReturn(false);
 
 		mockMvc.perform(delete("/communities/123/users/a396d5a8-a6b1-4c71-9498-a16e655dae2e")
 				.with(authentication(withUser(owner))))

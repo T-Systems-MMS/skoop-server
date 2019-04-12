@@ -2,7 +2,6 @@ package com.tsmms.skoop.communityuser.registration.command;
 
 import com.tsmms.skoop.community.Community;
 import com.tsmms.skoop.community.CommunityRole;
-import com.tsmms.skoop.security.CurrentUserService;
 import com.tsmms.skoop.user.User;
 import com.tsmms.skoop.communityuser.command.CommunityUserCommandService;
 import com.tsmms.skoop.communityuser.registration.AcceptanceToCommunityNotification;
@@ -28,16 +27,13 @@ import static java.util.Objects.requireNonNull;
 public class CommunityUserRegistrationCommandService {
 
 	private final CommunityUserRegistrationRepository communityUserRegistrationRepository;
-	private final CurrentUserService currentUserService;
 	private final CommunityUserCommandService communityUserCommandService;
 	private final NotificationCommandService notificationCommandService;
 
 	public CommunityUserRegistrationCommandService(CommunityUserRegistrationRepository communityUserRegistrationRepository,
-												   CurrentUserService currentUserService,
 												   CommunityUserCommandService communityUserCommandService,
 												   NotificationCommandService notificationCommandService) {
 		this.communityUserRegistrationRepository = requireNonNull(communityUserRegistrationRepository);
-		this.currentUserService = requireNonNull(currentUserService);
 		this.communityUserCommandService = requireNonNull(communityUserCommandService);
 		this.notificationCommandService = requireNonNull(notificationCommandService);
 	}
@@ -127,7 +123,7 @@ public class CommunityUserRegistrationCommandService {
 				.community(community)
 				.approvedByUser(true)
 				.approvedByCommunity(null)
-				.registeredUser(currentUserService.getCurrentUser())
+				.registeredUser(user)
 				.id(UUID.randomUUID().toString())
 				.creationDatetime(LocalDateTime.now())
 				.build();

@@ -1,5 +1,6 @@
 package com.tsmms.skoop.security;
 
+import com.tsmms.skoop.user.query.UserPermissionQueryService;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -9,14 +10,14 @@ import org.springframework.security.config.annotation.method.configuration.Globa
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class MethodSecurityConfiguration extends GlobalMethodSecurityConfiguration {
 
-	private final SecurityService securityService;
+	private final UserPermissionQueryService userPermissionQueryService;
 
-	public MethodSecurityConfiguration(SecurityService securityService) {
-		this.securityService = securityService;
+	public MethodSecurityConfiguration(UserPermissionQueryService userPermissionQueryService) {
+		this.userPermissionQueryService = userPermissionQueryService;
 	}
 
 	@Override
 	protected MethodSecurityExpressionHandler createExpressionHandler() {
-		return new SkoopMethodSecurityExpressionHandler(securityService);
+		return new SkoopMethodSecurityExpressionHandler(userPermissionQueryService);
 	}
 }

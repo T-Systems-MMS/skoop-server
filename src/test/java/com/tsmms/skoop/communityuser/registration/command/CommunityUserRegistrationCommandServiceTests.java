@@ -2,7 +2,6 @@ package com.tsmms.skoop.communityuser.registration.command;
 
 import com.tsmms.skoop.community.Community;
 import com.tsmms.skoop.community.CommunityType;
-import com.tsmms.skoop.security.CurrentUserService;
 import com.tsmms.skoop.user.User;
 import com.tsmms.skoop.communityuser.command.CommunityUserCommandService;
 import com.tsmms.skoop.communityuser.registration.CommunityUserRegistration;
@@ -40,9 +39,6 @@ class CommunityUserRegistrationCommandServiceTests {
 	private CommunityUserRegistrationRepository communityUserRegistrationRepository;
 
 	@Mock
-	private CurrentUserService currentUserService;
-
-	@Mock
 	private CommunityUserCommandService communityUserCommandService;
 
 	@Mock
@@ -53,7 +49,7 @@ class CommunityUserRegistrationCommandServiceTests {
 	@BeforeEach
 	void setUp() {
 		this.communityUserRegistrationCommandService = new CommunityUserRegistrationCommandService(communityUserRegistrationRepository,
-				currentUserService, communityUserCommandService, notificationCommandService);
+				communityUserCommandService, notificationCommandService);
 	}
 
 	@DisplayName("Test if users are invited.")
@@ -213,8 +209,6 @@ class CommunityUserRegistrationCommandServiceTests {
 				.id("db87d46a-e4ca-451a-903b-e8533e0b924b")
 				.userName("tester")
 				.build();
-
-		given(currentUserService.getCurrentUser()).willReturn(tester);
 
 		Community community = Community.builder()
 				.id("123")

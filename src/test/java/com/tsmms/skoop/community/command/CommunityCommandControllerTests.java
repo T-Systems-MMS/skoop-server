@@ -4,6 +4,7 @@ import com.tsmms.skoop.community.Community;
 import com.tsmms.skoop.community.CommunityRole;
 import com.tsmms.skoop.community.CommunityType;
 import com.tsmms.skoop.community.link.Link;
+import com.tsmms.skoop.community.query.CommunityQueryService;
 import com.tsmms.skoop.skill.Skill;
 import com.tsmms.skoop.skill.query.SkillQueryService;
 import com.tsmms.skoop.user.User;
@@ -53,6 +54,9 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 
 	@MockBean
 	private SkillQueryService skillQueryService;
+
+	@MockBean
+	private CommunityQueryService communityQueryService;
 
 	@Test
 	@DisplayName("Tests if a community can be created.")
@@ -251,11 +255,13 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 	@Test
 	@DisplayName("Tests if a community can be updated.")
 	void testIfCommunityIsUpdated() throws Exception {
-		given(securityService.isCommunityManager( "123")).willReturn(true);
+
 		final User owner = User.builder()
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
 				.build();
+
+		given(communityQueryService.isCommunityManager(owner.getId(), "123")).willReturn(true);
 
 		given(skillQueryService.findByNameIgnoreCase("Spring Boot")).willReturn(
 				Optional.of(
@@ -400,11 +406,11 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 	@Test
 	@DisplayName("Tests if forbbiden status code is returned when community is updated by a user who is not a community manager.")
 	void testIfForbiddenStatusCodeIsReturnedWhenCommunityIsUpdatedByUserWhoIsNotCommunityManager() throws Exception {
-		given(securityService.isCommunityManager( "123")).willReturn(false);
 		final User owner = User.builder()
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
 				.build();
+		given(communityQueryService.isCommunityManager(owner.getId(), "123")).willReturn(false);
 		final ClassPathResource body = new ClassPathResource("community/update-community.json");
 		try (final InputStream is = body.getInputStream()) {
 			mockMvc.perform(put("/communities/123")
@@ -420,11 +426,11 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 	@Test
 	@DisplayName("Tests if the community can be deleted.")
 	void testIfCommunityCanBeDeleted() throws Exception {
-		given(securityService.isCommunityManager( "123")).willReturn(true);
 		final User owner = User.builder()
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
 				.build();
+		given(communityQueryService.isCommunityManager(owner.getId(), "123")).willReturn(true);
 		mockMvc.perform(delete("/communities/123")
 				.with(authentication(withUser(owner))))
 				.andExpect(status().isNoContent());
@@ -433,11 +439,11 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 	@Test
 	@DisplayName("Tests if the community cannot be deleted by a user who is not a community manager.")
 	void testIfCommunityCannotBeDeletedByUserWhoIsNotCommunityManager() throws Exception {
-		given(securityService.isCommunityManager( "123")).willReturn(false);
 		final User owner = User.builder()
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
 				.build();
+		given(communityQueryService.isCommunityManager(owner.getId(), "123")).willReturn(false);
 		mockMvc.perform(delete("/communities/123")
 				.with(authentication(withUser(owner, "ADMIN"))))
 				.andExpect(status().isForbidden());

@@ -6,7 +6,7 @@ import com.tsmms.skoop.community.CommunityType;
 import com.tsmms.skoop.community.query.CommunityQueryService;
 import com.tsmms.skoop.exception.NoSuchResourceException;
 import com.tsmms.skoop.exception.UserCommunityException;
-import com.tsmms.skoop.security.SecurityService;
+import com.tsmms.skoop.security.CurrentUserService;
 import com.tsmms.skoop.user.User;
 import com.tsmms.skoop.user.query.UserQueryService;
 import com.tsmms.skoop.communityuser.CommunityUser;
@@ -39,20 +39,20 @@ import static java.util.Objects.requireNonNull;
 public class CommunityUserRegistrationCommandController {
 
 	private final CommunityUserRegistrationCommandService communityUserRegistrationCommandService;
-	private final SecurityService securityService;
+	private final CurrentUserService currentUserService;
 	private final UserQueryService userQueryService;
 	private final CommunityQueryService communityQueryService;
 	private final CommunityUserRegistrationQueryService communityUserRegistrationQueryService;
 	private final CommunityUserCommandService communityUserCommandService;
 
 	public CommunityUserRegistrationCommandController(CommunityUserRegistrationCommandService communityUserRegistrationCommandService,
-													  SecurityService securityService,
+													  CurrentUserService currentUserService,
 													  UserQueryService userQueryService,
 													  CommunityQueryService communityQueryService,
 													  CommunityUserRegistrationQueryService communityUserRegistrationQueryService,
 													  CommunityUserCommandService communityUserCommandService) {
 		this.communityUserRegistrationCommandService = requireNonNull(communityUserRegistrationCommandService);
-		this.securityService = requireNonNull(securityService);
+		this.currentUserService = requireNonNull(currentUserService);
 		this.userQueryService = requireNonNull(userQueryService);
 		this.communityQueryService = requireNonNull(communityQueryService);
 		this.communityUserRegistrationQueryService = requireNonNull(communityUserRegistrationQueryService);
@@ -81,14 +81,14 @@ public class CommunityUserRegistrationCommandController {
 					.build();
 		});
 		final List<CommunityUserRegistrationResponse> result;
-		if (securityService.isCommunityManager(communityId)) {
+		if (communityQueryService.isCommunityManager(currentUserService.getCurrentUserId(), communityId)) {
 			result = communityUserRegistrationCommandService.createUserRegistrationsOnBehalfOfCommunity(users, community).stream().map(CommunityUserRegistrationResponse::of).collect(Collectors.toList());
-		} else if (CommunityType.OPEN.equals(community.getType()) && securityService.isCommunityMember(communityId)) {
-			if (users.stream().anyMatch(user -> securityService.isAuthenticatedUserId(user.getId()))) {
+		} else if (CommunityType.OPEN.equals(community.getType()) && communityQueryService.isCommunityMember(currentUserService.getCurrentUserId(), communityId)) {
+			if (users.stream().anyMatch(user -> currentUserService.isAuthenticatedUserId(user.getId()))) {
 				throw new UserCommunityException("The authenticated user cannot invite herself / himself to join a community.");
 			}
 			result = communityUserRegistrationCommandService.createUserRegistrationsOnBehalfOfCommunity(users, community).stream().map(CommunityUserRegistrationResponse::of).collect(Collectors.toList());
-		} else if (request.getUserIds().size() == 1 && securityService.isAuthenticatedUserId(request.getUserIds().get(0))) {
+		} else if (request.getUserIds().size() == 1 && currentUserService.isAuthenticatedUserId(request.getUserIds().get(0))) {
 			if (CommunityType.OPEN.equals(community.getType())) {
 				// user is added as member immediately because registrations for open communities can be regarded as "auto-approved by the community
 				final CommunityUser communityUser = communityUserCommandService.create(community, users.get(0), CommunityRole.MEMBER);
@@ -130,10 +130,10 @@ public class CommunityUserRegistrationCommandController {
 					.build();
 		});
 		final CommunityUserRegistrationApprovalCommand command = request.command();
-		if (securityService.isCommunityManager(communityId)) {
+		if (communityQueryService.isCommunityManager(currentUserService.getCurrentUserId(), communityId)) {
 			command.setApprovedByUser(null);
 			return ResponseEntity.ok(CommunityUserRegistrationResponse.of(communityUserRegistrationCommandService.approve(registration, command)));
-		} else if (securityService.isAuthenticatedUserId(registration.getRegisteredUser().getId())) {
+		} else if (currentUserService.isAuthenticatedUserId(registration.getRegisteredUser().getId())) {
 			command.setApprovedByCommunity(null);
 			return ResponseEntity.ok(CommunityUserRegistrationResponse.of(communityUserRegistrationCommandService.approve(registration, command)));
 		} else {
