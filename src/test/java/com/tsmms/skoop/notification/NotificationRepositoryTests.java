@@ -560,4 +560,170 @@ class NotificationRepositoryTests {
 		);
 	}
 
+	@DisplayName("Counts notifications sent to the user and to the communities she / he is the manager of.")
+	@Test
+	void getsUserNotificationsCounter() {
+
+		User communityManager = userRepository.save(User.builder()
+				.id("123")
+				.userName("communityManager")
+				.build());
+
+		User commonUser = userRepository.save(User.builder()
+				.id("456")
+				.userName("commonUser")
+				.build());
+
+		Community javascriptUserGroup = communityRepository.save(Community.builder()
+				.id("567")
+				.title("JavaScript User Group")
+				.type(CommunityType.CLOSED)
+				.build()
+		);
+
+		Community frontendDevelopers = communityRepository.save(Community.builder()
+				.id("567123")
+				.title("Frontend developers")
+				.type(CommunityType.CLOSED)
+				.build()
+		);
+
+		// communityManager is a community manager of "JavaScript User Group"
+
+		communityUserRepository.save(CommunityUser.builder()
+				.creationDate(LocalDateTime.of(2019, 1, 20, 10, 0))
+				.lastModifiedDate(LocalDateTime.of(2019, 1, 20, 10, 0))
+				.community(javascriptUserGroup)
+				.user(communityManager)
+				.role(CommunityRole.MANAGER)
+				.build()
+		);
+
+		// communityManager is a member of "JavaScript User Group"
+
+		communityUserRepository.save(CommunityUser.builder()
+				.creationDate(LocalDateTime.of(2019, 1, 20, 10, 0))
+				.lastModifiedDate(LocalDateTime.of(2019, 1, 20, 10, 0))
+				.community(frontendDevelopers)
+				.user(communityManager)
+				.role(CommunityRole.MEMBER)
+				.build()
+		);
+
+		// communityManager was invited to join "Java User Group"
+
+		CommunityUserRegistration firstRegistration = communityUserRegistrationRepository.save(CommunityUserRegistration.builder()
+				.id("654321")
+				.creationDatetime(LocalDateTime.of(2019, 3, 26, 10, 0))
+				.approvedByCommunity(true)
+				.approvedByUser(null)
+				.registeredUser(communityManager)
+				.community(Community.builder()
+						.id("987")
+						.title("Java User Group")
+						.type(CommunityType.CLOSED)
+						.build()
+				)
+				.build()
+		);
+
+		// commonUser sent request to join "JavaScript User Group"
+
+		CommunityUserRegistration secondRegistration = communityUserRegistrationRepository.save(CommunityUserRegistration.builder()
+				.id("123456")
+				.creationDatetime(LocalDateTime.of(2019, 3, 26, 11, 0))
+				.approvedByCommunity(null)
+				.approvedByUser(true)
+				.registeredUser(commonUser)
+				.community(javascriptUserGroup)
+				.build()
+		);
+
+		// commonUser sent request to join "Frontend developers"
+
+		CommunityUserRegistration thirdRegistration = communityUserRegistrationRepository.save(CommunityUserRegistration.builder()
+				.id("123456789")
+				.creationDatetime(LocalDateTime.of(2019, 3, 27, 11, 0))
+				.approvedByCommunity(null)
+				.approvedByUser(true)
+				.registeredUser(commonUser)
+				.community(frontendDevelopers)
+				.build()
+		);
+
+		// notification that communityManager was invited to join "Java User Group". It will be shown to communityManager.
+
+		notificationRepository.save(InvitationToJoinCommunityNotification.builder()
+				.id("abc")
+				.creationDatetime(LocalDateTime.of(2019, 3, 26, 10, 0))
+				.registration(firstRegistration)
+				.communityName("Java User Group")
+				.build());
+
+		// notification that commonUser sent request to join "JavaScript User Group". It will be shown to communityManager.
+
+		notificationRepository.save(RequestToJoinCommunityNotification.builder()
+				.id("def")
+				.creationDatetime(LocalDateTime.of(2019, 3, 26, 11, 0))
+				.registration(secondRegistration)
+				.communityName("JavaScript User Group")
+				.build()
+		);
+
+		// notification that commonUser sent request to join "Frontend developers". It will not be shown to communityManager.
+
+		notificationRepository.save(RequestToJoinCommunityNotification.builder()
+				.id("ghi")
+				.creationDatetime(LocalDateTime.of(2019, 3, 27, 11, 0))
+				.registration(thirdRegistration)
+				.communityName("Frontend developers")
+				.build()
+		);
+
+		notificationRepository.save(CommunityUserRoleChangedNotification.builder()
+				.id("yyy")
+				.role(CommunityRole.MANAGER)
+				.communityName("Community the role has been changed in.")
+				.creationDatetime(LocalDateTime.of(2018, 4, 3, 12, 0))
+				.user(communityManager)
+				.build()
+		);
+
+		notificationRepository.save(UserLeftCommunityNotification.builder()
+				.id("zyx")
+				.creationDatetime(LocalDateTime.of(2019, 3, 21, 15, 30))
+				.community(javascriptUserGroup)
+				.user(User.builder()
+						.id("0123")
+						.userName("UserLeftCommunity")
+						.build())
+				.communityName("JavaScript User Group")
+				.build()
+		);
+
+		notificationRepository.save(CommunityDeletedNotification.builder()
+				.id("iop")
+				.creationDatetime(LocalDateTime.of(2019, 1, 3, 10, 0))
+				.communityName("Deleted community")
+				.recipients(singletonList(communityManager))
+				.build()
+		);
+
+		notificationRepository.save(CommunityChangedNotification.builder()
+				.id("ttt")
+				.communityName("Changed community")
+				.creationDatetime(LocalDateTime.of(2017, 1, 3, 10, 0))
+				.recipients(singletonList(communityManager))
+				.communityDetails(new HashSet<>(Arrays.asList(CommunityDetails.DESCRIPTION, CommunityDetails.TYPE)))
+				.community(Community.builder()
+						.id("123456789")
+						.title("Changed community")
+						.build()
+				)
+				.build()
+		);
+
+		assertThat(notificationRepository.getUserNotificationCounter("123")).isEqualTo(6);
+	}
+
 }
