@@ -22,4 +22,8 @@ public abstract class Notification {
 	@Property(name = "creationDatetime")
 	private LocalDateTime creationDatetime;
 
+	public boolean isToDo() {
+		return false;
+	}
+
 }

@@ -2,7 +2,9 @@ package com.tsmms.skoop.notification.command;
 
 import com.tsmms.skoop.community.Community;
 import com.tsmms.skoop.community.CommunityType;
+import com.tsmms.skoop.communityuser.registration.AcceptanceToCommunityNotification;
 import com.tsmms.skoop.communityuser.registration.CommunityUserRegistration;
+import com.tsmms.skoop.communityuser.registration.CommunityUserRegistrationRepository;
 import com.tsmms.skoop.communityuser.registration.InvitationToJoinCommunityNotification;
 import com.tsmms.skoop.notification.Notification;
 import com.tsmms.skoop.notification.NotificationRepository;
@@ -15,8 +17,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -25,11 +30,14 @@ class NotificationCommandServiceTests {
 	@Mock
 	private NotificationRepository notificationRepository;
 
+	@Mock
+	private CommunityUserRegistrationRepository communityUserRegistrationRepository;
+
 	private NotificationCommandService notificationCommandService;
 
 	@BeforeEach
 	void setUp() {
-		this.notificationCommandService = new NotificationCommandService(notificationRepository);
+		this.notificationCommandService = new NotificationCommandService(notificationRepository, communityUserRegistrationRepository);
 	}
 
 	@DisplayName("Saves a notification.")
@@ -74,7 +82,7 @@ class NotificationCommandServiceTests {
 				.communityName("Community")
 				.build());
 
-		final Notification notification = this.notificationCommandService.save(InvitationToJoinCommunityNotification.builder()
+		final Notification notification = notificationCommandService.save(InvitationToJoinCommunityNotification.builder()
 				.id("123")
 				.creationDatetime(LocalDateTime.of(2019, 3, 27, 9, 34))
 				.registration(CommunityUserRegistration.builder()
@@ -106,6 +114,66 @@ class NotificationCommandServiceTests {
 		assertThat(invitationToJoinCommunityNotification.getRegistration().getCommunity().getType()).isEqualTo(CommunityType.CLOSED);
 		assertThat(invitationToJoinCommunityNotification.getRegistration().getCommunity().getTitle()).isEqualTo("Community");
 		assertThat(invitationToJoinCommunityNotification.getCommunityName()).isEqualTo("Community");
+	}
+
+	@DisplayName("Deletes notification.")
+	@Test
+	void deleteNotification() {
+		assertDoesNotThrow(() -> notificationCommandService.delete(
+				AcceptanceToCommunityNotification.builder()
+						.id("123")
+				.communityName("Community")
+				.creationDatetime(LocalDateTime.of(2019, 3, 25, 10, 0))
+				.registration(
+						CommunityUserRegistration.builder()
+								.approvedByUser(true)
+								.approvedByCommunity(true)
+								.registeredUser(User.builder()
+										.id("abc")
+										.userName("tester")
+										.build())
+								.community(Community.builder()
+										.id("cba")
+										.type(CommunityType.CLOSED)
+										.title("Community")
+										.build()
+								)
+								.build()
+				)
+				.build()
+		));
+	}
+
+	@DisplayName("Exception is thrown if null is passed as ID when deleting notification.")
+	@Test
+	void exceptionIsThrownIfNullIsPassedWhenDeletingNotification() {
+		assertThrows(IllegalArgumentException.class, () -> notificationCommandService.delete(null));
+	}
+
+	@DisplayName("Deletes notifications.")
+	@Test
+	void deleteNotifications() {
+		assertDoesNotThrow(() -> notificationCommandService.deleteAll(Collections.singletonList(
+				InvitationToJoinCommunityNotification.builder()
+						.id("123")
+						.creationDatetime(LocalDateTime.of(2019, 3, 27, 9, 34))
+						.registration(CommunityUserRegistration.builder()
+								.approvedByUser(null)
+								.approvedByCommunity(true)
+								.registeredUser(User.builder()
+										.id("abc")
+										.userName("tester")
+										.build())
+								.community(Community.builder()
+										.id("cba")
+										.type(CommunityType.CLOSED)
+										.title("Community")
+										.build()
+								)
+								.build())
+						.communityName("Community")
+						.build()
+		)));
 	}
 
 }

@@ -5,6 +5,7 @@ import com.tsmms.skoop.notification.NotificationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
@@ -16,6 +17,11 @@ public class NotificationQueryService {
 
 	public NotificationQueryService(NotificationRepository notificationRepository) {
 		this.notificationRepository = requireNonNull(notificationRepository);
+	}
+
+	@Transactional(readOnly = true)
+	public Optional<Notification> getNotification(String notificationId) {
+		return notificationRepository.findById(notificationId);
 	}
 
 	@Transactional(readOnly = true)

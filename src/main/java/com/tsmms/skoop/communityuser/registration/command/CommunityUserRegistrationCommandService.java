@@ -89,7 +89,7 @@ public class CommunityUserRegistrationCommandService {
 	private void deleteToDosConnectedWithCommunityUserRegistration(CommunityUserRegistration communityUserRegistration) {
 		final List<Notification> notifications = notificationQueryService.getNotificationsByCommunityUserRegistrationId(communityUserRegistration.getId())
 				.collect(Collectors.toList());
-		notificationCommandService.delete(notifications);
+		notificationCommandService.deleteAll(notifications);
 	}
 
 	/**
@@ -159,13 +159,21 @@ public class CommunityUserRegistrationCommandService {
 	}
 
 	@Transactional
-	public void delete(Collection<CommunityUserRegistration> communityUserRegistrations) {
+	public void deleteAll(Collection<CommunityUserRegistration> communityUserRegistrations) {
 		if (communityUserRegistrations == null) {
 			throw new IllegalArgumentException("The collection with community user registrations cannot be null.");
 		}
 		if (!communityUserRegistrations.isEmpty()) {
 			communityUserRegistrationRepository.deleteAll(communityUserRegistrations);
 		}
+	}
+
+	@Transactional
+	public void delete(CommunityUserRegistration communityUserRegistration) {
+		if (communityUserRegistration == null) {
+			throw new IllegalArgumentException("Community user registration cannot be null.");
+		}
+		communityUserRegistrationRepository.delete(communityUserRegistration);
 	}
 
 }
