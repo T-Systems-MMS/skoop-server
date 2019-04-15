@@ -23,4 +23,9 @@ public class NotificationQueryService {
 		return notificationRepository.getUserNotifications(userId);
 	}
 
+	@Transactional(readOnly = true)
+	public Stream<Notification> getNotificationsByCommunityUserRegistrationId(String registrationId) {
+		return notificationRepository.findByRegistrationId(registrationId);
+	}
+
 }

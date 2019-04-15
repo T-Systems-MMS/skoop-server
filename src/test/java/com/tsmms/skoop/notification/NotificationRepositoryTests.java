@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static java.util.stream.Collectors.toList;
@@ -507,6 +508,56 @@ class NotificationRepositoryTests {
 		assertThat(requestToJoinCommunityNotification.getRegistration().getId()).isEqualTo("123456");
 		assertThat(requestToJoinCommunityNotification.getRegistration().getCreationDatetime()).isEqualTo(LocalDateTime.of(2019, 3, 26, 11, 0));
 		assertThat(requestToJoinCommunityNotification.getCommunityName()).isEqualTo("JavaScript User Group");
+	}
+
+	@DisplayName("Finds notifications by community user registration ID.")
+	@Test
+	void findsNotificationsByCommunityUserRegistrationId() {
+		notificationRepository.save(
+				InvitationToJoinCommunityNotification.builder()
+						.id("123")
+						.creationDatetime(LocalDateTime.of(2019, 3, 27, 9, 34))
+						.registration(CommunityUserRegistration.builder()
+								.id("abc")
+								.approvedByUser(null)
+								.approvedByCommunity(true)
+								.registeredUser(User.builder()
+										.id("abc")
+										.userName("tester")
+										.build())
+								.community(Community.builder()
+										.id("cba")
+										.type(CommunityType.CLOSED)
+										.title("Community")
+										.build()
+								)
+								.build())
+						.communityName("Community")
+						.build()
+		);
+		final Stream<Notification> notificationStream = notificationRepository.findByRegistrationId("abc");
+		assertThat(notificationStream).containsExactlyInAnyOrder(
+				InvitationToJoinCommunityNotification.builder()
+						.id("123")
+						.creationDatetime(LocalDateTime.of(2019, 3, 27, 9, 34))
+						.registration(CommunityUserRegistration.builder()
+								.id("abc")
+								.approvedByUser(null)
+								.approvedByCommunity(true)
+								.registeredUser(User.builder()
+										.id("abc")
+										.userName("tester")
+										.build())
+								.community(Community.builder()
+										.id("cba")
+										.type(CommunityType.CLOSED)
+										.title("Community")
+										.build()
+								)
+								.build())
+						.communityName("Community")
+						.build()
+		);
 	}
 
 }
