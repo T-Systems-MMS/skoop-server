@@ -28,4 +28,9 @@ public class InvitationToJoinCommunityNotification extends Notification {
 		this.registration = registration;
 		this.communityName = communityName;
 	}
+
+	@Override
+	public boolean isToDo() {
+		return true;
+	}
 }

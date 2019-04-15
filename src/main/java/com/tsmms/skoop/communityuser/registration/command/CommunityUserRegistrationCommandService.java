@@ -89,7 +89,7 @@ public class CommunityUserRegistrationCommandService {
 	private void deleteToDosConnectedWithCommunityUserRegistration(CommunityUserRegistration communityUserRegistration) {
 		final List<Notification> notifications = notificationQueryService.getNotificationsByCommunityUserRegistrationId(communityUserRegistration.getId())
 				.collect(Collectors.toList());
-		notificationCommandService.delete(notifications);
+		notificationCommandService.deleteAll(notifications);
 	}
 
 	/**

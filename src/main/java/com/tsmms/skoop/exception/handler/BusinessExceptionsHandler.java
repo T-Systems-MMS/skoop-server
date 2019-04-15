@@ -4,6 +4,7 @@ import com.tsmms.skoop.exception.DuplicateResourceException;
 import com.tsmms.skoop.exception.EmptyInputException;
 import com.tsmms.skoop.exception.NoSuchResourceException;
 import com.tsmms.skoop.exception.UserCommunityException;
+import com.tsmms.skoop.exception.UserNotAuthorizedException;
 import com.tsmms.skoop.exception.domain.ResponseError;
 import com.tsmms.skoop.exception.domain.ResponseValidationError;
 import com.tsmms.skoop.exception.MethodArgumentNotValidException;
@@ -101,6 +102,20 @@ public class BusinessExceptionsHandler implements IExceptionHandler {
 	@ExceptionHandler(UserCommunityException.class)
 	protected ResponseEntity<Object> handleUserCommunityException(UserCommunityException ex) {
 		String logMessage = String.format("{%s} User has some problems with access to / interaction with the community! %s",
+				FORBIDDEN.value() + " " + FORBIDDEN.getReasonPhrase(), ex.getLocalizedMessage());
+		doLog(ex, logMessage);
+
+		ResponseError responseError = new ResponseError(FORBIDDEN);
+		responseError.setMessage(ex.getLocalizedMessage());
+		return buildResponseEntity(ex, responseError);
+	}
+
+	/**
+	 * Handles UserNotAuthorizedException. If user does not have enough permissions to perform an action we throw this exception.
+	 */
+	@ExceptionHandler(UserNotAuthorizedException.class)
+	protected ResponseEntity<Object> handleUserCommunityException(UserNotAuthorizedException ex) {
+		String logMessage = String.format("{%s} User does not have enough permissions to perform an action! %s",
 				FORBIDDEN.value() + " " + FORBIDDEN.getReasonPhrase(), ex.getLocalizedMessage());
 		doLog(ex, logMessage);
 

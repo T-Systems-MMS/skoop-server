@@ -25,11 +25,14 @@ public class NotificationCommandService {
 
 	@Transactional
 	public void delete(Notification notification) {
+		if (notification == null) {
+			throw new IllegalArgumentException("Notification cannot be null.");
+		}
 		notificationRepository.delete(notification);
 	}
 
 	@Transactional
-	public void delete(Collection<Notification> notifications) {
+	public void deleteAll(Collection<Notification> notifications) {
 		notificationRepository.deleteAll(notifications);
 	}
 
