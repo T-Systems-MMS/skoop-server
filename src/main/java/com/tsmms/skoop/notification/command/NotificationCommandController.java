@@ -46,13 +46,13 @@ public class NotificationCommandController {
 	@DeleteMapping(path = "/notifications/{notificationId}")
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<Void> delete(@PathVariable("notificationId") String notificationId) {
-		notificationQueryService.getNotification(notificationId).orElseThrow(() -> {
+		if (notificationQueryService.getNotification(notificationId).isEmpty()) {
 			final String[] searchParamsMap = {"id", notificationId};
-			return NoSuchResourceException.builder()
+			throw NoSuchResourceException.builder()
 					.model(Model.USER)
 					.searchParamsMap(searchParamsMap)
 					.build();
-		});
+		}
 		final Notification notification = notificationQueryService.getUserNotifications(currentUserService.getCurrentUserId())
 				.filter(n -> notificationId.equals(n.getId()))
 				.findFirst()
