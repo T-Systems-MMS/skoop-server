@@ -2,8 +2,9 @@ package com.tsmms.skoop.notification.command;
 
 import com.tsmms.skoop.community.Community;
 import com.tsmms.skoop.community.CommunityType;
-import com.tsmms.skoop.communityuser.UserKickedOutFromCommunityNotification;
+import com.tsmms.skoop.communityuser.registration.AcceptanceToCommunityNotification;
 import com.tsmms.skoop.communityuser.registration.CommunityUserRegistration;
+import com.tsmms.skoop.communityuser.registration.CommunityUserRegistrationRepository;
 import com.tsmms.skoop.communityuser.registration.InvitationToJoinCommunityNotification;
 import com.tsmms.skoop.notification.Notification;
 import com.tsmms.skoop.notification.NotificationRepository;
@@ -29,11 +30,14 @@ class NotificationCommandServiceTests {
 	@Mock
 	private NotificationRepository notificationRepository;
 
+	@Mock
+	private CommunityUserRegistrationRepository communityUserRegistrationRepository;
+
 	private NotificationCommandService notificationCommandService;
 
 	@BeforeEach
 	void setUp() {
-		this.notificationCommandService = new NotificationCommandService(notificationRepository);
+		this.notificationCommandService = new NotificationCommandService(notificationRepository, communityUserRegistrationRepository);
 	}
 
 	@DisplayName("Saves a notification.")
@@ -115,21 +119,29 @@ class NotificationCommandServiceTests {
 	@DisplayName("Deletes notification.")
 	@Test
 	void deleteNotification() {
-		assertDoesNotThrow(() -> notificationCommandService.delete(UserKickedOutFromCommunityNotification.builder()
-				.id("def")
+		assertDoesNotThrow(() -> notificationCommandService.delete(
+				AcceptanceToCommunityNotification.builder()
+						.id("123")
+				.communityName("Community")
 				.creationDatetime(LocalDateTime.of(2019, 3, 25, 10, 0))
-				.user(User.builder()
-						.id("abc")
-						.userName("tester")
-						.build())
-				.community(Community.builder()
-						.id("145")
-						.title("JavaScript User Group")
-						.type(CommunityType.CLOSED)
-						.build()
+				.registration(
+						CommunityUserRegistration.builder()
+								.approvedByUser(true)
+								.approvedByCommunity(true)
+								.registeredUser(User.builder()
+										.id("abc")
+										.userName("tester")
+										.build())
+								.community(Community.builder()
+										.id("cba")
+										.type(CommunityType.CLOSED)
+										.title("Community")
+										.build()
+								)
+								.build()
 				)
-				.communityName("JavaScript User Group")
-				.build()));
+				.build()
+		));
 	}
 
 	@DisplayName("Exception is thrown if null is passed as ID when deleting notification.")

@@ -213,7 +213,7 @@ public class CommunityCommandService {
 
 	private void deletePendingInvitationsToJoinCommunity(Community community) {
 		final Stream<CommunityUserRegistration> pendingInvitations = communityUserRegistrationQueryService.getPendingInvitationsToJoinCommunity(community.getId());
-		communityUserRegistrationCommandService.delete(pendingInvitations.collect(toList()));
+		communityUserRegistrationCommandService.deleteAll(pendingInvitations.collect(toList()));
 	}
 
 	private List<Skill> createNonExistentSkills(Community community) {

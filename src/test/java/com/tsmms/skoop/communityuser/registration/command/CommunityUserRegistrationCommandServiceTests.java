@@ -580,7 +580,7 @@ class CommunityUserRegistrationCommandServiceTests {
 	@DisplayName("Deletes community user registrations.")
 	@Test
 	void deletesCommunityUserRegistrations() {
-		assertDoesNotThrow(() -> communityUserRegistrationCommandService.delete(Arrays.asList(CommunityUserRegistration.builder()
+		assertDoesNotThrow(() -> communityUserRegistrationCommandService.deleteAll(Arrays.asList(CommunityUserRegistration.builder()
 				.approvedByCommunity(null)
 				.approvedByUser(true)
 				.registeredUser(User.builder()
@@ -601,7 +601,35 @@ class CommunityUserRegistrationCommandServiceTests {
 	@DisplayName("Throws exception when null is passed as collection to delete community user registrations.")
 	@Test
 	void throwsExceptionWhenNullIsPassedAsCollectionToDeleteCommunityUserRegistrations() {
+		assertThrows(IllegalArgumentException.class, () -> communityUserRegistrationCommandService.deleteAll(null));
+	}
+
+	@DisplayName("Throws exception when null is passed when deleting community user registration.")
+	@Test
+	void throwsExceptionIfNullIsPassedWhenDeletingCommunityUserRegistration() {
 		assertThrows(IllegalArgumentException.class, () -> communityUserRegistrationCommandService.delete(null));
 	}
+
+	@DisplayName("Deletes community user registration.")
+	@Test
+	void deletesCommunityUserRegistration() {
+		assertDoesNotThrow(() -> communityUserRegistrationCommandService.delete(CommunityUserRegistration.builder()
+				.approvedByCommunity(null)
+				.approvedByUser(true)
+				.registeredUser(User.builder()
+						.id("db87d46a-e4ca-451a-903b-e8533e0b924b")
+						.userName("tester")
+						.build())
+				.community(Community.builder()
+						.id("123")
+						.title("Java User Group")
+						.type(CommunityType.CLOSED)
+						.description("Community for Java developers")
+						.build())
+				.creationDatetime(LocalDateTime.of(2019, 1, 15, 20, 0))
+				.id("123")
+				.build()));
+	}
+
 
 }
