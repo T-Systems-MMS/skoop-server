@@ -4,14 +4,12 @@ import com.tsmms.skoop.security.CurrentUserService;
 import com.tsmms.skoop.security.MethodSecurityConfiguration;
 import com.tsmms.skoop.user.UserPermissionScope;
 import com.tsmms.skoop.user.query.UserPermissionQueryService;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.neo4j.ogm.session.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.Collection;
 
@@ -29,6 +27,7 @@ import static org.mockito.BDDMockito.willReturn;
  * <p>Provides convenient builder methods to configure user permissions checked by method security.</p>
  */
 @Import({Neo4jSessionFactoryConfiguration.class, MethodSecurityConfiguration.class, CurrentUserService.class})
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public abstract class AbstractControllerTests {
 	@MockBean
 	private JwtDecoder jwtDecoder;
@@ -37,28 +36,11 @@ public abstract class AbstractControllerTests {
 	protected UserPermissionQueryService userPermissionQueryService;
 
 	@Autowired
-	private SessionFactory sessionFactory;
-
-	@Autowired
-	private ThreadPoolTaskExecutor threadPoolTaskExecutor;
-
-	@Autowired
 	protected CurrentUserService currentUserService;
 
 	@BeforeEach
 	void prepareSecurityService() {
 		willReturn(false).given(userPermissionQueryService).hasUserPermission(any(), any(), any());
-	}
-
-	@AfterEach
-	void shutdown() {
-		if (sessionFactory != null) {
-			sessionFactory.close();
-		}
-		if (threadPoolTaskExecutor != null) {
-			threadPoolTaskExecutor.setWaitForTasksToCompleteOnShutdown(true);
-			threadPoolTaskExecutor.destroy();
-		}
 	}
 
 	protected UserConfigurationBuilder givenUser(String userId) {
