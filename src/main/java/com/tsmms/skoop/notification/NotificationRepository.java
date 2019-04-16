@@ -41,6 +41,29 @@ public interface NotificationRepository extends Neo4jRepository<Notification, St
 			" ORDER BY n.creationDatetime DESC")
 	Stream<Notification> getUserNotifications(@Param("userId") String userId);
 
+	/**
+	 * Counts number of user notifications.
+	 * @param userId - user ID
+	 * @return number of user notifications
+	 */
+	@Query("OPTIONAL MATCH (n:Notification)-[:CAUSED_BY]->(registration:CommunityUserRegistration)-[:registeredUser]->(registeredUser:User {id: {userId}}) " +
+			" WITH collect(n) AS notifications " +
+			" OPTIONAL MATCH (n:UserKickedOutFromCommunityNotification)-[:USER]->(:User {id: {userId}}) " +
+			" WITH notifications + collect(n) AS notifications " +
+			" OPTIONAL MATCH (n:CommunityUserRoleChangedNotification)-[:USER]->(:User {id: {userId}}) " +
+			" WITH notifications + collect(n) AS notifications " +
+			" OPTIONAL MATCH (n:CommunityDeletedNotification)-[:RECIPIENT]->(:User {id: {userId}}) " +
+			" WITH notifications + collect(n) AS notifications " +
+			" OPTIONAL MATCH (n:CommunityChangedNotification)-[:RECIPIENT]->(:User {id: {userId}}) " +
+			" WITH notifications + collect(n) AS notifications " +
+			" OPTIONAL MATCH (n:RequestToJoinCommunityNotification)-[:CAUSED_BY]->(registration:CommunityUserRegistration)-[:community]->(c:Community)<-[:COMMUNITY_USER {role:'MANAGER'}]-(:User {id: {userId}}) " +
+			" WITH notifications + collect(n) AS notifications " +
+			" OPTIONAL MATCH (n:UserLeftCommunityNotification)-[:COMMUNITY]->(c:Community)<-[:COMMUNITY_USER {role:'MANAGER'}]-(:User {id: {userId}}) " +
+			" WITH notifications + collect(n) AS notifications " +
+			" UNWIND notifications as n " +
+			" RETURN count(n)")
+	int getUserNotificationCounter(@Param("userId") String userId);
+
 	@Query("MATCH (n:Notification)-[:CAUSED_BY]->(registration:CommunityUserRegistration {id: {registrationId}}) RETURN n")
 	Stream<Notification> findByRegistrationId(@Param("registrationId") String registrationId);
 

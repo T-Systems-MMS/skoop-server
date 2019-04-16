@@ -30,6 +30,14 @@ public class NotificationQueryService {
 	}
 
 	@Transactional(readOnly = true)
+	public int getUserNotificationCounter(String userId) {
+		if (userId == null) {
+			throw new IllegalArgumentException("User ID cannot be null.");
+		}
+		return notificationRepository.getUserNotificationCounter(userId);
+	}
+
+	@Transactional(readOnly = true)
 	public Stream<Notification> getNotificationsByCommunityUserRegistrationId(String registrationId) {
 		return notificationRepository.findByRegistrationId(registrationId);
 	}

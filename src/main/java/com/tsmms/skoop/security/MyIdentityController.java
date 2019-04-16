@@ -1,6 +1,7 @@
 package com.tsmms.skoop.security;
 
 import com.tsmms.skoop.exception.NoSuchResourceException;
+import com.tsmms.skoop.notification.query.NotificationQueryService;
 import com.tsmms.skoop.user.query.UserQueryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -16,14 +17,18 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import static com.tsmms.skoop.exception.enums.Model.USER;
 import static com.tsmms.skoop.security.JwtClaims.SKOOP_USER_ID;
+import static java.util.Objects.requireNonNull;
 
 @Api(tags = "MyIdentity")
 @RestController
 public class MyIdentityController {
-	private final UserQueryService userQueryService;
 
-	public MyIdentityController(UserQueryService userQueryService) {
-		this.userQueryService = userQueryService;
+	private final UserQueryService userQueryService;
+	private final NotificationQueryService notificationQueryService;
+
+	public MyIdentityController(UserQueryService userQueryService, NotificationQueryService notificationQueryService) {
+		this.userQueryService = requireNonNull(userQueryService);
+		this.notificationQueryService = requireNonNull(notificationQueryService);
 	}
 
 	@ApiOperation(
@@ -48,7 +53,7 @@ public class MyIdentityController {
 						.firstName(user.getFirstName())
 						.lastName(user.getLastName())
 						.email(user.getEmail())
-						.notificationCount(199) // TODO: get value from service
+						.notificationCount(notificationQueryService.getUserNotificationCounter(userId))
 						.build())
 				.orElseThrow(() -> NoSuchResourceException.builder()
 						.model(USER)

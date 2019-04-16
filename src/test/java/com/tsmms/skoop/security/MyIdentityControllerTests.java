@@ -1,5 +1,6 @@
 package com.tsmms.skoop.security;
 
+import com.tsmms.skoop.notification.query.NotificationQueryService;
 import com.tsmms.skoop.user.User;
 import com.tsmms.skoop.user.query.UserQueryService;
 import com.tsmms.skoop.common.AbstractControllerTests;
@@ -32,6 +33,9 @@ class MyIdentityControllerTests extends AbstractControllerTests {
 	@MockBean
 	private UserQueryService userQueryService;
 
+	@MockBean
+	private NotificationQueryService notificationQueryService;
+
 	@Test
 	@DisplayName("Gets user identity of the authenticated user")
 	void getAuthenticatedUserIdentity() throws Exception {
@@ -44,6 +48,8 @@ class MyIdentityControllerTests extends AbstractControllerTests {
 				.email("john.doe@mail.com")
 				.build();
 
+		given(notificationQueryService.getUserNotificationCounter(owner.getId())).willReturn(12);
+
 		given(userQueryService.getUserById("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))
 				.willReturn(Optional.of(owner));
 
@@ -55,7 +61,8 @@ class MyIdentityControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$.userName", is(equalTo("johndoe"))))
 				.andExpect(jsonPath("$.firstName", is(equalTo("John"))))
 				.andExpect(jsonPath("$.lastName", is(equalTo("Doe"))))
-				.andExpect(jsonPath("$.email", is(equalTo("john.doe@mail.com"))));
+				.andExpect(jsonPath("$.email", is(equalTo("john.doe@mail.com"))))
+				.andExpect(jsonPath("$.notificationCount", is(equalTo(12))));
 	}
 
 	@Test

@@ -31,6 +31,7 @@ import java.util.stream.Stream;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class NotificationQueryServiceTests {
@@ -307,6 +308,19 @@ class NotificationQueryServiceTests {
 						.communityName("Community")
 						.build()
 		);
+	}
+
+	@DisplayName("Counts user notifications.")
+	@Test
+	void getsUserNotificationCounter() {
+		given(notificationRepository.getUserNotificationCounter("123")).willReturn(12);
+		assertThat(notificationQueryService.getUserNotificationCounter("123")).isEqualTo(12);
+	}
+
+	@DisplayName("Throws exception if user ID is null when getting user notifications counter.")
+	@Test
+	void throwsExceptionIfUserIdIsNullWhenGettingUserNotificationsCounter() {
+		assertThrows(IllegalArgumentException.class, () -> notificationQueryService.getUserNotificationCounter(null));
 	}
 
 }
