@@ -56,7 +56,8 @@ public abstract class AbstractControllerTests {
 			sessionFactory.close();
 		}
 		if (threadPoolTaskExecutor != null) {
-			threadPoolTaskExecutor.shutdown();
+			threadPoolTaskExecutor.setWaitForTasksToCompleteOnShutdown(true);
+			threadPoolTaskExecutor.destroy();
 		}
 	}
 
