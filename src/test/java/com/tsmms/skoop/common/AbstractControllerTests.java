@@ -10,6 +10,7 @@ import org.neo4j.ogm.session.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 
 import java.util.Collection;
@@ -39,6 +40,9 @@ public abstract class AbstractControllerTests {
 	private SessionFactory sessionFactory;
 
 	@Autowired
+	private ThreadPoolTaskExecutor threadPoolTaskExecutor;
+
+	@Autowired
 	protected CurrentUserService currentUserService;
 
 	@BeforeEach
@@ -50,6 +54,9 @@ public abstract class AbstractControllerTests {
 	void shutdown() {
 		if (sessionFactory != null) {
 			sessionFactory.close();
+		}
+		if (threadPoolTaskExecutor != null) {
+			threadPoolTaskExecutor.shutdown();
 		}
 	}
 

@@ -19,3 +19,8 @@ neo4j:
 spring:
   datasource:
     driver-class-name: org.neo4j.jdbc.bolt.BoltDriver
+  task:
+    execution:
+      pool:
+        max-size: 50
+        queue-capacity: 100
