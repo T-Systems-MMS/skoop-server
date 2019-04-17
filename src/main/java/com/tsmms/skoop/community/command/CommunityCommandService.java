@@ -18,7 +18,6 @@ import com.tsmms.skoop.communityuser.query.CommunityUserQueryService;
 import com.tsmms.skoop.exception.enums.Model;
 import com.tsmms.skoop.notification.command.NotificationCommandService;
 import com.tsmms.skoop.security.CurrentUserService;
-import com.tsmms.skoop.skill.Skill;
 import com.tsmms.skoop.skill.command.SkillCommandService;
 import com.tsmms.skoop.user.User;
 import com.tsmms.skoop.communityuser.registration.command.CommunityUserRegistrationCommandService;
@@ -88,7 +87,7 @@ public class CommunityCommandService {
 		community.setCreationDate(now);
 		community.setLastModifiedDate(now);
 		community.setId(UUID.randomUUID().toString());
-		community.setSkills(createNonExistentSkills(community));
+		community.setSkills(skillCommandService.createNonExistentSkills(community.getSkills()));
 		final Community c = communityRepository.save(community);
 		final User user = userQueryService.getUserById(currentUserService.getCurrentUserId()).orElseThrow(() -> NoSuchResourceException.builder()
 				.model(Model.USER)
@@ -129,7 +128,7 @@ public class CommunityCommandService {
 				Optional.ofNullable(p.getSkills()).orElse(Collections.emptyList()),
 				Optional.ofNullable(community.getSkills()).orElse(Collections.emptyList()))) {
 			changedCommunityDetails.add(CommunityDetails.SKILLS);
-			p.setSkills(createNonExistentSkills(community));
+			p.setSkills(skillCommandService.createNonExistentSkills(community.getSkills()));
 		}
 		if (!CollectionUtils.isEqualCollection(
 				Optional.ofNullable(p.getLinks()).orElse(Collections.emptyList()),
@@ -214,21 +213,6 @@ public class CommunityCommandService {
 	private void deletePendingInvitationsToJoinCommunity(Community community) {
 		final Stream<CommunityUserRegistration> pendingInvitations = communityUserRegistrationQueryService.getPendingInvitationsToJoinCommunity(community.getId());
 		communityUserRegistrationCommandService.deleteAll(pendingInvitations.collect(toList()));
-	}
-
-	private List<Skill> createNonExistentSkills(Community community) {
-		if (community.getSkills() != null) {
-			return community.getSkills().stream().map(skill -> {
-				if (skill.getId() == null) {
-					return skillCommandService.createSkill(skill.getName(), null, null);
-				} else {
-					return skill;
-				}
-			}).collect(toList());
-		}
-		else {
-			return Collections.emptyList();
-		}
 	}
 
 }

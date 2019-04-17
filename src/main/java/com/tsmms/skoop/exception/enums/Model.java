@@ -17,6 +17,7 @@ public enum Model {
 	COMMUNITY_USER("community user"),
 	USER_REGISTRATION("user registration"),
 	NOTIFICATION("notification"),
+	TESTIMONIAL("testimonial"),
 
 	USER_SKILL_PRIORITY_REPORT("user skill priority report"),
 	USER_SKILL_PRIORITY_AGGREGATION_REPORT("user skill priority aggregation report"),
