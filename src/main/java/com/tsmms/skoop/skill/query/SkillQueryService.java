@@ -6,11 +6,13 @@ import com.tsmms.skoop.skill.SkillRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
 
 @Service
@@ -59,6 +61,23 @@ public class SkillQueryService {
 	@Transactional(readOnly = true)
 	public Stream<Skill> getSkillsByIds(List<String> skillIds) {
 		return stream(skillRepository.findAllById(skillIds).spliterator(), false);
+	}
+
+	@Transactional(readOnly = true)
+	public List<Skill> skillNamesToSkills(List<String> skillNames) {
+		final List<Skill> skills;
+		if (skillNames != null) {
+			skills = skillNames.stream().map(skillName ->
+					findByNameIgnoreCase(skillName).orElse(
+							Skill.builder()
+									.name(skillName)
+									.build()
+					)).collect(toList());
+		}
+		else {
+			skills = Collections.emptyList();
+		}
+		return skills;
 	}
 
 }

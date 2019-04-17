@@ -9,7 +9,6 @@ import com.tsmms.skoop.community.CommunityResponse;
 import com.tsmms.skoop.community.link.Link;
 import com.tsmms.skoop.exception.enums.Model;
 import com.tsmms.skoop.security.CurrentUserService;
-import com.tsmms.skoop.skill.Skill;
 import com.tsmms.skoop.skill.query.SkillQueryService;
 import com.tsmms.skoop.user.User;
 import com.tsmms.skoop.user.query.UserQueryService;
@@ -136,24 +135,12 @@ public class CommunityCommandController {
 	}
 
 	private Community convertCommunityRequestToCommunityDomain(CommunityRequest communityRequest) {
-		final List<Skill> skills;
-		if (communityRequest.getSkillNames() != null) {
-			skills = communityRequest.getSkillNames().stream().map(skillName ->
-					skillQueryService.findByNameIgnoreCase(skillName).orElse(
-							Skill.builder()
-									.name(skillName)
-									.build()
-					)).collect(toList());
-		}
-		else {
-			skills = Collections.emptyList();
-		}
 		return Community.builder()
 				.title(communityRequest.getTitle())
 				.type(communityRequest.getType())
 				.description(communityRequest.getDescription())
 				.links(convertLinkRequestListToLinkList(communityRequest))
-				.skills(skills)
+				.skills(skillQueryService.skillNamesToSkills(communityRequest.getSkillNames()))
 				.build();
 	}
 
