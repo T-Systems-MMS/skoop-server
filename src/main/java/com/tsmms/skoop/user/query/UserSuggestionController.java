@@ -1,6 +1,6 @@
 package com.tsmms.skoop.user.query;
 
-import com.tsmms.skoop.user.UserResponse;
+import com.tsmms.skoop.user.UserSimpleResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -38,9 +38,9 @@ public class UserSuggestionController {
 	})
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping(path = "/user-suggestions", produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<UserResponse> getUserSuggestions(@RequestParam("search") String search) {
+	public List<UserSimpleResponse> getUserSuggestions(@RequestParam("search") String search) {
 		return userQueryService.getUsersBySearchTerm(search)
-				.map(UserResponse::of)
+				.map(UserSimpleResponse::of)
 				.collect(toList());
 	}
 }
