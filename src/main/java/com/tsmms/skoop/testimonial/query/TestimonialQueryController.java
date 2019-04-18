@@ -39,9 +39,7 @@ public class TestimonialQueryController {
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
 	@PreAuthorize("isAuthenticated() and isPrincipalUserId(#userId)")
-	@GetMapping(path = "/users/{userId}/testimonials",
-			consumes = MediaType.APPLICATION_JSON_VALUE,
-			produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(path = "/users/{userId}/testimonials", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<TestimonialResponse>> getUserTestimonials(@PathVariable("userId") String userId) {
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(testimonialQueryService.getUserTestimonials(userId).map(TestimonialResponse::of).collect(Collectors.toList()));
