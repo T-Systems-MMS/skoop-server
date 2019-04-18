@@ -25,6 +25,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -295,6 +296,46 @@ class TestimonialCommandControllerTests extends AbstractControllerTests {
 					.with(csrf()))
 					.andExpect(status().isForbidden());
 		}
+	}
+
+	@DisplayName("Deletes testimonial.")
+	@Test
+	void deletesTestimonial() throws Exception {
+		final User tester = User.builder()
+				.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
+				.userName("tester")
+				.build();
+		mockMvc.perform(delete("/users/56ef4778-a084-4509-9a3e-80b7895cf7b0/testimonials/123")
+				.accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON)
+				.with(authentication(withUser(tester)))
+				.with(csrf()))
+				.andExpect(status().isNoContent());
+	}
+
+	@DisplayName("Not authenticated user cannot create testimonials.")
+	@Test
+	void notAuthenticatedUserCannotDeleteTestimonial() throws Exception {
+		mockMvc.perform(delete("/users/56ef4778-a084-4509-9a3e-80b7895cf7b0/testimonials/123")
+				.accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON)
+				.with(csrf()))
+				.andExpect(status().isUnauthorized());
+	}
+
+	@DisplayName("User cannot create testimonials on other users.")
+	@Test
+	void userCannotDeleteTestimonialsOnOtherUsers() throws Exception {
+		final User tester = User.builder()
+				.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
+				.userName("tester")
+				.build();
+		mockMvc.perform(delete("/users/c9cf7118-5f9e-40fc-9d89-28b2d0a77340/testimonials/123")
+				.accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON)
+				.with(authentication(withUser(tester)))
+				.with(csrf()))
+				.andExpect(status().isForbidden());
 	}
 
 }

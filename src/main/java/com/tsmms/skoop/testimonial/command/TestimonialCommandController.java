@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -46,7 +47,7 @@ public class TestimonialCommandController {
 			notes = "Create new user testimonial.")
 	@ApiResponses({
 			@ApiResponse(code = 201, message = "Successful execution"),
-			@ApiResponse(code = 400, message = "Invalid input data, e.g. missing mandatory data or project name exists"),
+			@ApiResponse(code = 400, message = "Invalid input data, e.g. missing mandatory data."),
 			@ApiResponse(code = 401, message = "Invalid authentication"),
 			@ApiResponse(code = 403, message = "Insufficient privileges to perform this operation"),
 			@ApiResponse(code = 500, message = "Error during execution")
@@ -73,7 +74,7 @@ public class TestimonialCommandController {
 			notes = "Update user testimonial.")
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "Successful execution"),
-			@ApiResponse(code = 400, message = "Invalid input data, e.g. missing mandatory data or project name exists"),
+			@ApiResponse(code = 400, message = "Invalid input data, e.g. missing mandatory data."),
 			@ApiResponse(code = 401, message = "Invalid authentication"),
 			@ApiResponse(code = 403, message = "Insufficient privileges to perform this operation"),
 			@ApiResponse(code = 500, message = "Error during execution")
@@ -91,6 +92,23 @@ public class TestimonialCommandController {
 				.skills(skillQueryService.convertSkillNamesToSkills(request.getSkills()))
 				.build();
 		return ResponseEntity.status(HttpStatus.OK).body(TestimonialResponse.of(testimonialCommandService.update(testimonialId, command)));
+	}
+
+	@ApiOperation(value = "Deletes user testimonial.",
+			notes = "Deletes user testimonial.")
+	@ApiResponses({
+			@ApiResponse(code = 204, message = "Successful execution"),
+			@ApiResponse(code = 400, message = "Invalid input data, e.g. missing mandatory data."),
+			@ApiResponse(code = 401, message = "Invalid authentication"),
+			@ApiResponse(code = 403, message = "Insufficient privileges to perform this operation"),
+			@ApiResponse(code = 500, message = "Error during execution")
+	})
+	@PreAuthorize("isAuthenticated() and isPrincipalUserId(#userId)")
+	@DeleteMapping(path = "/users/{userId}/testimonials/{testimonialId}")
+	public ResponseEntity<Void> deleteTestimonial(@PathVariable("userId") String userId,
+												  @PathVariable("testimonialId") String testimonialId) {
+		testimonialCommandService.delete(testimonialId);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
 	private Testimonial convertTestimonialRequestToTestimonial(TestimonialRequest request) {

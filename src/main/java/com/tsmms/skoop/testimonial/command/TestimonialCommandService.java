@@ -57,4 +57,19 @@ public class TestimonialCommandService {
 		return testimonialRepository.save(testimonial);
 	}
 
+	@Transactional
+	public void delete(String testimonialId) {
+		if (testimonialId == null) {
+			throw new IllegalArgumentException("Testimonial ID cannot be null.");
+		}
+		if (testimonialRepository.findById(testimonialId).isEmpty()) {
+			final String[] searchParamsMap = {"id", testimonialId};
+			throw NoSuchResourceException.builder()
+					.model(TESTIMONIAL)
+					.searchParamsMap(searchParamsMap)
+					.build();
+		}
+		testimonialRepository.deleteById(testimonialId);
+	}
+
 }
