@@ -1,5 +1,6 @@
 package com.tsmms.skoop.testimonial.command;
 
+import com.tsmms.skoop.exception.NoSuchResourceException;
 import com.tsmms.skoop.skill.Skill;
 import com.tsmms.skoop.skill.command.SkillCommandService;
 import com.tsmms.skoop.testimonial.Testimonial;
@@ -27,6 +28,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @ExtendWith(MockitoExtension.class)
 class TestimonialCommandServiceTests {
@@ -334,6 +336,52 @@ class TestimonialCommandServiceTests {
 	@Test
 	void throwsExceptionIfTestimonialUpdateCommandIsNullWhenUpdatingTestimonial() {
 		assertThrows(IllegalArgumentException.class, () -> testimonialCommandService.update("123", null));
+	}
+
+	@DisplayName("Deletes testimonial.")
+	@Test
+	void deletesTestimonial() {
+		given(testimonialRepository.findById("123")).willReturn(Optional.of(
+				Testimonial.builder()
+						.id("123")
+						.author("John Doe. Another company. CTO.")
+						.comment("He is one of the best developers I have ever worked with.")
+						.skills(Arrays.asList(
+								Skill.builder()
+										.id("123")
+										.name("Java")
+										.build(),
+								Skill.builder()
+										.id("456")
+										.name("Spring Boot")
+										.build(),
+								Skill.builder()
+										.id("789")
+										.name("Angular")
+										.build()
+						))
+						.creationDatetime(LocalDateTime.of(2019, 4, 18, 10, 0))
+						.lastModifiedDatetime(LocalDateTime.of(2019, 4, 18, 10, 0))
+						.user(User.builder()
+								.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
+								.userName("tester")
+								.build())
+						.build()
+		));
+		assertDoesNotThrow(() -> testimonialCommandService.delete("123"));
+	}
+
+	@DisplayName("Throws exception if testimonial ID is null when deleting testimonial.")
+	@Test
+	void throwsExceptionIfTestimonialIdIsNullWhenDeletingTestimonial() {
+		assertThrows(IllegalArgumentException.class, () -> testimonialCommandService.delete(null));
+	}
+
+	@DisplayName("Throws exception if non existent testimonial is deleted.")
+	@Test
+	void throwsExceptionIfNonExistentTestimonialIsDeleted() {
+		given(testimonialRepository.findById("123")).willReturn(Optional.empty());
+		assertThrows(NoSuchResourceException.class, () -> testimonialCommandService.delete("123"));
 	}
 
 }
