@@ -9,12 +9,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class SkillQueryServiceTests {
@@ -48,4 +52,41 @@ class SkillQueryServiceTests {
 		assertThat(skill.getName()).isEqualTo("Angular");
 		assertThat(skill.getDescription()).isEqualTo("JavaScript Framework");
 	}
+
+	@DisplayName("Converts skills names to skills.")
+	@Test
+	void convertSkillNamesToSkills() {
+		when(skillRepository.findByNameIgnoreCase(anyString())).thenAnswer(invocation -> {
+			final Object name = invocation.getArgument(0);
+			if ("Angular".equals(name)) {
+				return Optional.empty();
+			} else if ("Spring Boot".equals(name)) {
+				return Optional.of(
+						Skill.builder()
+								.id("123")
+								.name("Spring Boot")
+								.build()
+				);
+			} else {
+				return null;
+			}
+		});
+		final List<Skill> skills = skillQueryService.convertSkillNamesToSkills(Arrays.asList("Angular", "Spring Boot"));
+		assertThat(skills).containsExactlyInAnyOrder(
+				Skill.builder()
+						.id("123")
+						.name("Spring Boot")
+						.build(),
+				Skill.builder()
+						.name("Angular")
+						.build()
+		);
+	}
+
+	@DisplayName("Empty collection is returned when empty collection is passed to convert skill names to skills.")
+	@Test
+	void emptyCollectionIsReturnedWhenEmptyCollectionIsPassedToConvertSkillNamesToSkills() {
+		assertThat(skillQueryService.convertSkillNamesToSkills(Collections.emptyList())).isEmpty();
+	}
+
 }

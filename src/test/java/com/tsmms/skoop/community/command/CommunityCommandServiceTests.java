@@ -117,17 +117,16 @@ class CommunityCommandServiceTests {
 				.name("Angular")
 				.build();
 
-		final Skill tomcatSkill = Skill.builder()
-				.name("Tomcat")
-				.build();
-
-		given(skillCommandService.createSkill("Tomcat", null, null))
-				.willReturn(
-						Skill.builder()
-								.id("a3d55d3f-1215-4e8e-93f3-c06a5b9c2d56")
-								.name("Tomcat")
-								.build()
-				);
+		given(skillCommandService.createNonExistentSkills(Arrays.asList(
+				springBootSkill, angularSkill, Skill.builder()
+						.name("Tomcat")
+						.build()
+		))).willReturn(
+				Arrays.asList(springBootSkill, angularSkill, Skill.builder()
+						.id("a3d55d3f-1215-4e8e-93f3-c06a5b9c2d56")
+						.name("Tomcat")
+						.build())
+		);
 
 		given(communityRepository.save(argThat(AllOf.allOf(
 				isA(Community.class),
@@ -196,7 +195,9 @@ class CommunityCommandServiceTests {
 										.href("https://www.linkedin.com/java-user-group")
 										.build()
 						))
-						.skills(Arrays.asList(springBootSkill, angularSkill, tomcatSkill))
+						.skills(Arrays.asList(springBootSkill, angularSkill, Skill.builder()
+								.name("Tomcat")
+								.build()))
 						.build(),
 				Arrays.asList(
 						User.builder()
@@ -343,17 +344,16 @@ class CommunityCommandServiceTests {
 				.name("Angular")
 				.build();
 
-		final Skill tomcatSkill = Skill.builder()
-				.name("Tomcat")
-				.build();
-
-		given(skillCommandService.createSkill("Tomcat", null, null))
-				.willReturn(
-						Skill.builder()
-								.id("a3d55d3f-1215-4e8e-93f3-c06a5b9c2d56")
-								.name("Tomcat")
-								.build()
-				);
+		given(skillCommandService.createNonExistentSkills(Arrays.asList(
+				springBootSkill, angularSkill, Skill.builder()
+						.name("Tomcat")
+						.build()
+		))).willReturn(
+				Arrays.asList(springBootSkill, angularSkill, Skill.builder()
+						.id("a3d55d3f-1215-4e8e-93f3-c06a5b9c2d56")
+						.name("Tomcat")
+						.build())
+		);
 
 		given(communityRepository.findById("123")).willReturn(Optional.of(
 				Community.builder()
@@ -422,7 +422,9 @@ class CommunityCommandServiceTests {
 						.title("New java User Group")
 						.type(CommunityType.CLOSED)
 						.description("New community for Java developers")
-						.skills(Arrays.asList(springBootSkill, angularSkill, tomcatSkill))
+						.skills(Arrays.asList(springBootSkill, angularSkill, Skill.builder()
+								.name("Tomcat")
+								.build()))
 						.links(Collections.singletonList(Link.builder()
 								.name("jira")
 								.href("https://www.newjira.com")

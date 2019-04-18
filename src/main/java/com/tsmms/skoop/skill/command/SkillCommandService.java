@@ -12,10 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
 
 @Service
 public class SkillCommandService {
@@ -92,4 +94,21 @@ public class SkillCommandService {
 		});
 		skillRepository.delete(skill);
 	}
+
+	@Transactional
+	public List<Skill> createNonExistentSkills(List<Skill> skills) {
+		if (skills != null) {
+			return skills.stream().map(skill -> {
+				if (skill.getId() == null) {
+					return createSkill(skill.getName(), null, null);
+				} else {
+					return skill;
+				}
+			}).collect(toList());
+		}
+		else {
+			return Collections.emptyList();
+		}
+	}
+
 }
