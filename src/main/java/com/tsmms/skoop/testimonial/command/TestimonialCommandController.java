@@ -88,7 +88,7 @@ public class TestimonialCommandController {
 		final TestimonialUpdateCommand command = TestimonialUpdateCommand.builder()
 				.author(request.getAuthor())
 				.comment(request.getComment())
-				.skills(skillQueryService.skillNamesToSkills(request.getSkills()))
+				.skills(skillQueryService.convertSkillNamesToSkills(request.getSkills()))
 				.build();
 		return ResponseEntity.status(HttpStatus.OK).body(TestimonialResponse.of(testimonialCommandService.update(testimonialId, command)));
 	}
@@ -97,7 +97,7 @@ public class TestimonialCommandController {
 		return Testimonial.builder()
 				.author(request.getAuthor())
 				.comment(request.getComment())
-				.skills(skillQueryService.skillNamesToSkills(request.getSkills()))
+				.skills(skillQueryService.convertSkillNamesToSkills(request.getSkills()))
 				.build();
 	}
 

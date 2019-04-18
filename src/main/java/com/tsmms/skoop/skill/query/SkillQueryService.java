@@ -64,7 +64,7 @@ public class SkillQueryService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<Skill> skillNamesToSkills(List<String> skillNames) {
+	public List<Skill> convertSkillNamesToSkills(List<String> skillNames) {
 		final List<Skill> skills;
 		if (skillNames != null) {
 			skills = skillNames.stream().map(skillName ->

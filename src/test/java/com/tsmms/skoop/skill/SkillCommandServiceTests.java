@@ -13,6 +13,7 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -194,6 +195,52 @@ class SkillCommandServiceTests {
 	void deleteNonExistentSkillThrowsException() {
 		given(skillRepository.findById("123")).willReturn(Optional.empty());
 		assertThrows(NoSuchResourceException.class, () -> skillCommandService.deleteSkill("123"));
+	}
+
+	@Test
+	@DisplayName("Creates non existent skills.")
+	void createsNonExistentSkills() {
+		given(skillRepository.findByNameIgnoreCase("Angular")).willReturn(Optional.empty());
+
+		given(skillRepository.save(
+				argThat(allOf(
+						isA(Skill.class),
+						hasProperty("id", isA(String.class)),
+						hasProperty("name", is("Angular"))
+				))
+		)).willReturn(
+				Skill.builder()
+					.id("456")
+					.name("Angular")
+				.build()
+		);
+
+		final List<Skill> skills = skillCommandService.createNonExistentSkills(Arrays.asList(
+				Skill.builder()
+						.id("123")
+						.name("Spring Boot")
+						.build(),
+				Skill.builder()
+						.name("Angular")
+						.build()
+		));
+		assertThat(skills).containsExactlyInAnyOrder(
+				Skill.builder()
+						.id("123")
+						.name("Spring Boot")
+						.build(),
+				Skill.builder()
+						.id("456")
+						.name("Angular")
+						.build()
+		);
+	}
+
+	@DisplayName("Empty collection is returned when empty collection is passed to create non existent skills.")
+	@Test
+	void emptyCollectionIsReturnedWhenEmptyCollectionIsPassedToCreateNonExistentSkills() {
+		final List<Skill> skills = skillCommandService.createNonExistentSkills(Collections.emptyList());
+		assertThat(skills).isEmpty();
 	}
 
 }

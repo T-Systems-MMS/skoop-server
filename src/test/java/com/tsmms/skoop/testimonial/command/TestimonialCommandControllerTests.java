@@ -61,7 +61,7 @@ class TestimonialCommandControllerTests extends AbstractControllerTests {
 		given(userQueryService.getUserById(tester.getId()))
 				.willReturn(Optional.of(tester));
 
-		given(skillQueryService.skillNamesToSkills(Arrays.asList("Java", "Spring Boot")))
+		given(skillQueryService.convertSkillNamesToSkills(Arrays.asList("Java", "Spring Boot")))
 				.willReturn(
 						Arrays.asList(
 								Skill.builder()
@@ -184,7 +184,7 @@ class TestimonialCommandControllerTests extends AbstractControllerTests {
 
 		final ClassPathResource body = new ClassPathResource("testimonials/update-testimonial.json");
 
-		given(skillQueryService.skillNamesToSkills(Arrays.asList("Java", "Spring Boot", "Angular")))
+		given(skillQueryService.convertSkillNamesToSkills(Arrays.asList("Java", "Spring Boot", "Angular")))
 				.willReturn(
 						Arrays.asList(
 								Skill.builder()

@@ -140,7 +140,7 @@ public class CommunityCommandController {
 				.type(communityRequest.getType())
 				.description(communityRequest.getDescription())
 				.links(convertLinkRequestListToLinkList(communityRequest))
-				.skills(skillQueryService.skillNamesToSkills(communityRequest.getSkillNames()))
+				.skills(skillQueryService.convertSkillNamesToSkills(communityRequest.getSkillNames()))
 				.build();
 	}
 
