@@ -313,7 +313,7 @@ class TestimonialCommandControllerTests extends AbstractControllerTests {
 				.andExpect(status().isNoContent());
 	}
 
-	@DisplayName("Not authenticated user cannot create testimonials.")
+	@DisplayName("Not authenticated user cannot delete testimonials.")
 	@Test
 	void notAuthenticatedUserCannotDeleteTestimonial() throws Exception {
 		mockMvc.perform(delete("/users/56ef4778-a084-4509-9a3e-80b7895cf7b0/testimonials/123")
@@ -323,7 +323,7 @@ class TestimonialCommandControllerTests extends AbstractControllerTests {
 				.andExpect(status().isUnauthorized());
 	}
 
-	@DisplayName("User cannot create testimonials on other users.")
+	@DisplayName("User cannot delete testimonials on other users.")
 	@Test
 	void userCannotDeleteTestimonialsOnOtherUsers() throws Exception {
 		final User tester = User.builder()
