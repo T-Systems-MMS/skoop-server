@@ -99,15 +99,6 @@ class TestimonialCommandControllerTests extends AbstractControllerTests {
 										.name("Java")
 										.build(),
 								Skill.builder()
-										.name("Spring Boot")
-										.build()
-						))
-						.skills(Arrays.asList(
-								Skill.builder()
-										.id("123")
-										.name("Java")
-										.build(),
-								Skill.builder()
 										.id("456")
 										.name("Spring Boot")
 										.build()
