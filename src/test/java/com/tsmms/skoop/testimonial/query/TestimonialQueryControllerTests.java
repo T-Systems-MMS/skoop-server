@@ -122,7 +122,7 @@ class TestimonialQueryControllerTests extends AbstractControllerTests {
 				.andExpect(status().isUnauthorized());
 	}
 
-	@DisplayName("User cannot create testimonials on other users.")
+	@DisplayName("User cannot get testimonials on other users.")
 	@Test
 	void userCannotGetTestimonialsOnOtherUsers() throws Exception {
 		final User tester = User.builder()
