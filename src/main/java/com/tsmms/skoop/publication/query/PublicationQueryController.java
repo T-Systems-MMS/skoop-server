@@ -1,7 +1,6 @@
 package com.tsmms.skoop.publication.query;
 
 import com.tsmms.skoop.publication.PublicationResponse;
-import com.tsmms.skoop.testimonial.TestimonialResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
