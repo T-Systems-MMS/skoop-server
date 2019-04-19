@@ -1,0 +1,7 @@
+{
+	"title": "The first publication",
+	"date": "2019-04-19",
+	"link": "http://first-link.com",
+	"publisher": "The first publisher",
+	"skills": ["Java", "Spring Boot"]
+}

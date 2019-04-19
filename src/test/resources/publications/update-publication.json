@@ -1,0 +1,8 @@
+{
+	"id": "123",
+	"title": "The first publication updated",
+	"date": "2020-04-19",
+	"link": "http://first-updated-link.com",
+	"publisher": "The first publisher updated",
+	"skills": ["Java", "Spring Boot", "Angular"]
+}

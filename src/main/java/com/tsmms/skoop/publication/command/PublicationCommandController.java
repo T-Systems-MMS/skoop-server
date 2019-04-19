@@ -1,12 +1,12 @@
-package com.tsmms.skoop.testimonial.command;
+package com.tsmms.skoop.publication.command;
 
 import com.tsmms.skoop.exception.NoSuchResourceException;
+import com.tsmms.skoop.publication.Publication;
+import com.tsmms.skoop.publication.PublicationRequest;
+import com.tsmms.skoop.publication.PublicationResponse;
 import com.tsmms.skoop.skill.query.SkillQueryService;
 import com.tsmms.skoop.user.User;
 import com.tsmms.skoop.user.query.UserQueryService;
-import com.tsmms.skoop.testimonial.Testimonial;
-import com.tsmms.skoop.testimonial.TestimonialRequest;
-import com.tsmms.skoop.testimonial.TestimonialResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -25,28 +25,28 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
-import static java.util.Objects.requireNonNull;
 import static com.tsmms.skoop.exception.enums.Model.USER;
+import static java.util.Objects.requireNonNull;
 
-@Api(tags = "Testimonials")
+@Api(tags = "Publications")
 @RestController
 @Validated
-public class TestimonialCommandController {
+public class PublicationCommandController {
 
-	private final TestimonialCommandService testimonialCommandService;
 	private final UserQueryService userQueryService;
 	private final SkillQueryService skillQueryService;
+	private final PublicationCommandService publicationCommandService;
 
-	public TestimonialCommandController(TestimonialCommandService testimonialCommandService,
-										UserQueryService userQueryService,
-										SkillQueryService skillQueryService) {
-		this.testimonialCommandService = requireNonNull(testimonialCommandService);
+	public PublicationCommandController(UserQueryService userQueryService,
+										SkillQueryService skillQueryService,
+										PublicationCommandService publicationCommandService) {
 		this.userQueryService = requireNonNull(userQueryService);
 		this.skillQueryService = requireNonNull(skillQueryService);
+		this.publicationCommandService = requireNonNull(publicationCommandService);
 	}
 
-	@ApiOperation(value = "Create new user testimonial.",
-			notes = "Create new user testimonial.")
+	@ApiOperation(value = "Create new user publication.",
+			notes = "Create new user publication.")
 	@ApiResponses({
 			@ApiResponse(code = 201, message = "Successful execution"),
 			@ApiResponse(code = 400, message = "Invalid input data, e.g. missing mandatory data."),
@@ -55,11 +55,11 @@ public class TestimonialCommandController {
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
 	@PreAuthorize("isAuthenticated() and isPrincipalUserId(#userId)")
-	@PostMapping(path = "/users/{userId}/testimonials",
+	@PostMapping(path = "/users/{userId}/publications",
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<TestimonialResponse> createTestimonial(@PathVariable("userId") String userId,
-															 @RequestBody @Valid TestimonialRequest request) {
+	public ResponseEntity<PublicationResponse> createPublication(@PathVariable("userId") String userId,
+																 @RequestBody @Valid PublicationRequest request) {
 		final User user = userQueryService.getUserById(userId).orElseThrow(() -> {
 			final String[] searchParamsMap = {"id", userId};
 			return NoSuchResourceException.builder()
@@ -67,13 +67,13 @@ public class TestimonialCommandController {
 					.searchParamsMap(searchParamsMap)
 					.build();
 		});
-		final Testimonial testimonial = convertTestimonialRequestToTestimonial(request);
-		testimonial.setUser(user);
-		return ResponseEntity.status(HttpStatus.CREATED).body(TestimonialResponse.of(testimonialCommandService.create(testimonial)));
+		final Publication publication = convertPublicationRequestToPublication(request);
+		publication.setUser(user);
+		return ResponseEntity.status(HttpStatus.CREATED).body(PublicationResponse.of(publicationCommandService.create(publication)));
 	}
 
-	@ApiOperation(value = "Update user testimonial.",
-			notes = "Update user testimonial.")
+	@ApiOperation(value = "Update user publication.",
+			notes = "Update user publication.")
 	@ApiResponses({
 			@ApiResponse(code = 200, message = "Successful execution"),
 			@ApiResponse(code = 400, message = "Invalid input data, e.g. missing mandatory data."),
@@ -82,22 +82,24 @@ public class TestimonialCommandController {
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
 	@PreAuthorize("isAuthenticated() and isPrincipalUserId(#userId)")
-	@PutMapping(path = "/users/{userId}/testimonials/{testimonialId}",
+	@PutMapping(path = "/users/{userId}/publications/{publicationId}",
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<TestimonialResponse> updateTestimonial(@PathVariable("userId") String userId,
-																 @PathVariable("testimonialId") String testimonialId,
-																 @RequestBody @Valid TestimonialRequest request) {
-		final TestimonialUpdateCommand command = TestimonialUpdateCommand.builder()
-				.author(request.getAuthor())
-				.comment(request.getComment())
+	public ResponseEntity<PublicationResponse> updatePublication(@PathVariable("userId") String userId,
+																 @PathVariable("publicationId") String publicationId,
+																 @RequestBody @Valid PublicationRequest request) {
+		final PublicationUpdateCommand command = PublicationUpdateCommand.builder()
+				.title(request.getTitle())
+				.date(request.getDate())
+				.link(request.getLink())
+				.publisher(request.getPublisher())
 				.skills(skillQueryService.convertSkillNamesToSkills(request.getSkills()))
 				.build();
-		return ResponseEntity.status(HttpStatus.OK).body(TestimonialResponse.of(testimonialCommandService.update(testimonialId, command)));
+		return ResponseEntity.status(HttpStatus.OK).body(PublicationResponse.of(publicationCommandService.update(publicationId, command)));
 	}
 
-	@ApiOperation(value = "Deletes user testimonial.",
-			notes = "Deletes user testimonial.")
+	@ApiOperation(value = "Deletes user publication.",
+			notes = "Deletes user publication.")
 	@ApiResponses({
 			@ApiResponse(code = 204, message = "Successful execution"),
 			@ApiResponse(code = 400, message = "Invalid input data, e.g. missing mandatory data."),
@@ -106,17 +108,19 @@ public class TestimonialCommandController {
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
 	@PreAuthorize("isAuthenticated() and isPrincipalUserId(#userId)")
-	@DeleteMapping(path = "/users/{userId}/testimonials/{testimonialId}")
-	public ResponseEntity<Void> deleteTestimonial(@PathVariable("userId") String userId,
-												  @PathVariable("testimonialId") String testimonialId) {
-		testimonialCommandService.delete(testimonialId);
+	@DeleteMapping(path = "/users/{userId}/publications/{publicationId}")
+	public ResponseEntity<Void> deletePublication(@PathVariable("userId") String userId,
+												  @PathVariable("publicationId") String publicationId) {
+		publicationCommandService.delete(publicationId);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
-	private Testimonial convertTestimonialRequestToTestimonial(TestimonialRequest request) {
-		return Testimonial.builder()
-				.author(request.getAuthor())
-				.comment(request.getComment())
+	private Publication convertPublicationRequestToPublication(PublicationRequest request) {
+		return Publication.builder()
+				.title(request.getTitle())
+				.date(request.getDate())
+				.link(request.getLink())
+				.publisher(request.getPublisher())
 				.skills(skillQueryService.convertSkillNamesToSkills(request.getSkills()))
 				.build();
 	}

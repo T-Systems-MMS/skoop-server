@@ -1,9 +1,9 @@
-package com.tsmms.skoop.testimonial.command;
+package com.tsmms.skoop.publication.command;
 
 import com.tsmms.skoop.common.AbstractControllerTests;
+import com.tsmms.skoop.publication.Publication;
 import com.tsmms.skoop.skill.Skill;
 import com.tsmms.skoop.skill.query.SkillQueryService;
-import com.tsmms.skoop.testimonial.Testimonial;
 import com.tsmms.skoop.user.User;
 import com.tsmms.skoop.user.query.UserQueryService;
 import org.junit.jupiter.api.DisplayName;
@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Optional;
@@ -23,6 +24,7 @@ import java.util.Optional;
 import static com.tsmms.skoop.common.JwtAuthenticationFactory.withUser;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -32,32 +34,30 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import static org.mockito.BDDMockito.given;
-
-@WebMvcTest(TestimonialCommandController.class)
-class TestimonialCommandControllerTests extends AbstractControllerTests {
-
-	@MockBean
-	private SkillQueryService skillQueryService;
+@WebMvcTest(PublicationCommandController.class)
+class PublicationCommandControllerTests extends AbstractControllerTests {
 
 	@MockBean
 	private UserQueryService userQueryService;
 
 	@MockBean
-	private TestimonialCommandService testimonialCommandService;
+	private SkillQueryService skillQueryService;
+
+	@MockBean
+	private PublicationCommandService publicationCommandService;
 
 	@Autowired
 	private MockMvc mockMvc;
 
-	@DisplayName("Creates testimonial.")
+	@DisplayName("Creates publication.")
 	@Test
-	void createTestimonial() throws Exception {
+	void createPublication() throws Exception {
 		final User tester = User.builder()
 				.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
 				.userName("tester")
 				.build();
 
-		final ClassPathResource body = new ClassPathResource("testimonials/create-testimonial.json");
+		final ClassPathResource body = new ClassPathResource("publications/create-publication.json");
 
 		given(userQueryService.getUserById(tester.getId()))
 				.willReturn(Optional.of(tester));
@@ -75,9 +75,11 @@ class TestimonialCommandControllerTests extends AbstractControllerTests {
 						)
 				);
 
-		given(testimonialCommandService.create(Testimonial.builder()
-				.author("John Doe. Some company. CEO.")
-				.comment("He is the best developer I have ever worked with.")
+		given(publicationCommandService.create(Publication.builder()
+				.title("The first publication")
+				.publisher("The first publisher")
+				.date(LocalDate.of(2019, 4, 19))
+				.link("http://first-link.com")
 				.skills(Arrays.asList(
 						Skill.builder()
 								.id("123")
@@ -87,13 +89,18 @@ class TestimonialCommandControllerTests extends AbstractControllerTests {
 								.name("Spring Boot")
 								.build()
 				))
-				.user(tester)
-				.build()
-		)).willReturn(
-				Testimonial.builder()
-						.id("abc")
-						.author("John Doe. Some company. CEO.")
-						.comment("He is the best developer I have ever worked with.")
+				.user(User.builder()
+						.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
+						.userName("tester")
+						.build())
+				.build())
+		)
+				.willReturn(Publication.builder()
+						.id("123")
+						.title("The first publication")
+						.publisher("The first publisher")
+						.date(LocalDate.of(2019, 4, 19))
+						.link("http://first-link.com")
 						.skills(Arrays.asList(
 								Skill.builder()
 										.id("123")
@@ -104,14 +111,17 @@ class TestimonialCommandControllerTests extends AbstractControllerTests {
 										.name("Spring Boot")
 										.build()
 						))
-						.creationDatetime(LocalDateTime.of(2019, 4, 17, 10, 0))
-						.lastModifiedDatetime(LocalDateTime.of(2019, 4, 17, 10, 0))
-						.user(tester)
+						.creationDatetime(LocalDateTime.of(2019, 4, 19, 13, 0))
+						.lastModifiedDatetime(LocalDateTime.of(2019, 4, 19, 13, 0))
+						.user(User.builder()
+								.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
+								.userName("tester")
+								.build())
 						.build()
-		);
+				);
 
 		try (final InputStream is = body.getInputStream()) {
-			mockMvc.perform(post("/users/56ef4778-a084-4509-9a3e-80b7895cf7b0/testimonials")
+			mockMvc.perform(post("/users/56ef4778-a084-4509-9a3e-80b7895cf7b0/publications")
 					.accept(MediaType.APPLICATION_JSON)
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(is.readAllBytes())
@@ -119,11 +129,13 @@ class TestimonialCommandControllerTests extends AbstractControllerTests {
 					.with(csrf()))
 					.andExpect(status().isCreated())
 					.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-					.andExpect(jsonPath("$.id", is(equalTo("abc"))))
-					.andExpect(jsonPath("$.author", is(equalTo("John Doe. Some company. CEO."))))
-					.andExpect(jsonPath("$.comment", is(equalTo("He is the best developer I have ever worked with."))))
-					.andExpect(jsonPath("$.creationDatetime", is(equalTo("2019-04-17T10:00:00"))))
-					.andExpect(jsonPath("$.lastModifiedDatetime", is(equalTo("2019-04-17T10:00:00"))))
+					.andExpect(jsonPath("$.id", is(equalTo("123"))))
+					.andExpect(jsonPath("$.title", is(equalTo("The first publication"))))
+					.andExpect(jsonPath("$.publisher", is(equalTo("The first publisher"))))
+					.andExpect(jsonPath("$.creationDatetime", is(equalTo("2019-04-19T13:00:00"))))
+					.andExpect(jsonPath("$.lastModifiedDatetime", is(equalTo("2019-04-19T13:00:00"))))
+					.andExpect(jsonPath("$.link", is(equalTo("http://first-link.com"))))
+					.andExpect(jsonPath("$.date", is(equalTo("2019-04-19"))))
 					.andExpect(jsonPath("$.skills[0].id", is(equalTo("123"))))
 					.andExpect(jsonPath("$.skills[0].name", is(equalTo("Java"))))
 					.andExpect(jsonPath("$.skills[1].id", is(equalTo("456"))))
@@ -131,12 +143,12 @@ class TestimonialCommandControllerTests extends AbstractControllerTests {
 		}
 	}
 
-	@DisplayName("Not authenticated user cannot create testimonials.")
+	@DisplayName("Not authenticated user cannot create publications.")
 	@Test
-	void notAuthenticatedUserCannotCreateTestimonials() throws Exception {
-		final ClassPathResource body = new ClassPathResource("testimonials/create-testimonial.json");
+	void notAuthenticatedUserCannotCreatePublications() throws Exception {
+		final ClassPathResource body = new ClassPathResource("publications/create-publication.json");
 		try (final InputStream is = body.getInputStream()) {
-			mockMvc.perform(post("/users/56ef4778-a084-4509-9a3e-80b7895cf7b0/testimonials")
+			mockMvc.perform(post("/users/56ef4778-a084-4509-9a3e-80b7895cf7b0/publications")
 					.accept(MediaType.APPLICATION_JSON)
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(is.readAllBytes())
@@ -145,18 +157,18 @@ class TestimonialCommandControllerTests extends AbstractControllerTests {
 		}
 	}
 
-	@DisplayName("User cannot create testimonials on other users.")
+	@DisplayName("User cannot create publications of other users.")
 	@Test
-	void userCannotCreateTestimonialsOnOtherUsers() throws Exception {
+	void userCannotCreatePublicattionsOfOtherUsers() throws Exception {
 		final User tester = User.builder()
 				.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
 				.userName("tester")
 				.build();
 
-		final ClassPathResource body = new ClassPathResource("testimonials/create-testimonial.json");
+		final ClassPathResource body = new ClassPathResource("publications/create-publication.json");
 
 		try (final InputStream is = body.getInputStream()) {
-			mockMvc.perform(post("/users/c9cf7118-5f9e-40fc-9d89-28b2d0a77340/testimonials")
+			mockMvc.perform(post("/users/c9cf7118-5f9e-40fc-9d89-28b2d0a77340/publications")
 					.accept(MediaType.APPLICATION_JSON)
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(is.readAllBytes())
@@ -166,15 +178,15 @@ class TestimonialCommandControllerTests extends AbstractControllerTests {
 		}
 	}
 
-	@DisplayName("Update testimonial.")
+	@DisplayName("Updates publication.")
 	@Test
-	void updateTestimonial() throws Exception {
+	void updatePublication() throws Exception {
 		final User tester = User.builder()
 				.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
 				.userName("tester")
 				.build();
 
-		final ClassPathResource body = new ClassPathResource("testimonials/update-testimonial.json");
+		final ClassPathResource body = new ClassPathResource("publications/update-publication.json");
 
 		given(skillQueryService.convertSkillNamesToSkills(Arrays.asList("Java", "Spring Boot", "Angular")))
 				.willReturn(
@@ -188,15 +200,16 @@ class TestimonialCommandControllerTests extends AbstractControllerTests {
 										.name("Spring Boot")
 										.build(),
 								Skill.builder()
-										.id("789")
 										.name("Angular")
 										.build()
 						)
 				);
 
-		given(testimonialCommandService.update("abc", TestimonialUpdateCommand.builder()
-				.author("John Doe. Another company. CTO.")
-				.comment("He is one of the best developers I have ever worked with.")
+		given(publicationCommandService.update("123", PublicationUpdateCommand.builder()
+				.publisher("The first publisher updated")
+				.link("http://first-updated-link.com")
+				.title("The first publication updated")
+				.date(LocalDate.of(2020, 4, 19))
 				.skills(Arrays.asList(
 						Skill.builder()
 								.id("123")
@@ -207,16 +220,17 @@ class TestimonialCommandControllerTests extends AbstractControllerTests {
 								.name("Spring Boot")
 								.build(),
 						Skill.builder()
-								.id("789")
 								.name("Angular")
 								.build()
 				))
 				.build()
 		)).willReturn(
-				Testimonial.builder()
-						.id("abc")
-						.author("John Doe. Another company. CTO.")
-						.comment("He is one of the best developers I have ever worked with.")
+				Publication.builder()
+						.id("123")
+						.title("The first publication updated")
+						.publisher("The first publisher updated")
+						.date(LocalDate.of(2020, 4, 19))
+						.link("http://first-updated-link.com")
 						.skills(Arrays.asList(
 								Skill.builder()
 										.id("123")
@@ -231,17 +245,14 @@ class TestimonialCommandControllerTests extends AbstractControllerTests {
 										.name("Angular")
 										.build()
 						))
-						.creationDatetime(LocalDateTime.of(2019, 4, 18, 10, 0))
-						.lastModifiedDatetime(LocalDateTime.of(2019, 4, 18, 10, 0))
-						.user(User.builder()
-								.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
-								.userName("tester")
-								.build())
+						.creationDatetime(LocalDateTime.of(2019, 4, 22, 13, 0))
+						.lastModifiedDatetime(LocalDateTime.of(2019, 4, 22, 13, 0))
+						.user(tester)
 						.build()
 		);
 
 		try (final InputStream is = body.getInputStream()) {
-			mockMvc.perform(put("/users/56ef4778-a084-4509-9a3e-80b7895cf7b0/testimonials/abc")
+			mockMvc.perform(put("/users/56ef4778-a084-4509-9a3e-80b7895cf7b0/publications/123")
 					.accept(MediaType.APPLICATION_JSON)
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(is.readAllBytes())
@@ -249,11 +260,13 @@ class TestimonialCommandControllerTests extends AbstractControllerTests {
 					.with(csrf()))
 					.andExpect(status().isOk())
 					.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-					.andExpect(jsonPath("$.id", is(equalTo("abc"))))
-					.andExpect(jsonPath("$.author", is(equalTo("John Doe. Another company. CTO."))))
-					.andExpect(jsonPath("$.comment", is(equalTo("He is one of the best developers I have ever worked with."))))
-					.andExpect(jsonPath("$.creationDatetime", is(equalTo("2019-04-18T10:00:00"))))
-					.andExpect(jsonPath("$.lastModifiedDatetime", is(equalTo("2019-04-18T10:00:00"))))
+					.andExpect(jsonPath("$.id", is(equalTo("123"))))
+					.andExpect(jsonPath("$.title", is(equalTo("The first publication updated"))))
+					.andExpect(jsonPath("$.publisher", is(equalTo("The first publisher updated"))))
+					.andExpect(jsonPath("$.creationDatetime", is(equalTo("2019-04-22T13:00:00"))))
+					.andExpect(jsonPath("$.lastModifiedDatetime", is(equalTo("2019-04-22T13:00:00"))))
+					.andExpect(jsonPath("$.link", is(equalTo("http://first-updated-link.com"))))
+					.andExpect(jsonPath("$.date", is(equalTo("2020-04-19"))))
 					.andExpect(jsonPath("$.skills[0].id", is(equalTo("123"))))
 					.andExpect(jsonPath("$.skills[0].name", is(equalTo("Java"))))
 					.andExpect(jsonPath("$.skills[1].id", is(equalTo("456"))))
@@ -263,12 +276,12 @@ class TestimonialCommandControllerTests extends AbstractControllerTests {
 		}
 	}
 
-	@DisplayName("Not authenticated user cannot update testimonials.")
+	@DisplayName("Not authenticated user cannot update publications.")
 	@Test
-	void notAuthenticatedUserCannotUpdateTestimonials() throws Exception {
-		final ClassPathResource body = new ClassPathResource("testimonials/update-testimonial.json");
+	void notAuthenticatedUserCannotUpdatePublications() throws Exception {
+		final ClassPathResource body = new ClassPathResource("publications/update-publication.json");
 		try (final InputStream is = body.getInputStream()) {
-			mockMvc.perform(put("/users/56ef4778-a084-4509-9a3e-80b7895cf7b0/testimonials/abc")
+			mockMvc.perform(put("/users/56ef4778-a084-4509-9a3e-80b7895cf7b0/publications/123")
 					.accept(MediaType.APPLICATION_JSON)
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(is.readAllBytes())
@@ -277,18 +290,18 @@ class TestimonialCommandControllerTests extends AbstractControllerTests {
 		}
 	}
 
-	@DisplayName("User cannot update testimonials on other users.")
+	@DisplayName("User cannot update publications of other users.")
 	@Test
-	void userCannotUpdatesTestimonialsOnOtherUsers() throws Exception {
+	void userCannotUpdatePublicationsOfOtherUsers() throws Exception {
 		final User tester = User.builder()
 				.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
 				.userName("tester")
 				.build();
 
-		final ClassPathResource body = new ClassPathResource("testimonials/update-testimonial.json");
+		final ClassPathResource body = new ClassPathResource("publications/update-publication.json");
 
 		try (final InputStream is = body.getInputStream()) {
-			mockMvc.perform(put("/users/c9cf7118-5f9e-40fc-9d89-28b2d0a77340/testimonials/abc")
+			mockMvc.perform(put("/users/c9cf7118-5f9e-40fc-9d89-28b2d0a77340/publications/123")
 					.accept(MediaType.APPLICATION_JSON)
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(is.readAllBytes())
@@ -298,14 +311,14 @@ class TestimonialCommandControllerTests extends AbstractControllerTests {
 		}
 	}
 
-	@DisplayName("Deletes testimonial.")
+	@DisplayName("Deletes publication.")
 	@Test
-	void deletesTestimonial() throws Exception {
+	void deletesPublication() throws Exception {
 		final User tester = User.builder()
 				.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
 				.userName("tester")
 				.build();
-		mockMvc.perform(delete("/users/56ef4778-a084-4509-9a3e-80b7895cf7b0/testimonials/123")
+		mockMvc.perform(delete("/users/56ef4778-a084-4509-9a3e-80b7895cf7b0/publications/123")
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.with(authentication(withUser(tester)))
@@ -313,29 +326,30 @@ class TestimonialCommandControllerTests extends AbstractControllerTests {
 				.andExpect(status().isNoContent());
 	}
 
-	@DisplayName("Not authenticated user cannot delete testimonials.")
+	@DisplayName("Not authenticated user cannot delete publications.")
 	@Test
-	void notAuthenticatedUserCannotDeleteTestimonial() throws Exception {
-		mockMvc.perform(delete("/users/56ef4778-a084-4509-9a3e-80b7895cf7b0/testimonials/123")
+	void notAuthenticatedUserCannotDeletePublications() throws Exception {
+		mockMvc.perform(delete("/users/56ef4778-a084-4509-9a3e-80b7895cf7b0/publications/123")
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.with(csrf()))
 				.andExpect(status().isUnauthorized());
 	}
 
-	@DisplayName("User cannot delete testimonials on other users.")
+	@DisplayName("User cannot delete publications of other users.")
 	@Test
-	void userCannotDeleteTestimonialsOnOtherUsers() throws Exception {
+	void userCannotDeletePublicationsOfOtherUsers() throws Exception {
 		final User tester = User.builder()
 				.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
 				.userName("tester")
 				.build();
-		mockMvc.perform(delete("/users/c9cf7118-5f9e-40fc-9d89-28b2d0a77340/testimonials/123")
+		mockMvc.perform(delete("/users/c9cf7118-5f9e-40fc-9d89-28b2d0a77340/publications/123")
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.with(authentication(withUser(tester)))
 				.with(csrf()))
 				.andExpect(status().isForbidden());
 	}
+
 
 }
