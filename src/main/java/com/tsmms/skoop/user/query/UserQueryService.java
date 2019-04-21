@@ -47,7 +47,7 @@ public class UserQueryService {
 	}
 
 	@Transactional(readOnly = true)
-	@Cacheable(cacheNames = "userIds", unless = "#result.empty")
+	@Cacheable(cacheNames = "userIds", unless = "#result == null")
 	public Optional<String> getUserIdByUserName(String userName) {
 		return userRepository.findUserIdByUserName(userName);
 	}
