@@ -8,7 +8,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.PlatformTransactionManager;
 
 import java.util.Optional;
 
@@ -23,8 +22,6 @@ class UserQueryServiceCachingTests {
 	private UserRepository userRepository;
 	@MockBean
 	private ConversionService conversionService;
-	@MockBean
-	private PlatformTransactionManager transactionManager;
 
 	@Autowired
 	private UserQueryService userQueryService;

@@ -46,7 +46,6 @@ public class UserQueryService {
 		return userRepository.findByUserName(userName);
 	}
 
-	@Transactional(readOnly = true)
 	@Cacheable(cacheNames = "userIds", unless = "#result == null")
 	public Optional<String> getUserIdByUserName(String userName) {
 		return userRepository.findUserIdByUserName(userName);
