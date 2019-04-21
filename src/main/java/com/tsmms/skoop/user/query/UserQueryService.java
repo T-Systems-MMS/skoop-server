@@ -3,6 +3,7 @@ package com.tsmms.skoop.user.query;
 import com.tsmms.skoop.exception.EmptyInputException;
 import com.tsmms.skoop.user.User;
 import com.tsmms.skoop.user.UserRepository;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +44,12 @@ public class UserQueryService {
 	@Transactional(readOnly = true)
 	public Optional<User> getByUserName(String userName) {
 		return userRepository.findByUserName(userName);
+	}
+
+	@Transactional(readOnly = true)
+	@Cacheable(cacheNames = "userIds", unless = "#result.empty")
+	public Optional<String> getUserIdByUserName(String userName) {
+		return userRepository.findUserIdByUserName(userName);
 	}
 
 	@Transactional(readOnly = true)

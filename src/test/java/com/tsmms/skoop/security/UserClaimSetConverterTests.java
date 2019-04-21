@@ -34,12 +34,7 @@ class UserClaimSetConverterTests {
 	@Test
 	@DisplayName("User claim set is enriched with a user id when the user exists.")
 	void testIfUserClaimSetIsEnrichedWithUserIdWhenUserExists() {
-		given(userQueryService.getByUserName("johndoe")).willReturn(Optional.of(
-				User.builder()
-						.id("123")
-						.userName("johndoe")
-						.build()
-		));
+		given(userQueryService.getUserIdByUserName("johndoe")).willReturn(Optional.of("123"));
 		final Map<String, Object> claims = new HashMap<>();
 		claims.put("given_name", "John");
 		claims.put("family_name", "Doe");
@@ -48,14 +43,13 @@ class UserClaimSetConverterTests {
 		claims.put("jti", "38929539-bbac-4d4a-be9b-9ba2305f0f51");
 		claims.put("session_state", "355b7a43-ef3a-4e85-9e95-cde240e47d56");
 		final Map<String, Object> enrichedClaims = userClaimSetConverter.convert(claims);
-		assertThat(enrichedClaims).containsKeys("skoop_user_id");
-		assertThat(enrichedClaims).containsValues("123");
+		assertThat(enrichedClaims).containsEntry(JwtClaims.SKOOP_USER_ID, "123");
 	}
 
 	@Test
 	@DisplayName("User claim set is enriched with a user id when the user does not exist.")
 	void testIfUserClaimSetIsEnrichedWithUserIdWhenUserDoesNotExist() {
-		given(userQueryService.getByUserName("johndoe")).willReturn(Optional.empty());
+		given(userQueryService.getUserIdByUserName("johndoe")).willReturn(Optional.empty());
 		given(userCommandService.createUser("johndoe", "John", "Doe", "johndoe@mail.com")).willReturn(
 				User.builder()
 						.id("123")
@@ -72,8 +66,7 @@ class UserClaimSetConverterTests {
 		claims.put("jti", "38929539-bbac-4d4a-be9b-9ba2305f0f51");
 		claims.put("session_state", "355b7a43-ef3a-4e85-9e95-cde240e47d56");
 		final Map<String, Object> enrichedClaims = userClaimSetConverter.convert(claims);
-		assertThat(enrichedClaims).containsKeys("skoop_user_id");
-		assertThat(enrichedClaims).containsValues("123");
+		assertThat(enrichedClaims).containsEntry(JwtClaims.SKOOP_USER_ID, "123");
 	}
 
 }

@@ -11,6 +11,9 @@ import java.util.Optional;
 public interface UserRepository extends Neo4jRepository<User, String> {
 	Optional<User> findByUserName(String userName);
 
+	@Query("MATCH (user:User {userName:{userName}}) RETURN user.id")
+	Optional<String> findUserIdByUserName(@Param("userName") String userName);
+
 	Optional<User> findByReferenceId(String referenceId);
 
 	@Query("MATCH (user:User) " +

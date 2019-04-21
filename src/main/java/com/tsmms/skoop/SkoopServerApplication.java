@@ -3,6 +3,7 @@ package com.tsmms.skoop;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @EnableNeo4jRepositories
 @EnableTransactionManagement
 @Transactional(rollbackFor = Exception.class)
+@EnableCaching
 public class SkoopServerApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SkoopServerApplication.class, args);

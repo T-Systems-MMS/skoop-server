@@ -24,3 +24,7 @@ spring:
       pool:
         max-size: 50
         queue-capacity: 100
+  cache:
+    cache-names: userIds
+    caffeine:
+      spec: maximumSize=2000,expireAfterAccess=3600s

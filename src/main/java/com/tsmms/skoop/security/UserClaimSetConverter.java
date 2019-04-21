@@ -50,25 +50,25 @@ public class UserClaimSetConverter implements Converter<Map<String, Object>, Map
 		String lastName = (String) mappedClaims.get(JwtClaims.LAST_NAME);
 		String email = (String) mappedClaims.get(JwtClaims.EMAIL);
 
-		User user = loadUser(userName, firstName, lastName, email);
+		String userId = ensureUserExists(userName, firstName, lastName, email);
 
 		// Add internal user ID as additional claim to be used by authorization framework.
-		mappedClaims.put(JwtClaims.SKOOP_USER_ID, user.getId());
+		mappedClaims.put(JwtClaims.SKOOP_USER_ID, userId);
 
 		return mappedClaims;
 	}
 
-	private User loadUser(String userName, String firstName, String lastName, String email) {
-		User user;
+	private String ensureUserExists(String userName, String firstName, String lastName, String email) {
+		String userId;
 		try {
-			user = userQueryService.getByUserName(userName)
-					.orElseGet(() -> userCommandService.createUser(userName, firstName, lastName, email));
+			userId = userQueryService.getUserIdByUserName(userName)
+					.orElseGet(() -> userCommandService.createUser(userName, firstName, lastName, email).getId());
 		} catch (ClientException e) {
 			// Retry user lookup because creation may have failed due to concurrent creation by another request.
-			user = userQueryService.getByUserName(userName)
+			userId = userQueryService.getUserIdByUserName(userName)
 					.orElseThrow(() -> new IllegalStateException(format(
 							"User with user name '%s' was not found after retry", userName)));
 		}
-		return user;
+		return userId;
 	}
 }
