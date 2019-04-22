@@ -50,4 +50,19 @@ public class UserNotificationQueryController {
 				.map(n -> conversionService.convert(n, AbstractNotificationResponse.class)).collect(Collectors.toList()));
 	}
 
+	@ApiOperation(value = "Gets user notification counter.",
+			notes = "Gets user notification counter.")
+	@ApiResponses({
+			@ApiResponse(code = 200, message = "Successful execution"),
+			@ApiResponse(code = 400, message = "Invalid input data, e.g. missing mandatory data or project name exists"),
+			@ApiResponse(code = 401, message = "Invalid authentication"),
+			@ApiResponse(code = 403, message = "Insufficient privileges to perform this operation"),
+			@ApiResponse(code = 500, message = "Error during execution")
+	})
+	@PreAuthorize("isAuthenticated() and isPrincipalUserId(#userId)")
+	@GetMapping(path = "/users/{userId}/notification-counter", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Integer> getUserNotificationCounter(@PathVariable("userId") String userId) {
+		return ResponseEntity.ok(notificationQueryService.getUserNotificationCounter(userId));
+	}
+
 }
