@@ -1,7 +1,7 @@
-package com.tsmms.skoop.publication.command;
+package com.tsmms.skoop.membership.command;
 
 import com.tsmms.skoop.common.AbstractControllerTests;
-import com.tsmms.skoop.publication.Publication;
+import com.tsmms.skoop.membership.Membership;
 import com.tsmms.skoop.skill.Skill;
 import com.tsmms.skoop.skill.query.SkillQueryService;
 import com.tsmms.skoop.user.User;
@@ -16,7 +16,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.InputStream;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Optional;
@@ -34,8 +33,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(PublicationCommandController.class)
-class PublicationCommandControllerTests extends AbstractControllerTests {
+@WebMvcTest(MembershipCommandController.class)
+class MembershipCommandControllerTests extends AbstractControllerTests {
 
 	@MockBean
 	private UserQueryService userQueryService;
@@ -44,20 +43,20 @@ class PublicationCommandControllerTests extends AbstractControllerTests {
 	private SkillQueryService skillQueryService;
 
 	@MockBean
-	private PublicationCommandService publicationCommandService;
+	private MembershipCommandService membershipCommandService;
 
 	@Autowired
 	private MockMvc mockMvc;
 
-	@DisplayName("Creates publication.")
+	@DisplayName("Creates membership.")
 	@Test
-	void createPublication() throws Exception {
+	void createMembership() throws Exception {
 		final User tester = User.builder()
 				.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
 				.userName("tester")
 				.build();
 
-		final ClassPathResource body = new ClassPathResource("publications/create-publication.json");
+		final ClassPathResource body = new ClassPathResource("membership/create-membership.json");
 
 		given(userQueryService.getUserById(tester.getId()))
 				.willReturn(Optional.of(tester));
@@ -75,10 +74,9 @@ class PublicationCommandControllerTests extends AbstractControllerTests {
 						)
 				);
 
-		given(publicationCommandService.create(Publication.builder()
-				.title("The first publication")
-				.publisher("The first publisher")
-				.date(LocalDate.of(2019, 4, 19))
+		given(membershipCommandService.create(Membership.builder()
+				.name("First membership")
+				.description("First membership description")
 				.link("http://first-link.com")
 				.skills(Arrays.asList(
 						Skill.builder()
@@ -95,11 +93,10 @@ class PublicationCommandControllerTests extends AbstractControllerTests {
 						.build())
 				.build())
 		)
-				.willReturn(Publication.builder()
+				.willReturn(Membership.builder()
 						.id("123")
-						.title("The first publication")
-						.publisher("The first publisher")
-						.date(LocalDate.of(2019, 4, 19))
+						.name("First membership")
+						.description("First membership description")
 						.link("http://first-link.com")
 						.skills(Arrays.asList(
 								Skill.builder()
@@ -121,7 +118,7 @@ class PublicationCommandControllerTests extends AbstractControllerTests {
 				);
 
 		try (final InputStream is = body.getInputStream()) {
-			mockMvc.perform(post("/users/56ef4778-a084-4509-9a3e-80b7895cf7b0/publications")
+			mockMvc.perform(post("/users/56ef4778-a084-4509-9a3e-80b7895cf7b0/memberships")
 					.accept(MediaType.APPLICATION_JSON)
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(is.readAllBytes())
@@ -130,12 +127,11 @@ class PublicationCommandControllerTests extends AbstractControllerTests {
 					.andExpect(status().isCreated())
 					.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 					.andExpect(jsonPath("$.id", is(equalTo("123"))))
-					.andExpect(jsonPath("$.title", is(equalTo("The first publication"))))
-					.andExpect(jsonPath("$.publisher", is(equalTo("The first publisher"))))
+					.andExpect(jsonPath("$.name", is(equalTo("First membership"))))
+					.andExpect(jsonPath("$.description", is(equalTo("First membership description"))))
 					.andExpect(jsonPath("$.creationDatetime", is(equalTo("2019-04-19T13:00:00"))))
 					.andExpect(jsonPath("$.lastModifiedDatetime", is(equalTo("2019-04-19T13:00:00"))))
 					.andExpect(jsonPath("$.link", is(equalTo("http://first-link.com"))))
-					.andExpect(jsonPath("$.date", is(equalTo("2019-04-19"))))
 					.andExpect(jsonPath("$.skills[0].id", is(equalTo("123"))))
 					.andExpect(jsonPath("$.skills[0].name", is(equalTo("Java"))))
 					.andExpect(jsonPath("$.skills[1].id", is(equalTo("456"))))
@@ -143,12 +139,12 @@ class PublicationCommandControllerTests extends AbstractControllerTests {
 		}
 	}
 
-	@DisplayName("Not authenticated user cannot create publications.")
+	@DisplayName("Not authenticated user cannot create memberships.")
 	@Test
-	void notAuthenticatedUserCannotCreatePublications() throws Exception {
-		final ClassPathResource body = new ClassPathResource("publications/create-publication.json");
+	void notAuthenticatedUserCannotCreateMemberships() throws Exception {
+		final ClassPathResource body = new ClassPathResource("membership/create-membership.json");
 		try (final InputStream is = body.getInputStream()) {
-			mockMvc.perform(post("/users/56ef4778-a084-4509-9a3e-80b7895cf7b0/publications")
+			mockMvc.perform(post("/users/56ef4778-a084-4509-9a3e-80b7895cf7b0/memberships")
 					.accept(MediaType.APPLICATION_JSON)
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(is.readAllBytes())
@@ -157,18 +153,18 @@ class PublicationCommandControllerTests extends AbstractControllerTests {
 		}
 	}
 
-	@DisplayName("User cannot create publications of other users.")
+	@DisplayName("User cannot create memberships of other users.")
 	@Test
-	void userCannotCreatePublicationsOfOtherUsers() throws Exception {
+	void userCannotCreateMembershipsOfOtherUsers() throws Exception {
 		final User tester = User.builder()
 				.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
 				.userName("tester")
 				.build();
 
-		final ClassPathResource body = new ClassPathResource("publications/create-publication.json");
+		final ClassPathResource body = new ClassPathResource("membership/create-membership.json");
 
 		try (final InputStream is = body.getInputStream()) {
-			mockMvc.perform(post("/users/c9cf7118-5f9e-40fc-9d89-28b2d0a77340/publications")
+			mockMvc.perform(post("/users/c9cf7118-5f9e-40fc-9d89-28b2d0a77340/memberships")
 					.accept(MediaType.APPLICATION_JSON)
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(is.readAllBytes())
@@ -178,15 +174,15 @@ class PublicationCommandControllerTests extends AbstractControllerTests {
 		}
 	}
 
-	@DisplayName("Updates publication.")
+	@DisplayName("Updates membership.")
 	@Test
-	void updatePublication() throws Exception {
+	void updateMembership() throws Exception {
 		final User tester = User.builder()
 				.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
 				.userName("tester")
 				.build();
 
-		final ClassPathResource body = new ClassPathResource("publications/update-publication.json");
+		final ClassPathResource body = new ClassPathResource("membership/update-membership.json");
 
 		given(skillQueryService.convertSkillNamesToSkills(Arrays.asList("Java", "Spring Boot", "Angular")))
 				.willReturn(
@@ -205,11 +201,10 @@ class PublicationCommandControllerTests extends AbstractControllerTests {
 						)
 				);
 
-		given(publicationCommandService.update("123", PublicationUpdateCommand.builder()
-				.publisher("The first publisher updated")
+		given(membershipCommandService.update("123", MembershipUpdateCommand.builder()
+				.name("First membership updated")
+				.description("First membership description updated")
 				.link("http://first-updated-link.com")
-				.title("The first publication updated")
-				.date(LocalDate.of(2020, 4, 19))
 				.skills(Arrays.asList(
 						Skill.builder()
 								.id("123")
@@ -225,11 +220,10 @@ class PublicationCommandControllerTests extends AbstractControllerTests {
 				))
 				.build()
 		)).willReturn(
-				Publication.builder()
+				Membership.builder()
 						.id("123")
-						.title("The first publication updated")
-						.publisher("The first publisher updated")
-						.date(LocalDate.of(2020, 4, 19))
+						.name("First membership updated")
+						.description("First membership description updated")
 						.link("http://first-updated-link.com")
 						.skills(Arrays.asList(
 								Skill.builder()
@@ -252,7 +246,7 @@ class PublicationCommandControllerTests extends AbstractControllerTests {
 		);
 
 		try (final InputStream is = body.getInputStream()) {
-			mockMvc.perform(put("/users/56ef4778-a084-4509-9a3e-80b7895cf7b0/publications/123")
+			mockMvc.perform(put("/users/56ef4778-a084-4509-9a3e-80b7895cf7b0/memberships/123")
 					.accept(MediaType.APPLICATION_JSON)
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(is.readAllBytes())
@@ -261,12 +255,11 @@ class PublicationCommandControllerTests extends AbstractControllerTests {
 					.andExpect(status().isOk())
 					.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 					.andExpect(jsonPath("$.id", is(equalTo("123"))))
-					.andExpect(jsonPath("$.title", is(equalTo("The first publication updated"))))
-					.andExpect(jsonPath("$.publisher", is(equalTo("The first publisher updated"))))
+					.andExpect(jsonPath("$.name", is(equalTo("First membership updated"))))
+					.andExpect(jsonPath("$.description", is(equalTo("First membership description updated"))))
 					.andExpect(jsonPath("$.creationDatetime", is(equalTo("2019-04-22T13:00:00"))))
 					.andExpect(jsonPath("$.lastModifiedDatetime", is(equalTo("2019-04-22T13:00:00"))))
 					.andExpect(jsonPath("$.link", is(equalTo("http://first-updated-link.com"))))
-					.andExpect(jsonPath("$.date", is(equalTo("2020-04-19"))))
 					.andExpect(jsonPath("$.skills[0].id", is(equalTo("123"))))
 					.andExpect(jsonPath("$.skills[0].name", is(equalTo("Java"))))
 					.andExpect(jsonPath("$.skills[1].id", is(equalTo("456"))))
@@ -276,12 +269,12 @@ class PublicationCommandControllerTests extends AbstractControllerTests {
 		}
 	}
 
-	@DisplayName("Not authenticated user cannot update publications.")
+	@DisplayName("Not authenticated user cannot update memberships.")
 	@Test
-	void notAuthenticatedUserCannotUpdatePublications() throws Exception {
-		final ClassPathResource body = new ClassPathResource("publications/update-publication.json");
+	void notAuthenticatedUserCannotUpdateMemberships() throws Exception {
+		final ClassPathResource body = new ClassPathResource("membership/update-membership.json");
 		try (final InputStream is = body.getInputStream()) {
-			mockMvc.perform(put("/users/56ef4778-a084-4509-9a3e-80b7895cf7b0/publications/123")
+			mockMvc.perform(put("/users/56ef4778-a084-4509-9a3e-80b7895cf7b0/memberships/123")
 					.accept(MediaType.APPLICATION_JSON)
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(is.readAllBytes())
@@ -290,18 +283,18 @@ class PublicationCommandControllerTests extends AbstractControllerTests {
 		}
 	}
 
-	@DisplayName("User cannot update publications of other users.")
+	@DisplayName("User cannot update memberships of other users.")
 	@Test
-	void userCannotUpdatePublicationsOfOtherUsers() throws Exception {
+	void userCannotUpdateMembershipsOfOtherUsers() throws Exception {
 		final User tester = User.builder()
 				.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
 				.userName("tester")
 				.build();
 
-		final ClassPathResource body = new ClassPathResource("publications/update-publication.json");
+		final ClassPathResource body = new ClassPathResource("membership/update-membership.json");
 
 		try (final InputStream is = body.getInputStream()) {
-			mockMvc.perform(put("/users/c9cf7118-5f9e-40fc-9d89-28b2d0a77340/publications/123")
+			mockMvc.perform(put("/users/c9cf7118-5f9e-40fc-9d89-28b2d0a77340/memberships/123")
 					.accept(MediaType.APPLICATION_JSON)
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(is.readAllBytes())
@@ -311,14 +304,14 @@ class PublicationCommandControllerTests extends AbstractControllerTests {
 		}
 	}
 
-	@DisplayName("Deletes publication.")
+	@DisplayName("Deletes membership.")
 	@Test
-	void deletesPublication() throws Exception {
+	void deletesMembership() throws Exception {
 		final User tester = User.builder()
 				.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
 				.userName("tester")
 				.build();
-		mockMvc.perform(delete("/users/56ef4778-a084-4509-9a3e-80b7895cf7b0/publications/123")
+		mockMvc.perform(delete("/users/56ef4778-a084-4509-9a3e-80b7895cf7b0/memberships/123")
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.with(authentication(withUser(tester)))
@@ -326,30 +319,29 @@ class PublicationCommandControllerTests extends AbstractControllerTests {
 				.andExpect(status().isNoContent());
 	}
 
-	@DisplayName("Not authenticated user cannot delete publications.")
+	@DisplayName("Not authenticated user cannot delete membership.")
 	@Test
-	void notAuthenticatedUserCannotDeletePublications() throws Exception {
-		mockMvc.perform(delete("/users/56ef4778-a084-4509-9a3e-80b7895cf7b0/publications/123")
+	void notAuthenticatedUserCannotDeleteMemberships() throws Exception {
+		mockMvc.perform(delete("/users/56ef4778-a084-4509-9a3e-80b7895cf7b0/memberships/123")
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.with(csrf()))
 				.andExpect(status().isUnauthorized());
 	}
 
-	@DisplayName("User cannot delete publications of other users.")
+	@DisplayName("User cannot delete membership of other users.")
 	@Test
-	void userCannotDeletePublicationsOfOtherUsers() throws Exception {
+	void userCannotDeleteMembershipsOfOtherUsers() throws Exception {
 		final User tester = User.builder()
 				.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
 				.userName("tester")
 				.build();
-		mockMvc.perform(delete("/users/c9cf7118-5f9e-40fc-9d89-28b2d0a77340/publications/123")
+		mockMvc.perform(delete("/users/c9cf7118-5f9e-40fc-9d89-28b2d0a77340/memberships/123")
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.with(authentication(withUser(tester)))
 				.with(csrf()))
 				.andExpect(status().isForbidden());
 	}
-
 
 }

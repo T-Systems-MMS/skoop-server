@@ -1,0 +1,7 @@
+{
+	"id": "123",
+	"name": "First membership updated",
+	"description": "First membership description updated",
+	"link": "http://first-updated-link.com",
+	"skills": ["Java", "Spring Boot", "Angular"]
+}

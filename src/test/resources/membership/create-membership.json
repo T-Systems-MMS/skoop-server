@@ -1,0 +1,6 @@
+{
+	"name": "First membership",
+	"description": "First membership description",
+	"link": "http://first-link.com",
+	"skills": ["Java", "Spring Boot"]
+}
