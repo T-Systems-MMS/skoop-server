@@ -1,7 +1,6 @@
 package com.tsmms.skoop.user.notification;
 
 import com.tsmms.skoop.common.AbstractControllerTests;
-import com.tsmms.skoop.common.JwtAuthenticationFactory;
 import com.tsmms.skoop.community.Community;
 import com.tsmms.skoop.community.CommunityChangedNotification;
 import com.tsmms.skoop.community.CommunityDeletedNotification;
@@ -31,8 +30,6 @@ import java.util.HashSet;
 import java.util.stream.Stream;
 
 import static java.util.Collections.singletonList;
-import static org.hamcrest.Matchers.array;
-import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -43,6 +40,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static com.tsmms.skoop.common.JwtAuthenticationFactory.withUser;
 
 @WebMvcTest(UserNotificationQueryController.class)
 class UserNotificationQueryControllerTests extends AbstractControllerTests {
@@ -173,7 +171,7 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 
 		mockMvc.perform(get("/users/56ef4778-a084-4509-9a3e-80b7895cf7b0/notifications")
 				.accept(MediaType.APPLICATION_JSON)
-				.with(authentication(JwtAuthenticationFactory.withUser(tester))))
+				.with(authentication(withUser(tester))))
 				.andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.length()", is(equalTo(8))))
@@ -252,7 +250,7 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 				.andExpect(status().isUnauthorized());
 	}
 
-	@DisplayName("A user cannot get notifictions of another user.")
+	@DisplayName("A user cannot get notifications of another user.")
 	@Test
 	void userCannotGetNotificationsOfAnotherUser() throws Exception {
 		final User tester = User.builder()
@@ -261,7 +259,45 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 				.build();
 		mockMvc.perform(get("/users/47fd5fb1-ccf5-4163-986f-6eeb9ef37280/notifications")
 				.accept(MediaType.APPLICATION_JSON)
-				.with(authentication(JwtAuthenticationFactory.withUser(tester))))
+				.with(authentication(withUser(tester))))
+				.andExpect(status().isForbidden());
+	}
+
+	@DisplayName("Gets user notification counter.")
+	@Test
+	void getUserNotificationCounter() throws Exception {
+		final User tester = User.builder()
+				.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
+				.userName("tester")
+				.build();
+
+		given(notificationQueryService.getUserNotificationCounter(tester.getId()))
+				.willReturn(12);
+
+		mockMvc.perform(get("/users/56ef4778-a084-4509-9a3e-80b7895cf7b0/notification-counter")
+				.accept(MediaType.APPLICATION_JSON)
+				.with(authentication(withUser(tester))))
+				.andExpect(status().isOk());
+	}
+
+	@DisplayName("Not authenticated user cannot get user notification counter.")
+	@Test
+	void notAuthenticatedUserCannotGetUserNotificationCounter() throws Exception {
+		mockMvc.perform(get("/users/56ef4778-a084-4509-9a3e-80b7895cf7b0/notification-counter")
+				.accept(MediaType.APPLICATION_JSON))
+				.andExpect(status().isUnauthorized());
+	}
+
+	@DisplayName("A user cannot get user notification counter of another user.")
+	@Test
+	void userCannotGetUserNotificationCounterOfAnotherUser() throws Exception {
+		final User tester = User.builder()
+				.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
+				.userName("tester")
+				.build();
+		mockMvc.perform(get("/users/47fd5fb1-ccf5-4163-986f-6eeb9ef37280/notification-counter")
+				.accept(MediaType.APPLICATION_JSON)
+				.with(authentication(withUser(tester))))
 				.andExpect(status().isForbidden());
 	}
 

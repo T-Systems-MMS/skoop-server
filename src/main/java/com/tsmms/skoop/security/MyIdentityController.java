@@ -1,7 +1,6 @@
 package com.tsmms.skoop.security;
 
 import com.tsmms.skoop.exception.NoSuchResourceException;
-import com.tsmms.skoop.notification.query.NotificationQueryService;
 import com.tsmms.skoop.user.query.UserQueryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -24,11 +23,9 @@ import static java.util.Objects.requireNonNull;
 public class MyIdentityController {
 
 	private final UserQueryService userQueryService;
-	private final NotificationQueryService notificationQueryService;
 
-	public MyIdentityController(UserQueryService userQueryService, NotificationQueryService notificationQueryService) {
+	public MyIdentityController(UserQueryService userQueryService) {
 		this.userQueryService = requireNonNull(userQueryService);
-		this.notificationQueryService = requireNonNull(notificationQueryService);
 	}
 
 	@ApiOperation(
@@ -53,7 +50,6 @@ public class MyIdentityController {
 						.firstName(user.getFirstName())
 						.lastName(user.getLastName())
 						.email(user.getEmail())
-						.notificationCount(notificationQueryService.getUserNotificationCounter(userId))
 						.build())
 				.orElseThrow(() -> NoSuchResourceException.builder()
 						.model(USER)
