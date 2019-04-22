@@ -66,7 +66,10 @@ public class OpenAPIConfiguration {
 						new Tag("UserSkills", "API to modify relationships between users and skills"),
 						new Tag("UserProjects", "API allowing queries and modifications of relationships between users and projects."),
 						new Tag("UserNotifications", "API allowing queries of user notifications."),
-						new Tag("UserCommunities", "API allowing queries of user communities."));
+						new Tag("UserCommunities", "API allowing queries of user communities."),
+						new Tag("Publications", "API allowing queries and modifications of user publications."),
+						new Tag("Membership", "API allowing queries and modifications of user memberships."),
+						new Tag("Testimonials", "API allowing queries and modifications of testimonials on user."));
 	}
 
 	@Bean
