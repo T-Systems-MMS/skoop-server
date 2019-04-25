@@ -13,7 +13,7 @@ import org.neo4j.ogm.annotation.Relationship;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
@@ -38,7 +38,7 @@ public class Publication {
 	@Property(name = "lastModifiedDatetime")
 	private LocalDateTime lastModifiedDatetime;
 	@Relationship(type = "REFERS_TO_SKILL")
-	private List<Skill> skills;
+	private Set<Skill> skills;
 	@Relationship(type = "USER")
 	private User user;
 

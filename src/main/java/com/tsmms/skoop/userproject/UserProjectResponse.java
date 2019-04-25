@@ -1,6 +1,7 @@
 package com.tsmms.skoop.userproject;
 
 import com.tsmms.skoop.project.ProjectResponse;
+import com.tsmms.skoop.skill.SkillResponse;
 import com.tsmms.skoop.user.UserSimpleResponse;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -10,6 +11,9 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Set;
+
+import static com.tsmms.skoop.skill.SkillResponse.convertSkillListToSkillResponseSet;
 
 @Data
 @Builder
@@ -49,6 +53,9 @@ public class UserProjectResponse {
 	@ApiModelProperty("The assigned project")
 	private ProjectResponse project;
 
+	@ApiModelProperty("Skills user worked with during the project.")
+	private Set<SkillResponse> skills;
+
 	public static UserProjectResponse of(UserProject userProject) {
 		return UserProjectResponse.builder()
 				.id(userProject.getId())
@@ -60,6 +67,7 @@ public class UserProjectResponse {
 				.lastModifiedDate(userProject.getLastModifiedDate())
 				.project(ProjectResponse.of(userProject.getProject()))
 				.user(UserSimpleResponse.of(userProject.getUser()))
+				.skills(convertSkillListToSkillResponseSet(userProject.getSkills()))
 				.build();
 	}
 

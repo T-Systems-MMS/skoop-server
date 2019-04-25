@@ -1,5 +1,6 @@
 package com.tsmms.skoop.userproject.command;
 
+import com.tsmms.skoop.skill.query.SkillQueryService;
 import com.tsmms.skoop.userproject.UserProject;
 import com.tsmms.skoop.userproject.UserProjectResponse;
 import io.swagger.annotations.Api;
@@ -19,14 +20,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
+import static java.util.Objects.requireNonNull;
+
 @Api(tags = "UserProjects")
 @RestController
 public class UserProjectCommandController {
 
 	private final UserProjectCommandService userProjectCommandService;
+	private final SkillQueryService skillQueryService;
 
-	public UserProjectCommandController(UserProjectCommandService userProjectCommandService) {
-		this.userProjectCommandService = userProjectCommandService;
+	public UserProjectCommandController(UserProjectCommandService userProjectCommandService,
+										SkillQueryService skillQueryService) {
+		this.userProjectCommandService = requireNonNull(userProjectCommandService);
+		this.skillQueryService = requireNonNull(skillQueryService);
 	}
 
 	@ApiOperation(value = "Assign a project to a user.",
@@ -49,8 +55,9 @@ public class UserProjectCommandController {
 				.role(request.getRole())
 				.startDate(request.getStartDate())
 				.endDate(request.getEndDate())
+				.skills(skillQueryService.convertSkillNamesToSkillsSet(request.getSkills()))
 				.build();
-		final UserProject result = userProjectCommandService.assignProjectToUser(request.getProjectId(), userId, userProject);
+		final UserProject result = userProjectCommandService.assignProjectToUser(request.getProjectName(), userId, userProject);
 		return ResponseEntity.status(HttpStatus.CREATED)
 				.body(UserProjectResponse.of(result));
 	}
@@ -72,7 +79,7 @@ public class UserProjectCommandController {
 	public ResponseEntity<UserProjectResponse> updateUserProject(@PathVariable("userId") String userId,
 																 @PathVariable("projectId") String projectId,
 																 @Valid @RequestBody UpdateUserProjectRequest request) {
-		final UserProject result = userProjectCommandService.updateUserProject(userId, projectId, request.command());
+		final UserProject result = userProjectCommandService.updateUserProject(userId, projectId, updateUserProjectRequestToUpdateUserProjectCommand(request));
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(UserProjectResponse.of(result));
 	}
@@ -92,6 +99,16 @@ public class UserProjectCommandController {
 												  @PathVariable("projectId") String projectId) {
 		userProjectCommandService.deleteUserProject(userId, projectId);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	}
+
+	private UpdateUserProjectCommand updateUserProjectRequestToUpdateUserProjectCommand(UpdateUserProjectRequest request) {
+		return UpdateUserProjectCommand.builder()
+				.role(request.getRole())
+				.tasks(request.getTasks())
+				.startDate(request.getStartDate())
+				.endDate(request.getEndDate())
+				.skills(skillQueryService.convertSkillNamesToSkillsSet(request.getSkills()))
+				.build();
 	}
 
 }

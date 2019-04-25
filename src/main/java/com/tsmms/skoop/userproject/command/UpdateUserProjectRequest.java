@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @Builder
@@ -27,14 +28,7 @@ public class UpdateUserProjectRequest {
 	private LocalDate startDate;
 	@ApiModelProperty("The date when user finished working on the project")
 	private LocalDate endDate;
-
-	public UpdateUserProjectCommand command() {
-		return UpdateUserProjectCommand.builder()
-				.role(role)
-				.tasks(tasks)
-				.startDate(startDate)
-				.endDate(endDate)
-				.build();
-	}
+	@ApiModelProperty("Skills user worked with during the project.")
+	private Set<String> skills;
 
 }

@@ -15,9 +15,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Optional;
 
-import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
@@ -49,13 +51,19 @@ class TestimonialCommandServiceTests {
 	@DisplayName("Creates testimonial.")
 	@Test
 	void createTestimonial() {
-		given(skillCommandService.createNonExistentSkills(Arrays.asList(Skill.builder()
-						.id("123")
-						.name("Java")
-						.build(),
-				Skill.builder()
-						.name("Spring Boot")
-						.build())))
+		given(skillCommandService.createNonExistentSkills(argThat(
+				allOf(
+						isA(Collection.class),
+						containsInAnyOrder(
+								Skill.builder()
+										.id("123")
+										.name("Java")
+										.build(),
+								Skill.builder()
+										.name("Spring Boot")
+										.build()
+						)
+				))))
 				.willReturn(
 						Arrays.asList(
 								Skill.builder()
@@ -80,7 +88,7 @@ class TestimonialCommandServiceTests {
 								.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
 								.userName("tester")
 								.build())),
-						hasProperty("skills", contains(
+						hasProperty("skills", containsInAnyOrder(
 								Skill.builder()
 										.id("123")
 										.name("Java")
@@ -96,15 +104,17 @@ class TestimonialCommandServiceTests {
 						.id("abc")
 						.author("John Doe. Some company. CEO.")
 						.comment("He is the best developer I have ever worked with.")
-						.skills(Arrays.asList(
-								Skill.builder()
-										.id("123")
-										.name("Java")
-										.build(),
-								Skill.builder()
-										.id("456")
-										.name("Spring Boot")
-										.build()
+						.skills(new HashSet<>(
+								Arrays.asList(
+										Skill.builder()
+												.id("123")
+												.name("Java")
+												.build(),
+										Skill.builder()
+												.id("456")
+												.name("Spring Boot")
+												.build()
+								)
 						))
 						.creationDatetime(LocalDateTime.of(2019, 4, 17, 10, 0))
 						.lastModifiedDatetime(LocalDateTime.of(2019, 4, 17, 10, 0))
@@ -119,7 +129,7 @@ class TestimonialCommandServiceTests {
 				Testimonial.builder()
 						.author("John Doe. Some company. CEO.")
 						.comment("He is the best developer I have ever worked with.")
-						.skills(Arrays.asList(
+						.skills(new HashSet<>(Arrays.asList(
 								Skill.builder()
 										.id("123")
 										.name("Java")
@@ -127,7 +137,7 @@ class TestimonialCommandServiceTests {
 								Skill.builder()
 										.name("Spring Boot")
 										.build()
-						))
+						)))
 						.user(User.builder()
 								.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
 								.userName("tester")
@@ -157,20 +167,23 @@ class TestimonialCommandServiceTests {
 	@DisplayName("Updates testimonial.")
 	@Test
 	void updatesTestimonial() {
-		given(skillCommandService.createNonExistentSkills(Arrays.asList(
-				Skill.builder()
-						.id("123")
-						.name("Java")
-						.build(),
-				Skill.builder()
-						.id("456")
-						.name("Spring Boot")
-						.build(),
-				Skill.builder()
-						.id("789")
-						.name("Angular")
-						.build()
-		))).willReturn(Arrays.asList(
+		given(skillCommandService.createNonExistentSkills(argThat(allOf(
+				isA(Collection.class),
+				containsInAnyOrder(
+						Skill.builder()
+								.id("123")
+								.name("Java")
+								.build(),
+						Skill.builder()
+								.id("456")
+								.name("Spring Boot")
+								.build(),
+						Skill.builder()
+								.id("789")
+								.name("Angular")
+								.build()
+				)
+		)))).willReturn(Arrays.asList(
 				Skill.builder()
 						.id("123")
 						.name("Java")
@@ -191,7 +204,7 @@ class TestimonialCommandServiceTests {
 										.id("abc")
 										.author("John Doe. Some company. CEO.")
 										.comment("He is the best developer I have ever worked with.")
-										.skills(Arrays.asList(
+										.skills(new HashSet<>(Arrays.asList(
 												Skill.builder()
 														.id("123")
 														.name("Java")
@@ -200,7 +213,7 @@ class TestimonialCommandServiceTests {
 														.id("456")
 														.name("Spring Boot")
 														.build()
-										))
+										)))
 										.creationDatetime(LocalDateTime.of(2019, 4, 17, 10, 0))
 										.lastModifiedDatetime(LocalDateTime.of(2019, 4, 17, 10, 0))
 										.user(User.builder()
@@ -223,7 +236,7 @@ class TestimonialCommandServiceTests {
 								.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
 								.userName("tester")
 								.build())),
-						hasProperty("skills", contains(
+						hasProperty("skills", containsInAnyOrder(
 								Skill.builder()
 										.id("123")
 										.name("Java")
@@ -243,7 +256,7 @@ class TestimonialCommandServiceTests {
 						.id("abc")
 						.author("John Doe. Another company. CTO.")
 						.comment("He is one of the best developers I have ever worked with.")
-						.skills(Arrays.asList(
+						.skills(new HashSet<>(Arrays.asList(
 								Skill.builder()
 										.id("123")
 										.name("Java")
@@ -256,7 +269,7 @@ class TestimonialCommandServiceTests {
 										.id("789")
 										.name("Angular")
 										.build()
-						))
+						)))
 						.creationDatetime(LocalDateTime.of(2019, 4, 18, 10, 0))
 						.lastModifiedDatetime(LocalDateTime.of(2019, 4, 18, 10, 0))
 						.user(User.builder()
@@ -269,19 +282,21 @@ class TestimonialCommandServiceTests {
 		final Testimonial testimonial = testimonialCommandService.update("abc", TestimonialUpdateCommand.builder()
 				.author("John Doe. Another company. CTO.")
 				.comment("He is one of the best developers I have ever worked with.")
-				.skills(Arrays.asList(
-						Skill.builder()
-								.id("123")
-								.name("Java")
-								.build(),
-						Skill.builder()
-								.id("456")
-								.name("Spring Boot")
-								.build(),
-						Skill.builder()
-								.id("789")
-								.name("Angular")
-								.build()
+				.skills(new HashSet<>(
+						Arrays.asList(
+								Skill.builder()
+										.id("123")
+										.name("Java")
+										.build(),
+								Skill.builder()
+										.id("456")
+										.name("Spring Boot")
+										.build(),
+								Skill.builder()
+										.id("789")
+										.name("Angular")
+										.build()
+						)
 				))
 				.build()
 		);
@@ -314,19 +329,21 @@ class TestimonialCommandServiceTests {
 		assertThrows(IllegalArgumentException.class, () -> testimonialCommandService.update(null, TestimonialUpdateCommand.builder()
 				.author("John Doe. Another company. CTO.")
 				.comment("He is one of the best developers I have ever worked with.")
-				.skills(Arrays.asList(
-						Skill.builder()
-								.id("123")
-								.name("Java")
-								.build(),
-						Skill.builder()
-								.id("456")
-								.name("Spring Boot")
-								.build(),
-						Skill.builder()
-								.id("789")
-								.name("Angular")
-								.build()
+				.skills(new HashSet<>(
+						Arrays.asList(
+								Skill.builder()
+										.id("123")
+										.name("Java")
+										.build(),
+								Skill.builder()
+										.id("456")
+										.name("Spring Boot")
+										.build(),
+								Skill.builder()
+										.id("789")
+										.name("Angular")
+										.build()
+						)
 				))
 				.build()
 		));
@@ -346,7 +363,7 @@ class TestimonialCommandServiceTests {
 						.id("123")
 						.author("John Doe. Another company. CTO.")
 						.comment("He is one of the best developers I have ever worked with.")
-						.skills(Arrays.asList(
+						.skills(new HashSet<>(Arrays.asList(
 								Skill.builder()
 										.id("123")
 										.name("Java")
@@ -359,7 +376,7 @@ class TestimonialCommandServiceTests {
 										.id("789")
 										.name("Angular")
 										.build()
-						))
+						)))
 						.creationDatetime(LocalDateTime.of(2019, 4, 18, 10, 0))
 						.lastModifiedDatetime(LocalDateTime.of(2019, 4, 18, 10, 0))
 						.user(User.builder()

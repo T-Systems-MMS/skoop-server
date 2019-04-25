@@ -67,7 +67,7 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 				.build();
 		final ClassPathResource body = new ClassPathResource("community/create-community.json");
 
-		given(skillQueryService.convertSkillNamesToSkills(Arrays.asList("Spring Boot", "Angular", "Spring MVC"))).willReturn(
+		given(skillQueryService.convertSkillNamesToSkillsList(Arrays.asList("Spring Boot", "Angular", "Spring MVC"))).willReturn(
 				Arrays.asList(
 						Skill.builder()
 								.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")

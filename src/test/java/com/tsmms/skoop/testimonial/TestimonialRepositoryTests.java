@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.data.neo4j.DataNeo4jTest;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,7 +48,7 @@ class TestimonialRepositoryTests {
 						.id("abc")
 						.author("John Doe. Some company. CEO.")
 						.comment("He is the best developer I have ever worked with.")
-						.skills(Arrays.asList(
+						.skills(new HashSet<>(Arrays.asList(
 								Skill.builder()
 										.id("123")
 										.name("Java")
@@ -56,7 +57,7 @@ class TestimonialRepositoryTests {
 										.id("456")
 										.name("Spring Boot")
 										.build()
-						))
+						)))
 						.creationDatetime(LocalDateTime.of(2019, 4, 17, 10, 0))
 						.lastModifiedDatetime(LocalDateTime.of(2019, 4, 17, 10, 0))
 						.user(tester)
@@ -65,7 +66,7 @@ class TestimonialRepositoryTests {
 						.id("xyz")
 						.author("Jim Doe. Some company. CTO.")
 						.comment("He is the best developer I have ever worked with.")
-						.skills(Arrays.asList(
+						.skills(new HashSet<>(Arrays.asList(
 								Skill.builder()
 										.id("123")
 										.name("Java")
@@ -74,7 +75,7 @@ class TestimonialRepositoryTests {
 										.id("456")
 										.name("Spring Boot")
 										.build()
-						))
+						)))
 						.creationDatetime(LocalDateTime.of(2019, 4, 17, 11, 30))
 						.lastModifiedDatetime(LocalDateTime.of(2019, 4, 17, 11, 30))
 						.user(tester)
@@ -83,7 +84,7 @@ class TestimonialRepositoryTests {
 						.id("def")
 						.author("Jenny Doe. Another company. CEO.")
 						.comment("He is one of the best developers I have ever worked with.")
-						.skills(Arrays.asList(
+						.skills(new HashSet<>(Arrays.asList(
 								Skill.builder()
 										.id("789")
 										.name("JavaScript")
@@ -92,7 +93,7 @@ class TestimonialRepositoryTests {
 										.id("456")
 										.name("Spring Boot")
 										.build()
-						))
+						)))
 						.creationDatetime(LocalDateTime.of(2018, 4, 17, 10, 0))
 						.lastModifiedDatetime(LocalDateTime.of(2018, 4, 17, 10, 0))
 						.user(anotherTester)

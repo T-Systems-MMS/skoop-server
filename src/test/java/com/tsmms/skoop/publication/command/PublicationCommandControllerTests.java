@@ -19,11 +19,16 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Optional;
 
 import static com.tsmms.skoop.common.JwtAuthenticationFactory.withUser;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isA;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -33,6 +38,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
+import static org.hamcrest.core.AllOf.allOf;
 
 @WebMvcTest(PublicationCommandController.class)
 class PublicationCommandControllerTests extends AbstractControllerTests {
@@ -62,8 +69,29 @@ class PublicationCommandControllerTests extends AbstractControllerTests {
 		given(userQueryService.getUserById(tester.getId()))
 				.willReturn(Optional.of(tester));
 
-		given(skillQueryService.convertSkillNamesToSkills(Arrays.asList("Java", "Spring Boot")))
-				.willReturn(
+		given(skillQueryService.convertSkillNamesToSkillsSet(argThat(allOf(
+				isA(Collection.class),
+				containsInAnyOrder("Java", "Spring Boot")
+		)))).willReturn(
+						new HashSet<>(
+								Arrays.asList(
+										Skill.builder()
+												.id("123")
+												.name("Java")
+												.build(),
+										Skill.builder()
+												.name("Spring Boot")
+												.build()
+						)
+				)
+		);
+
+		given(publicationCommandService.create(Publication.builder()
+				.title("The first publication")
+				.publisher("The first publisher")
+				.date(LocalDate.of(2019, 4, 19))
+				.link("http://first-link.com")
+				.skills(new HashSet<>(
 						Arrays.asList(
 								Skill.builder()
 										.id("123")
@@ -73,21 +101,6 @@ class PublicationCommandControllerTests extends AbstractControllerTests {
 										.name("Spring Boot")
 										.build()
 						)
-				);
-
-		given(publicationCommandService.create(Publication.builder()
-				.title("The first publication")
-				.publisher("The first publisher")
-				.date(LocalDate.of(2019, 4, 19))
-				.link("http://first-link.com")
-				.skills(Arrays.asList(
-						Skill.builder()
-								.id("123")
-								.name("Java")
-								.build(),
-						Skill.builder()
-								.name("Spring Boot")
-								.build()
 				))
 				.user(User.builder()
 						.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
@@ -101,7 +114,7 @@ class PublicationCommandControllerTests extends AbstractControllerTests {
 						.publisher("The first publisher")
 						.date(LocalDate.of(2019, 4, 19))
 						.link("http://first-link.com")
-						.skills(Arrays.asList(
+						.skills(new HashSet<>(Arrays.asList(
 								Skill.builder()
 										.id("123")
 										.name("Java")
@@ -110,7 +123,7 @@ class PublicationCommandControllerTests extends AbstractControllerTests {
 										.id("456")
 										.name("Spring Boot")
 										.build()
-						))
+						)))
 						.creationDatetime(LocalDateTime.of(2019, 4, 19, 13, 0))
 						.lastModifiedDatetime(LocalDateTime.of(2019, 4, 19, 13, 0))
 						.user(User.builder()
@@ -136,10 +149,8 @@ class PublicationCommandControllerTests extends AbstractControllerTests {
 					.andExpect(jsonPath("$.lastModifiedDatetime", is(equalTo("2019-04-19T13:00:00"))))
 					.andExpect(jsonPath("$.link", is(equalTo("http://first-link.com"))))
 					.andExpect(jsonPath("$.date", is(equalTo("2019-04-19"))))
-					.andExpect(jsonPath("$.skills[0].id", is(equalTo("123"))))
-					.andExpect(jsonPath("$.skills[0].name", is(equalTo("Java"))))
-					.andExpect(jsonPath("$.skills[1].id", is(equalTo("456"))))
-					.andExpect(jsonPath("$.skills[1].name", is(equalTo("Spring Boot"))));
+					.andExpect(jsonPath("$.skills[?(@.id=='123')].name", hasItem("Java")))
+					.andExpect(jsonPath("$.skills[?(@.id=='456')].name", hasItem("Spring Boot")));
 		}
 	}
 
@@ -188,8 +199,34 @@ class PublicationCommandControllerTests extends AbstractControllerTests {
 
 		final ClassPathResource body = new ClassPathResource("publications/update-publication.json");
 
-		given(skillQueryService.convertSkillNamesToSkills(Arrays.asList("Java", "Spring Boot", "Angular")))
+		given(skillQueryService.convertSkillNamesToSkillsSet(argThat(allOf(
+				isA(Collection.class),
+				containsInAnyOrder("Java", "Spring Boot", "Angular")
+		))))
 				.willReturn(
+						new HashSet<>(
+								Arrays.asList(
+										Skill.builder()
+												.id("123")
+												.name("Java")
+												.build(),
+										Skill.builder()
+												.id("456")
+												.name("Spring Boot")
+												.build(),
+										Skill.builder()
+												.name("Angular")
+												.build()
+								)
+						)
+				);
+
+		given(publicationCommandService.update("123", PublicationUpdateCommand.builder()
+				.publisher("The first publisher updated")
+				.link("http://first-updated-link.com")
+				.title("The first publication updated")
+				.date(LocalDate.of(2020, 4, 19))
+				.skills(new HashSet<>(
 						Arrays.asList(
 								Skill.builder()
 										.id("123")
@@ -203,25 +240,6 @@ class PublicationCommandControllerTests extends AbstractControllerTests {
 										.name("Angular")
 										.build()
 						)
-				);
-
-		given(publicationCommandService.update("123", PublicationUpdateCommand.builder()
-				.publisher("The first publisher updated")
-				.link("http://first-updated-link.com")
-				.title("The first publication updated")
-				.date(LocalDate.of(2020, 4, 19))
-				.skills(Arrays.asList(
-						Skill.builder()
-								.id("123")
-								.name("Java")
-								.build(),
-						Skill.builder()
-								.id("456")
-								.name("Spring Boot")
-								.build(),
-						Skill.builder()
-								.name("Angular")
-								.build()
 				))
 				.build()
 		)).willReturn(
@@ -231,7 +249,7 @@ class PublicationCommandControllerTests extends AbstractControllerTests {
 						.publisher("The first publisher updated")
 						.date(LocalDate.of(2020, 4, 19))
 						.link("http://first-updated-link.com")
-						.skills(Arrays.asList(
+						.skills(new HashSet<>(Arrays.asList(
 								Skill.builder()
 										.id("123")
 										.name("Java")
@@ -244,7 +262,7 @@ class PublicationCommandControllerTests extends AbstractControllerTests {
 										.id("789")
 										.name("Angular")
 										.build()
-						))
+						)))
 						.creationDatetime(LocalDateTime.of(2019, 4, 22, 13, 0))
 						.lastModifiedDatetime(LocalDateTime.of(2019, 4, 22, 13, 0))
 						.user(tester)
@@ -267,12 +285,9 @@ class PublicationCommandControllerTests extends AbstractControllerTests {
 					.andExpect(jsonPath("$.lastModifiedDatetime", is(equalTo("2019-04-22T13:00:00"))))
 					.andExpect(jsonPath("$.link", is(equalTo("http://first-updated-link.com"))))
 					.andExpect(jsonPath("$.date", is(equalTo("2020-04-19"))))
-					.andExpect(jsonPath("$.skills[0].id", is(equalTo("123"))))
-					.andExpect(jsonPath("$.skills[0].name", is(equalTo("Java"))))
-					.andExpect(jsonPath("$.skills[1].id", is(equalTo("456"))))
-					.andExpect(jsonPath("$.skills[1].name", is(equalTo("Spring Boot"))))
-					.andExpect(jsonPath("$.skills[2].id", is(equalTo("789"))))
-					.andExpect(jsonPath("$.skills[2].name", is(equalTo("Angular"))));
+					.andExpect(jsonPath("$.skills[?(@.id=='123')].name", hasItem("Java")))
+					.andExpect(jsonPath("$.skills[?(@.id=='456')].name", hasItem("Spring Boot")))
+					.andExpect(jsonPath("$.skills[?(@.id=='789')].name", hasItem("Angular")));
 		}
 	}
 

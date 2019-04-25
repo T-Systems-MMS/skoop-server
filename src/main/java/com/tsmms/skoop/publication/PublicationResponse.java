@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Set;
 
-import static com.tsmms.skoop.skill.SkillResponse.convertSkillListToSkillResponseList;
+import static com.tsmms.skoop.skill.SkillResponse.convertSkillListToSkillResponseSet;
 
 @Data
 @Builder
@@ -39,7 +39,7 @@ public class PublicationResponse {
 	@ApiModelProperty("The datetime when publication was last edited.")
 	private LocalDateTime lastModifiedDatetime;
 	@ApiModelProperty("The skills linked to the publication.")
-	private List<SkillResponse> skills;
+	private Set<SkillResponse> skills;
 
 	public static PublicationResponse of(Publication publication) {
 		return PublicationResponse.builder()
@@ -50,7 +50,7 @@ public class PublicationResponse {
 				.link(publication.getLink())
 				.creationDatetime(publication.getCreationDatetime())
 				.lastModifiedDatetime(publication.getLastModifiedDatetime())
-				.skills(convertSkillListToSkillResponseList(publication.getSkills()))
+				.skills(convertSkillListToSkillResponseSet(publication.getSkills()))
 				.build();
 	}
 

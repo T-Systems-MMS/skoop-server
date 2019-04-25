@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -96,7 +97,7 @@ public class SkillCommandService {
 	}
 
 	@Transactional
-	public List<Skill> createNonExistentSkills(List<Skill> skills) {
+	public Collection<Skill> createNonExistentSkills(Collection<Skill> skills) {
 		if (skills != null) {
 			return skills.stream().map(skill -> {
 				if (skill.getId() == null) {

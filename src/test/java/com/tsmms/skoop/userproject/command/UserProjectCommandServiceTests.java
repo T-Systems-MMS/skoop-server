@@ -3,7 +3,9 @@ package com.tsmms.skoop.userproject.command;
 import com.tsmms.skoop.exception.DuplicateResourceException;
 import com.tsmms.skoop.exception.NoSuchResourceException;
 import com.tsmms.skoop.project.Project;
+import com.tsmms.skoop.project.command.ProjectCommandService;
 import com.tsmms.skoop.project.query.ProjectQueryService;
+import com.tsmms.skoop.skill.command.SkillCommandService;
 import com.tsmms.skoop.user.User;
 import com.tsmms.skoop.user.query.UserQueryService;
 import com.tsmms.skoop.userproject.UserProject;
@@ -33,13 +35,19 @@ class UserProjectCommandServiceTests {
 	private ProjectQueryService projectQueryService;
 
 	@Mock
+	private SkillCommandService skillCommandService;
+
+	@Mock
+	private ProjectCommandService projectCommandService;
+
+	@Mock
 	private UserQueryService userQueryService;
 
 	private UserProjectCommandService userProjectCommandService;
 
 	@BeforeEach
 	void setUp() {
-		userProjectCommandService = new UserProjectCommandService(userProjectRepository, projectQueryService, userQueryService);
+		userProjectCommandService = new UserProjectCommandService(userProjectRepository, projectQueryService, userQueryService, skillCommandService, projectCommandService);
 	}
 
 	@Test
@@ -58,7 +66,7 @@ class UserProjectCommandServiceTests {
 						.description("Project description")
 						.build())
 				.build();
-		given(projectQueryService.getProjectById("ABC")).willReturn(Optional.of(Project.builder()
+		given(projectQueryService.getProjectByName("Project")).willReturn(Optional.of(Project.builder()
 				.id("ABC")
 				.name("Project")
 				.description("Project description")
@@ -68,7 +76,7 @@ class UserProjectCommandServiceTests {
 				.userName("tester")
 				.build()));
 		given(userProjectRepository.save(ArgumentMatchers.isA(UserProject.class))).willReturn(userProject);
-		userProject = userProjectCommandService.assignProjectToUser("ABC", "123", UserProject.builder()
+		userProject = userProjectCommandService.assignProjectToUser("Project", "123", UserProject.builder()
 				.role("QA")
 				.tasks("testing")
 				.user(User.builder()
@@ -92,29 +100,47 @@ class UserProjectCommandServiceTests {
 	}
 
 	@Test
-	@DisplayName("Assign project to user throws an exception when there is no such a project")
+	@DisplayName("Assign project to user creates new project when there is no such project")
 	void assignProjectToUserThrowsExceptionWhenThereIsNoSuchProject() {
-		given(projectQueryService.getProjectById("ABC")).willReturn(Optional.empty());
-		assertThrows(NoSuchResourceException.class, () ->
-				userProjectCommandService.assignProjectToUser("ABC", "123", UserProject.builder()
-						.role("QA")
-						.tasks("testing")
-						.user(User.builder()
-								.id("123")
-								.userName("tester")
-								.build())
-						.project(Project.builder()
-								.id("ABC")
-								.name("Project")
-								.description("Project description")
-								.build())
-						.build()));
+		final UserProject userProject = UserProject.builder()
+				.role("QA")
+				.tasks("testing")
+				.user(User.builder()
+						.id("123")
+						.userName("tester")
+						.build())
+				.project(Project.builder()
+						.id("ABC")
+						.name("Project")
+						.build())
+				.build();
+		given(projectQueryService.getProjectByName("Project")).willReturn(Optional.empty());
+		given(projectCommandService.create(Project.builder()
+				.name("Project")
+				.build()
+		)).willReturn(Project.builder()
+				.id("ABC")
+				.name("Project")
+				.build());
+		given(userQueryService.getUserById("123")).willReturn(Optional.of(User.builder()
+				.id("123")
+				.userName("tester")
+				.build()));
+		given(userProjectRepository.save(ArgumentMatchers.isA(UserProject.class))).willReturn(userProject);
+		final UserProject result = userProjectCommandService.assignProjectToUser("Project", "123", userProject);
+		assertThat(result).isNotNull();
+		assertThat(result.getRole()).isEqualTo("QA");
+		assertThat(result.getTasks()).isEqualTo("testing");
+		assertThat(result.getProject()).isNotNull();
+		assertThat(result.getProject().getName()).isEqualTo("Project");
+		assertThat(result.getUser()).isNotNull();
+		assertThat(result.getUser().getUserName()).isEqualTo("tester");
 	}
 
 	@Test
 	@DisplayName("Assign project to user throws an exception when there is no such a user")
 	void assignProjectToUserThrowsExceptionWhenThereIsNoSuchUser() {
-		given(projectQueryService.getProjectById("ABC")).willReturn(Optional.of(
+		given(projectQueryService.getProjectByName("Project")).willReturn(Optional.of(
 				Project.builder()
 						.id("ABC")
 						.name("Project")
@@ -123,7 +149,7 @@ class UserProjectCommandServiceTests {
 		));
 		given(userQueryService.getUserById("123")).willReturn(Optional.empty());
 		assertThrows(NoSuchResourceException.class, () ->
-				userProjectCommandService.assignProjectToUser("ABC", "123", UserProject.builder()
+				userProjectCommandService.assignProjectToUser("Project", "123", UserProject.builder()
 						.role("QA")
 						.tasks("testing")
 						.user(User.builder()
@@ -141,7 +167,7 @@ class UserProjectCommandServiceTests {
 	@Test
 	@DisplayName("Assign project to user throws an exception when there is already a relationship between a specified project and a specified user")
 	void assignProjectToUserThrowsExceptionWhenThereIsAlreadyRelationshipBetweenProjectAndUser() {
-		given(projectQueryService.getProjectById("ABC")).willReturn(Optional.of(
+		given(projectQueryService.getProjectByName("Project")).willReturn(Optional.of(
 				Project.builder()
 						.id("ABC")
 						.name("Project")
@@ -160,7 +186,7 @@ class UserProjectCommandServiceTests {
 				.tasks("development")
 				.build()));
 		assertThrows(DuplicateResourceException.class, () ->
-				userProjectCommandService.assignProjectToUser("ABC", "123", UserProject.builder()
+				userProjectCommandService.assignProjectToUser("Project", "123", UserProject.builder()
 						.role("QA")
 						.tasks("testing")
 						.user(User.builder()

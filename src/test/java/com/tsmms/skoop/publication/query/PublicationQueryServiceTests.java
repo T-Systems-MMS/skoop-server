@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -53,7 +54,7 @@ class PublicationQueryServiceTests {
 								.publisher("The first publisher")
 								.date(LocalDate.of(2019, 4, 19))
 								.link("http://first-link.com")
-								.skills(Arrays.asList(
+								.skills(new HashSet<>(Arrays.asList(
 										Skill.builder()
 												.id("123")
 												.name("Java")
@@ -62,7 +63,7 @@ class PublicationQueryServiceTests {
 												.id("456")
 												.name("Spring Boot")
 												.build()
-								))
+								)))
 								.creationDatetime(LocalDateTime.of(2019, 4, 19, 13, 0))
 								.lastModifiedDatetime(LocalDateTime.of(2019, 4, 19, 13, 0))
 								.user(tester)
@@ -73,12 +74,12 @@ class PublicationQueryServiceTests {
 								.publisher("The second publisher")
 								.date(LocalDate.of(2019, 4, 20))
 								.link("http://second-link.com")
-								.skills(Collections.singletonList(
+								.skills(new HashSet<>(Collections.singletonList(
 										Skill.builder()
 												.id("123")
 												.name("Java")
 												.build()
-								))
+								)))
 								.creationDatetime(LocalDateTime.of(2019, 4, 20, 13, 0))
 								.lastModifiedDatetime(LocalDateTime.of(2019, 4, 20, 13, 0))
 								.user(tester)

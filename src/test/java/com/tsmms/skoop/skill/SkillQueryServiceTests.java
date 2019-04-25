@@ -71,7 +71,7 @@ class SkillQueryServiceTests {
 				return null;
 			}
 		});
-		final List<Skill> skills = skillQueryService.convertSkillNamesToSkills(Arrays.asList("Angular", "Spring Boot"));
+		final List<Skill> skills = skillQueryService.convertSkillNamesToSkillsList(Arrays.asList("Angular", "Spring Boot"));
 		assertThat(skills).containsExactlyInAnyOrder(
 				Skill.builder()
 						.id("123")
@@ -86,7 +86,7 @@ class SkillQueryServiceTests {
 	@DisplayName("Empty collection is returned when empty collection is passed to convert skill names to skills.")
 	@Test
 	void emptyCollectionIsReturnedWhenEmptyCollectionIsPassedToConvertSkillNamesToSkills() {
-		assertThat(skillQueryService.convertSkillNamesToSkills(Collections.emptyList())).isEmpty();
+		assertThat(skillQueryService.convertSkillNamesToSkillsList(Collections.emptyList())).isEmpty();
 	}
 
 }

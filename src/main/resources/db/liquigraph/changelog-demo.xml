@@ -103,25 +103,25 @@
 		<query>MATCH (c:Community {title: 'Phoebe\'s community'}), (u:User {userName: 'phin'})
 			CREATE (u)-[:COMMUNITY_USER {role: 'MANAGER', creationDate: toString(localdatetime()), lastModifiedDate: toString(localdatetime())}]->(c)</query>
 
-		<query>MATCH (p:Project {name: 'SKOOP'}), (u:User {userName: 'dmle'})
-			CREATE (u)-[:USER_PROJECT {role: 'Developer', tasks: 'Development and testing.', startDate: '2019-01-09', endDate: '2019-03-31',
-			creationDate: toString(localdatetime()), lastModifiedDate: toString(localdatetime())}]->(p)</query>
+		<query><![CDATA[ MATCH (p:Project {name: 'SKOOP'}), (u:User {userName: 'dmle'})
+			CREATE (u)<-[:USER]-(:UserProject {role: 'Developer', tasks: 'Development and testing.', startDate: '2019-01-09', endDate: '2019-03-31',
+			creationDate: toString(localdatetime()), lastModifiedDate: toString(localdatetime())})-[:PROJECT]->(p) ]]></query>
 
-		<query>MATCH (p:Project {name: 'SKOOP'}), (u:User {userName: 'sviv'})
-			CREATE (u)-[:USER_PROJECT {role: 'Developer', tasks: 'Development and testing.', startDate: '2019-01-09', endDate: '2019-03-31',
-			creationDate: toString(localdatetime()), lastModifiedDate: toString(localdatetime())}]->(p)</query>
+		<query><![CDATA[ MATCH (p:Project {name: 'SKOOP'}), (u:User {userName: 'sviv'})
+			CREATE (u)<-[:USER]-(:UserProject {role: 'Developer', tasks: 'Development and testing.', startDate: '2019-01-09', endDate: '2019-03-31',
+			creationDate: toString(localdatetime()), lastModifiedDate: toString(localdatetime())})-[:PROJECT]->(p) ]]></query>
 
-		<query>MATCH (p:Project {name: 'SKOOP'}), (u:User {userName: 'frwt'})
-			CREATE (u)-[:USER_PROJECT {role: 'Product owner', tasks: 'Product ownership and declaring of requirements.', startDate: '2019-01-09', endDate: '2019-03-31',
-			creationDate: toString(localdatetime()), lastModifiedDate: toString(localdatetime())}]->(p)</query>
+		<query><![CDATA[ MATCH (p:Project {name: 'SKOOP'}), (u:User {userName: 'frwt'})
+			CREATE (u)<-[:USER]-(:UserProject {role: 'Product owner', tasks: 'Product ownership and declaring of requirements.', startDate: '2019-01-09', endDate: '2019-03-31',
+			creationDate: toString(localdatetime()), lastModifiedDate: toString(localdatetime())})-[:PROJECT]->(p) ]]></query>
 
-		<query>MATCH (p:Project {name: 'SKOOP'}), (u:User {userName: 'rju'})
-			CREATE (u)-[:USER_PROJECT {role: 'Project manager', tasks: 'Project management.', startDate: '2019-01-09', endDate: '2019-03-31',
-			creationDate: toString(localdatetime()), lastModifiedDate: toString(localdatetime())}]->(p)</query>
+		<query><![CDATA[ MATCH (p:Project {name: 'SKOOP'}), (u:User {userName: 'rju'})
+			CREATE (u)<-[:USER]-(:UserProject {role: 'Project manager', tasks: 'Project management.', startDate: '2019-01-09', endDate: '2019-03-31',
+			creationDate: toString(localdatetime()), lastModifiedDate: toString(localdatetime())})-[:PROJECT]->(p) ]]></query>
 
-		<query>MATCH (p:Project {name: 'SKOOP'}), (u:User {userName: 'phin'})
-			CREATE (u)-[:USER_PROJECT {role: 'Project manager', tasks: 'Project management.', startDate: '2019-01-09', endDate: '2019-03-31',
-			creationDate: toString(localdatetime()), lastModifiedDate: toString(localdatetime())}]->(p)</query>
+		<query><![CDATA[ MATCH (p:Project {name: 'SKOOP'}), (u:User {userName: 'phin'})
+			CREATE (u)<-[:USER]-(:UserProject {role: 'Project manager', tasks: 'Project management.', startDate: '2019-01-09', endDate: '2019-03-31',
+			creationDate: toString(localdatetime()), lastModifiedDate: toString(localdatetime())})-[:PROJECT]->(p) ]]></query>
 
 		<query>CREATE (:Link {name: 'GitHub WebApp Repository', href: 'https://github.com/T-Systems-MMS/skoop-webapp'})</query>
 		<query>CREATE (:Link {name: 'GitHub Deployment Repository', href: 'https://github.com/T-Systems-MMS/skoop-deployment'})</query>

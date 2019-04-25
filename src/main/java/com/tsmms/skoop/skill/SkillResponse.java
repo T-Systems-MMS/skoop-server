@@ -4,10 +4,15 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
-
-import static java.util.stream.Collectors.toList;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 @Data
 @Builder
@@ -39,11 +44,21 @@ public class SkillResponse {
 				.build();
 	}
 
-	public static List<SkillResponse> convertSkillListToSkillResponseList(List<Skill> skills) {
-		if (skills == null) {
-			return Collections.emptyList();
+	private static <C extends Collection<SkillResponse>> Optional<C> convertSkillCollectionToSkillResponseCollection(Supplier<? extends C> collectionFactory, Collection<Skill> skills) {
+		if (skills != null) {
+			return Optional.of(skills.stream().map(SkillResponse::of).collect(Collectors.toCollection(collectionFactory)));
 		}
-		return skills.stream().map(SkillResponse::of).collect(toList());
+		else {
+			return Optional.empty();
+		}
+	}
+
+	public static List<SkillResponse> convertSkillListToSkillResponseList(List<Skill> skills) {
+		return SkillResponse.<List<SkillResponse>>convertSkillCollectionToSkillResponseCollection(ArrayList::new, skills).orElse(Collections.emptyList());
+	}
+
+	public static Set<SkillResponse> convertSkillListToSkillResponseSet(Set<Skill> skills) {
+		return SkillResponse.<Set<SkillResponse>>convertSkillCollectionToSkillResponseCollection(HashSet::new, skills).orElse(Collections.emptySet());
 	}
 
 }

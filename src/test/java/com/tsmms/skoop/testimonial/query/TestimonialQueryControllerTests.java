@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.stream.Stream;
 
 import static com.tsmms.skoop.common.JwtAuthenticationFactory.withUser;
@@ -51,7 +52,7 @@ class TestimonialQueryControllerTests extends AbstractControllerTests {
 								.id("abc")
 								.author("John Doe. Some company. CEO.")
 								.comment("He is the best developer I have ever worked with.")
-								.skills(Arrays.asList(
+								.skills(new HashSet<>(Arrays.asList(
 										Skill.builder()
 												.id("123")
 												.name("Java")
@@ -60,7 +61,7 @@ class TestimonialQueryControllerTests extends AbstractControllerTests {
 												.id("456")
 												.name("Spring Boot")
 												.build()
-								))
+								)))
 								.creationDatetime(LocalDateTime.of(2019, 4, 17, 10, 0))
 								.lastModifiedDatetime(LocalDateTime.of(2019, 4, 17, 10, 0))
 								.user(tester)
@@ -69,7 +70,7 @@ class TestimonialQueryControllerTests extends AbstractControllerTests {
 								.id("def")
 								.author("Jenny Doe. Another company. CEO.")
 								.comment("He is one of the best developers I have ever worked with.")
-								.skills(Arrays.asList(
+								.skills(new HashSet<>(Arrays.asList(
 										Skill.builder()
 												.id("789")
 												.name("JavaScript")
@@ -78,7 +79,7 @@ class TestimonialQueryControllerTests extends AbstractControllerTests {
 												.id("456")
 												.name("Spring Boot")
 												.build()
-								))
+								)))
 								.creationDatetime(LocalDateTime.of(2018, 4, 17, 10, 0))
 								.lastModifiedDatetime(LocalDateTime.of(2018, 4, 17, 10, 0))
 								.user(tester)

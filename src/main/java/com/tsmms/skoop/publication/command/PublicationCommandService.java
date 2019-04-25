@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.UUID;
 
 import static java.util.Objects.requireNonNull;
@@ -31,7 +33,7 @@ public class PublicationCommandService {
 		publication.setId(UUID.randomUUID().toString());
 		publication.setCreationDatetime(now);
 		publication.setLastModifiedDatetime(now);
-		publication.setSkills(skillCommandService.createNonExistentSkills(publication.getSkills()));
+		publication.setSkills(new HashSet<>(skillCommandService.createNonExistentSkills(publication.getSkills())));
 		return publicationRepository.save(publication);
 	}
 
@@ -55,7 +57,7 @@ public class PublicationCommandService {
 		publication.setPublisher(command.getPublisher());
 		publication.setDate(command.getDate());
 		publication.setTitle(command.getTitle());
-		publication.setSkills(skillCommandService.createNonExistentSkills(command.getSkills()));
+		publication.setSkills(new HashSet<>(skillCommandService.createNonExistentSkills(command.getSkills())));
 		return publicationRepository.save(publication);
 	}
 

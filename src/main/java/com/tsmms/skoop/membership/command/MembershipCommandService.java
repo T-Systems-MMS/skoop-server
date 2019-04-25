@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.UUID;
 
 import static com.tsmms.skoop.exception.enums.Model.MEMBERSHIP;
@@ -30,7 +31,7 @@ public class MembershipCommandService {
 		membership.setId(UUID.randomUUID().toString());
 		membership.setCreationDatetime(now);
 		membership.setLastModifiedDatetime(now);
-		membership.setSkills(skillCommandService.createNonExistentSkills(membership.getSkills()));
+		membership.setSkills(new HashSet<>(skillCommandService.createNonExistentSkills(membership.getSkills())));
 		return membershipRepository.save(membership);
 	}
 
@@ -53,7 +54,7 @@ public class MembershipCommandService {
 		membership.setLink(command.getLink());
 		membership.setDescription(command.getDescription());
 		membership.setName(command.getName());
-		membership.setSkills(skillCommandService.createNonExistentSkills(command.getSkills()));
+		membership.setSkills(new HashSet<>(skillCommandService.createNonExistentSkills(command.getSkills())));
 		return membershipRepository.save(membership);
 	}
 

@@ -6,14 +6,19 @@ import com.tsmms.skoop.skill.SkillRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
+import static java.util.stream.Collectors.toCollection;
 
 @Service
 public class SkillQueryService {
@@ -63,21 +68,28 @@ public class SkillQueryService {
 		return stream(skillRepository.findAllById(skillIds).spliterator(), false);
 	}
 
-	@Transactional(readOnly = true)
-	public List<Skill> convertSkillNamesToSkills(List<String> skillNames) {
-		final List<Skill> skills;
+	private <C extends Collection<Skill>> Optional<C> convertSkillNamesToSkills(Supplier<? extends C> collectionFactory, Collection<String> skillNames) {
 		if (skillNames != null) {
-			skills = skillNames.stream().map(skillName ->
+			return Optional.of(skillNames.stream().map(skillName ->
 					findByNameIgnoreCase(skillName).orElse(
 							Skill.builder()
 									.name(skillName)
 									.build()
-					)).collect(toList());
+					)).collect(toCollection(collectionFactory)));
 		}
 		else {
-			skills = Collections.emptyList();
+			return Optional.empty();
 		}
-		return skills;
+	}
+
+	@Transactional(readOnly = true)
+	public List<Skill> convertSkillNamesToSkillsList(Collection<String> skillNames) {
+		return this.<List<Skill>>convertSkillNamesToSkills(ArrayList::new, skillNames).orElse(Collections.emptyList());
+	}
+
+	@Transactional(readOnly = true)
+	public Set<Skill> convertSkillNamesToSkillsSet(Collection<String> skillNames) {
+		return this.<Set<Skill>>convertSkillNamesToSkills(HashSet::new, skillNames).orElse(Collections.emptySet());
 	}
 
 }
