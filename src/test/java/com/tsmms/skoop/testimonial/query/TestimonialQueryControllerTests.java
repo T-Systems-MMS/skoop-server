@@ -19,6 +19,7 @@ import java.util.stream.Stream;
 
 import static com.tsmms.skoop.common.JwtAuthenticationFactory.withUser;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
@@ -98,19 +99,15 @@ class TestimonialQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[0].comment", is(equalTo("He is the best developer I have ever worked with."))))
 				.andExpect(jsonPath("$[0].creationDatetime", is(equalTo("2019-04-17T10:00:00"))))
 				.andExpect(jsonPath("$[0].lastModifiedDatetime", is(equalTo("2019-04-17T10:00:00"))))
-				.andExpect(jsonPath("$[0].skills[0].id", is(equalTo("123"))))
-				.andExpect(jsonPath("$[0].skills[0].name", is(equalTo("Java"))))
-				.andExpect(jsonPath("$[0].skills[1].id", is(equalTo("456"))))
-				.andExpect(jsonPath("$[0].skills[1].name", is(equalTo("Spring Boot"))))
+				.andExpect(jsonPath("$[0].skills[?(@.id=='123')].name", hasItem("Java")))
+				.andExpect(jsonPath("$[0].skills[?(@.id=='456')].name", hasItem("Spring Boot")))
 				.andExpect(jsonPath("$[1].id", is(equalTo("def"))))
 				.andExpect(jsonPath("$[1].author", is(equalTo("Jenny Doe. Another company. CEO."))))
 				.andExpect(jsonPath("$[1].comment", is(equalTo("He is one of the best developers I have ever worked with."))))
 				.andExpect(jsonPath("$[1].creationDatetime", is(equalTo("2018-04-17T10:00:00"))))
 				.andExpect(jsonPath("$[1].lastModifiedDatetime", is(equalTo("2018-04-17T10:00:00"))))
-				.andExpect(jsonPath("$[1].skills[0].id", is(equalTo("789"))))
-				.andExpect(jsonPath("$[1].skills[0].name", is(equalTo("JavaScript"))))
-				.andExpect(jsonPath("$[1].skills[1].id", is(equalTo("456"))))
-				.andExpect(jsonPath("$[1].skills[1].name", is(equalTo("Spring Boot"))));
+				.andExpect(jsonPath("$[1].skills[?(@.id=='789')].name", hasItem("JavaScript")))
+				.andExpect(jsonPath("$[1].skills[?(@.id=='456')].name", hasItem("Spring Boot")));
 	}
 
 	@DisplayName("Not authenticated user cannot get user testimonials.")

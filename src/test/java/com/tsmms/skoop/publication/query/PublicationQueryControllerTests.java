@@ -21,6 +21,7 @@ import java.util.stream.Stream;
 
 import static com.tsmms.skoop.common.JwtAuthenticationFactory.withUser;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -103,10 +104,8 @@ class PublicationQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[0].date", is(equalTo("2019-04-19"))))
 				.andExpect(jsonPath("$[0].creationDatetime", is(equalTo("2019-04-19T13:00:00"))))
 				.andExpect(jsonPath("$[0].lastModifiedDatetime", is(equalTo("2019-04-19T13:00:00"))))
-				.andExpect(jsonPath("$[0].skills[0].id", is(equalTo("123"))))
-				.andExpect(jsonPath("$[0].skills[0].name", is(equalTo("Java"))))
-				.andExpect(jsonPath("$[0].skills[1].id", is(equalTo("456"))))
-				.andExpect(jsonPath("$[0].skills[1].name", is(equalTo("Spring Boot"))))
+				.andExpect(jsonPath("$[0].skills[?(@.id=='123')].name", hasItem("Java")))
+				.andExpect(jsonPath("$[0].skills[?(@.id=='456')].name", hasItem("Spring Boot")))
 				.andExpect(jsonPath("$[1].id", is(equalTo("456"))))
 				.andExpect(jsonPath("$[1].title", is(equalTo("The second publication"))))
 				.andExpect(jsonPath("$[1].publisher", is(equalTo("The second publisher"))))
@@ -114,8 +113,7 @@ class PublicationQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[1].date", is(equalTo("2019-04-20"))))
 				.andExpect(jsonPath("$[1].creationDatetime", is(equalTo("2019-04-20T13:00:00"))))
 				.andExpect(jsonPath("$[1].lastModifiedDatetime", is(equalTo("2019-04-20T13:00:00"))))
-				.andExpect(jsonPath("$[1].skills[0].id", is(equalTo("123"))))
-				.andExpect(jsonPath("$[1].skills[0].name", is(equalTo("Java"))));
+				.andExpect(jsonPath("$[1].skills[?(@.id=='123')].name", hasItem("Java")));
 	}
 
 	@DisplayName("Not authenticated user cannot get user publications.")
