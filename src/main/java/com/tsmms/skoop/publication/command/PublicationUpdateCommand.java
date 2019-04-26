@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -19,6 +20,6 @@ public class PublicationUpdateCommand {
 	private LocalDate date;
 	private String publisher;
 	private String link;
-	private List<Skill> skills;
+	private Set<Skill> skills;
 
 }

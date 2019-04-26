@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -215,7 +216,7 @@ class SkillCommandServiceTests {
 				.build()
 		);
 
-		final List<Skill> skills = skillCommandService.createNonExistentSkills(Arrays.asList(
+		final Set<Skill> skills = skillCommandService.createNonExistentSkills(Arrays.asList(
 				Skill.builder()
 						.id("123")
 						.name("Spring Boot")
@@ -239,7 +240,7 @@ class SkillCommandServiceTests {
 	@DisplayName("Empty collection is returned when empty collection is passed to create non existent skills.")
 	@Test
 	void emptyCollectionIsReturnedWhenEmptyCollectionIsPassedToCreateNonExistentSkills() {
-		final List<Skill> skills = skillCommandService.createNonExistentSkills(Collections.emptyList());
+		final Set<Skill> skills = skillCommandService.createNonExistentSkills(Collections.emptyList());
 		assertThat(skills).isEmpty();
 	}
 

@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -67,7 +68,7 @@ class CommunityQueryServiceTests {
 										.href("https://www.linkedin.com/java-user-group")
 										.build()
 						))
-						.skills(Arrays.asList(springBootSkill, angularSkill))
+						.skills(new HashSet<>(Arrays.asList(springBootSkill, angularSkill)))
 						.build()
 		));
 		final Optional<Community> community = communityQueryService.getCommunityById("123");
@@ -132,7 +133,7 @@ class CommunityQueryServiceTests {
 								))
 								.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
 								.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
-								.skills(Arrays.asList(springBootSkill, angularSkill))
+								.skills(new HashSet<>(Arrays.asList(springBootSkill, angularSkill)))
 								.build(),
 						Community.builder()
 								.id("456")
@@ -151,7 +152,7 @@ class CommunityQueryServiceTests {
 								))
 								.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
 								.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
-								.skills(Arrays.asList(springBootSkill, javascriptSkill))
+								.skills(new HashSet<>(Arrays.asList(springBootSkill, javascriptSkill)))
 								.build())
 		);
 
@@ -243,7 +244,7 @@ class CommunityQueryServiceTests {
 								))
 								.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
 								.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
-								.skills(Arrays.asList(springBootSkill, angularSkill))
+								.skills(new HashSet<>(Arrays.asList(springBootSkill, angularSkill)))
 								.build(),
 						Community.builder()
 								.id("456")
@@ -262,7 +263,7 @@ class CommunityQueryServiceTests {
 								))
 								.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
 								.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
-								.skills(Arrays.asList(springBootSkill, javascriptSkill))
+								.skills(new HashSet<>(Arrays.asList(springBootSkill, javascriptSkill)))
 								.build()
 				));
 

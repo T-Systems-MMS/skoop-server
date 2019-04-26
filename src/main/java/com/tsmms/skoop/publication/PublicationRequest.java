@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -34,6 +34,6 @@ public class PublicationRequest {
 	@ApiModelProperty("Link to the publication.")
 	private String link;
 	@ApiModelProperty("Skills linked to the publication.")
-	private List<String> skills;
+	private Set<String> skills;
 
 }

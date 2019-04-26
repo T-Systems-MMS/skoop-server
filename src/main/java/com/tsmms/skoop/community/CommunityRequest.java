@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -35,7 +36,7 @@ public class CommunityRequest {
 	private List<LinkRequest> links;
 
 	@ApiModelProperty("List of skill names.")
-	private List<String> skillNames;
+	private Set<String> skillNames;
 
 	@ApiModelProperty("List of identifiers of invited users.")
 	private List<String> invitedUserIds;

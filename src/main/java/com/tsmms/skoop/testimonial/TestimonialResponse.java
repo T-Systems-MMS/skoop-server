@@ -9,9 +9,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Set;
 
-import static com.tsmms.skoop.skill.SkillResponse.convertSkillListToSkillResponseList;
+import static com.tsmms.skoop.skill.SkillResponse.convertSkillListToSkillResponseSet;
 
 @Data
 @Builder
@@ -34,7 +34,7 @@ public class TestimonialResponse {
 	@ApiModelProperty("The datetime when testimonial was last edited.")
 	private LocalDateTime lastModifiedDatetime;
 	@ApiModelProperty("The skills linked to the testimonial.")
-	private List<SkillResponse> skills;
+	private Set<SkillResponse> skills;
 
 	public static TestimonialResponse of(Testimonial testimonial) {
 		return TestimonialResponse.builder()
@@ -43,7 +43,7 @@ public class TestimonialResponse {
 				.comment(testimonial.getComment())
 				.creationDatetime(testimonial.getCreationDatetime())
 				.lastModifiedDatetime(testimonial.getLastModifiedDatetime())
-				.skills(convertSkillListToSkillResponseList(testimonial.getSkills()))
+				.skills(convertSkillListToSkillResponseSet(testimonial.getSkills()))
 				.build();
 	}
 

@@ -1,6 +1,8 @@
 package com.tsmms.skoop.userproject.command;
 
 import com.tsmms.skoop.project.Project;
+import com.tsmms.skoop.skill.Skill;
+import com.tsmms.skoop.skill.query.SkillQueryService;
 import com.tsmms.skoop.user.User;
 import com.tsmms.skoop.common.AbstractControllerTests;
 import com.tsmms.skoop.userproject.UserProject;
@@ -16,6 +18,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 
 import static com.tsmms.skoop.common.JwtAuthenticationFactory.withUser;
 import static org.hamcrest.Matchers.equalTo;
@@ -32,11 +37,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(UserProjectCommandController.class)
 class UserProjectCommandControllerTests extends AbstractControllerTests {
 
-	@Autowired
-	private MockMvc mockMvc;
+	@MockBean
+	private SkillQueryService skillQueryService;
 
 	@MockBean
 	private UserProjectCommandService userProjectCommandService;
+
+	@Autowired
+	private MockMvc mockMvc;
 
 	@Test
 	@DisplayName("Tests if a project can be assigned to a user")
@@ -46,18 +54,28 @@ class UserProjectCommandControllerTests extends AbstractControllerTests {
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
 				.build();
-		given(userProjectCommandService.assignProjectToUser("123", "1f37fb2a-b4d0-4119-9113-4677beb20ae2", UserProject.builder()
+		given(skillQueryService.convertSkillNamesToSkillsSet(Collections.singleton("Spring Boot"))).willReturn(Collections.singleton(
+				Skill.builder()
+						.name("Spring Boot")
+						.build()
+		));
+		given(userProjectCommandService.assignProjectToUser("Project", "1f37fb2a-b4d0-4119-9113-4677beb20ae2", UserProject.builder()
 				.role("developer")
 				.tasks("development")
 				.startDate(LocalDate.of(2019, 1, 9))
 				.endDate(LocalDate.of(2019, 5, 1))
+				.skills(Collections.singleton(
+						Skill.builder()
+								.name("Spring Boot")
+								.build()
+				))
 				.build()
 		)).willReturn(UserProject.builder()
 				.role("developer")
 				.tasks("development")
 				.startDate(LocalDate.of(2019, 1, 9))
 				.endDate(LocalDate.of(2019, 5, 1))
-				.id(732L)
+				.id("aaa")
 				.creationDate(LocalDateTime.of(2019, 11, 3, 13, 30))
 				.lastModifiedDate(LocalDateTime.of(2019, 11, 3, 13, 31))
 				.user(User.builder()
@@ -88,7 +106,7 @@ class UserProjectCommandControllerTests extends AbstractControllerTests {
 					.with(authentication(withUser(owner)))
 					.with(csrf()))
 					.andExpect(status().isCreated())
-					.andExpect(jsonPath("$.id", is(equalTo(732))))
+					.andExpect(jsonPath("$.id", is(equalTo("aaa"))))
 					.andExpect(jsonPath("$.role", is(equalTo("developer"))))
 					.andExpect(jsonPath("$.tasks", is(equalTo("development"))))
 					.andExpect(jsonPath("$.startDate", is(equalTo("2019-01-09"))))
@@ -146,14 +164,36 @@ class UserProjectCommandControllerTests extends AbstractControllerTests {
 	@DisplayName("Tests if user project can be updated.")
 	void testIfUserProjectCanBeUpdated() throws Exception {
 		final ClassPathResource body = new ClassPathResource("update-user-project.json");
+		given(skillQueryService.convertSkillNamesToSkillsSet(new HashSet<>(Arrays.asList("Spring Boot", "Java")))).willReturn(new HashSet<>(
+				Arrays.asList(
+						Skill.builder()
+								.id("123")
+								.name("Spring Boot")
+								.build(),
+						Skill.builder()
+								.name("Java")
+								.build()
+				)
+		));
 		given(userProjectCommandService.updateUserProject("1f37fb2a-b4d0-4119-9113-4677beb20ae2", "123", UpdateUserProjectCommand.builder()
 				.role("developer")
 				.tasks("development")
 				.startDate(LocalDate.of(2019, 1, 9))
 				.endDate(LocalDate.of(2019, 5, 1))
+				.skills(new HashSet<>(
+						Arrays.asList(
+								Skill.builder()
+										.id("123")
+										.name("Spring Boot")
+										.build(),
+								Skill.builder()
+										.name("Java")
+										.build()
+						)
+				))
 				.build()
 		)).willReturn(UserProject.builder()
-				.id(123L)
+				.id("bbb")
 				.role("developer")
 				.tasks("development")
 				.startDate(LocalDate.of(2019, 1, 9))
@@ -191,7 +231,7 @@ class UserProjectCommandControllerTests extends AbstractControllerTests {
 					.with(authentication(withUser(owner)))
 					.with(csrf()))
 					.andExpect(status().isOk())
-					.andExpect(jsonPath("$.id", is(equalTo(123))))
+					.andExpect(jsonPath("$.id", is(equalTo("bbb"))))
 					.andExpect(jsonPath("$.role", is(equalTo("developer"))))
 					.andExpect(jsonPath("$.tasks", is(equalTo("development"))))
 					.andExpect(jsonPath("$.startDate", is(equalTo("2019-01-09"))))

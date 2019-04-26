@@ -125,8 +125,8 @@ public class CommunityCommandService {
 			p.setDescription(community.getDescription());
 		}
 		if (!CollectionUtils.isEqualCollection(
-				Optional.ofNullable(p.getSkills()).orElse(Collections.emptyList()),
-				Optional.ofNullable(community.getSkills()).orElse(Collections.emptyList()))) {
+				Optional.ofNullable(p.getSkills()).orElse(Collections.emptySet()),
+				Optional.ofNullable(community.getSkills()).orElse(Collections.emptySet()))) {
 			changedCommunityDetails.add(CommunityDetails.SKILLS);
 			p.setSkills(skillCommandService.createNonExistentSkills(community.getSkills()));
 		}

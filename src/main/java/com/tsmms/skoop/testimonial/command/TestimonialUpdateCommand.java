@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -16,6 +17,6 @@ public class TestimonialUpdateCommand {
 
 	private String author;
 	private String comment;
-	private List<Skill> skills;
+	private Set<Skill> skills;
 
 }

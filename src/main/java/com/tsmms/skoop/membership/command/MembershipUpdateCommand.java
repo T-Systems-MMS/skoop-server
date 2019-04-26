@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -17,6 +18,6 @@ public class MembershipUpdateCommand {
 	private String name;
 	private String description;
 	private String link;
-	private List<Skill> skills;
+	private Set<Skill> skills;
 
 }

@@ -18,11 +18,18 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Optional;
 
 import static com.tsmms.skoop.common.JwtAuthenticationFactory.withUser;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.core.AllOf.allOf;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isA;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -62,23 +69,28 @@ class TestimonialCommandControllerTests extends AbstractControllerTests {
 		given(userQueryService.getUserById(tester.getId()))
 				.willReturn(Optional.of(tester));
 
-		given(skillQueryService.convertSkillNamesToSkills(Arrays.asList("Java", "Spring Boot")))
+		given(skillQueryService.convertSkillNamesToSkillsSet(argThat(allOf(
+				isA(Collection.class),
+				containsInAnyOrder("Java", "Spring Boot")
+		))))
 				.willReturn(
-						Arrays.asList(
-								Skill.builder()
-										.id("123")
-										.name("Java")
-										.build(),
-								Skill.builder()
-										.name("Spring Boot")
-										.build()
+						new HashSet<>(
+								Arrays.asList(
+										Skill.builder()
+												.id("123")
+												.name("Java")
+												.build(),
+										Skill.builder()
+												.name("Spring Boot")
+												.build()
+								)
 						)
 				);
 
 		given(testimonialCommandService.create(Testimonial.builder()
 				.author("John Doe. Some company. CEO.")
 				.comment("He is the best developer I have ever worked with.")
-				.skills(Arrays.asList(
+				.skills(new HashSet<>(Arrays.asList(
 						Skill.builder()
 								.id("123")
 								.name("Java")
@@ -86,7 +98,7 @@ class TestimonialCommandControllerTests extends AbstractControllerTests {
 						Skill.builder()
 								.name("Spring Boot")
 								.build()
-				))
+				)))
 				.user(tester)
 				.build()
 		)).willReturn(
@@ -94,7 +106,7 @@ class TestimonialCommandControllerTests extends AbstractControllerTests {
 						.id("abc")
 						.author("John Doe. Some company. CEO.")
 						.comment("He is the best developer I have ever worked with.")
-						.skills(Arrays.asList(
+						.skills(new HashSet<>(Arrays.asList(
 								Skill.builder()
 										.id("123")
 										.name("Java")
@@ -103,7 +115,7 @@ class TestimonialCommandControllerTests extends AbstractControllerTests {
 										.id("456")
 										.name("Spring Boot")
 										.build()
-						))
+						)))
 						.creationDatetime(LocalDateTime.of(2019, 4, 17, 10, 0))
 						.lastModifiedDatetime(LocalDateTime.of(2019, 4, 17, 10, 0))
 						.user(tester)
@@ -124,10 +136,8 @@ class TestimonialCommandControllerTests extends AbstractControllerTests {
 					.andExpect(jsonPath("$.comment", is(equalTo("He is the best developer I have ever worked with."))))
 					.andExpect(jsonPath("$.creationDatetime", is(equalTo("2019-04-17T10:00:00"))))
 					.andExpect(jsonPath("$.lastModifiedDatetime", is(equalTo("2019-04-17T10:00:00"))))
-					.andExpect(jsonPath("$.skills[0].id", is(equalTo("123"))))
-					.andExpect(jsonPath("$.skills[0].name", is(equalTo("Java"))))
-					.andExpect(jsonPath("$.skills[1].id", is(equalTo("456"))))
-					.andExpect(jsonPath("$.skills[1].name", is(equalTo("Spring Boot"))));
+					.andExpect(jsonPath("$.skills[?(@.id=='123')].name", hasItem("Java")))
+					.andExpect(jsonPath("$.skills[?(@.id=='456')].name", hasItem("Spring Boot")));
 		}
 	}
 
@@ -176,8 +186,31 @@ class TestimonialCommandControllerTests extends AbstractControllerTests {
 
 		final ClassPathResource body = new ClassPathResource("testimonials/update-testimonial.json");
 
-		given(skillQueryService.convertSkillNamesToSkills(Arrays.asList("Java", "Spring Boot", "Angular")))
+		given(skillQueryService.convertSkillNamesToSkillsSet(argThat(allOf(
+				isA(Collection.class),
+				containsInAnyOrder("Java", "Spring Boot", "Angular")
+		))))
 				.willReturn(
+						new HashSet<>(Arrays.asList(
+								Skill.builder()
+										.id("123")
+										.name("Java")
+										.build(),
+								Skill.builder()
+										.id("456")
+										.name("Spring Boot")
+										.build(),
+								Skill.builder()
+										.id("789")
+										.name("Angular")
+										.build()
+						))
+				);
+
+		given(testimonialCommandService.update("abc", TestimonialUpdateCommand.builder()
+				.author("John Doe. Another company. CTO.")
+				.comment("He is one of the best developers I have ever worked with.")
+				.skills(new HashSet<>(
 						Arrays.asList(
 								Skill.builder()
 										.id("123")
@@ -192,24 +225,6 @@ class TestimonialCommandControllerTests extends AbstractControllerTests {
 										.name("Angular")
 										.build()
 						)
-				);
-
-		given(testimonialCommandService.update("abc", TestimonialUpdateCommand.builder()
-				.author("John Doe. Another company. CTO.")
-				.comment("He is one of the best developers I have ever worked with.")
-				.skills(Arrays.asList(
-						Skill.builder()
-								.id("123")
-								.name("Java")
-								.build(),
-						Skill.builder()
-								.id("456")
-								.name("Spring Boot")
-								.build(),
-						Skill.builder()
-								.id("789")
-								.name("Angular")
-								.build()
 				))
 				.build()
 		)).willReturn(
@@ -217,7 +232,7 @@ class TestimonialCommandControllerTests extends AbstractControllerTests {
 						.id("abc")
 						.author("John Doe. Another company. CTO.")
 						.comment("He is one of the best developers I have ever worked with.")
-						.skills(Arrays.asList(
+						.skills(new HashSet<>(Arrays.asList(
 								Skill.builder()
 										.id("123")
 										.name("Java")
@@ -230,7 +245,7 @@ class TestimonialCommandControllerTests extends AbstractControllerTests {
 										.id("789")
 										.name("Angular")
 										.build()
-						))
+						)))
 						.creationDatetime(LocalDateTime.of(2019, 4, 18, 10, 0))
 						.lastModifiedDatetime(LocalDateTime.of(2019, 4, 18, 10, 0))
 						.user(User.builder()
@@ -254,12 +269,9 @@ class TestimonialCommandControllerTests extends AbstractControllerTests {
 					.andExpect(jsonPath("$.comment", is(equalTo("He is one of the best developers I have ever worked with."))))
 					.andExpect(jsonPath("$.creationDatetime", is(equalTo("2019-04-18T10:00:00"))))
 					.andExpect(jsonPath("$.lastModifiedDatetime", is(equalTo("2019-04-18T10:00:00"))))
-					.andExpect(jsonPath("$.skills[0].id", is(equalTo("123"))))
-					.andExpect(jsonPath("$.skills[0].name", is(equalTo("Java"))))
-					.andExpect(jsonPath("$.skills[1].id", is(equalTo("456"))))
-					.andExpect(jsonPath("$.skills[1].name", is(equalTo("Spring Boot"))))
-					.andExpect(jsonPath("$.skills[2].id", is(equalTo("789"))))
-					.andExpect(jsonPath("$.skills[2].name", is(equalTo("Angular"))));
+					.andExpect(jsonPath("$.skills[?(@.id=='123')].name", hasItem("Java")))
+					.andExpect(jsonPath("$.skills[?(@.id=='456')].name", hasItem("Spring Boot")))
+					.andExpect(jsonPath("$.skills[?(@.id=='789')].name", hasItem("Angular")));
 		}
 	}
 

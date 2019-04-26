@@ -10,8 +10,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -71,7 +73,7 @@ class SkillQueryServiceTests {
 				return null;
 			}
 		});
-		final List<Skill> skills = skillQueryService.convertSkillNamesToSkills(Arrays.asList("Angular", "Spring Boot"));
+		final Set<Skill> skills = skillQueryService.convertSkillNamesToSkillsSet(new HashSet<>(Arrays.asList("Angular", "Spring Boot")));
 		assertThat(skills).containsExactlyInAnyOrder(
 				Skill.builder()
 						.id("123")
@@ -86,7 +88,7 @@ class SkillQueryServiceTests {
 	@DisplayName("Empty collection is returned when empty collection is passed to convert skill names to skills.")
 	@Test
 	void emptyCollectionIsReturnedWhenEmptyCollectionIsPassedToConvertSkillNamesToSkills() {
-		assertThat(skillQueryService.convertSkillNamesToSkills(Collections.emptyList())).isEmpty();
+		assertThat(skillQueryService.convertSkillNamesToSkillsSet(Collections.emptySet())).isEmpty();
 	}
 
 }

@@ -19,9 +19,11 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -90,7 +92,7 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 										.build()))
 								.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
 								.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
-								.skills(Arrays.asList(springBootSkill, angularSkill))
+								.skills(new HashSet<>(Arrays.asList(springBootSkill, angularSkill)))
 								.build(),
 						Community.builder()
 								.id("456")
@@ -113,7 +115,7 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 										.build()))
 								.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
 								.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
-								.skills(Arrays.asList(springBootSkill, javascriptSkill))
+								.skills(new HashSet<>(Arrays.asList(springBootSkill, javascriptSkill)))
 								.build()
 				)
 		);
@@ -134,10 +136,8 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[0].links[1].href", is(equalTo("https://www.linkedin.com/java-user-group"))))
 				.andExpect(jsonPath("$[0].managers[0].id", is(equalTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))))
 				.andExpect(jsonPath("$[0].managers[0].userName", is(equalTo("tester"))))
-				.andExpect(jsonPath("$[0].skills[0].id", is(equalTo("4f09647e-c7d3-4aa6-ab3d-0faff66b951f"))))
-				.andExpect(jsonPath("$[0].skills[0].name", is(equalTo("Spring Boot"))))
-				.andExpect(jsonPath("$[0].skills[1].id", is(equalTo("6d0870d0-a7b8-4cf4-8a24-bedcfe350903"))))
-				.andExpect(jsonPath("$[0].skills[1].name", is(equalTo("Angular"))))
+				.andExpect(jsonPath("$[0].skills[?(@.id=='4f09647e-c7d3-4aa6-ab3d-0faff66b951f')].name", hasItem("Spring Boot")))
+				.andExpect(jsonPath("$[0].skills[?(@.id=='6d0870d0-a7b8-4cf4-8a24-bedcfe350903')].name", hasItem("Angular")))
 				.andExpect(jsonPath("$[1].id", is(equalTo("456"))))
 				.andExpect(jsonPath("$[1].title", is(equalTo("Scala User Group"))))
 				.andExpect(jsonPath("$[1].type", is(equalTo("OPEN"))))
@@ -148,10 +148,8 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[1].links[1].href", is(equalTo("https://www.linkedin.com/scala-user-group"))))
 				.andExpect(jsonPath("$[1].managers[0].id", is(equalTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))))
 				.andExpect(jsonPath("$[1].managers[0].userName", is(equalTo("tester"))))
-				.andExpect(jsonPath("$[1].skills[0].id", is(equalTo("4f09647e-c7d3-4aa6-ab3d-0faff66b951f"))))
-				.andExpect(jsonPath("$[1].skills[0].name", is(equalTo("Spring Boot"))))
-				.andExpect(jsonPath("$[1].skills[1].id", is(equalTo("10ea2af6-cd81-48e0-b339-0576d16b9d19"))))
-				.andExpect(jsonPath("$[1].skills[1].name", is(equalTo("JavaScript"))));
+				.andExpect(jsonPath("$[1].skills[?(@.id=='4f09647e-c7d3-4aa6-ab3d-0faff66b951f')].name", hasItem("Spring Boot")))
+				.andExpect(jsonPath("$[1].skills[?(@.id=='10ea2af6-cd81-48e0-b339-0576d16b9d19')].name", hasItem("JavaScript")));
 	}
 
 	@Test
@@ -195,7 +193,7 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 										.build()))
 								.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
 								.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
-								.skills(Arrays.asList(springBootSkill, angularSkill))
+								.skills(new HashSet<>(Arrays.asList(springBootSkill, angularSkill)))
 								.build()
 				)
 		);
@@ -216,10 +214,8 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$.links[1].href", is(equalTo("https://www.linkedin.com/scala-user-group"))))
 				.andExpect(jsonPath("$.managers[0].id", is(equalTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))))
 				.andExpect(jsonPath("$.managers[0].userName", is(equalTo("tester"))))
-				.andExpect(jsonPath("$.skills[0].id", is(equalTo("4f09647e-c7d3-4aa6-ab3d-0faff66b951f"))))
-				.andExpect(jsonPath("$.skills[0].name", is(equalTo("Spring Boot"))))
-				.andExpect(jsonPath("$.skills[1].id", is(equalTo("6d0870d0-a7b8-4cf4-8a24-bedcfe350903"))))
-				.andExpect(jsonPath("$.skills[1].name", is(equalTo("Angular"))));
+				.andExpect(jsonPath("$.skills[?(@.id=='4f09647e-c7d3-4aa6-ab3d-0faff66b951f')].name", hasItem("Spring Boot")))
+				.andExpect(jsonPath("$.skills[?(@.id=='6d0870d0-a7b8-4cf4-8a24-bedcfe350903')].name", hasItem("Angular")));
 	}
 
 	@Test

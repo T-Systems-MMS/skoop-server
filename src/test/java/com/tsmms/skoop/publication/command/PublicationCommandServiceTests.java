@@ -16,9 +16,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
@@ -51,26 +54,30 @@ class PublicationCommandServiceTests {
 	@Test
 	void createsPublication() {
 
-		given(skillCommandService.createNonExistentSkills(Arrays.asList(
-				Skill.builder()
-						.id("123")
-						.name("Java")
-						.build(),
-				Skill.builder()
-						.name("Spring Boot")
-						.build()
-				)
-		)).willReturn(
-				Arrays.asList(
-						Skill.builder()
-								.id("123")
-								.name("Java")
-								.build(),
-						Skill.builder()
-								.id("456")
-								.name("Spring Boot")
-								.build()
-				)
+		given(skillCommandService.createNonExistentSkills(
+				argThat(allOf(
+						isA(Collection.class),
+						containsInAnyOrder(Skill.builder()
+										.id("123")
+										.name("Java")
+										.build(),
+								Skill.builder()
+										.name("Spring Boot")
+										.build()
+						))
+				))).willReturn(
+						new HashSet<>(
+								Arrays.asList(
+										Skill.builder()
+												.id("123")
+												.name("Java")
+												.build(),
+										Skill.builder()
+												.id("456")
+												.name("Spring Boot")
+												.build()
+								)
+						)
 		);
 
 		given(publicationRepository.save(
@@ -105,7 +112,7 @@ class PublicationCommandServiceTests {
 						.publisher("The first publisher")
 						.date(LocalDate.of(2019, 4, 19))
 						.link("http://first-link.com")
-						.skills(Arrays.asList(
+						.skills(new HashSet<>(Arrays.asList(
 								Skill.builder()
 										.id("123")
 										.name("Java")
@@ -114,7 +121,7 @@ class PublicationCommandServiceTests {
 										.id("456")
 										.name("Spring Boot")
 										.build()
-						))
+						)))
 						.creationDatetime(LocalDateTime.of(2019, 4, 19, 13, 0))
 						.lastModifiedDatetime(LocalDateTime.of(2019, 4, 19, 13, 0))
 						.user(User.builder()
@@ -130,7 +137,7 @@ class PublicationCommandServiceTests {
 						.publisher("The first publisher")
 						.date(LocalDate.of(2019, 4, 19))
 						.link("http://first-link.com")
-						.skills(Arrays.asList(
+						.skills(new HashSet<>(Arrays.asList(
 								Skill.builder()
 										.id("123")
 										.name("Java")
@@ -138,7 +145,7 @@ class PublicationCommandServiceTests {
 								Skill.builder()
 										.name("Spring Boot")
 										.build()
-						))
+						)))
 						.user(User.builder()
 								.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
 								.userName("tester")
@@ -178,7 +185,7 @@ class PublicationCommandServiceTests {
 								.publisher("The first publisher")
 								.date(LocalDate.of(2019, 4, 19))
 								.link("http://first-link.com")
-								.skills(Arrays.asList(
+								.skills(new HashSet<>(Arrays.asList(
 										Skill.builder()
 												.id("123")
 												.name("Java")
@@ -187,7 +194,7 @@ class PublicationCommandServiceTests {
 												.id("456")
 												.name("Spring Boot")
 												.build()
-								))
+								)))
 								.creationDatetime(LocalDateTime.of(2019, 4, 19, 13, 0))
 								.lastModifiedDatetime(LocalDateTime.of(2019, 4, 19, 13, 0))
 								.user(User.builder()
@@ -197,33 +204,41 @@ class PublicationCommandServiceTests {
 								.build()
 				)
 		);
-		given(skillCommandService.createNonExistentSkills(Arrays.asList(
-				Skill.builder()
-						.id("123")
-						.name("Java")
-						.build(),
-				Skill.builder()
-						.id("456")
-						.name("Spring Boot")
-						.build(),
-				Skill.builder()
-						.name("Angular")
-						.build()
-		))).willReturn(
-				Arrays.asList(
-						Skill.builder()
-								.id("123")
-								.name("Java")
-								.build(),
-						Skill.builder()
-								.id("456")
-								.name("Spring Boot")
-								.build(),
-						Skill.builder()
-								.id("789")
-								.name("Angular")
-								.build()
-				)
+		given(skillCommandService.createNonExistentSkills(
+				argThat(
+						allOf(
+								isA(Collection.class),
+								containsInAnyOrder(
+										Skill.builder()
+												.id("123")
+												.name("Java")
+												.build(),
+										Skill.builder()
+												.id("456")
+												.name("Spring Boot")
+												.build(),
+										Skill.builder()
+												.name("Angular")
+												.build()
+								)
+						)
+				))).willReturn(
+						new HashSet<>(
+								Arrays.asList(
+										Skill.builder()
+												.id("123")
+												.name("Java")
+												.build(),
+										Skill.builder()
+												.id("456")
+												.name("Spring Boot")
+												.build(),
+										Skill.builder()
+												.id("789")
+												.name("Angular")
+												.build()
+								)
+						)
 		);
 
 		given(publicationRepository.save(
@@ -240,7 +255,7 @@ class PublicationCommandServiceTests {
 								.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
 								.userName("tester")
 								.build())),
-						hasProperty("skills", contains(
+						hasProperty("skills", containsInAnyOrder(
 								Skill.builder()
 										.id("123")
 										.name("Java")
@@ -262,7 +277,7 @@ class PublicationCommandServiceTests {
 						.publisher("The first publisher updated")
 						.date(LocalDate.of(2020, 4, 19))
 						.link("http://first-updated-link.com")
-						.skills(Arrays.asList(
+						.skills(new HashSet<>(Arrays.asList(
 								Skill.builder()
 										.id("123")
 										.name("Java")
@@ -275,7 +290,7 @@ class PublicationCommandServiceTests {
 										.id("789")
 										.name("Angular")
 										.build()
-						))
+						)))
 						.creationDatetime(LocalDateTime.of(2019, 4, 22, 13, 0))
 						.lastModifiedDatetime(LocalDateTime.of(2019, 4, 22, 13, 0))
 						.user(User.builder()
@@ -290,18 +305,20 @@ class PublicationCommandServiceTests {
 				.publisher("The first publisher updated")
 				.date(LocalDate.of(2020, 4, 19))
 				.link("http://first-updated-link.com")
-				.skills(Arrays.asList(
-						Skill.builder()
-								.id("123")
-								.name("Java")
-								.build(),
-						Skill.builder()
-								.id("456")
-								.name("Spring Boot")
-								.build(),
-						Skill.builder()
-								.name("Angular")
-								.build()
+				.skills(new HashSet<>(
+						Arrays.asList(
+								Skill.builder()
+										.id("123")
+										.name("Java")
+										.build(),
+								Skill.builder()
+										.id("456")
+										.name("Spring Boot")
+										.build(),
+								Skill.builder()
+										.name("Angular")
+										.build()
+						)
 				))
 				.build()
 		);
@@ -339,18 +356,20 @@ class PublicationCommandServiceTests {
 				.publisher("The first publisher updated")
 				.date(LocalDate.of(2020, 4, 19))
 				.link("http://first-updated-link.com")
-				.skills(Arrays.asList(
-						Skill.builder()
-								.id("123")
-								.name("Java")
-								.build(),
-						Skill.builder()
-								.id("456")
-								.name("Spring Boot")
-								.build(),
-						Skill.builder()
-								.name("Angular")
-								.build()
+				.skills(new HashSet<>(
+						Arrays.asList(
+								Skill.builder()
+										.id("123")
+										.name("Java")
+										.build(),
+								Skill.builder()
+										.id("456")
+										.name("Spring Boot")
+										.build(),
+								Skill.builder()
+										.name("Angular")
+										.build()
+						)
 				))
 				.build()
 		));
@@ -372,7 +391,7 @@ class PublicationCommandServiceTests {
 								.publisher("The first publisher")
 								.date(LocalDate.of(2019, 4, 19))
 								.link("http://first-link.com")
-								.skills(Arrays.asList(
+								.skills(new HashSet<>(Arrays.asList(
 										Skill.builder()
 												.id("123")
 												.name("Java")
@@ -381,7 +400,7 @@ class PublicationCommandServiceTests {
 												.id("456")
 												.name("Spring Boot")
 												.build()
-								))
+								)))
 								.creationDatetime(LocalDateTime.of(2019, 4, 19, 13, 0))
 								.lastModifiedDatetime(LocalDateTime.of(2019, 4, 19, 13, 0))
 								.user(User.builder()

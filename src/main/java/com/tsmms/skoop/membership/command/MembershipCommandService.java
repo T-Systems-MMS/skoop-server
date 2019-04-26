@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.UUID;
 
 import static com.tsmms.skoop.exception.enums.Model.MEMBERSHIP;

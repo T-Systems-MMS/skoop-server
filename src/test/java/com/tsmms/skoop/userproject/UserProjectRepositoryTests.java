@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.neo4j.DataNeo4jTest;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -61,6 +62,7 @@ class UserProjectRepositoryTests {
 		other = userRepository.save(other);
 
 		UserProject testerFirstProject = UserProject.builder()
+				.id(UUID.randomUUID().toString())
 				.user(tester)
 				.project(firstProject)
 				.role("QA")
@@ -68,6 +70,7 @@ class UserProjectRepositoryTests {
 				.build();
 		userProjectRepository.save(testerFirstProject);
 		UserProject testerThirdProject = UserProject.builder()
+				.id(UUID.randomUUID().toString())
 				.user(tester)
 				.project(thirdProject)
 				.role("QA")
@@ -75,12 +78,14 @@ class UserProjectRepositoryTests {
 				.build();
 		userProjectRepository.save(testerThirdProject);
 		userProjectRepository.save(UserProject.builder()
+				.id(UUID.randomUUID().toString())
 				.user(other)
 				.project(firstProject)
 				.role("Developer")
 				.tasks("Development")
 				.build());
 		userProjectRepository.save(UserProject.builder()
+				.id(UUID.randomUUID().toString())
 				.user(other)
 				.project(secondProject)
 				.role("Developer")
@@ -110,6 +115,7 @@ class UserProjectRepositoryTests {
 				.build();
 		userRepository.save(user);
 		UserProject testerProject = UserProject.builder()
+				.id(UUID.randomUUID().toString())
 				.user(user)
 				.project(project)
 				.role("QA")

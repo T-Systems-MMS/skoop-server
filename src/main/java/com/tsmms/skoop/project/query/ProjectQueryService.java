@@ -31,4 +31,9 @@ public class ProjectQueryService {
 		return projectRepository.findById(projectId);
 	}
 
+	@Transactional(readOnly = true)
+	public Optional<Project> getProjectByName(String name) {
+		return projectRepository.findByNameIgnoreCase(name);
+	}
+
 }

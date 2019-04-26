@@ -39,12 +39,12 @@ class UserProjectQueryServiceTests {
 						UserProject.builder()
 								.role("developer")
 								.tasks("development")
-								.id(732L)
+								.id("aaa")
 								.build(),
 						UserProject.builder()
 								.role("designer")
 								.tasks("design")
-								.id(733L)
+								.id("bbb")
 								.build()
 				)
 		);
@@ -55,11 +55,11 @@ class UserProjectQueryServiceTests {
 		List<UserProject> userProjectsList = userProjects.collect(toList());
 		assertThat(userProjectsList).hasSize(2);
 		UserProject userProject = userProjectsList.get(0);
-		assertThat(userProject.getId()).isEqualTo(732L);
+		assertThat(userProject.getId()).isEqualTo("aaa");
 		assertThat(userProject.getRole()).isEqualTo("developer");
 		assertThat(userProject.getTasks()).isEqualTo("development");
 		userProject = userProjectsList.get(1);
-		assertThat(userProject.getId()).isEqualTo(733L);
+		assertThat(userProject.getId()).isEqualTo("bbb");
 		assertThat(userProject.getRole()).isEqualTo("designer");
 		assertThat(userProject.getTasks()).isEqualTo("design");
 	}
@@ -71,7 +71,7 @@ class UserProjectQueryServiceTests {
 				Optional.of(UserProject.builder()
 						.role("developer")
 						.tasks("development")
-						.id(732L)
+						.id("aaa")
 						.build())
 		);
 
@@ -80,7 +80,7 @@ class UserProjectQueryServiceTests {
 		assertThat(userProject).isPresent();
 		assertThat(userProject.get().getRole()).isEqualTo("developer");
 		assertThat(userProject.get().getTasks()).isEqualTo("development");
-		assertThat(userProject.get().getId()).isEqualTo(732L);
+		assertThat(userProject.get().getId()).isEqualTo("aaa");
 	}
 
 }

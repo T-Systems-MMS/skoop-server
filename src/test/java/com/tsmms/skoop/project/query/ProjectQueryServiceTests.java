@@ -66,4 +66,19 @@ class ProjectQueryServiceTests {
 		assertThat(project.getDescription()).isEqualTo("Second project description");
 	}
 
+	@DisplayName("Get project by its name.")
+	@Test
+	void getProjectByName() {
+		given(projectRepository.findByNameIgnoreCase("Project")).willReturn(Optional.of(
+				Project.builder()
+						.id("123")
+						.name("Project")
+				.build()
+		));
+		final Optional<Project> project = projectQueryService.getProjectByName("Project");
+		assertThat(project).isNotEmpty();
+		assertThat(project.get().getId()).isEqualTo("123");
+		assertThat(project.get().getName()).isEqualTo("Project");
+	}
+
 }

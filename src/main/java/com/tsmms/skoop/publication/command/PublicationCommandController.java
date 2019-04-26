@@ -93,7 +93,7 @@ public class PublicationCommandController {
 				.date(request.getDate())
 				.link(request.getLink())
 				.publisher(request.getPublisher())
-				.skills(skillQueryService.convertSkillNamesToSkills(request.getSkills()))
+				.skills(skillQueryService.convertSkillNamesToSkillsSet(request.getSkills()))
 				.build();
 		return ResponseEntity.status(HttpStatus.OK).body(PublicationResponse.of(publicationCommandService.update(publicationId, command)));
 	}
@@ -121,7 +121,7 @@ public class PublicationCommandController {
 				.date(request.getDate())
 				.link(request.getLink())
 				.publisher(request.getPublisher())
-				.skills(skillQueryService.convertSkillNamesToSkills(request.getSkills()))
+				.skills(skillQueryService.convertSkillNamesToSkillsSet(request.getSkills()))
 				.build();
 	}
 

@@ -2,5 +2,6 @@
 	"role": "developer",
 	"tasks": "development",
 	"startDate": "2019-01-09",
-	"endDate": "2019-05-01"
+	"endDate": "2019-05-01",
+	"skills": ["Spring Boot", "Java"]
 }

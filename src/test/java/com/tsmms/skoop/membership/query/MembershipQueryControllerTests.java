@@ -15,10 +15,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.stream.Stream;
 
 import static com.tsmms.skoop.common.JwtAuthenticationFactory.withUser;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
@@ -53,7 +55,7 @@ class MembershipQueryControllerTests extends AbstractControllerTests {
 								.name("First membership")
 								.description("First membership description")
 								.link("http://first-link.com")
-								.skills(Arrays.asList(
+								.skills(new HashSet<>(Arrays.asList(
 										Skill.builder()
 												.id("123")
 												.name("Java")
@@ -62,7 +64,7 @@ class MembershipQueryControllerTests extends AbstractControllerTests {
 												.id("456")
 												.name("Spring Boot")
 												.build()
-								))
+								)))
 								.creationDatetime(LocalDateTime.of(2019, 4, 19, 13, 0))
 								.lastModifiedDatetime(LocalDateTime.of(2019, 4, 19, 13, 0))
 								.user(tester)
@@ -72,12 +74,12 @@ class MembershipQueryControllerTests extends AbstractControllerTests {
 								.name("Second membership")
 								.description("Second membership description")
 								.link("http://second-link.com")
-								.skills(Collections.singletonList(
+								.skills(new HashSet<>(Collections.singletonList(
 										Skill.builder()
 												.id("123")
 												.name("Java")
 												.build()
-								))
+								)))
 								.creationDatetime(LocalDateTime.of(2019, 4, 20, 13, 0))
 								.lastModifiedDatetime(LocalDateTime.of(2019, 4, 20, 13, 0))
 								.user(tester)
@@ -97,18 +99,15 @@ class MembershipQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[0].link", is(equalTo("http://first-link.com"))))
 				.andExpect(jsonPath("$[0].creationDatetime", is(equalTo("2019-04-19T13:00:00"))))
 				.andExpect(jsonPath("$[0].lastModifiedDatetime", is(equalTo("2019-04-19T13:00:00"))))
-				.andExpect(jsonPath("$[0].skills[0].id", is(equalTo("123"))))
-				.andExpect(jsonPath("$[0].skills[0].name", is(equalTo("Java"))))
-				.andExpect(jsonPath("$[0].skills[1].id", is(equalTo("456"))))
-				.andExpect(jsonPath("$[0].skills[1].name", is(equalTo("Spring Boot"))))
+				.andExpect(jsonPath("$[0].skills[?(@.id=='123')].name", hasItem("Java")))
+				.andExpect(jsonPath("$[0].skills[?(@.id=='456')].name", hasItem("Spring Boot")))
 				.andExpect(jsonPath("$[1].id", is(equalTo("456"))))
 				.andExpect(jsonPath("$[1].name", is(equalTo("Second membership"))))
 				.andExpect(jsonPath("$[1].description", is(equalTo("Second membership description"))))
 				.andExpect(jsonPath("$[1].link", is(equalTo("http://second-link.com"))))
 				.andExpect(jsonPath("$[1].creationDatetime", is(equalTo("2019-04-20T13:00:00"))))
 				.andExpect(jsonPath("$[1].lastModifiedDatetime", is(equalTo("2019-04-20T13:00:00"))))
-				.andExpect(jsonPath("$[1].skills[0].id", is(equalTo("123"))))
-				.andExpect(jsonPath("$[1].skills[0].name", is(equalTo("Java"))));
+				.andExpect(jsonPath("$[1].skills[?(@.id=='123')].name", hasItem("Java")));
 	}
 
 	@DisplayName("Not authenticated user cannot get user memberships.")

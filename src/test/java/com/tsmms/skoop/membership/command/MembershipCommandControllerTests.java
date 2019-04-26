@@ -18,11 +18,18 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Optional;
 
 import static com.tsmms.skoop.common.JwtAuthenticationFactory.withUser;
+import static org.hamcrest.Matchers.hasItem;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.AllOf.allOf;
+import static org.hamcrest.Matchers.isA;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -61,16 +68,21 @@ class MembershipCommandControllerTests extends AbstractControllerTests {
 		given(userQueryService.getUserById(tester.getId()))
 				.willReturn(Optional.of(tester));
 
-		given(skillQueryService.convertSkillNamesToSkills(Arrays.asList("Java", "Spring Boot")))
+		given(skillQueryService.convertSkillNamesToSkillsSet(argThat(allOf(
+				isA(Collection.class),
+				containsInAnyOrder("Java", "Spring Boot")
+		))))
 				.willReturn(
-						Arrays.asList(
-								Skill.builder()
-										.id("123")
-										.name("Java")
-										.build(),
-								Skill.builder()
-										.name("Spring Boot")
-										.build()
+						new HashSet<>(
+								Arrays.asList(
+										Skill.builder()
+												.id("123")
+												.name("Java")
+												.build(),
+										Skill.builder()
+												.name("Spring Boot")
+												.build()
+								)
 						)
 				);
 
@@ -78,7 +90,7 @@ class MembershipCommandControllerTests extends AbstractControllerTests {
 				.name("First membership")
 				.description("First membership description")
 				.link("http://first-link.com")
-				.skills(Arrays.asList(
+				.skills(new HashSet<>(Arrays.asList(
 						Skill.builder()
 								.id("123")
 								.name("Java")
@@ -86,7 +98,7 @@ class MembershipCommandControllerTests extends AbstractControllerTests {
 						Skill.builder()
 								.name("Spring Boot")
 								.build()
-				))
+				)))
 				.user(User.builder()
 						.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
 						.userName("tester")
@@ -98,7 +110,7 @@ class MembershipCommandControllerTests extends AbstractControllerTests {
 						.name("First membership")
 						.description("First membership description")
 						.link("http://first-link.com")
-						.skills(Arrays.asList(
+						.skills(new HashSet<>(Arrays.asList(
 								Skill.builder()
 										.id("123")
 										.name("Java")
@@ -107,7 +119,7 @@ class MembershipCommandControllerTests extends AbstractControllerTests {
 										.id("456")
 										.name("Spring Boot")
 										.build()
-						))
+						)))
 						.creationDatetime(LocalDateTime.of(2019, 4, 19, 13, 0))
 						.lastModifiedDatetime(LocalDateTime.of(2019, 4, 19, 13, 0))
 						.user(User.builder()
@@ -184,8 +196,32 @@ class MembershipCommandControllerTests extends AbstractControllerTests {
 
 		final ClassPathResource body = new ClassPathResource("membership/update-membership.json");
 
-		given(skillQueryService.convertSkillNamesToSkills(Arrays.asList("Java", "Spring Boot", "Angular")))
-				.willReturn(
+		given(skillQueryService.convertSkillNamesToSkillsSet(argThat(allOf(
+				isA(Collection.class),
+				containsInAnyOrder("Java", "Spring Boot", "Angular")
+		)))).willReturn(
+						new HashSet<>(
+								Arrays.asList(
+										Skill.builder()
+												.id("123")
+												.name("Java")
+												.build(),
+										Skill.builder()
+												.id("456")
+												.name("Spring Boot")
+												.build(),
+										Skill.builder()
+												.name("Angular")
+												.build()
+								)
+						)
+				);
+
+		given(membershipCommandService.update("123", MembershipUpdateCommand.builder()
+				.name("First membership updated")
+				.description("First membership description updated")
+				.link("http://first-updated-link.com")
+				.skills(new HashSet<>(
 						Arrays.asList(
 								Skill.builder()
 										.id("123")
@@ -199,24 +235,6 @@ class MembershipCommandControllerTests extends AbstractControllerTests {
 										.name("Angular")
 										.build()
 						)
-				);
-
-		given(membershipCommandService.update("123", MembershipUpdateCommand.builder()
-				.name("First membership updated")
-				.description("First membership description updated")
-				.link("http://first-updated-link.com")
-				.skills(Arrays.asList(
-						Skill.builder()
-								.id("123")
-								.name("Java")
-								.build(),
-						Skill.builder()
-								.id("456")
-								.name("Spring Boot")
-								.build(),
-						Skill.builder()
-								.name("Angular")
-								.build()
 				))
 				.build()
 		)).willReturn(
@@ -225,7 +243,7 @@ class MembershipCommandControllerTests extends AbstractControllerTests {
 						.name("First membership updated")
 						.description("First membership description updated")
 						.link("http://first-updated-link.com")
-						.skills(Arrays.asList(
+						.skills(new HashSet<>(Arrays.asList(
 								Skill.builder()
 										.id("123")
 										.name("Java")
@@ -238,7 +256,7 @@ class MembershipCommandControllerTests extends AbstractControllerTests {
 										.id("789")
 										.name("Angular")
 										.build()
-						))
+						)))
 						.creationDatetime(LocalDateTime.of(2019, 4, 22, 13, 0))
 						.lastModifiedDatetime(LocalDateTime.of(2019, 4, 22, 13, 0))
 						.user(tester)
@@ -260,12 +278,9 @@ class MembershipCommandControllerTests extends AbstractControllerTests {
 					.andExpect(jsonPath("$.creationDatetime", is(equalTo("2019-04-22T13:00:00"))))
 					.andExpect(jsonPath("$.lastModifiedDatetime", is(equalTo("2019-04-22T13:00:00"))))
 					.andExpect(jsonPath("$.link", is(equalTo("http://first-updated-link.com"))))
-					.andExpect(jsonPath("$.skills[0].id", is(equalTo("123"))))
-					.andExpect(jsonPath("$.skills[0].name", is(equalTo("Java"))))
-					.andExpect(jsonPath("$.skills[1].id", is(equalTo("456"))))
-					.andExpect(jsonPath("$.skills[1].name", is(equalTo("Spring Boot"))))
-					.andExpect(jsonPath("$.skills[2].id", is(equalTo("789"))))
-					.andExpect(jsonPath("$.skills[2].name", is(equalTo("Angular"))));
+					.andExpect(jsonPath("$.skills[?(@.id=='123')].name", hasItem("Java")))
+					.andExpect(jsonPath("$.skills[?(@.id=='456')].name", hasItem("Spring Boot")))
+					.andExpect(jsonPath("$.skills[?(@.id=='789')].name", hasItem("Angular")));
 		}
 	}
 

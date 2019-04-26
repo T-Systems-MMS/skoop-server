@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -29,6 +30,6 @@ public class TestimonialRequest {
 	@NotEmpty
 	private String comment;
 	@ApiModelProperty("Skills linked to the testimonial.")
-	private List<String> skills;
+	private Set<String> skills;
 
 }

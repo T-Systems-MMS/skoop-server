@@ -14,10 +14,11 @@ import lombok.NoArgsConstructor;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.tsmms.skoop.skill.SkillResponse.convertSkillListToSkillResponseSet;
 import static com.tsmms.skoop.user.UserSimpleResponse.convertUserListToUserSimpleResponseList;
-import static com.tsmms.skoop.skill.SkillResponse.convertSkillListToSkillResponseList;
 import static com.tsmms.skoop.community.link.LinkResponse.convertLinkListToLinkResponseList;
 
 @Data
@@ -49,7 +50,7 @@ public class CommunityResponse {
 	private List<UserSimpleResponse> managers;
 
 	@ApiModelProperty("List of skills associated with a community.")
-	private List<SkillResponse> skills;
+	private Set<SkillResponse> skills;
 
 	public static CommunityResponse of(Community community) {
 		if (community == null) {
@@ -62,7 +63,7 @@ public class CommunityResponse {
 				.description(community.getDescription())
 				.links(convertLinkListToLinkResponseList(community.getLinks()))
 				.managers(convertUserListToUserSimpleResponseList(getManagers(community.getCommunityUsers())))
-				.skills(convertSkillListToSkillResponseList(community.getSkills()))
+				.skills(convertSkillListToSkillResponseSet(community.getSkills()))
 				.build();
 	}
 

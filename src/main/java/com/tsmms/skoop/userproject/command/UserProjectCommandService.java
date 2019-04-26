@@ -3,7 +3,9 @@ package com.tsmms.skoop.userproject.command;
 import com.tsmms.skoop.exception.DuplicateResourceException;
 import com.tsmms.skoop.exception.NoSuchResourceException;
 import com.tsmms.skoop.project.Project;
+import com.tsmms.skoop.project.command.ProjectCommandService;
 import com.tsmms.skoop.project.query.ProjectQueryService;
+import com.tsmms.skoop.skill.command.SkillCommandService;
 import com.tsmms.skoop.user.User;
 import com.tsmms.skoop.user.query.UserQueryService;
 import com.tsmms.skoop.exception.enums.Model;
@@ -14,45 +16,51 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import static com.tsmms.skoop.exception.enums.Model.USER;
 import static com.tsmms.skoop.exception.enums.Model.USER_PROJECT;
 import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 
 @Service
 public class UserProjectCommandService {
 
 	private final UserProjectRepository userProjectRepository;
 	private final ProjectQueryService projectQueryService;
+	private final ProjectCommandService projectCommandService;
 	private final UserQueryService userQueryService;
+	private final SkillCommandService skillCommandService;
 
-	public UserProjectCommandService(UserProjectRepository userProjectRepository, ProjectQueryService projectQueryService, UserQueryService userQueryService) {
-		this.userProjectRepository = userProjectRepository;
-		this.projectQueryService = projectQueryService;
-		this.userQueryService = userQueryService;
+	public UserProjectCommandService(UserProjectRepository userProjectRepository, ProjectQueryService projectQueryService, UserQueryService userQueryService,
+									 SkillCommandService skillCommandService,
+									 ProjectCommandService projectCommandService) {
+		this.userProjectRepository = requireNonNull(userProjectRepository);
+		this.projectQueryService = requireNonNull(projectQueryService);
+		this.userQueryService = requireNonNull(userQueryService);
+		this.skillCommandService = requireNonNull(skillCommandService);
+		this.projectCommandService = requireNonNull(projectCommandService);
 	}
 
 	@Transactional
 	@PreAuthorize("isPrincipalUserId(#userId)")
-	public UserProject assignProjectToUser(String projectId, String userId, UserProject userProject) {
-		final Project project = projectQueryService.getProjectById(projectId).orElseThrow(() -> {
-			String[] searchParamsMap = {"id", projectId};
-			return NoSuchResourceException.builder()
-					.model(Model.PROJECT)
-					.searchParamsMap(searchParamsMap)
-					.build();
-		});
+	public UserProject assignProjectToUser(String projectName, String userId, UserProject userProject) {
+		final Project project = projectQueryService.getProjectByName(projectName).orElseGet(() -> projectCommandService.create(Project.builder()
+				.name(projectName)
+				.build()
+		));
 		final User user = userQueryService.getUserById(userId).orElseThrow(() -> NoSuchResourceException.builder()
 				.model(USER)
 				.searchParamsMap(new String[]{"id", userId})
 				.build());
-		userProjectRepository.findByUserIdAndProjectId(userId, projectId).ifPresent(up -> {
+		userProjectRepository.findByUserIdAndProjectId(userId, project.getId()).ifPresent(up -> {
 			throw DuplicateResourceException.builder()
-					.message(format("User-project relationship with user id '%s' and project id '%s' already exists", userId, projectId))
+					.message(format("User-project relationship with user id '%s' and project id '%s' already exists", userId, project.getId()))
 					.build();
 		});
 		userProject.setProject(project);
 		userProject.setUser(user);
+		userProject.setSkills(skillCommandService.createNonExistentSkills(userProject.getSkills()));
 		return save(userProject);
 	}
 
@@ -68,11 +76,13 @@ public class UserProjectCommandService {
 		userProject.setTasks(command.getTasks());
 		userProject.setStartDate(command.getStartDate());
 		userProject.setEndDate(command.getEndDate());
+		userProject.setSkills(skillCommandService.createNonExistentSkills(command.getSkills()));
 		return save(userProject);
 	}
 
 	private UserProject save(UserProject userProject) {
 		final LocalDateTime now = LocalDateTime.now();
+		userProject.setId(UUID.randomUUID().toString());
 		userProject.setCreationDate(now);
 		userProject.setLastModifiedDate(now);
 		return userProjectRepository.save(userProject);
