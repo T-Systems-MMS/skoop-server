@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
+import java.util.UUID;
 
 import static com.tsmms.skoop.exception.enums.Model.USER;
 import static com.tsmms.skoop.exception.enums.Model.USER_PROJECT;
@@ -60,7 +60,7 @@ public class UserProjectCommandService {
 		});
 		userProject.setProject(project);
 		userProject.setUser(user);
-		userProject.setSkills(new HashSet<>(skillCommandService.createNonExistentSkills(userProject.getSkills())));
+		userProject.setSkills(skillCommandService.createNonExistentSkills(userProject.getSkills()));
 		return save(userProject);
 	}
 
@@ -76,12 +76,13 @@ public class UserProjectCommandService {
 		userProject.setTasks(command.getTasks());
 		userProject.setStartDate(command.getStartDate());
 		userProject.setEndDate(command.getEndDate());
-		userProject.setSkills(new HashSet<>(skillCommandService.createNonExistentSkills(command.getSkills())));
+		userProject.setSkills(skillCommandService.createNonExistentSkills(command.getSkills()));
 		return save(userProject);
 	}
 
 	private UserProject save(UserProject userProject) {
 		final LocalDateTime now = LocalDateTime.now();
+		userProject.setId(UUID.randomUUID().toString());
 		userProject.setCreationDate(now);
 		userProject.setLastModifiedDate(now);
 		return userProjectRepository.save(userProject);

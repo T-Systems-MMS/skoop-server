@@ -17,11 +17,13 @@ import org.springframework.boot.test.autoconfigure.data.neo4j.DataNeo4jTest;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -119,14 +121,16 @@ class CommunityRepositoryTests {
 						.title("Java User Group")
 						.type(CommunityType.OPEN)
 						.description("Community for Java developers")
-						.skills(Arrays.asList(Skill.builder()
-										.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
-										.name("Spring Boot")
-										.build(),
-								Skill.builder()
-										.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
-										.name("Angular")
-										.build()))
+						.skills(new HashSet<>(
+								Arrays.asList(Skill.builder()
+												.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
+												.name("Spring Boot")
+												.build(),
+										Skill.builder()
+												.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
+												.name("Angular")
+												.build())
+						))
 						.build()
 		);
 		// When
@@ -217,7 +221,7 @@ class CommunityRepositoryTests {
 						.id(UUID.randomUUID().toString())
 						.title("Java User Group")
 						.description("Group for Java developers")
-						.skills(Arrays.asList(springBoot, angular))
+						.skills(new HashSet<>(Arrays.asList(springBoot, angular)))
 						.type(CommunityType.OPEN)
 						.build()
 		);
@@ -227,7 +231,7 @@ class CommunityRepositoryTests {
 						.id(UUID.randomUUID().toString())
 						.title("Frontend developers")
 						.description("Group for frontend developers")
-						.skills(singletonList(angular))
+						.skills(singleton(angular))
 						.type(CommunityType.OPEN)
 						.build()
 		);

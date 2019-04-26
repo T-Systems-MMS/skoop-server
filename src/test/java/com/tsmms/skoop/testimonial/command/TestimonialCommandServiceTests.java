@@ -65,15 +65,17 @@ class TestimonialCommandServiceTests {
 						)
 				))))
 				.willReturn(
-						Arrays.asList(
-								Skill.builder()
-										.id("123")
-										.name("Java")
-										.build(),
-								Skill.builder()
-										.id("456")
-										.name("Spring Boot")
-										.build()
+						new HashSet<>(
+								Arrays.asList(
+										Skill.builder()
+												.id("123")
+												.name("Java")
+												.build(),
+										Skill.builder()
+												.id("456")
+												.name("Spring Boot")
+												.build()
+								)
 						)
 				);
 		given(testimonialRepository.save(
@@ -183,20 +185,24 @@ class TestimonialCommandServiceTests {
 								.name("Angular")
 								.build()
 				)
-		)))).willReturn(Arrays.asList(
-				Skill.builder()
-						.id("123")
-						.name("Java")
-						.build(),
-				Skill.builder()
-						.id("456")
-						.name("Spring Boot")
-						.build(),
-				Skill.builder()
-						.id("789")
-						.name("Angular")
-						.build()
-		));
+		)))).willReturn(
+				new HashSet<>(
+						Arrays.asList(
+								Skill.builder()
+										.id("123")
+										.name("Java")
+										.build(),
+								Skill.builder()
+										.id("456")
+										.name("Spring Boot")
+										.build(),
+								Skill.builder()
+										.id("789")
+										.name("Angular")
+										.build()
+						)
+				)
+		);
 		given(testimonialRepository.findById("abc"))
 				.willReturn(
 						Optional.of(

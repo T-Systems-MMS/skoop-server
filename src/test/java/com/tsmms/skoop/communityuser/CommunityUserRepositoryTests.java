@@ -19,6 +19,7 @@ import org.springframework.boot.test.autoconfigure.data.neo4j.DataNeo4jTest;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -483,7 +484,7 @@ class CommunityUserRepositoryTests {
 						.id("123")
 						.title("Java User Group")
 						.description("Group for Java developers")
-						.skills(Arrays.asList(springBoot, angular))
+						.skills(new HashSet<>(Arrays.asList(springBoot, angular)))
 						.type(CommunityType.OPEN)
 						.build()
 		);
@@ -493,7 +494,7 @@ class CommunityUserRepositoryTests {
 						.id(UUID.randomUUID().toString())
 						.title("Frontend developers")
 						.description("Group for frontend developers")
-						.skills(singletonList(angular))
+						.skills(new HashSet<>(singletonList(angular)))
 						.type(CommunityType.OPEN)
 						.build()
 		);

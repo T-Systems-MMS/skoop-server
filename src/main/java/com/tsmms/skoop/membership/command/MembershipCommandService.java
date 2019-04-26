@@ -31,7 +31,7 @@ public class MembershipCommandService {
 		membership.setId(UUID.randomUUID().toString());
 		membership.setCreationDatetime(now);
 		membership.setLastModifiedDatetime(now);
-		membership.setSkills(new HashSet<>(skillCommandService.createNonExistentSkills(membership.getSkills())));
+		membership.setSkills(skillCommandService.createNonExistentSkills(membership.getSkills()));
 		return membershipRepository.save(membership);
 	}
 
@@ -54,7 +54,7 @@ public class MembershipCommandService {
 		membership.setLink(command.getLink());
 		membership.setDescription(command.getDescription());
 		membership.setName(command.getName());
-		membership.setSkills(new HashSet<>(skillCommandService.createNonExistentSkills(command.getSkills())));
+		membership.setSkills(skillCommandService.createNonExistentSkills(command.getSkills()));
 		return membershipRepository.save(membership);
 	}
 

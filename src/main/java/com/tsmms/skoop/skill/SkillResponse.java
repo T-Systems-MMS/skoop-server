@@ -4,7 +4,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -51,10 +50,6 @@ public class SkillResponse {
 		else {
 			return Optional.empty();
 		}
-	}
-
-	public static List<SkillResponse> convertSkillListToSkillResponseList(List<Skill> skills) {
-		return SkillResponse.<List<SkillResponse>>convertSkillCollectionToSkillResponseCollection(ArrayList::new, skills).orElse(Collections.emptyList());
 	}
 
 	public static Set<SkillResponse> convertSkillListToSkillResponseSet(Set<Skill> skills) {

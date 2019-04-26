@@ -18,6 +18,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import static org.neo4j.ogm.annotation.Relationship.UNDIRECTED;
 
@@ -56,6 +57,6 @@ public class Community {
 	@ToString.Exclude
 	@EqualsAndHashCode.Exclude
 	@Relationship(type = "RELATES_TO", direction = Relationship.OUTGOING)
-	private List<Skill> skills;
+	private Set<Skill> skills;
 
 }

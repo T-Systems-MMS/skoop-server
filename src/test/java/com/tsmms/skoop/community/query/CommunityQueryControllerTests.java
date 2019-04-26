@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -90,7 +91,7 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 										.build()))
 								.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
 								.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
-								.skills(Arrays.asList(springBootSkill, angularSkill))
+								.skills(new HashSet<>(Arrays.asList(springBootSkill, angularSkill)))
 								.build(),
 						Community.builder()
 								.id("456")
@@ -113,7 +114,7 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 										.build()))
 								.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
 								.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
-								.skills(Arrays.asList(springBootSkill, javascriptSkill))
+								.skills(new HashSet<>(Arrays.asList(springBootSkill, javascriptSkill)))
 								.build()
 				)
 		);
@@ -195,7 +196,7 @@ class CommunityQueryControllerTests extends AbstractControllerTests {
 										.build()))
 								.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
 								.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
-								.skills(Arrays.asList(springBootSkill, angularSkill))
+								.skills(new HashSet<>(Arrays.asList(springBootSkill, angularSkill)))
 								.build()
 				)
 		);

@@ -66,15 +66,17 @@ class MembershipCommandServiceTests {
 						.build()
 				))
 		))).willReturn(
-				Arrays.asList(
-						Skill.builder()
-								.id("123")
-								.name("Java")
-								.build(),
-						Skill.builder()
-								.id("456")
-								.name("Spring Boot")
-								.build()
+				new HashSet<>(
+						Arrays.asList(
+								Skill.builder()
+										.id("123")
+										.name("Java")
+										.build(),
+								Skill.builder()
+										.id("456")
+										.name("Spring Boot")
+										.build()
+						)
 				)
 		);
 
@@ -213,19 +215,21 @@ class MembershipCommandServiceTests {
 								.build()
 				)
 		)))).willReturn(
-				Arrays.asList(
-						Skill.builder()
-								.id("123")
-								.name("Java")
-								.build(),
-						Skill.builder()
-								.id("456")
-								.name("Spring Boot")
-								.build(),
-						Skill.builder()
-								.id("789")
-								.name("Angular")
-								.build()
+				new HashSet<>(
+						Arrays.asList(
+								Skill.builder()
+										.id("123")
+										.name("Java")
+										.build(),
+								Skill.builder()
+										.id("456")
+										.name("Spring Boot")
+										.build(),
+								Skill.builder()
+										.id("789")
+										.name("Angular")
+										.build()
+						)
 				)
 		);
 

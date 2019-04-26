@@ -24,7 +24,7 @@ import static com.tsmms.skoop.skill.SkillResponse.convertSkillListToSkillRespons
 public class UserProjectResponse {
 
 	@ApiModelProperty("An identifier of a relationship")
-	private Long id;
+	private String id;
 
 	@ApiModelProperty("Role the user has/had working on the project")
 	private String role;

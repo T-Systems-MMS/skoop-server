@@ -6,7 +6,6 @@ import com.tsmms.skoop.skill.SkillRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -80,11 +79,6 @@ public class SkillQueryService {
 		else {
 			return Optional.empty();
 		}
-	}
-
-	@Transactional(readOnly = true)
-	public List<Skill> convertSkillNamesToSkillsList(Collection<String> skillNames) {
-		return this.<List<Skill>>convertSkillNamesToSkills(ArrayList::new, skillNames).orElse(Collections.emptyList());
 	}
 
 	@Transactional(readOnly = true)

@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -88,7 +87,7 @@ public class CommunityCommandService {
 		community.setCreationDate(now);
 		community.setLastModifiedDate(now);
 		community.setId(UUID.randomUUID().toString());
-		community.setSkills(new ArrayList<>(skillCommandService.createNonExistentSkills(community.getSkills())));
+		community.setSkills(skillCommandService.createNonExistentSkills(community.getSkills()));
 		final Community c = communityRepository.save(community);
 		final User user = userQueryService.getUserById(currentUserService.getCurrentUserId()).orElseThrow(() -> NoSuchResourceException.builder()
 				.model(Model.USER)
@@ -126,10 +125,10 @@ public class CommunityCommandService {
 			p.setDescription(community.getDescription());
 		}
 		if (!CollectionUtils.isEqualCollection(
-				Optional.ofNullable(p.getSkills()).orElse(Collections.emptyList()),
-				Optional.ofNullable(community.getSkills()).orElse(Collections.emptyList()))) {
+				Optional.ofNullable(p.getSkills()).orElse(Collections.emptySet()),
+				Optional.ofNullable(community.getSkills()).orElse(Collections.emptySet()))) {
 			changedCommunityDetails.add(CommunityDetails.SKILLS);
-			p.setSkills(new ArrayList<>(skillCommandService.createNonExistentSkills(community.getSkills())));
+			p.setSkills(skillCommandService.createNonExistentSkills(community.getSkills()));
 		}
 		if (!CollectionUtils.isEqualCollection(
 				Optional.ofNullable(p.getLinks()).orElse(Collections.emptyList()),

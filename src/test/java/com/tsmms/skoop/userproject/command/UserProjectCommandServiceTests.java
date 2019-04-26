@@ -54,6 +54,7 @@ class UserProjectCommandServiceTests {
 	@DisplayName("Assigns project to user")
 	void assignsProjectToUser() {
 		UserProject userProject = UserProject.builder()
+				.id("aaa")
 				.role("QA")
 				.tasks("testing")
 				.user(User.builder()
@@ -90,6 +91,7 @@ class UserProjectCommandServiceTests {
 						.build())
 				.build());
 		assertThat(userProject).isNotNull();
+		assertThat(userProject.getId()).isNotEmpty();
 		assertThat(userProject.getRole()).isEqualTo("QA");
 		assertThat(userProject.getTasks()).isEqualTo("testing");
 		assertThat(userProject.getProject()).isNotNull();
@@ -129,6 +131,7 @@ class UserProjectCommandServiceTests {
 		given(userProjectRepository.save(ArgumentMatchers.isA(UserProject.class))).willReturn(userProject);
 		final UserProject result = userProjectCommandService.assignProjectToUser("Project", "123", userProject);
 		assertThat(result).isNotNull();
+		assertThat(result.getId()).isNotEmpty();
 		assertThat(result.getRole()).isEqualTo("QA");
 		assertThat(result.getTasks()).isEqualTo("testing");
 		assertThat(result.getProject()).isNotNull();
@@ -181,7 +184,7 @@ class UserProjectCommandServiceTests {
 						.build()
 		));
 		given(userProjectRepository.findByUserIdAndProjectId("123", "ABC")).willReturn(Optional.of(UserProject.builder()
-				.id(1L)
+				.id("aaa")
 				.role("developer")
 				.tasks("development")
 				.build()));
@@ -213,7 +216,7 @@ class UserProjectCommandServiceTests {
 	void userProjectIsUpdated() {
 		given(userProjectRepository.findByUserIdAndProjectId("123", "ABC")).willReturn(Optional.of(
 				UserProject.builder()
-						.id(1L)
+						.id("aaa")
 						.project(Project.builder()
 								.id("ABC")
 								.name("Project")
@@ -231,6 +234,7 @@ class UserProjectCommandServiceTests {
 		));
 		given(userProjectRepository.save(ArgumentMatchers.isA(UserProject.class))).willReturn(
 			UserProject.builder()
+					.id("aaa")
 					.role("developer")
 					.tasks("development")
 					.startDate(LocalDate.of(2019, 1, 10))

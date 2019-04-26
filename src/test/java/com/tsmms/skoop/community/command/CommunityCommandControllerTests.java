@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -67,19 +68,21 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 				.build();
 		final ClassPathResource body = new ClassPathResource("community/create-community.json");
 
-		given(skillQueryService.convertSkillNamesToSkillsList(Arrays.asList("Spring Boot", "Angular", "Spring MVC"))).willReturn(
-				Arrays.asList(
-						Skill.builder()
-								.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
-								.name("Spring Boot")
-								.build(),
-						Skill.builder()
-								.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
-								.name("Angular")
-								.build(),
-						Skill.builder()
-								.name("Spring MVC")
-								.build()
+		given(skillQueryService.convertSkillNamesToSkillsSet(new HashSet<>(Arrays.asList("Spring Boot", "Angular", "Spring MVC")))).willReturn(
+				new HashSet<>(
+						Arrays.asList(
+								Skill.builder()
+										.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
+										.name("Spring Boot")
+										.build(),
+								Skill.builder()
+										.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
+										.name("Angular")
+										.build(),
+								Skill.builder()
+										.name("Spring MVC")
+										.build()
+						)
 				)
 		);
 
@@ -111,18 +114,20 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 								.href("https://www.linkedin.com/java-user-group")
 								.build()
 				))
-				.skills(Arrays.asList(Skill.builder()
-						.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
-						.name("Spring Boot")
-						.build(),
-						Skill.builder()
-						.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
-						.name("Angular")
-						.build(),
-						Skill.builder()
-						.name("Spring MVC")
-						.build()
-						))
+				.skills(new HashSet<>(
+						Arrays.asList(Skill.builder()
+										.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
+										.name("Spring Boot")
+										.build(),
+								Skill.builder()
+										.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
+										.name("Angular")
+										.build(),
+								Skill.builder()
+										.name("Spring MVC")
+										.build()
+						)
+				))
 				.build();
 		given(communityCommandService.create(community, Arrays.asList(
 				User.builder()
@@ -151,18 +156,20 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 						))
 						.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
 						.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
-						.skills(Arrays.asList(Skill.builder()
-										.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
-										.name("Spring Boot")
-										.build(),
-								Skill.builder()
-										.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
-										.name("Angular")
-										.build(),
-								Skill.builder()
-										.id("dce8b8c9-cd49-4a87-8cd2-4ca106dcf7f3")
-										.name("Spring MVC")
-										.build()))
+						.skills(new HashSet<>(
+								Arrays.asList(Skill.builder()
+												.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
+												.name("Spring Boot")
+												.build(),
+										Skill.builder()
+												.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
+												.name("Angular")
+												.build(),
+										Skill.builder()
+												.id("dce8b8c9-cd49-4a87-8cd2-4ca106dcf7f3")
+												.name("Spring MVC")
+												.build())
+						))
 						.communityUsers(singletonList(CommunityUser.builder()
 								.user(owner)
 								.role(CommunityRole.MANAGER)
@@ -310,17 +317,19 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 								.href("https://www.linkedin.com/java-user-group")
 								.build()
 				))
-				.skills(Arrays.asList(Skill.builder()
-								.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
-								.name("Spring Boot")
-								.build(),
-						Skill.builder()
-								.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
-								.name("Angular")
-								.build(),
-						Skill.builder()
-								.name("Spring MVC")
-								.build()))
+				.skills(new HashSet<>(
+						Arrays.asList(Skill.builder()
+										.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
+										.name("Spring Boot")
+										.build(),
+								Skill.builder()
+										.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
+										.name("Angular")
+										.build(),
+								Skill.builder()
+										.name("Spring MVC")
+										.build())
+				))
 				.build();
 		given(communityCommandService.update(community)).willReturn(
 				Community.builder()
@@ -338,18 +347,20 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 										.href("https://www.linkedin.com/java-user-group")
 										.build()
 						))
-						.skills(Arrays.asList(Skill.builder()
-								.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
-								.name("Spring Boot")
-								.build(),
-								Skill.builder()
-										.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
-										.name("Angular")
-										.build(),
-								Skill.builder()
-										.id("dce8b8c9-cd49-4a87-8cd2-4ca106dcf7f3")
-										.name("Spring MVC")
-										.build()))
+						.skills(new HashSet<>(
+								Arrays.asList(Skill.builder()
+												.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
+												.name("Spring Boot")
+												.build(),
+										Skill.builder()
+												.id("6d0870d0-a7b8-4cf4-8a24-bedcfe350903")
+												.name("Angular")
+												.build(),
+										Skill.builder()
+												.id("dce8b8c9-cd49-4a87-8cd2-4ca106dcf7f3")
+												.name("Spring MVC")
+												.build())
+						))
 						.communityUsers(singletonList(CommunityUser.builder()
 								.user(owner)
 								.role(CommunityRole.MANAGER)

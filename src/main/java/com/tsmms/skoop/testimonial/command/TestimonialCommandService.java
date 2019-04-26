@@ -8,8 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.UUID;
 
 import static java.util.Objects.requireNonNull;
@@ -33,7 +31,7 @@ public class TestimonialCommandService {
 		testimonial.setId(UUID.randomUUID().toString());
 		testimonial.setCreationDatetime(now);
 		testimonial.setLastModifiedDatetime(now);
-		testimonial.setSkills(new HashSet<>(skillCommandService.createNonExistentSkills(testimonial.getSkills())));
+		testimonial.setSkills(skillCommandService.createNonExistentSkills(testimonial.getSkills()));
 		return testimonialRepository.save(testimonial);
 	}
 
@@ -55,7 +53,7 @@ public class TestimonialCommandService {
 		testimonial.setLastModifiedDatetime(LocalDateTime.now());
 		testimonial.setAuthor(command.getAuthor());
 		testimonial.setComment(command.getComment());
-		testimonial.setSkills(new HashSet<>(skillCommandService.createNonExistentSkills(command.getSkills())));
+		testimonial.setSkills(skillCommandService.createNonExistentSkills(command.getSkills()));
 		return testimonialRepository.save(testimonial);
 	}
 

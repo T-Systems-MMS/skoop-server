@@ -20,8 +20,10 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.stream.Stream;
 
+import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -88,7 +90,7 @@ class UserCommunityControllerTests extends AbstractControllerTests {
 										.build()))
 								.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
 								.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
-								.skills(Arrays.asList(springBootSkill, angularSkill))
+								.skills(new HashSet<>(Arrays.asList(springBootSkill, angularSkill)))
 								.build(),
 						Community.builder()
 								.id("456")
@@ -111,7 +113,7 @@ class UserCommunityControllerTests extends AbstractControllerTests {
 								))
 								.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
 								.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
-								.skills(Arrays.asList(springBootSkill, javascriptSkill))
+								.skills(new HashSet<>(Arrays.asList(springBootSkill, javascriptSkill)))
 								.build()
 				)
 		);
@@ -174,7 +176,7 @@ class UserCommunityControllerTests extends AbstractControllerTests {
 										.build()))
 								.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
 								.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
-								.skills(singletonList(Skill.builder()
+								.skills(singleton(Skill.builder()
 										.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
 										.name("Spring Boot")
 										.build()))
@@ -200,7 +202,7 @@ class UserCommunityControllerTests extends AbstractControllerTests {
 								))
 								.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
 								.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
-								.skills(singletonList(Skill.builder()
+								.skills(singleton(Skill.builder()
 										.id("4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
 										.name("Spring Boot")
 										.build()))

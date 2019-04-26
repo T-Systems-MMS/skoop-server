@@ -30,8 +30,8 @@ import java.util.Set;
 public class UserProject {
 
 	@Id
-	@GeneratedValue
-	private Long id;
+	@Property(name = "id")
+	private String id;
 
 	@Property(name = "role")
 	private String role;
