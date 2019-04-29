@@ -57,6 +57,7 @@ public class UserPermissionCommandController {
 								.map(userPermissionRequest -> UserPermissionEntry.builder()
 										.scope(userPermissionRequest.getScope())
 										.authorizedUserIds(userPermissionRequest.getAuthorizedUserIds())
+										.allUsersAuthorized(userPermissionRequest.isAllUsersAuthorized())
 										.build())
 								.collect(toList()))
 						.build())

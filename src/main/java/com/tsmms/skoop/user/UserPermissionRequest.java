@@ -25,4 +25,7 @@ public class UserPermissionRequest {
 
 	@ApiModelProperty("IDs of the users to grant the permission to.")
 	private List<String> authorizedUserIds;
+
+	@ApiModelProperty("Is all users authorized.")
+	private boolean allUsersAuthorized;
 }

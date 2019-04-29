@@ -21,7 +21,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import java.util.List;
 import java.util.Set;
 
-import static com.tsmms.skoop.user.UserPermissionScope.READ_USER_SKILLS;
+import static com.tsmms.skoop.user.UserPermissionScope.READ_USER_PROFILE;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
@@ -50,7 +50,7 @@ public class UserQueryController {
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping(path = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<UserResponse> getUsers(@ApiIgnore @AuthenticationPrincipal Jwt jwt) {
-		final Set<String> allowedUserIds = getIdsOfUsersWhoGrantedPermissionToReadSkills(jwt);
+		final Set<String> allowedUserIds = getIdsOfUsersWhoGrantedPermissionToReadProfile(jwt);
 		return userQueryService.getUsers()
 				.map(user -> convertUserToUserResponse(user, allowedUserIds))
 				.collect(toList());
@@ -67,13 +67,11 @@ public class UserQueryController {
 			@ApiResponse(code = 404, message = "Resource not found"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("isAuthenticated()")
+	@PreAuthorize("isAuthenticated() and (isPrincipalUserId(#userId) or hasUserPermission(#userId, 'READ_USER_PROFILE'))")
 	@GetMapping(path = "/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public UserResponse getUserById(@PathVariable("userId") String userId,
-									@ApiIgnore @AuthenticationPrincipal Jwt jwt) {
-		final Set<String> allowedUserIds = getIdsOfUsersWhoGrantedPermissionToReadSkills(jwt);
+	public UserResponse getUserById(@PathVariable("userId") String userId) {
 		return userQueryService.getUserById(userId)
-				.map(user -> convertUserToUserResponse(user, allowedUserIds))
+				.map(UserResponse::of)
 				.orElseThrow(() -> {
 					String[] searchParamsMap = {"id", userId};
 					return NoSuchResourceException.builder()
@@ -115,9 +113,9 @@ public class UserQueryController {
 	 * @param jwt - JWT of authenticated user
 	 * @return ids of allowed users
 	 */
-	private Set<String> getIdsOfUsersWhoGrantedPermissionToReadSkills(Jwt jwt) {
+	private Set<String> getIdsOfUsersWhoGrantedPermissionToReadProfile(Jwt jwt) {
 		final Set<String> allowedUserIds = userPermissionQueryService.getUsersWhoGrantedPermission(
-				jwt.getClaimAsString(JwtClaims.SKOOP_USER_ID), READ_USER_SKILLS).map(User::getId).collect(toSet());
+				jwt.getClaimAsString(JwtClaims.SKOOP_USER_ID), READ_USER_PROFILE).map(User::getId).collect(toSet());
 		allowedUserIds.add(jwt.getClaimAsString(JwtClaims.SKOOP_USER_ID));
 		return allowedUserIds;
 	}

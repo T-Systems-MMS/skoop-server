@@ -17,5 +17,6 @@ public class ReplaceUserPermissionListCommand {
 	public static class UserPermissionEntry {
 		private UserPermissionScope scope;
 		private List<String> authorizedUserIds;
+		private boolean allUsersAuthorized;
 	}
 }
