@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 public interface UserPermissionRepository extends Neo4jRepository<UserPermission, String> {
 	Iterable<UserPermission> findByOwnerId(String ownerId);
 
-	Long deleteByOwnerId(String ownerId);
+	Long deleteByOwnerIdAndScope(String ownerId, UserPermissionScope scope);
 
 	Iterable<UserPermission> findByAuthorizedUsersId(String authorizedUserId);
 

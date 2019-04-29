@@ -28,13 +28,16 @@ public class UserPermissionCommandService {
 	public Stream<UserPermission> replaceOutboundUserPermissions(ReplaceUserPermissionListCommand command) {
 		// Create mapping for each scope to the authorized users (merges potential duplicate scope entries).
 		final EnumMap<UserPermissionScope, Set<String>> scopeAuthorizedUsers = new EnumMap<>(UserPermissionScope.class);
+		final EnumMap<UserPermissionScope, Boolean> allUsersAuthorized = new EnumMap<>(UserPermissionScope.class);
 		command.getUserPermissions().forEach(userPermissionEntry -> {
 			if (userPermissionEntry.isAllUsersAuthorized() && CollectionUtils.isNotEmpty(userPermissionEntry.getAuthorizedUserIds())) {
 				throw new IllegalArgumentException("There must not be authorized user identifiers when all users are authorized.");
 			}
 			if (Boolean.TRUE.equals(userPermissionEntry.isAllUsersAuthorized())) {
-				scopeAuthorizedUsers.put(userPermissionEntry.getScope(), Collections.emptySet());
+				allUsersAuthorized.put(userPermissionEntry.getScope(), true);
+				scopeAuthorizedUsers.put(userPermissionEntry.getScope(), null);
 			} else {
+				allUsersAuthorized.put(userPermissionEntry.getScope(), false);
 				Set<String> authorizedUsers = scopeAuthorizedUsers.computeIfAbsent(
 						userPermissionEntry.getScope(), scope -> new HashSet<>());
 				authorizedUsers.addAll(userPermissionEntry.getAuthorizedUserIds());
@@ -47,17 +50,18 @@ public class UserPermissionCommandService {
 				.searchParamsMap(new String[]{"id", command.getOwnerId()})
 				.build());
 
-		// Remove all existing user permissions for the owner.
-		userPermissionRepository.deleteByOwnerId(command.getOwnerId());
-
 		// Create new user permissions for the given scopes and authorized users.
 		final List<UserPermission> userPermissions = new LinkedList<>();
 		scopeAuthorizedUsers.forEach((scope, authorizedUserIds) -> {
+			// Remove all existing user permissions for the owner.
+			userPermissionRepository.deleteByOwnerIdAndScope(command.getOwnerId(), scope);
 			final List<User> authorizedUsers = new LinkedList<>();
-			if (authorizedUserIds.isEmpty()) {
+			if (allUsersAuthorized.get(scope)) {
 				userRepository.findAll().forEach(authorizedUsers::add);
 			} else {
-				userRepository.findAllById(authorizedUserIds).forEach(authorizedUsers::add);
+				if (CollectionUtils.isNotEmpty(authorizedUserIds)) {
+					userRepository.findAllById(authorizedUserIds).forEach(authorizedUsers::add);
+				}
 			}
 			UserPermission userPermission = UserPermission.builder()
 					.id(UUID.randomUUID().toString())
@@ -66,6 +70,7 @@ public class UserPermissionCommandService {
 					.authorizedUsers(authorizedUsers)
 					.build();
 			userPermissions.add(userPermissionRepository.save(userPermission));
+			owner.setUserPermissions(userPermissions);
 		});
 		return userPermissions.stream();
 	}
