@@ -14,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.stream.Stream;
 
+import static java.util.stream.StreamSupport.stream;
+
 @Service
 public class UserPermissionCommandService {
 	private UserRepository userRepository;
@@ -40,6 +42,9 @@ public class UserPermissionCommandService {
 				allUsersAuthorized.put(userPermissionEntry.getScope(), false);
 				Set<String> authorizedUsers = scopeAuthorizedUsers.computeIfAbsent(
 						userPermissionEntry.getScope(), scope -> new HashSet<>());
+				if (userPermissionEntry.getAuthorizedUserIds().stream().anyMatch(userId -> command.getOwnerId().equals(userId))) {
+					throw new IllegalArgumentException("Permissions must not be granted to the owner.");
+				}
 				authorizedUsers.addAll(userPermissionEntry.getAuthorizedUserIds());
 			}
 		});
@@ -57,7 +62,9 @@ public class UserPermissionCommandService {
 			userPermissionRepository.deleteByOwnerIdAndScope(command.getOwnerId(), scope);
 			final List<User> authorizedUsers = new LinkedList<>();
 			if (allUsersAuthorized.get(scope)) {
-				userRepository.findAll().forEach(authorizedUsers::add);
+				stream(userRepository.findAll().spliterator(), false)
+						.filter(user -> !owner.getId().equals(user.getId()))
+						.forEach(authorizedUsers::add);
 			} else {
 				if (CollectionUtils.isNotEmpty(authorizedUserIds)) {
 					userRepository.findAllById(authorizedUserIds).forEach(authorizedUsers::add);
