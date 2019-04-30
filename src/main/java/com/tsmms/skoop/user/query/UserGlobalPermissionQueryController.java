@@ -39,7 +39,7 @@ public class UserGlobalPermissionQueryController {
 	})
 	@PreAuthorize("isPrincipalUserId(#userId)")
 	@GetMapping(path = "/users/{userId}/global-permissions", produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<GlobalPermissionResponse> getInboundUserPermissions(@PathVariable("userId") String userId) {
+	public List<GlobalPermissionResponse> getUserGlobalPermissions(@PathVariable("userId") String userId) {
 		return userGlobalPermissionQueryService.getUserGlobalPermissions(userId)
 				.map(GlobalPermissionResponse::of)
 				.collect(toList());

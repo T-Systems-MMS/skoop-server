@@ -99,8 +99,7 @@ public class UserQueryController {
 				.userName(user.getUserName())
 				.firstName(user.getFirstName())
 				.lastName(user.getLastName())
-				.email(user.getEmail())
-				.coach(user.getCoach());
+				.email(user.getEmail());
 		if (userGlobalPermissionQueryService.isGlobalPermissionGranted(user.getId(), READ_USER_PROFILE) || allowedUserIds.contains(user.getId())) {
 			b.academicDegree(user.getAcademicDegree())
 					.positionProfile(user.getPositionProfile())

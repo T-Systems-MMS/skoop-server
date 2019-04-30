@@ -29,9 +29,6 @@ public class UserResponse {
 	@ApiModelProperty("Email of the user.")
 	private String email;
 
-	@ApiModelProperty("Show as coach?")
-	private Boolean coach;
-
 	@ApiModelProperty("Academic degree of the user.")
 	private String academicDegree;
 
@@ -60,7 +57,6 @@ public class UserResponse {
 				.firstName(user.getFirstName())
 				.lastName(user.getLastName())
 				.email(user.getEmail())
-				.coach(user.getCoach())
 				.academicDegree(user.getAcademicDegree())
 				.positionProfile(user.getPositionProfile())
 				.summary(user.getSummary())

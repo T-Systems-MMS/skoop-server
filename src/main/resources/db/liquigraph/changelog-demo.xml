@@ -30,14 +30,14 @@
 		<query>MATCH (s:Skill {name: 'CSS'}), (sg:SkillGroup {name: 'Frontend'}) CREATE (s)-[:SKILL_GROUPS]->(sg)</query>
 		<query>MATCH (s:Skill {name: 'HTML'}), (sg:SkillGroup {name: 'Frontend'}) CREATE (s)-[:SKILL_GROUPS]->(sg)</query>
 
-		<query>CREATE (:User {id: randomUUID(), firstName: 'Dmitry', lastName: 'Dmitry\'s surname', userName: 'dmle', coach: false, email: 'dmle@mail.com', referenceId: randomUUID()})</query>
-		<query>CREATE (:User {id: randomUUID(), firstName: 'Sveta', lastName: 'Sveta\'s surname', userName: 'sviv', coach: false, email: 'sviv@mail.com', referenceId: randomUUID()})</query>
-		<query>CREATE (:User {id: randomUUID(), firstName: 'Franziska', lastName: 'Franziska\'s surname', userName: 'frwt', coach: false, email: 'frwt@mail.com', referenceId: randomUUID()})</query>
-		<query>CREATE (:User {id: randomUUID(), firstName: 'Rainer', lastName: 'Rainer\'s surname', userName: 'rju', coach: false, email: 'rju@mail.com', referenceId: randomUUID()})</query>
-		<query>CREATE (:User {id: randomUUID(), firstName: 'Phoebe', lastName: 'Phoebe\'s surname', userName: 'phin', coach: false, email: 'phin@mail.com', referenceId: randomUUID()})</query>
-		<query>CREATE (:User {id: randomUUID(), firstName: 'First user', lastName: 'First user\'s surname', userName: 'us1', coach: false, email: 'us1@mail.com', referenceId: randomUUID()})</query>
-		<query>CREATE (:User {id: randomUUID(), firstName: 'Second user', lastName: 'Second user\'s surname', userName: 'us2', coach: false, email: 'us2@mail.com', referenceId: randomUUID()})</query>
-		<query>CREATE (:User {id: randomUUID(), firstName: 'Third user', lastName: 'Third user\'s surname', userName: 'us3', coach: false, email: 'us3@mail.com', referenceId: randomUUID()})</query>
+		<query>CREATE (:User {id: randomUUID(), firstName: 'Dmitry', lastName: 'Dmitry\'s surname', userName: 'dmle', email: 'dmle@mail.com', referenceId: randomUUID()})</query>
+		<query>CREATE (:User {id: randomUUID(), firstName: 'Sveta', lastName: 'Sveta\'s surname', userName: 'sviv', email: 'sviv@mail.com', referenceId: randomUUID()})</query>
+		<query>CREATE (:User {id: randomUUID(), firstName: 'Franziska', lastName: 'Franziska\'s surname', userName: 'frwt', email: 'frwt@mail.com', referenceId: randomUUID()})</query>
+		<query>CREATE (:User {id: randomUUID(), firstName: 'Rainer', lastName: 'Rainer\'s surname', userName: 'rju', email: 'rju@mail.com', referenceId: randomUUID()})</query>
+		<query>CREATE (:User {id: randomUUID(), firstName: 'Phoebe', lastName: 'Phoebe\'s surname', userName: 'phin', email: 'phin@mail.com', referenceId: randomUUID()})</query>
+		<query>CREATE (:User {id: randomUUID(), firstName: 'First user', lastName: 'First user\'s surname', userName: 'us1', email: 'us1@mail.com', referenceId: randomUUID()})</query>
+		<query>CREATE (:User {id: randomUUID(), firstName: 'Second user', lastName: 'Second user\'s surname', userName: 'us2', email: 'us2@mail.com', referenceId: randomUUID()})</query>
+		<query>CREATE (:User {id: randomUUID(), firstName: 'Third user', lastName: 'Third user\'s surname', userName: 'us3', email: 'us3@mail.com', referenceId: randomUUID()})</query>
 
 		<query>MATCH (u:User {userName: 'dmle'}), (s:Skill {name: 'Spring Boot'}) CREATE (u)-[:RELATED_TO {currentLevel: 1, desiredLevel: 2, priority: 2}]->(s)</query>
 		<query>MATCH (u:User {userName: 'dmle'}), (s:Skill {name: 'Java'}) CREATE (u)-[:RELATED_TO {currentLevel: 2, desiredLevel: 3, priority: 1}]->(s)</query>

@@ -48,7 +48,6 @@ class UserSuggestionControllerTests extends AbstractControllerTests {
 						.firstName("Toni")
 						.lastName("Tester")
 						.email("toni.tester@skoop.io")
-						.coach(true)
 						.academicDegree("Diplom-Wirtschaftsinformatiker")
 						.positionProfile("Software Architect")
 						.summary("Toni's summary")
@@ -63,7 +62,6 @@ class UserSuggestionControllerTests extends AbstractControllerTests {
 						.firstName("Tina")
 						.lastName("Testing")
 						.email("tina.testing@skoop.io")
-						.coach(false)
 						.academicDegree("Diplom-Wirtschaftsinformatiker")
 						.positionProfile("Software Engineer")
 						.summary("Tina's summary")
@@ -78,7 +76,6 @@ class UserSuggestionControllerTests extends AbstractControllerTests {
 						.firstName("Tom")
 						.lastName("Test")
 						.email("tom.test@skoop.io")
-						.coach(false)
 						.academicDegree("Diplom-Wirtschaftsinformatiker")
 						.positionProfile("Software Engineer")
 						.summary("Tom's summary")
@@ -101,13 +98,11 @@ class UserSuggestionControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[0].firstName", is(equalTo("Tina"))))
 				.andExpect(jsonPath("$[0].lastName", is(equalTo("Testing"))))
 				.andExpect(jsonPath("$[0].email", is(equalTo("tina.testing@skoop.io"))))
-				.andExpect(jsonPath("$[0].coach", is(equalTo(false))))
 				.andExpect(jsonPath("$[1].id", is(equalTo("c9d0da43-ac3d-40a3-9864-f4267acaddfc"))))
 				.andExpect(jsonPath("$[1].userName", is(equalTo("test"))))
 				.andExpect(jsonPath("$[1].firstName", is(equalTo("Tom"))))
 				.andExpect(jsonPath("$[1].lastName", is(equalTo("Test"))))
-				.andExpect(jsonPath("$[1].email", is(equalTo("tom.test@skoop.io"))))
-				.andExpect(jsonPath("$[1].coach", is(equalTo(false))));
+				.andExpect(jsonPath("$[1].email", is(equalTo("tom.test@skoop.io"))));
 	}
 
 	@DisplayName("Not authenticated user cannot get user suggestions.")

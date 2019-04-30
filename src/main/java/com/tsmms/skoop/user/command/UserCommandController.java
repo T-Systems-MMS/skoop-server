@@ -50,7 +50,6 @@ public class UserCommandController {
 				.firstName(user.getFirstName())
 				.lastName(user.getLastName())
 				.email(user.getEmail())
-				.coach(user.getCoach())
 				.build());
 	}
 
@@ -79,7 +78,6 @@ public class UserCommandController {
 				.firstName(user.getFirstName())
 				.lastName(user.getLastName())
 				.email(user.getEmail())
-				.coach(user.getCoach())
 				.academicDegree(user.getAcademicDegree())
 				.positionProfile(user.getPositionProfile())
 				.summary(user.getSummary())

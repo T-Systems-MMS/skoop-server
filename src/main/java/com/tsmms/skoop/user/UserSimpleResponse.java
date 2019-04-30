@@ -46,7 +46,6 @@ public class UserSimpleResponse {
 				.firstName(user.getFirstName())
 				.lastName(user.getLastName())
 				.email(user.getEmail())
-				.coach(user.getCoach())
 				.build();
 	}
 

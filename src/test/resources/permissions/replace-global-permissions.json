@@ -1,0 +1,11 @@
+[
+	{
+		"scope": "READ_USER_PROFILE"
+	},
+	{
+		"scope": "SEE_AS_COACH"
+	},
+	{
+		"scope": "READ_USER_SKILLS"
+	}
+]

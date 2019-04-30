@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(UserCommandController.class)
-public class UserCommandControllerTests extends AbstractControllerTests {
+class UserCommandControllerTests extends AbstractControllerTests {
 	@Autowired
 	private MockMvc mockMvc;
 
@@ -45,7 +45,7 @@ public class UserCommandControllerTests extends AbstractControllerTests {
 	@DisplayName("Creates and returns the given user")
 	void createUser() throws Exception {
 		given(userCommandService.createUser("tester1", "firstTester", null, "tester1@gmail.com"))
-				.willReturn(User.builder().id("123").userName("tester1").firstName("firstTester").email("tester1@gmail.com").coach(false).build());
+				.willReturn(User.builder().id("123").userName("tester1").firstName("firstTester").email("tester1@gmail.com").build());
 
 		UserRequest userRequest = UserRequest.builder().userName("tester1").firstName("firstTester").email("tester1@gmail.com").build();
 		// TODO: Use plain request string instead of Jackson object mapper.
@@ -62,8 +62,7 @@ public class UserCommandControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$.id", is(equalTo("123"))))
 				.andExpect(jsonPath("$.userName", is(equalTo("tester1"))))
 				.andExpect(jsonPath("$.lastName", is(equalTo(null))))
-				.andExpect(jsonPath("$.email", is(equalTo("tester1@gmail.com"))))
-				.andExpect(jsonPath("$.coach", is(false)));
+				.andExpect(jsonPath("$.email", is(equalTo("tester1@gmail.com"))));
 	}
 
 	@Test
@@ -86,7 +85,7 @@ public class UserCommandControllerTests extends AbstractControllerTests {
 				.build();
 
 		given(userCommandService.updateUser("123", userRequest))
-				.willReturn(User.builder().id("123").userName("tester1").firstName("firstTester").email("tester1@gmail.com").coach(true)
+				.willReturn(User.builder().id("123").userName("tester1").firstName("firstTester").email("tester1@gmail.com")
 						.academicDegree("Diplom-Wirtschaftsinformatiker")
 						.positionProfile("Software Architect")
 						.summary("Tester summary")
@@ -108,7 +107,6 @@ public class UserCommandControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$.userName", is(equalTo("tester1"))))
 				.andExpect(jsonPath("$.lastName", is(equalTo(null))))
 				.andExpect(jsonPath("$.email", is(equalTo("tester1@gmail.com"))))
-				.andExpect(jsonPath("$.coach", is(true)))
 				.andExpect(jsonPath("$.academicDegree", is("Diplom-Wirtschaftsinformatiker")))
 				.andExpect(jsonPath("$.positionProfile", is("Software Architect")))
 				.andExpect(jsonPath("$.summary", is("Tester summary")))
@@ -130,7 +128,7 @@ public class UserCommandControllerTests extends AbstractControllerTests {
 
 	@Test
 	@DisplayName("Responds with status 404 if user to be deleted does not exist")
-	public void deleteUser_ThrowsException() throws Exception {
+	void deleteUser_ThrowsException() throws Exception {
 		BDDMockito.willThrow(NoSuchResourceException.builder()
 				.model(Model.USER)
 				.searchParamsMap(new String[]{"id", "123"})

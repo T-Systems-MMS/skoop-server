@@ -35,7 +35,7 @@ public class UserGlobalPermissionQueryService {
 		if (scope == null) {
 			throw new IllegalArgumentException("Scope cannot be null.");
 		}
-		return globalPermissionRepository.findByOwnerIdAndScope(ownerId, scope);
+		return globalPermissionRepository.isGlobalPermissionGranted(ownerId, scope);
 	}
 
 }

@@ -162,7 +162,6 @@ class UserSkillQueryControllerTests extends AbstractControllerTests {
 								.firstName("Tina")
 								.lastName("Testing")
 								.email("tina.testing@skoop.io")
-								.coach(true)
 								.build(),
 						User.builder()
 								.id("e8a4f522-e662-4ead-b3ce-b004f3bdcde5")
@@ -170,7 +169,6 @@ class UserSkillQueryControllerTests extends AbstractControllerTests {
 								.firstName("Tabia")
 								.lastName("Testbed")
 								.email("tabia.testbed@skoop.io")
-								.coach(true)
 								.build()
 				));
 
@@ -185,7 +183,6 @@ class UserSkillQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[0].firstName", is(equalTo("Tina"))))
 				.andExpect(jsonPath("$[0].lastName", is(equalTo("Testing"))))
 				.andExpect(jsonPath("$[0].email", is(equalTo("tina.testing@skoop.io"))))
-				.andExpect(jsonPath("$[0].coach", is(equalTo(true))))
 				.andExpect(jsonPath("$[0].academicDegree").doesNotExist())
 				.andExpect(jsonPath("$[0].positionProfile").doesNotExist())
 				.andExpect(jsonPath("$[0].summary").doesNotExist())
@@ -198,7 +195,6 @@ class UserSkillQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[1].firstName", is(equalTo("Tabia"))))
 				.andExpect(jsonPath("$[1].lastName", is(equalTo("Testbed"))))
 				.andExpect(jsonPath("$[1].email", is(equalTo("tabia.testbed@skoop.io"))))
-				.andExpect(jsonPath("$[1].coach", is(equalTo(true))))
 				.andExpect(jsonPath("$[1].academicDegree").doesNotExist())
 				.andExpect(jsonPath("$[1].positionProfile").doesNotExist())
 				.andExpect(jsonPath("$[1].summary").doesNotExist())

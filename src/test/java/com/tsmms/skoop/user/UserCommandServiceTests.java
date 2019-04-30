@@ -32,7 +32,7 @@ class UserCommandServiceTests {
 	void createUser() {
 		given(userRepository.findByUserName("tester1")).willReturn(Optional.empty());
 		given(userRepository.save(ArgumentMatchers.isA(User.class)))
-				.willReturn(User.builder().id("123").userName("tester1").firstName("firstTester").email("tester1@gmail.com").coach(false).build());
+				.willReturn(User.builder().id("123").userName("tester1").firstName("firstTester").email("tester1@gmail.com").build());
 
 		User user = userCommandService.createUser("tester1", "firstTester", null, "tester1@gmail.com");
 
@@ -41,7 +41,6 @@ class UserCommandServiceTests {
 		assertThat(user.getId()).isEqualTo("123");
 		assertThat(user.getUserName()).isEqualTo("tester1");
 		assertThat(user.getEmail()).isEqualTo("tester1@gmail.com");
-		assertThat(user.getCoach()).isFalse();
 	}
 
 	@Test
@@ -61,7 +60,7 @@ class UserCommandServiceTests {
 		given(userRepository.findById("123"))
 				.willReturn(Optional.of(User.builder().id("123").userName("tester1").firstName("firstTester").email("tester1@gmail.com").build()));
 		given(userRepository.save(ArgumentMatchers.any(User.class)))
-				.willReturn(User.builder().id("123").userName("tester1").firstName("firstTester").email("tester1@gmail.com").coach(true).build());
+				.willReturn(User.builder().id("123").userName("tester1").firstName("firstTester").email("tester1@gmail.com").build());
 
 		User user = userCommandService.updateUser("123", UserRequest.builder().userName("tester1")
 				.firstName("firstTester").lastName(null).email("tester1@gmail.com").coach(true).build());
@@ -71,7 +70,6 @@ class UserCommandServiceTests {
 		assertThat(user.getId()).isEqualTo("123");
 		assertThat(user.getUserName()).isEqualTo("tester1");
 		assertThat(user.getEmail()).isEqualTo("tester1@gmail.com");
-		assertThat(user.getCoach()).isTrue();
 	}
 
 }

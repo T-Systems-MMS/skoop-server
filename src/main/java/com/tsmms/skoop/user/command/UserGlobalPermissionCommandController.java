@@ -16,9 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Collectors.toList;
 
 @Api(tags = "UserGlobalPermissions")
 @RestController
@@ -57,10 +58,10 @@ public class UserGlobalPermissionCommandController {
 								.scope(globalPermissionRequest.getScope())
 								.build()
 						)
-						.collect(Collectors.toSet())
+						.collect(toSet())
 				)
 				.build()
-		).map(GlobalPermissionResponse::of).collect(Collectors.toList());
+		).map(GlobalPermissionResponse::of).collect(toList());
 	}
 
 }

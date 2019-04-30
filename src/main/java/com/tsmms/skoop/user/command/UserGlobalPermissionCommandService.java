@@ -11,11 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toSet;
 
 @Service
 public class UserGlobalPermissionCommandService {
@@ -45,7 +45,7 @@ public class UserGlobalPermissionCommandService {
 				.owner(owner)
 				.scope(globalPermission.getScope())
 				.build()
-		).collect(Collectors.toSet());
+		).collect(toSet());
 		return StreamSupport.stream(globalPermissionRepository.saveAll(globalPermissions).spliterator(), false);
 	}
 

@@ -22,8 +22,8 @@ public interface UserSkillRepository extends Neo4jRepository<UserSkill, Long> {
 	Optional<UserSkill> findByUserIdAndSkillId(String userId, String skillId);
 
 	@Query("MATCH (user:User {id:{userId}})-[userSkill:RELATED_TO]-(:Skill {id:{skillId}})" +
-			"-[coachSkill:RELATED_TO]-(coach:User) " +
-			"WHERE coachSkill.currentLevel >= userSkill.desiredLevel AND coach.coach = true " +
+			"-[coachSkill:RELATED_TO]-(coach:User)-[:HAS_GRANTED]->(:GlobalPermission {scope: 'SEE_AS_COACH'}) " +
+			"WHERE coachSkill.currentLevel >= userSkill.desiredLevel " +
 			"RETURN coach " +
 			"LIMIT 20")
 	Iterable<User> findCoachesByUserIdAndSkillId(@Param("userId") String userId, @Param("skillId") String skillId);
