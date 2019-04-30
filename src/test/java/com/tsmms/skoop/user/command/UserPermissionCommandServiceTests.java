@@ -26,7 +26,6 @@ import static org.hamcrest.Matchers.isA;
 import static org.hamcrest.core.AllOf.allOf;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.hamcrest.MockitoHamcrest.argThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class UserPermissionCommandServiceTests {
@@ -105,105 +104,6 @@ class UserPermissionCommandServiceTests {
 				.userPermissions(Collections.singletonList(ReplaceUserPermissionListCommand.UserPermissionEntry.builder()
 						.scope(UserPermissionScope.READ_USER_PROFILE)
 						.authorizedUserIds(Arrays.asList("456", "789"))
-						.allUsersAuthorized(false)
-						.build()
-				))
-				.build()
-		).collect(Collectors.toList());
-		assertThat(userPermissions).hasSize(1);
-		UserPermission userPermission = userPermissions.get(0);
-		assertThat(userPermission.getId()).isEqualTo("abc");
-		assertThat(userPermission.getOwner()).isEqualTo(User.builder()
-				.id("123")
-				.userName("owner")
-				.build());
-		assertThat(userPermission.getAuthorizedUsers()).containsExactlyInAnyOrder(User.builder()
-						.id("456")
-						.userName("firstUser")
-						.build(),
-				User.builder()
-						.id("789")
-						.userName("secondUser")
-						.build());
-		assertThat(userPermission.getScope()).isEqualTo(UserPermissionScope.READ_USER_PROFILE);
-	}
-
-	@DisplayName("Throws exception when all users are authenticated and authenticated user ids is not empty.")
-	@Test
-	void throwsExceptionWhenAllUsersAreAuthenticatedAndAuthenticatedUserIdsIsNotEmpty() {
-		assertThrows(IllegalArgumentException.class, () -> userPermissionCommandService.replaceOutboundUserPermissions(ReplaceUserPermissionListCommand.builder()
-				.ownerId("123")
-				.userPermissions(Collections.singletonList(ReplaceUserPermissionListCommand.UserPermissionEntry.builder()
-						.scope(UserPermissionScope.READ_USER_PROFILE)
-						.authorizedUserIds(Arrays.asList("456", "789"))
-						.allUsersAuthorized(true)
-						.build()
-				))
-				.build()
-		));
-	}
-
-	@DisplayName("Sets permission to all users.")
-	@Test
-	void setPermissionToAllUsers() {
-		given(userRepository.findById("123")).willReturn(Optional.of(
-				User.builder()
-						.id("123")
-						.userName("owner")
-						.build()
-		));
-		given(userRepository.findAll()).willReturn(Arrays.asList(
-				User.builder()
-						.id("456")
-						.userName("firstUser")
-						.build(),
-				User.builder()
-						.id("789")
-						.userName("secondUser")
-						.build()
-		));
-		given(userPermissionRepository.save(argThat(allOf(
-				isA(UserPermission.class),
-				hasProperty("id", isA(String.class)),
-				hasProperty("owner", equalTo(User.builder()
-						.id("123")
-						.userName("owner")
-						.build())),
-				hasProperty("authorizedUsers", equalTo(Arrays.asList(
-						User.builder()
-								.id("456")
-								.userName("firstUser")
-								.build(),
-						User.builder()
-								.id("789")
-								.userName("secondUser")
-								.build()
-				)))
-				))
-		)).willReturn(UserPermission.builder()
-				.id("abc")
-				.owner(User.builder()
-						.id("123")
-						.userName("owner")
-						.build())
-				.scope(UserPermissionScope.READ_USER_PROFILE)
-				.authorizedUsers(Arrays.asList(
-						User.builder()
-								.id("456")
-								.userName("firstUser")
-								.build(),
-						User.builder()
-								.id("789")
-								.userName("secondUser")
-								.build()
-				))
-				.build()
-		);
-		final List<UserPermission> userPermissions = userPermissionCommandService.replaceOutboundUserPermissions(ReplaceUserPermissionListCommand.builder()
-				.ownerId("123")
-				.userPermissions(Collections.singletonList(ReplaceUserPermissionListCommand.UserPermissionEntry.builder()
-						.scope(UserPermissionScope.READ_USER_PROFILE)
-						.allUsersAuthorized(true)
 						.build()
 				))
 				.build()

@@ -14,8 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static java.util.stream.StreamSupport.stream;
-
 @Service
 public class UserPermissionCommandService {
 	private UserRepository userRepository;
@@ -30,16 +28,10 @@ public class UserPermissionCommandService {
 	public Stream<UserPermission> replaceOutboundUserPermissions(ReplaceUserPermissionListCommand command) {
 		// Create mapping for each scope to the authorized users (merges potential duplicate scope entries).
 		final EnumMap<UserPermissionScope, Set<String>> scopeAuthorizedUsers = new EnumMap<>(UserPermissionScope.class);
-		final EnumMap<UserPermissionScope, Boolean> allUsersAuthorized = new EnumMap<>(UserPermissionScope.class);
 		command.getUserPermissions().forEach(userPermissionEntry -> {
-			if (userPermissionEntry.isAllUsersAuthorized() && CollectionUtils.isNotEmpty(userPermissionEntry.getAuthorizedUserIds())) {
-				throw new IllegalArgumentException("There must not be authorized user identifiers when all users are authorized.");
-			}
-			if (Boolean.TRUE.equals(userPermissionEntry.isAllUsersAuthorized())) {
-				allUsersAuthorized.put(userPermissionEntry.getScope(), true);
-				scopeAuthorizedUsers.put(userPermissionEntry.getScope(), null);
+			if (CollectionUtils.isEmpty(userPermissionEntry.getAuthorizedUserIds())) {
+				scopeAuthorizedUsers.put(userPermissionEntry.getScope(), Collections.emptySet());
 			} else {
-				allUsersAuthorized.put(userPermissionEntry.getScope(), false);
 				Set<String> authorizedUsers = scopeAuthorizedUsers.computeIfAbsent(
 						userPermissionEntry.getScope(), scope -> new HashSet<>());
 				if (userPermissionEntry.getAuthorizedUserIds().stream().anyMatch(userId -> command.getOwnerId().equals(userId))) {
@@ -61,14 +53,8 @@ public class UserPermissionCommandService {
 			// Remove all existing user permissions for the owner.
 			userPermissionRepository.deleteByOwnerIdAndScope(command.getOwnerId(), scope);
 			final List<User> authorizedUsers = new LinkedList<>();
-			if (allUsersAuthorized.get(scope)) {
-				stream(userRepository.findAll().spliterator(), false)
-						.filter(user -> !owner.getId().equals(user.getId()))
-						.forEach(authorizedUsers::add);
-			} else {
-				if (CollectionUtils.isNotEmpty(authorizedUserIds)) {
-					userRepository.findAllById(authorizedUserIds).forEach(authorizedUsers::add);
-				}
+			if (CollectionUtils.isNotEmpty(authorizedUserIds)) {
+				userRepository.findAllById(authorizedUserIds).forEach(authorizedUsers::add);
 			}
 			UserPermission userPermission = UserPermission.builder()
 					.id(UUID.randomUUID().toString())
