@@ -8,22 +8,19 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @ApiModel(
-		value = "UserPermissionRequest",
-		description = "Request object for creating or updating a user permission."
+		value = "GlobalPermissionRequest",
+		description = "Request object for creating or updating user global permission."
 )
-public class UserPermissionRequest {
+public class GlobalPermissionRequest {
 
-	@ApiModelProperty("Scope of access to be granted to the authorized users.")
+	@ApiModelProperty("Scope of access to be granted to all users.")
 	@NotBlank
 	private UserPermissionScope scope;
 
-	@ApiModelProperty("IDs of the users to grant the permission to.")
-	private List<String> authorizedUserIds;
 }

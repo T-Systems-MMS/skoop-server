@@ -1,6 +1,7 @@
 package com.tsmms.skoop.security;
 
 import com.tsmms.skoop.user.UserPermissionScope;
+import com.tsmms.skoop.user.query.UserGlobalPermissionQueryService;
 import com.tsmms.skoop.user.query.UserPermissionQueryService;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
@@ -12,11 +13,14 @@ public class SkoopSecurityExpressionRoot extends SecurityExpressionRoot implemen
 	private Object returnObject;
 	private Object target;
 	private final UserPermissionQueryService userPermissionQueryService;
+	private final UserGlobalPermissionQueryService userGlobalPermissionQueryService;
 
 	public SkoopSecurityExpressionRoot(Authentication authentication,
-									   UserPermissionQueryService userPermissionQueryService) {
+									   UserPermissionQueryService userPermissionQueryService,
+									   UserGlobalPermissionQueryService userGlobalPermissionQueryService) {
 		super(authentication);
 		this.userPermissionQueryService = userPermissionQueryService;
+		this.userGlobalPermissionQueryService = userGlobalPermissionQueryService;
 	}
 
 	/**
@@ -54,6 +58,19 @@ public class SkoopSecurityExpressionRoot extends SecurityExpressionRoot implemen
 			return userPermissionQueryService.hasUserPermission(ownerId, userIdClaim, UserPermissionScope.valueOf(scope));
 		}
 		return false;
+	}
+
+	/**
+	 * Checks whether the user referenced by the owner ID has granted the user global permission.
+	 * <p>Usage example assuming a method with a parameter named "userId":</p>
+	 * <p>@PreAuthorize("isGlobalPermissionGranted(#userId, 'READ_USER_PROFILE')")</p>
+	 *
+	 * @param ownerId ID of the user who owns the protected resource.
+	 * @param scope   Scope of the user permission to check. See {@link UserPermissionScope}
+	 * @return <code>true</code> if the user referenced by owner ID has granted the user global permission with the given scope.
+	 */
+	public boolean isGlobalPermissionGranted(String ownerId, String scope) {
+		return userGlobalPermissionQueryService.isGlobalPermissionGranted(ownerId, UserPermissionScope.valueOf(scope));
 	}
 
 	public void setFilterObject(Object filterObject) {

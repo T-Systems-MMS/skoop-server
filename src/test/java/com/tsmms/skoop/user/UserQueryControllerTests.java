@@ -2,6 +2,7 @@ package com.tsmms.skoop.user;
 
 import com.tsmms.skoop.common.AbstractControllerTests;
 import com.tsmms.skoop.common.JwtAuthenticationFactory;
+import com.tsmms.skoop.user.query.UserGlobalPermissionQueryService;
 import com.tsmms.skoop.user.query.UserQueryController;
 import com.tsmms.skoop.user.query.UserQueryService;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,6 +37,9 @@ class UserQueryControllerTests extends AbstractControllerTests {
 
 	@MockBean
 	private UserQueryService userQueryService;
+
+	@MockBean
+	private UserGlobalPermissionQueryService userGlobalPermissionQueryService;
 
 	private User owner;
 
@@ -121,6 +125,50 @@ class UserQueryControllerTests extends AbstractControllerTests {
 	@DisplayName("Responds with the requested user")
 	void respondsWithRequestedUser() throws Exception {
 		given(userPermissionQueryService.hasUserPermission("d9d74c04-0ab0-479c-a1d7-d372990f11b6", owner.getId(), UserPermissionScope.READ_USER_PROFILE))
+				.willReturn(true);
+
+		given(userQueryService.getUserById("d9d74c04-0ab0-479c-a1d7-d372990f11b6"))
+				.willReturn(Optional.of(User.builder()
+						.id("d9d74c04-0ab0-479c-a1d7-d372990f11b6")
+						.userName("testing")
+						.firstName("Tina")
+						.lastName("Testing")
+						.email("tina.testing@skoop.io")
+						.coach(false)
+						.academicDegree("Diplom-Wirtschaftsinformatiker")
+						.positionProfile("Software Engineer")
+						.summary("Tina's summary")
+						.industrySectors(Arrays.asList("Automotive", "Telecommunication"))
+						.specializations(Arrays.asList("IT Consulting", "Software Integration"))
+						.certificates(Collections.singletonList("Kotlin Certified Programmer"))
+						.languages(Collections.singletonList("English"))
+						.build()
+				));
+
+		mockMvc.perform(get("/users/d9d74c04-0ab0-479c-a1d7-d372990f11b6")
+				.accept(MediaType.APPLICATION_JSON)
+				.with(authentication(JwtAuthenticationFactory.withUser(owner))))
+				.andExpect(status().isOk())
+				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+				.andExpect(jsonPath("$.id", is(equalTo("d9d74c04-0ab0-479c-a1d7-d372990f11b6"))))
+				.andExpect(jsonPath("$.userName", is(equalTo("testing"))))
+				.andExpect(jsonPath("$.firstName", is(equalTo("Tina"))))
+				.andExpect(jsonPath("$.lastName", is(equalTo("Testing"))))
+				.andExpect(jsonPath("$.email", is(equalTo("tina.testing@skoop.io"))))
+				.andExpect(jsonPath("$.coach", is(equalTo(false))))
+				.andExpect(jsonPath("$.academicDegree", is(equalTo("Diplom-Wirtschaftsinformatiker"))))
+				.andExpect(jsonPath("$.positionProfile", is(equalTo("Software Engineer"))))
+				.andExpect(jsonPath("$.summary", is(equalTo("Tina's summary"))))
+				.andExpect(jsonPath("$.industrySectors", is(equalTo(Arrays.asList("Automotive", "Telecommunication")))))
+				.andExpect(jsonPath("$.specializations", is(equalTo(Arrays.asList("IT Consulting", "Software Integration")))))
+				.andExpect(jsonPath("$.certificates", is(equalTo(Collections.singletonList("Kotlin Certified Programmer")))))
+				.andExpect(jsonPath("$.languages", is(equalTo(Collections.singletonList("English")))));
+	}
+
+	@Test
+	@DisplayName("Responds with the requested user when global permission to read her / his profile granted.")
+	void respondsWithRequestedUserWhenGlobalPermissionToReadHerProfileGranted() throws Exception {
+		given(userGlobalPermissionQueryService.isGlobalPermissionGranted("d9d74c04-0ab0-479c-a1d7-d372990f11b6", UserPermissionScope.READ_USER_PROFILE))
 				.willReturn(true);
 
 		given(userQueryService.getUserById("d9d74c04-0ab0-479c-a1d7-d372990f11b6"))

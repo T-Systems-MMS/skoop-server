@@ -25,16 +25,21 @@ import static com.tsmms.skoop.user.UserPermissionScope.READ_USER_PROFILE;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
+import static java.util.Objects.requireNonNull;
+
 @Api(tags = "Users")
 @RestController
 public class UserQueryController {
 	private UserQueryService userQueryService;
 	private UserPermissionQueryService userPermissionQueryService;
+	private UserGlobalPermissionQueryService userGlobalPermissionQueryService;
 
 	public UserQueryController(UserQueryService userQueryService,
-							   UserPermissionQueryService userPermissionQueryService) {
-		this.userQueryService = userQueryService;
-		this.userPermissionQueryService = userPermissionQueryService;
+							   UserPermissionQueryService userPermissionQueryService,
+							   UserGlobalPermissionQueryService userGlobalPermissionQueryService) {
+		this.userQueryService = requireNonNull(userQueryService);
+		this.userPermissionQueryService = requireNonNull(userPermissionQueryService);
+		this.userGlobalPermissionQueryService = requireNonNull(userGlobalPermissionQueryService);
 	}
 
 	@ApiOperation(
@@ -67,7 +72,7 @@ public class UserQueryController {
 			@ApiResponse(code = 404, message = "Resource not found"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("isAuthenticated() and (isPrincipalUserId(#userId) or hasUserPermission(#userId, 'READ_USER_PROFILE'))")
+	@PreAuthorize("isAuthenticated() and (isPrincipalUserId(#userId) or hasUserPermission(#userId, 'READ_USER_PROFILE') or isGlobalPermissionGranted(#userId, 'READ_USER_PROFILE'))")
 	@GetMapping(path = "/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public UserResponse getUserById(@PathVariable("userId") String userId) {
 		return userQueryService.getUserById(userId)
@@ -96,7 +101,7 @@ public class UserQueryController {
 				.lastName(user.getLastName())
 				.email(user.getEmail())
 				.coach(user.getCoach());
-		if (allowedUserIds.contains(user.getId())) {
+		if (userGlobalPermissionQueryService.isGlobalPermissionGranted(user.getId(), READ_USER_PROFILE) || allowedUserIds.contains(user.getId())) {
 			b.academicDegree(user.getAcademicDegree())
 					.positionProfile(user.getPositionProfile())
 					.summary(user.getSummary())
