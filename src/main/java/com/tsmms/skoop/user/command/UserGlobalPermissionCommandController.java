@@ -52,15 +52,15 @@ public class UserGlobalPermissionCommandController {
 
 		return userGlobalPermissionCommandService.replaceUserGlobalPermissions(
 				ReplaceUserGlobalPermissionListCommand.builder()
-				.ownerId(userId)
-				.globalPermissions(globalPermissionRequests.stream()
-						.map(globalPermissionRequest -> UserGlobalPermissionEntry.builder()
-								.scope(globalPermissionRequest.getScope())
-								.build()
+						.ownerId(userId)
+						.globalPermissions(globalPermissionRequests.stream()
+								.map(globalPermissionRequest -> UserGlobalPermissionEntry.builder()
+										.scope(globalPermissionRequest.getScope())
+										.build()
+								)
+								.collect(toSet())
 						)
-						.collect(toSet())
-				)
-				.build()
+						.build()
 		).map(GlobalPermissionResponse::of).collect(toList());
 	}
 

@@ -52,9 +52,9 @@ class UserGlobalPermissionCommandServiceTests {
 		given(userQueryService.getUserById("123")).willReturn(
 				Optional.of(
 						User.builder()
-						.id("123")
-						.userName("tester")
-						.build()
+								.id("123")
+								.userName("tester")
+								.build()
 				)
 		);
 

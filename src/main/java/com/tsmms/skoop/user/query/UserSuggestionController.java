@@ -31,8 +31,8 @@ public class UserSuggestionController {
 	}
 
 	@ApiOperation(
-			value = "Get user suggestions expect the authenticated user.",
-			notes = "Get user suggestions for the given search term expect the authenticated user. The term is looked up in the user name, first " +
+			value = "Get user suggestions except the authenticated user.",
+			notes = "Get user suggestions for the given search term except the authenticated user. The term is looked up in the user name, first " +
 					"name and last name. The list is sorted by user name in alphabetical order."
 	)
 	@ApiResponses({

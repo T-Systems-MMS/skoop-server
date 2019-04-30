@@ -48,19 +48,19 @@ class UserPermissionCommandServiceTests {
 	void replaceOutboundUserPermissions() {
 		given(userRepository.findById("123")).willReturn(Optional.of(
 				User.builder()
-				.id("123")
-				.userName("owner")
-				.build()
+						.id("123")
+						.userName("owner")
+						.build()
 		));
 		given(userRepository.findAllById(new HashSet<>(Arrays.asList("456", "789")))).willReturn(Arrays.asList(
 				User.builder()
-				.id("456")
-				.userName("firstUser")
-				.build(),
+						.id("456")
+						.userName("firstUser")
+						.build(),
 				User.builder()
-				.id("789")
-				.userName("secondUser")
-				.build()
+						.id("789")
+						.userName("secondUser")
+						.build()
 		));
 		given(userPermissionRepository.save(argThat(allOf(
 				isA(UserPermission.class),
