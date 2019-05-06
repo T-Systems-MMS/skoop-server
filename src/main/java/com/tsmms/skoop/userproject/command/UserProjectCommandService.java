@@ -61,7 +61,11 @@ public class UserProjectCommandService {
 		userProject.setProject(project);
 		userProject.setUser(user);
 		userProject.setSkills(skillCommandService.createNonExistentSkills(userProject.getSkills()));
-		return save(userProject);
+		final LocalDateTime now = LocalDateTime.now();
+		userProject.setId(UUID.randomUUID().toString());
+		userProject.setCreationDate(now);
+		userProject.setLastModifiedDate(now);
+		return userProjectRepository.save(userProject);
 	}
 
 	@Transactional
@@ -77,13 +81,7 @@ public class UserProjectCommandService {
 		userProject.setStartDate(command.getStartDate());
 		userProject.setEndDate(command.getEndDate());
 		userProject.setSkills(skillCommandService.createNonExistentSkills(command.getSkills()));
-		return save(userProject);
-	}
-
-	private UserProject save(UserProject userProject) {
 		final LocalDateTime now = LocalDateTime.now();
-		userProject.setId(UUID.randomUUID().toString());
-		userProject.setCreationDate(now);
 		userProject.setLastModifiedDate(now);
 		return userProjectRepository.save(userProject);
 	}
