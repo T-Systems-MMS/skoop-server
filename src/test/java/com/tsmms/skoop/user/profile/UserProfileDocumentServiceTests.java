@@ -55,7 +55,6 @@ class UserProfileDocumentServiceTests {
 					.firstName("John")
 					.lastName("Doe")
 					.email("john.doe@mail.com")
-					.coach(false)
 					.academicDegree("Diplom-Wirtschaftsinformatiker")
 					.positionProfile("Software Developer")
 					.summary("Developer")
@@ -136,7 +135,6 @@ class UserProfileDocumentServiceTests {
 					.firstName("John")
 					.lastName("Doe")
 					.email("john.doe@mail.com")
-					.coach(false)
 					.build();
 
 			given(userRepository.findByReferenceId("5acc24df-792a-4458-8d01-0c67033eceff")).willReturn(

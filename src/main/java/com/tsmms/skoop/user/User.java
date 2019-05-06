@@ -39,9 +39,6 @@ public class User {
 	@Property(name = "email")
 	private String email;
 
-	@Property(name = "coach")
-	private Boolean coach;
-
 	@Property(name = "academicDegree")
 	private String academicDegree;
 

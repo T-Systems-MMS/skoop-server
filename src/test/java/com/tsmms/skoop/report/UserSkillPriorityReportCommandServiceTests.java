@@ -31,7 +31,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-public class UserSkillPriorityReportCommandServiceTests {
+class UserSkillPriorityReportCommandServiceTests {
 	@Mock
 	private UserSkillPriorityReportRepository userSkillPriorityReportRepository;
 	@Mock
@@ -49,7 +49,7 @@ public class UserSkillPriorityReportCommandServiceTests {
 
 	@Test
 	@DisplayName("Creates a user skill priority report")
-	public void createReport() {
+	void createReport() {
 		LocalDateTime now = LocalDateTime.now();
 
 		// TODO: Make given test data more consistent.
@@ -70,7 +70,6 @@ public class UserSkillPriorityReportCommandServiceTests {
 										.userName("tester")
 										.firstName("Toni")
 										.lastName("Tester")
-										.coach(true)
 										.build()
 								, User.builder()
 										.id("11c8265e-e582-4700-a3c0-647d70046dc6")

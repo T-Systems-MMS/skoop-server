@@ -44,7 +44,6 @@ public class UserCommandService {
 				.firstName(firstName)
 				.lastName(lastName)
 				.email(email)
-				.coach(false)
 				.build());
 	}
 
@@ -65,7 +64,6 @@ public class UserCommandService {
 					.searchParamsMap(searchParamsMap)
 					.build();
 		});
-		user.setCoach(userRequest.getCoach());
 		user.setAcademicDegree(userRequest.getAcademicDegree());
 		user.setPositionProfile(userRequest.getPositionProfile());
 		user.setSummary(userRequest.getSummary());

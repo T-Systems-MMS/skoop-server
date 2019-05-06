@@ -2,6 +2,8 @@ package com.tsmms.skoop.userskill;
 
 import com.tsmms.skoop.skill.Skill;
 import com.tsmms.skoop.skill.SkillRepository;
+import com.tsmms.skoop.user.GlobalUserPermission;
+import com.tsmms.skoop.user.GlobalUserPermissionRepository;
 import com.tsmms.skoop.user.User;
 import com.tsmms.skoop.user.UserRepository;
 import org.assertj.core.api.Assertions;
@@ -10,7 +12,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.neo4j.DataNeo4jTest;
 
+import java.util.Arrays;
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static com.tsmms.skoop.user.GlobalUserPermissionScope.*;
 
 @DataNeo4jTest
 class UserSkillRepositoryTests {
@@ -20,6 +26,8 @@ class UserSkillRepositoryTests {
 	private SkillRepository skillRepository;
 	@Autowired
 	private UserSkillRepository userSkillRepository;
+	@Autowired
+	private GlobalUserPermissionRepository globalUserPermissionRepository;
 
 	@Test
 	@DisplayName("Provides the skills related to the user given by user ID")
@@ -238,13 +246,11 @@ class UserSkillRepositoryTests {
 		User tester = User.builder()
 				.id("2")
 				.userName("tester")
-				.coach(true)
 				.build();
 		tester = userRepository.save(tester);
 		User coach = User.builder()
 				.id("3")
 				.userName("coach")
-				.coach(true)
 				.build();
 		coach = userRepository.save(coach);
 		User noCoach = User.builder()
@@ -288,6 +294,19 @@ class UserSkillRepositoryTests {
 				.desiredLevel(4)
 				.priority(1)
 				.build());
+
+		globalUserPermissionRepository.saveAll(Arrays.asList(
+				GlobalUserPermission.builder()
+						.id(UUID.randomUUID().toString())
+						.owner(tester)
+						.scope(FIND_AS_COACH)
+						.build(),
+				GlobalUserPermission.builder()
+						.id(UUID.randomUUID().toString())
+						.owner(coach)
+						.scope(FIND_AS_COACH)
+						.build()
+		));
 
 		// When
 		Iterable<User> coaches = userSkillRepository.findCoachesByUserIdAndSkillId("1", "A");

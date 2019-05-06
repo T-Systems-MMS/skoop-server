@@ -2,7 +2,6 @@ package com.tsmms.skoop.user;
 
 import com.tsmms.skoop.common.AbstractControllerTests;
 import com.tsmms.skoop.common.JwtAuthenticationFactory;
-import com.tsmms.skoop.user.query.UserPermissionQueryService;
 import com.tsmms.skoop.user.query.UserQueryController;
 import com.tsmms.skoop.user.query.UserQueryService;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,7 +57,6 @@ class UserQueryControllerTests extends AbstractControllerTests {
 						.firstName("Toni")
 						.lastName("Tester")
 						.email("toni.tester@skoop.io")
-						.coach(true)
 						.academicDegree("Diplom-Wirtschaftsinformatiker")
 						.positionProfile("Software Architect")
 						.summary("Toni's summary")
@@ -73,7 +71,6 @@ class UserQueryControllerTests extends AbstractControllerTests {
 						.firstName("Tina")
 						.lastName("Testing")
 						.email("tina.testing@skoop.io")
-						.coach(false)
 						.academicDegree("Diplom-Wirtschaftsinformatiker")
 						.positionProfile("Software Engineer")
 						.summary("Tina's summary")
@@ -95,7 +92,6 @@ class UserQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[0].firstName", is(equalTo("Toni"))))
 				.andExpect(jsonPath("$[0].lastName", is(equalTo("Tester"))))
 				.andExpect(jsonPath("$[0].email", is(equalTo("toni.tester@skoop.io"))))
-				.andExpect(jsonPath("$[0].coach", is(equalTo(true))))
 				.andExpect(jsonPath("$[0].academicDegree", is(equalTo("Diplom-Wirtschaftsinformatiker"))))
 				.andExpect(jsonPath("$[0].positionProfile", is(equalTo("Software Architect"))))
 				.andExpect(jsonPath("$[0].summary", is(equalTo("Toni's summary"))))
@@ -108,7 +104,6 @@ class UserQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[1].firstName", is(equalTo("Tina"))))
 				.andExpect(jsonPath("$[1].lastName", is(equalTo("Testing"))))
 				.andExpect(jsonPath("$[1].email", is(equalTo("tina.testing@skoop.io"))))
-				.andExpect(jsonPath("$[1].coach", is(equalTo(false))))
 				.andExpect(jsonPath("$[1].academicDegree", nullValue()))
 				.andExpect(jsonPath("$[1].positionProfile", nullValue()))
 				.andExpect(jsonPath("$[1].summary", nullValue()))
@@ -121,35 +116,114 @@ class UserQueryControllerTests extends AbstractControllerTests {
 	@Test
 	@DisplayName("Responds with the requested user")
 	void respondsWithRequestedUser() throws Exception {
-		given(userQueryService.getUserById("56ef4778-a084-4509-9a3e-80b7895cf7b0"))
-				.willReturn(Optional.of(User.builder()
-						.id("56ef4778-a084-4509-9a3e-80b7895cf7b0")
-						.userName("tester")
-						.firstName("Toni")
-						.lastName("Tester")
-						.email("toni.tester@skoop.io")
-						.coach(true)
-						.build())
-				);
+		given(userPermissionQueryService.hasUserPermission("d9d74c04-0ab0-479c-a1d7-d372990f11b6", owner.getId(), UserPermissionScope.READ_USER_PROFILE))
+				.willReturn(true);
 
-		mockMvc.perform(get("/users/56ef4778-a084-4509-9a3e-80b7895cf7b0")
+		given(userQueryService.getUserById("d9d74c04-0ab0-479c-a1d7-d372990f11b6"))
+				.willReturn(Optional.of(User.builder()
+						.id("d9d74c04-0ab0-479c-a1d7-d372990f11b6")
+						.userName("testing")
+						.firstName("Tina")
+						.lastName("Testing")
+						.email("tina.testing@skoop.io")
+						.academicDegree("Diplom-Wirtschaftsinformatiker")
+						.positionProfile("Software Engineer")
+						.summary("Tina's summary")
+						.industrySectors(Arrays.asList("Automotive", "Telecommunication"))
+						.specializations(Arrays.asList("IT Consulting", "Software Integration"))
+						.certificates(Collections.singletonList("Kotlin Certified Programmer"))
+						.languages(Collections.singletonList("English"))
+						.build()
+				));
+
+		mockMvc.perform(get("/users/d9d74c04-0ab0-479c-a1d7-d372990f11b6")
 				.accept(MediaType.APPLICATION_JSON)
 				.with(authentication(JwtAuthenticationFactory.withUser(owner))))
 				.andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-				.andExpect(jsonPath("$.id", is(equalTo("56ef4778-a084-4509-9a3e-80b7895cf7b0"))))
-				.andExpect(jsonPath("$.userName", is(equalTo("tester"))))
-				.andExpect(jsonPath("$.firstName", is(equalTo("Toni"))))
-				.andExpect(jsonPath("$.lastName", is(equalTo("Tester"))))
-				.andExpect(jsonPath("$.email", is(equalTo("toni.tester@skoop.io"))))
-				.andExpect(jsonPath("$.coach", is(equalTo(true))))
-				.andExpect(jsonPath("$.academicDegree", nullValue()))
-				.andExpect(jsonPath("$.positionProfile", nullValue()))
-				.andExpect(jsonPath("$.summary", nullValue()))
-				.andExpect(jsonPath("$.industrySectors", nullValue()))
-				.andExpect(jsonPath("$.specializations", nullValue()))
-				.andExpect(jsonPath("$.certificates", nullValue()))
-				.andExpect(jsonPath("$.languages", nullValue()));
+				.andExpect(jsonPath("$.id", is(equalTo("d9d74c04-0ab0-479c-a1d7-d372990f11b6"))))
+				.andExpect(jsonPath("$.userName", is(equalTo("testing"))))
+				.andExpect(jsonPath("$.firstName", is(equalTo("Tina"))))
+				.andExpect(jsonPath("$.lastName", is(equalTo("Testing"))))
+				.andExpect(jsonPath("$.email", is(equalTo("tina.testing@skoop.io"))))
+				.andExpect(jsonPath("$.academicDegree", is(equalTo("Diplom-Wirtschaftsinformatiker"))))
+				.andExpect(jsonPath("$.positionProfile", is(equalTo("Software Engineer"))))
+				.andExpect(jsonPath("$.summary", is(equalTo("Tina's summary"))))
+				.andExpect(jsonPath("$.industrySectors", is(equalTo(Arrays.asList("Automotive", "Telecommunication")))))
+				.andExpect(jsonPath("$.specializations", is(equalTo(Arrays.asList("IT Consulting", "Software Integration")))))
+				.andExpect(jsonPath("$.certificates", is(equalTo(Collections.singletonList("Kotlin Certified Programmer")))))
+				.andExpect(jsonPath("$.languages", is(equalTo(Collections.singletonList("English")))));
+	}
+
+	@Test
+	@DisplayName("Responds with the requested user when global permission to read her / his profile granted.")
+	void respondsWithRequestedUserWhenGlobalPermissionToReadHerProfileGranted() throws Exception {
+		given(globalUserPermissionQueryService.isGlobalUserPermissionGranted("d9d74c04-0ab0-479c-a1d7-d372990f11b6", GlobalUserPermissionScope.READ_USER_PROFILE))
+				.willReturn(true);
+
+		given(userQueryService.getUserById("d9d74c04-0ab0-479c-a1d7-d372990f11b6"))
+				.willReturn(Optional.of(User.builder()
+						.id("d9d74c04-0ab0-479c-a1d7-d372990f11b6")
+						.userName("testing")
+						.firstName("Tina")
+						.lastName("Testing")
+						.email("tina.testing@skoop.io")
+						.academicDegree("Diplom-Wirtschaftsinformatiker")
+						.positionProfile("Software Engineer")
+						.summary("Tina's summary")
+						.industrySectors(Arrays.asList("Automotive", "Telecommunication"))
+						.specializations(Arrays.asList("IT Consulting", "Software Integration"))
+						.certificates(Collections.singletonList("Kotlin Certified Programmer"))
+						.languages(Collections.singletonList("English"))
+						.build()
+				));
+
+		mockMvc.perform(get("/users/d9d74c04-0ab0-479c-a1d7-d372990f11b6")
+				.accept(MediaType.APPLICATION_JSON)
+				.with(authentication(JwtAuthenticationFactory.withUser(owner))))
+				.andExpect(status().isOk())
+				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+				.andExpect(jsonPath("$.id", is(equalTo("d9d74c04-0ab0-479c-a1d7-d372990f11b6"))))
+				.andExpect(jsonPath("$.userName", is(equalTo("testing"))))
+				.andExpect(jsonPath("$.firstName", is(equalTo("Tina"))))
+				.andExpect(jsonPath("$.lastName", is(equalTo("Testing"))))
+				.andExpect(jsonPath("$.email", is(equalTo("tina.testing@skoop.io"))))
+				.andExpect(jsonPath("$.academicDegree", is(equalTo("Diplom-Wirtschaftsinformatiker"))))
+				.andExpect(jsonPath("$.positionProfile", is(equalTo("Software Engineer"))))
+				.andExpect(jsonPath("$.summary", is(equalTo("Tina's summary"))))
+				.andExpect(jsonPath("$.industrySectors", is(equalTo(Arrays.asList("Automotive", "Telecommunication")))))
+				.andExpect(jsonPath("$.specializations", is(equalTo(Arrays.asList("IT Consulting", "Software Integration")))))
+				.andExpect(jsonPath("$.certificates", is(equalTo(Collections.singletonList("Kotlin Certified Programmer")))))
+				.andExpect(jsonPath("$.languages", is(equalTo(Collections.singletonList("English")))));
+	}
+
+	@Test
+	@DisplayName("Not authenticated user cannot get other user profile.")
+	void notAuthenticatedUserCannotGetOtherUserProfile() throws Exception {
+		given(userPermissionQueryService.hasUserPermission("d9d74c04-0ab0-479c-a1d7-d372990f11b6", owner.getId(), UserPermissionScope.READ_USER_PROFILE))
+				.willReturn(false);
+
+		given(userQueryService.getUserById("d9d74c04-0ab0-479c-a1d7-d372990f11b6"))
+				.willReturn(Optional.of(User.builder()
+						.id("d9d74c04-0ab0-479c-a1d7-d372990f11b6")
+						.userName("testing")
+						.firstName("Tina")
+						.lastName("Testing")
+						.email("tina.testing@skoop.io")
+						.academicDegree("Diplom-Wirtschaftsinformatiker")
+						.positionProfile("Software Engineer")
+						.summary("Tina's summary")
+						.industrySectors(Arrays.asList("Automotive", "Telecommunication"))
+						.specializations(Arrays.asList("IT Consulting", "Software Integration"))
+						.certificates(Collections.singletonList("Kotlin Certified Programmer"))
+						.languages(Collections.singletonList("English"))
+						.build()
+				));
+
+		mockMvc.perform(get("/users/d9d74c04-0ab0-479c-a1d7-d372990f11b6")
+				.accept(MediaType.APPLICATION_JSON)
+				.with(authentication(JwtAuthenticationFactory.withUser(owner))))
+				.andExpect(status().isForbidden());
 	}
 
 	@Test
@@ -162,7 +236,6 @@ class UserQueryControllerTests extends AbstractControllerTests {
 						.firstName("Toni")
 						.lastName("Tester")
 						.email("toni.tester@skoop.io")
-						.coach(true)
 						.academicDegree("Diplom-Wirtschaftsinformatiker")
 						.positionProfile("Software Architect")
 						.summary("Toni's summary")
@@ -183,7 +256,6 @@ class UserQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$.firstName", is(equalTo("Toni"))))
 				.andExpect(jsonPath("$.lastName", is(equalTo("Tester"))))
 				.andExpect(jsonPath("$.email", is(equalTo("toni.tester@skoop.io"))))
-				.andExpect(jsonPath("$.coach", is(equalTo(true))))
 				.andExpect(jsonPath("$.academicDegree", is(equalTo("Diplom-Wirtschaftsinformatiker"))))
 				.andExpect(jsonPath("$.positionProfile", is(equalTo("Software Architect"))))
 				.andExpect(jsonPath("$.summary", is(equalTo("Toni's summary"))))
@@ -194,9 +266,9 @@ class UserQueryControllerTests extends AbstractControllerTests {
 	}
 
 	@Test
-	@DisplayName("Responds with the list of users with additional fields present both for requesting user and for user allowed to see her skills")
-	void respondsWithListOfUsersWithAdditionalFieldsPresentBothForRequestingUserAndForUserAllowedToSeeHerSkills() throws Exception {
-		given(userPermissionQueryService.getUsersWhoGrantedPermission("56ef4778-a084-4509-9a3e-80b7895cf7b0", UserPermissionScope.READ_USER_SKILLS))
+	@DisplayName("Responds with the list of users with additional fields present both for requesting user and for user allowed to see her profile")
+	void respondsWithListOfUsersWithAdditionalFieldsPresentBothForRequestingUserAndForUserAllowedToSeeHerProfile() throws Exception {
+		given(userPermissionQueryService.getUsersWhoGrantedPermission("56ef4778-a084-4509-9a3e-80b7895cf7b0", UserPermissionScope.READ_USER_PROFILE))
 				.willReturn(Stream.of(
 					User.builder()
 							.id("d9d74c04-0ab0-479c-a1d7-d372990f11b6")
@@ -210,7 +282,6 @@ class UserQueryControllerTests extends AbstractControllerTests {
 						.firstName("Toni")
 						.lastName("Tester")
 						.email("toni.tester@skoop.io")
-						.coach(true)
 						.academicDegree("Diplom-Wirtschaftsinformatiker")
 						.positionProfile("Software Architect")
 						.summary("Toni's summary")
@@ -225,7 +296,6 @@ class UserQueryControllerTests extends AbstractControllerTests {
 						.firstName("Tina")
 						.lastName("Testing")
 						.email("tina.testing@skoop.io")
-						.coach(false)
 						.academicDegree("Diplom-Wirtschaftsinformatiker")
 						.positionProfile("Software Engineer")
 						.summary("Tina's summary")
@@ -247,7 +317,6 @@ class UserQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[0].firstName", is(equalTo("Toni"))))
 				.andExpect(jsonPath("$[0].lastName", is(equalTo("Tester"))))
 				.andExpect(jsonPath("$[0].email", is(equalTo("toni.tester@skoop.io"))))
-				.andExpect(jsonPath("$[0].coach", is(equalTo(true))))
 				.andExpect(jsonPath("$[0].academicDegree", is(equalTo("Diplom-Wirtschaftsinformatiker"))))
 				.andExpect(jsonPath("$[0].positionProfile", is(equalTo("Software Architect"))))
 				.andExpect(jsonPath("$[0].summary", is(equalTo("Toni's summary"))))
@@ -260,7 +329,6 @@ class UserQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[1].firstName", is(equalTo("Tina"))))
 				.andExpect(jsonPath("$[1].lastName", is(equalTo("Testing"))))
 				.andExpect(jsonPath("$[1].email", is(equalTo("tina.testing@skoop.io"))))
-				.andExpect(jsonPath("$[1].coach", is(equalTo(false))))
 				.andExpect(jsonPath("$[1].academicDegree", is(equalTo("Diplom-Wirtschaftsinformatiker"))))
 				.andExpect(jsonPath("$[1].positionProfile", is(equalTo("Software Engineer"))))
 				.andExpect(jsonPath("$[1].summary", is(equalTo("Tina's summary"))))

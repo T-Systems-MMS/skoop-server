@@ -140,7 +140,6 @@ class CommunityUserQueryControllerTests extends AbstractControllerTests {
 								.firstName("John")
 								.lastName("Doe The First")
 								.email("firstUser@mail.com")
-								.coach(false)
 								.build(),
 						User.builder()
 								.id("2edc1229-b4d0-4119-9113-4677beb20ae2")
@@ -148,7 +147,6 @@ class CommunityUserQueryControllerTests extends AbstractControllerTests {
 								.firstName("John")
 								.lastName("Doe The Second")
 								.email("secondUser@mail.com")
-								.coach(false)
 								.build()
 				)
 		);
@@ -165,13 +163,11 @@ class CommunityUserQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[0].firstName", is(equalTo("John"))))
 				.andExpect(jsonPath("$[0].lastName", is(equalTo("Doe The First"))))
 				.andExpect(jsonPath("$[0].email", is(equalTo("firstUser@mail.com"))))
-				.andExpect(jsonPath("$[0].coach", is(equalTo(false))))
 				.andExpect(jsonPath("$[1].id", is(equalTo("2edc1229-b4d0-4119-9113-4677beb20ae2"))))
 				.andExpect(jsonPath("$[1].userName", is(equalTo("secondUser"))))
 				.andExpect(jsonPath("$[1].firstName", is(equalTo("John"))))
 				.andExpect(jsonPath("$[1].lastName", is(equalTo("Doe The Second"))))
-				.andExpect(jsonPath("$[1].email", is(equalTo("secondUser@mail.com"))))
-				.andExpect(jsonPath("$[1].coach", is(equalTo(false))));
+				.andExpect(jsonPath("$[1].email", is(equalTo("secondUser@mail.com"))));
 	}
 
 	@DisplayName("Not authenticated user cannot get user suggestions for the community.")
@@ -201,7 +197,6 @@ class CommunityUserQueryControllerTests extends AbstractControllerTests {
 								.firstName("John")
 								.lastName("Doe The First")
 								.email("firstUser@mail.com")
-								.coach(false)
 								.build(),
 						User.builder()
 								.id("2edc1229-b4d0-4119-9113-4677beb20ae2")
@@ -209,7 +204,6 @@ class CommunityUserQueryControllerTests extends AbstractControllerTests {
 								.firstName("John")
 								.lastName("Doe The Second")
 								.email("secondUser@mail.com")
-								.coach(false)
 								.build()
 				)
 		);
@@ -225,13 +219,11 @@ class CommunityUserQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[0].firstName", is(equalTo("John"))))
 				.andExpect(jsonPath("$[0].lastName", is(equalTo("Doe The First"))))
 				.andExpect(jsonPath("$[0].email", is(equalTo("firstUser@mail.com"))))
-				.andExpect(jsonPath("$[0].coach", is(equalTo(false))))
 				.andExpect(jsonPath("$[1].id", is(equalTo("2edc1229-b4d0-4119-9113-4677beb20ae2"))))
 				.andExpect(jsonPath("$[1].userName", is(equalTo("secondUser"))))
 				.andExpect(jsonPath("$[1].firstName", is(equalTo("John"))))
 				.andExpect(jsonPath("$[1].lastName", is(equalTo("Doe The Second"))))
-				.andExpect(jsonPath("$[1].email", is(equalTo("secondUser@mail.com"))))
-				.andExpect(jsonPath("$[1].coach", is(equalTo(false))));
+				.andExpect(jsonPath("$[1].email", is(equalTo("secondUser@mail.com"))));
 	}
 
 	@DisplayName("Not authenticated user cannot get users recommended to be invited to join a community.")

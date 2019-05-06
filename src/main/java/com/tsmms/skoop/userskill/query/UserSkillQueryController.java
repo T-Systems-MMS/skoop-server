@@ -38,7 +38,7 @@ public class UserSkillQueryController {
 			@ApiResponse(code = 404, message = "Resource not found"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("isPrincipalUserId(#userId) or hasUserPermission(#userId, 'READ_USER_SKILLS')")
+	@PreAuthorize("isPrincipalUserId(#userId) or hasUserPermission(#userId, 'READ_USER_SKILLS') or isGlobalPermissionGranted(#userId, 'READ_USER_SKILLS')")
 	@GetMapping(path = "/users/{userId}/skills", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<UserSkillResponse> getUserSkills(@PathVariable("userId") String userId) {
 		return userSkillQueryService.getUserSkillsByUserId(userId)
@@ -61,7 +61,7 @@ public class UserSkillQueryController {
 			@ApiResponse(code = 404, message = "Resource not found, e.g. user does not exist or skill not assigned"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("isPrincipalUserId(#userId) or hasUserPermission(#userId, 'READ_USER_SKILLS')")
+	@PreAuthorize("isPrincipalUserId(#userId) or hasUserPermission(#userId, 'READ_USER_SKILLS') or isGlobalPermissionGranted(#userId, 'READ_USER_SKILLS')")
 	@GetMapping(path = "/users/{userId}/skills/{skillId}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public UserSkillResponse getUserSkill(@PathVariable("userId") String userId,
 										  @PathVariable("skillId") String skillId) {

@@ -19,6 +19,7 @@ import java.util.List;
 		description = "Request object for creating or updating a user permission."
 )
 public class UserPermissionRequest {
+
 	@ApiModelProperty("Scope of access to be granted to the authorized users.")
 	@NotBlank
 	private UserPermissionScope scope;

@@ -1,5 +1,6 @@
 package com.tsmms.skoop.user.query;
 
+import com.tsmms.skoop.security.CurrentUserService;
 import com.tsmms.skoop.user.UserSimpleResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -14,19 +15,24 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.Objects.requireNonNull;
 
 @Api(tags = "UserSuggestions")
 @RestController
 public class UserSuggestionController {
-	private UserQueryService userQueryService;
 
-	public UserSuggestionController(UserQueryService userQueryService) {
-		this.userQueryService = userQueryService;
+	private UserQueryService userQueryService;
+	private CurrentUserService currentUserService;
+
+	public UserSuggestionController(UserQueryService userQueryService,
+									CurrentUserService currentUserService) {
+		this.userQueryService = requireNonNull(userQueryService);
+		this.currentUserService = requireNonNull(currentUserService);
 	}
 
 	@ApiOperation(
-			value = "Get user suggestions",
-			notes = "Get user suggestions for the given search term. The term is looked up in the user name, first " +
+			value = "Get user suggestions except the authenticated user.",
+			notes = "Get user suggestions for the given search term except the authenticated user. The term is looked up in the user name, first " +
 					"name and last name. The list is sorted by user name in alphabetical order."
 	)
 	@ApiResponses({
@@ -39,7 +45,9 @@ public class UserSuggestionController {
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping(path = "/user-suggestions", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<UserSimpleResponse> getUserSuggestions(@RequestParam("search") String search) {
+		final String currentUserId = currentUserService.getCurrentUserId();
 		return userQueryService.getUsersBySearchTerm(search)
+				.filter(user -> !currentUserId.equals(user.getId()))
 				.map(UserSimpleResponse::of)
 				.collect(toList());
 	}
