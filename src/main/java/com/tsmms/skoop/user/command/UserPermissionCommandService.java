@@ -63,7 +63,6 @@ public class UserPermissionCommandService {
 					.authorizedUsers(authorizedUsers)
 					.build();
 			userPermissions.add(userPermissionRepository.save(userPermission));
-			owner.setUserPermissions(userPermissions);
 		});
 		return userPermissions.stream();
 	}
