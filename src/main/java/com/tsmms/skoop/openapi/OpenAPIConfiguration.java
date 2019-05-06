@@ -70,7 +70,7 @@ public class OpenAPIConfiguration {
 						new Tag("Publications", "API allowing queries and modifications of user publications."),
 						new Tag("Membership", "API allowing queries and modifications of user memberships."),
 						new Tag("Testimonials", "API allowing queries and modifications of testimonials on user."),
-						new Tag("UserGlobalPermissions", "API allowing queries and modifications of global permissions managed by user."));
+						new Tag("GlobalUserPermissions", "API allowing queries and modifications of global permissions managed by user."));
 	}
 
 	@Bean

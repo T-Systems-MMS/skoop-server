@@ -1,7 +1,7 @@
 package com.tsmms.skoop.user.query;
 
 import com.tsmms.skoop.common.AbstractControllerTests;
-import com.tsmms.skoop.user.GlobalPermission;
+import com.tsmms.skoop.user.GlobalUserPermission;
 import com.tsmms.skoop.user.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,17 +24,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static com.tsmms.skoop.common.JwtAuthenticationFactory.withUser;
-import static com.tsmms.skoop.user.UserPermissionScope.*;
+import static com.tsmms.skoop.user.GlobalUserPermissionScope.*;
 
-@WebMvcTest(UserGlobalPermissionQueryController.class)
-class UserGlobalPermissionQueryControllerTests extends AbstractControllerTests {
+@WebMvcTest(GlobalUserPermissionQueryController.class)
+class GlobalUserPermissionQueryControllerTests extends AbstractControllerTests {
 
 	@Autowired
 	private MockMvc mockMvc;
 
-	@DisplayName("Gets user global permissions.")
+	@DisplayName("Gets global user permissions.")
 	@Test
-	void getUserGlobalPermissions() throws Exception {
+	void getGlobalUserPermissions() throws Exception {
 
 		final User owner = User.builder()
 				.id("adac977c-8e0d-4e00-98a8-da7b44aa5dd6")
@@ -51,19 +51,19 @@ class UserGlobalPermissionQueryControllerTests extends AbstractControllerTests {
 				.languages(Collections.singletonList("Deutsch"))
 				.build();
 
-		given(userGlobalPermissionQueryService.getUserGlobalPermissions("adac977c-8e0d-4e00-98a8-da7b44aa5dd6")).willReturn(
+		given(globalUserPermissionQueryService.getGlobalUserPermissions("adac977c-8e0d-4e00-98a8-da7b44aa5dd6")).willReturn(
 				Stream.of(
-						GlobalPermission.builder()
+						GlobalUserPermission.builder()
 								.id("123")
 								.scope(READ_USER_PROFILE)
 								.owner(owner)
 								.build(),
-						GlobalPermission.builder()
+						GlobalUserPermission.builder()
 								.id("456")
-								.scope(SEE_AS_COACH)
+								.scope(FIND_AS_COACH)
 								.owner(owner)
 								.build(),
-						GlobalPermission.builder()
+						GlobalUserPermission.builder()
 								.id("789")
 								.scope(READ_USER_SKILLS)
 								.owner(owner)
@@ -83,7 +83,7 @@ class UserGlobalPermissionQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[?(@.id=='123')].owner.firstName", hasItem("John")))
 				.andExpect(jsonPath("$[?(@.id=='123')].owner.lastName", hasItem("Doe")))
 				.andExpect(jsonPath("$[?(@.id=='123')].owner.email", hasItem("john.doe@mail.com")))
-				.andExpect(jsonPath("$[?(@.id=='456')].scope", hasItem("SEE_AS_COACH")))
+				.andExpect(jsonPath("$[?(@.id=='456')].scope", hasItem("FIND_AS_COACH")))
 				.andExpect(jsonPath("$[?(@.id=='456')].owner.id", hasItem("adac977c-8e0d-4e00-98a8-da7b44aa5dd6")))
 				.andExpect(jsonPath("$[?(@.id=='456')].owner.userName", hasItem("johndoe")))
 				.andExpect(jsonPath("$[?(@.id=='456')].owner.firstName", hasItem("John")))

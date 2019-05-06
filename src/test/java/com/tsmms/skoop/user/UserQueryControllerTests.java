@@ -2,7 +2,6 @@ package com.tsmms.skoop.user;
 
 import com.tsmms.skoop.common.AbstractControllerTests;
 import com.tsmms.skoop.common.JwtAuthenticationFactory;
-import com.tsmms.skoop.user.query.UserGlobalPermissionQueryService;
 import com.tsmms.skoop.user.query.UserQueryController;
 import com.tsmms.skoop.user.query.UserQueryService;
 import org.junit.jupiter.api.BeforeEach;
@@ -159,7 +158,7 @@ class UserQueryControllerTests extends AbstractControllerTests {
 	@Test
 	@DisplayName("Responds with the requested user when global permission to read her / his profile granted.")
 	void respondsWithRequestedUserWhenGlobalPermissionToReadHerProfileGranted() throws Exception {
-		given(userGlobalPermissionQueryService.isGlobalPermissionGranted("d9d74c04-0ab0-479c-a1d7-d372990f11b6", UserPermissionScope.READ_USER_PROFILE))
+		given(globalUserPermissionQueryService.isGlobalUserPermissionGranted("d9d74c04-0ab0-479c-a1d7-d372990f11b6", GlobalUserPermissionScope.READ_USER_PROFILE))
 				.willReturn(true);
 
 		given(userQueryService.getUserById("d9d74c04-0ab0-479c-a1d7-d372990f11b6"))

@@ -1,0 +1,41 @@
+package com.tsmms.skoop.user.query;
+
+import com.tsmms.skoop.user.GlobalUserPermission;
+import com.tsmms.skoop.user.GlobalUserPermissionRepository;
+import com.tsmms.skoop.user.GlobalUserPermissionScope;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.stream.Stream;
+
+import static java.util.Objects.requireNonNull;
+
+@Service
+public class GlobalUserPermissionQueryService {
+
+	private final GlobalUserPermissionRepository globalUserPermissionRepository;
+
+	public GlobalUserPermissionQueryService(GlobalUserPermissionRepository globalUserPermissionRepository) {
+		this.globalUserPermissionRepository = requireNonNull(globalUserPermissionRepository);
+	}
+
+	@Transactional(readOnly = true)
+	public Stream<GlobalUserPermission> getGlobalUserPermissions(String ownerId) {
+		if (ownerId == null) {
+			throw new IllegalArgumentException("Owner ID cannot be null.");
+		}
+		return globalUserPermissionRepository.findByOwnerId(ownerId);
+	}
+
+	@Transactional(readOnly = true)
+	public boolean isGlobalUserPermissionGranted(String ownerId, GlobalUserPermissionScope scope) {
+		if (ownerId == null) {
+			throw new IllegalArgumentException("Owner ID cannot be null.");
+		}
+		if (scope == null) {
+			throw new IllegalArgumentException("Scope cannot be null.");
+		}
+		return globalUserPermissionRepository.isGlobalPermissionGranted(ownerId, scope);
+	}
+
+}

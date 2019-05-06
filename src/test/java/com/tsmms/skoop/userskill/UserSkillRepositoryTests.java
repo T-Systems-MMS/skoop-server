@@ -2,10 +2,9 @@ package com.tsmms.skoop.userskill;
 
 import com.tsmms.skoop.skill.Skill;
 import com.tsmms.skoop.skill.SkillRepository;
-import com.tsmms.skoop.user.GlobalPermission;
-import com.tsmms.skoop.user.GlobalPermissionRepository;
+import com.tsmms.skoop.user.GlobalUserPermission;
+import com.tsmms.skoop.user.GlobalUserPermissionRepository;
 import com.tsmms.skoop.user.User;
-import com.tsmms.skoop.user.UserPermissionScope;
 import com.tsmms.skoop.user.UserRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -17,6 +16,7 @@ import java.util.Arrays;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static com.tsmms.skoop.user.GlobalUserPermissionScope.*;
 
 @DataNeo4jTest
 class UserSkillRepositoryTests {
@@ -27,7 +27,7 @@ class UserSkillRepositoryTests {
 	@Autowired
 	private UserSkillRepository userSkillRepository;
 	@Autowired
-	private GlobalPermissionRepository globalPermissionRepository;
+	private GlobalUserPermissionRepository globalUserPermissionRepository;
 
 	@Test
 	@DisplayName("Provides the skills related to the user given by user ID")
@@ -295,16 +295,16 @@ class UserSkillRepositoryTests {
 				.priority(1)
 				.build());
 
-		globalPermissionRepository.saveAll(Arrays.asList(
-				GlobalPermission.builder()
+		globalUserPermissionRepository.saveAll(Arrays.asList(
+				GlobalUserPermission.builder()
 						.id(UUID.randomUUID().toString())
 						.owner(tester)
-						.scope(UserPermissionScope.SEE_AS_COACH)
+						.scope(FIND_AS_COACH)
 						.build(),
-				GlobalPermission.builder()
+				GlobalUserPermission.builder()
 						.id(UUID.randomUUID().toString())
 						.owner(coach)
-						.scope(UserPermissionScope.SEE_AS_COACH)
+						.scope(FIND_AS_COACH)
 						.build()
 		));
 

@@ -12,22 +12,22 @@ import lombok.Data;
 		description = "Permission granted by the user to all users in order to allow them access a specific scope " +
 				"of the owner's user data."
 )
-public class GlobalPermissionResponse {
+public class GlobalUserPermissionResponse {
 
 	@ApiModelProperty("ID of global permission.")
 	private String id;
 
 	@ApiModelProperty("Scope of access allowed to the all users.")
-	private UserPermissionScope scope;
+	private GlobalUserPermissionScope scope;
 
 	@ApiModelProperty("Owning user who grants the permission.")
 	private UserSimpleResponse owner;
 
-	public static GlobalPermissionResponse of(GlobalPermission globalPermission) {
-		return GlobalPermissionResponse.builder()
-				.id(globalPermission.getId())
-				.scope(globalPermission.getScope())
-				.owner(UserSimpleResponse.of(globalPermission.getOwner()))
+	public static GlobalUserPermissionResponse of(GlobalUserPermission globalUserPermission) {
+		return GlobalUserPermissionResponse.builder()
+				.id(globalUserPermission.getId())
+				.scope(globalUserPermission.getScope())
+				.owner(UserSimpleResponse.of(globalUserPermission.getOwner()))
 				.build();
 	}
 

@@ -1,6 +1,6 @@
 package com.tsmms.skoop.user.query;
 
-import com.tsmms.skoop.user.GlobalPermissionResponse;
+import com.tsmms.skoop.user.GlobalUserPermissionResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -16,14 +16,14 @@ import java.util.List;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 
-@Api(tags = "UserGlobalPermissions")
+@Api(tags = "GlobalUserPermissions")
 @RestController
-public class UserGlobalPermissionQueryController {
+public class GlobalUserPermissionQueryController {
 
-	private final UserGlobalPermissionQueryService userGlobalPermissionQueryService;
+	private final GlobalUserPermissionQueryService globalUserPermissionQueryService;
 
-	public UserGlobalPermissionQueryController(UserGlobalPermissionQueryService userGlobalPermissionQueryService) {
-		this.userGlobalPermissionQueryService = requireNonNull(userGlobalPermissionQueryService);
+	public GlobalUserPermissionQueryController(GlobalUserPermissionQueryService globalUserPermissionQueryService) {
+		this.globalUserPermissionQueryService = requireNonNull(globalUserPermissionQueryService);
 	}
 
 	@ApiOperation(
@@ -39,9 +39,9 @@ public class UserGlobalPermissionQueryController {
 	})
 	@PreAuthorize("isPrincipalUserId(#userId)")
 	@GetMapping(path = "/users/{userId}/global-permissions", produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<GlobalPermissionResponse> getUserGlobalPermissions(@PathVariable("userId") String userId) {
-		return userGlobalPermissionQueryService.getUserGlobalPermissions(userId)
-				.map(GlobalPermissionResponse::of)
+	public List<GlobalUserPermissionResponse> getGlobalUserPermissions(@PathVariable("userId") String userId) {
+		return globalUserPermissionQueryService.getGlobalUserPermissions(userId)
+				.map(GlobalUserPermissionResponse::of)
 				.collect(toList());
 	}
 

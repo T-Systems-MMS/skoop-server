@@ -16,14 +16,14 @@ import static org.neo4j.ogm.annotation.Relationship.INCOMING;
 @NoArgsConstructor
 @AllArgsConstructor
 @NodeEntity
-public class GlobalPermission {
+public class GlobalUserPermission {
 
 	@Id
 	@Property(name = "id")
 	private String id;
 
 	@Property(name = "scope")
-	private UserPermissionScope scope;
+	private GlobalUserPermissionScope scope;
 
 	@Relationship(type = "HAS_GRANTED", direction = INCOMING)
 	private User owner;

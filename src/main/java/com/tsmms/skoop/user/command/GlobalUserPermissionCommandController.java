@@ -1,8 +1,8 @@
 package com.tsmms.skoop.user.command;
 
-import com.tsmms.skoop.user.command.ReplaceUserGlobalPermissionListCommand.UserGlobalPermissionEntry;
-import com.tsmms.skoop.user.GlobalPermissionRequest;
-import com.tsmms.skoop.user.GlobalPermissionResponse;
+import com.tsmms.skoop.user.command.ReplaceGlobalUserPermissionListCommand.GlobalUserPermissionEntry;
+import com.tsmms.skoop.user.GlobalUserPermissionRequest;
+import com.tsmms.skoop.user.GlobalUserPermissionResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -21,14 +21,14 @@ import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Collectors.toList;
 
-@Api(tags = "UserGlobalPermissions")
+@Api(tags = "GlobalUserPermissions")
 @RestController
-public class UserGlobalPermissionCommandController {
+public class GlobalUserPermissionCommandController {
 
-	private final UserGlobalPermissionCommandService userGlobalPermissionCommandService;
+	private final GlobalUserPermissionCommandService globalUserPermissionCommandService;
 
-	public UserGlobalPermissionCommandController(UserGlobalPermissionCommandService userGlobalPermissionCommandService) {
-		this.userGlobalPermissionCommandService = requireNonNull(userGlobalPermissionCommandService);
+	public GlobalUserPermissionCommandController(GlobalUserPermissionCommandService globalUserPermissionCommandService) {
+		this.globalUserPermissionCommandService = requireNonNull(globalUserPermissionCommandService);
 	}
 
 	@ApiOperation(
@@ -47,21 +47,21 @@ public class UserGlobalPermissionCommandController {
 	@PutMapping(path = "/users/{userId}/global-permissions",
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<GlobalPermissionResponse> replaceGlobalPermissions(@PathVariable("userId") String userId,
-																   @Valid @RequestBody List<GlobalPermissionRequest> globalPermissionRequests) {
+	public List<GlobalUserPermissionResponse> replaceGlobalPermissions(@PathVariable("userId") String userId,
+																	   @Valid @RequestBody List<GlobalUserPermissionRequest> globalUserPermissionRequests) {
 
-		return userGlobalPermissionCommandService.replaceUserGlobalPermissions(
-				ReplaceUserGlobalPermissionListCommand.builder()
+		return globalUserPermissionCommandService.replaceGlobalUserPermissions(
+				ReplaceGlobalUserPermissionListCommand.builder()
 						.ownerId(userId)
-						.globalPermissions(globalPermissionRequests.stream()
-								.map(globalPermissionRequest -> UserGlobalPermissionEntry.builder()
-										.scope(globalPermissionRequest.getScope())
+						.globalPermissions(globalUserPermissionRequests.stream()
+								.map(globalUserPermissionRequest -> GlobalUserPermissionEntry.builder()
+										.scope(globalUserPermissionRequest.getScope())
 										.build()
 								)
 								.collect(toSet())
 						)
 						.build()
-		).map(GlobalPermissionResponse::of).collect(toList());
+		).map(GlobalUserPermissionResponse::of).collect(toList());
 	}
 
 }

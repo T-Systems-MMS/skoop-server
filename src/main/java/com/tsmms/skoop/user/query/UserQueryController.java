@@ -3,6 +3,7 @@ package com.tsmms.skoop.user.query;
 import com.tsmms.skoop.exception.NoSuchResourceException;
 import com.tsmms.skoop.security.JwtClaims;
 import com.tsmms.skoop.exception.enums.Model;
+import com.tsmms.skoop.user.GlobalUserPermissionScope;
 import com.tsmms.skoop.user.User;
 import com.tsmms.skoop.user.UserResponse;
 import io.swagger.annotations.Api;
@@ -32,14 +33,14 @@ import static java.util.Objects.requireNonNull;
 public class UserQueryController {
 	private UserQueryService userQueryService;
 	private UserPermissionQueryService userPermissionQueryService;
-	private UserGlobalPermissionQueryService userGlobalPermissionQueryService;
+	private GlobalUserPermissionQueryService globalUserPermissionQueryService;
 
 	public UserQueryController(UserQueryService userQueryService,
 							   UserPermissionQueryService userPermissionQueryService,
-							   UserGlobalPermissionQueryService userGlobalPermissionQueryService) {
+							   GlobalUserPermissionQueryService globalUserPermissionQueryService) {
 		this.userQueryService = requireNonNull(userQueryService);
 		this.userPermissionQueryService = requireNonNull(userPermissionQueryService);
-		this.userGlobalPermissionQueryService = requireNonNull(userGlobalPermissionQueryService);
+		this.globalUserPermissionQueryService = requireNonNull(globalUserPermissionQueryService);
 	}
 
 	@ApiOperation(
@@ -100,7 +101,7 @@ public class UserQueryController {
 				.firstName(user.getFirstName())
 				.lastName(user.getLastName())
 				.email(user.getEmail());
-		if (userGlobalPermissionQueryService.isGlobalPermissionGranted(user.getId(), READ_USER_PROFILE) || allowedUserIds.contains(user.getId())) {
+		if (globalUserPermissionQueryService.isGlobalUserPermissionGranted(user.getId(), GlobalUserPermissionScope.READ_USER_PROFILE) || allowedUserIds.contains(user.getId())) {
 			b.academicDegree(user.getAcademicDegree())
 					.positionProfile(user.getPositionProfile())
 					.summary(user.getSummary())

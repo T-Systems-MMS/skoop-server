@@ -1,6 +1,6 @@
 package com.tsmms.skoop.security;
 
-import com.tsmms.skoop.user.query.UserGlobalPermissionQueryService;
+import com.tsmms.skoop.user.query.GlobalUserPermissionQueryService;
 import com.tsmms.skoop.user.query.UserPermissionQueryService;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
@@ -11,18 +11,18 @@ import static java.util.Objects.requireNonNull;
 
 public class SkoopMethodSecurityExpressionHandler extends DefaultMethodSecurityExpressionHandler {
 	private final UserPermissionQueryService userPermissionQueryService;
-	private final UserGlobalPermissionQueryService userGlobalPermissionQueryService;
+	private final GlobalUserPermissionQueryService globalUserPermissionQueryService;
 
 	public SkoopMethodSecurityExpressionHandler(UserPermissionQueryService userPermissionQueryService,
-												UserGlobalPermissionQueryService userGlobalPermissionQueryService) {
+												GlobalUserPermissionQueryService globalUserPermissionQueryService) {
 		this.userPermissionQueryService = requireNonNull(userPermissionQueryService);
-		this.userGlobalPermissionQueryService = requireNonNull(userGlobalPermissionQueryService);
+		this.globalUserPermissionQueryService = requireNonNull(globalUserPermissionQueryService);
 	}
 
 	@Override
 	protected MethodSecurityExpressionOperations createSecurityExpressionRoot(Authentication authentication, MethodInvocation invocation) {
 		SkoopSecurityExpressionRoot root = new SkoopSecurityExpressionRoot(authentication, userPermissionQueryService,
-				userGlobalPermissionQueryService);
+				globalUserPermissionQueryService);
 		root.setThis(invocation.getThis());
 		root.setPermissionEvaluator(getPermissionEvaluator());
 		root.setTrustResolver(getTrustResolver());

@@ -1,6 +1,7 @@
 package com.tsmms.skoop.userskill.query;
 
 import com.tsmms.skoop.skill.Skill;
+import com.tsmms.skoop.user.GlobalUserPermissionScope;
 import com.tsmms.skoop.user.User;
 import com.tsmms.skoop.user.UserPermissionScope;
 import com.tsmms.skoop.common.AbstractControllerTests;
@@ -28,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(UserSkillQueryController.class)
 class UserSkillQueryControllerTests extends AbstractControllerTests {
+
 	@Autowired
 	private MockMvc mockMvc;
 
@@ -266,4 +268,92 @@ class UserSkillQueryControllerTests extends AbstractControllerTests {
 					then(userSkillQueryService).shouldHaveZeroInteractions();
 				});
 	}
+
+	@Test
+	@DisplayName("Gets skills of another user on behalf of the authorized user when the owner granted global READ_USER_SKILLS permission.")
+	void getSkillsOfAnotherUserWhenSheGrantedGlobalReadSkillsPermission() throws Exception {
+		User owner = User.builder()
+				.id("bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6")
+				.userName("tester")
+				.build();
+		User foreigner = User.builder()
+				.id("c749d708-6ef4-4ce8-9a86-220a70065326")
+				.userName("testing")
+				.build();
+
+		given(userSkillQueryService.getUserSkillsByUserId("bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6")).willReturn(Stream.of(
+				UserSkill.builder()
+						.id(1L)
+						.user(owner)
+						.skill(Skill.builder()
+								.id("e441613b-319f-4698-917d-6a4037c8e330")
+								.name("Angular")
+								.description("JavaScript Framework")
+								.build())
+						.currentLevel(2)
+						.desiredLevel(3)
+						.priority(4)
+						.build()
+		));
+
+		given(globalUserPermissionQueryService.isGlobalUserPermissionGranted(owner.getId(), GlobalUserPermissionScope.READ_USER_SKILLS)).willReturn(true);
+
+		mockMvc.perform(get("/users/bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6/skills")
+				.accept(MediaType.APPLICATION_JSON)
+				.with(authentication(withUser(foreigner))))
+				.andExpect(status().isOk())
+				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+				.andExpect(jsonPath("$.length()", is(equalTo(1))))
+				.andExpect(jsonPath("$[0].skill.id", is(equalTo("e441613b-319f-4698-917d-6a4037c8e330"))))
+				.andExpect(jsonPath("$[0].skill.name", is(equalTo("Angular"))))
+				.andExpect(jsonPath("$[0].skill.description", is(equalTo("JavaScript Framework"))))
+				.andExpect(jsonPath("$[0].currentLevel", is(equalTo(2))))
+				.andExpect(jsonPath("$[0].desiredLevel", is(equalTo(3))))
+				.andExpect(jsonPath("$[0].priority", is(equalTo(4))));
+	}
+
+	@Test
+	@DisplayName("Gets specific skill of another user on behalf of the authorized user when the owner granted global READ_USER_SKILLS permission.")
+	void getSpecificSkillOfAnotherUserWhenSheGrantedGlobalReadSkillsPermission() throws Exception {
+		User owner = User.builder()
+				.id("bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6")
+				.userName("tester")
+				.build();
+
+		User foreigner = User.builder()
+				.id("c749d708-6ef4-4ce8-9a86-220a70065326")
+				.userName("testing")
+				.build();
+
+		given(userSkillQueryService.getUserSkillByUserIdAndSkillId(
+				"bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6", "e441613b-319f-4698-917d-6a4037c8e330"))
+				.willReturn(Optional.of(UserSkill.builder()
+						.id(1L)
+						.user(owner)
+						.skill(Skill.builder()
+								.id("e441613b-319f-4698-917d-6a4037c8e330")
+								.name("Angular")
+								.description("JavaScript Framework")
+								.build())
+						.currentLevel(2)
+						.desiredLevel(3)
+						.priority(4)
+						.build()
+				));
+
+		given(globalUserPermissionQueryService.isGlobalUserPermissionGranted(owner.getId(), GlobalUserPermissionScope.READ_USER_SKILLS)).willReturn(true);
+
+		mockMvc.perform(get("/users/bcbc938c-8e0d-4e00-98a8-da7b44aa5dd6/skills/e441613b-319f-4698-917d-6a4037c8e330")
+				.accept(MediaType.APPLICATION_JSON)
+				.with(authentication(withUser(foreigner))))
+				.andExpect(status().isOk())
+				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+				.andExpect(jsonPath("$.skill.id", is(equalTo("e441613b-319f-4698-917d-6a4037c8e330"))))
+				.andExpect(jsonPath("$.skill.name", is(equalTo("Angular"))))
+				.andExpect(jsonPath("$.skill.description", is(equalTo("JavaScript Framework"))))
+				.andExpect(jsonPath("$.currentLevel", is(equalTo(2))))
+				.andExpect(jsonPath("$.desiredLevel", is(equalTo(3))))
+				.andExpect(jsonPath("$.priority", is(equalTo(4))));
+	}
+
 }

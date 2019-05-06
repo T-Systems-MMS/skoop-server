@@ -1,7 +1,8 @@
 package com.tsmms.skoop.user.command;
 
-import com.tsmms.skoop.user.GlobalPermission;
-import com.tsmms.skoop.user.GlobalPermissionRepository;
+import com.tsmms.skoop.exception.NoSuchResourceException;
+import com.tsmms.skoop.user.GlobalUserPermission;
+import com.tsmms.skoop.user.GlobalUserPermissionRepository;
 import com.tsmms.skoop.user.User;
 import com.tsmms.skoop.user.query.UserQueryService;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,14 +11,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import com.tsmms.skoop.user.command.ReplaceUserGlobalPermissionListCommand.UserGlobalPermissionEntry;
+import com.tsmms.skoop.user.command.ReplaceGlobalUserPermissionListCommand.GlobalUserPermissionEntry;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static com.tsmms.skoop.user.UserPermissionScope.*;
+import static com.tsmms.skoop.user.GlobalUserPermissionScope.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
@@ -30,24 +31,24 @@ import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
-class UserGlobalPermissionCommandServiceTests {
+class GlobalUserPermissionCommandServiceTests {
 
 	@Mock
-	private GlobalPermissionRepository globalPermissionRepository;
+	private GlobalUserPermissionRepository globalUserPermissionRepository;
 
 	@Mock
 	private UserQueryService userQueryService;
 
-	private UserGlobalPermissionCommandService userGlobalPermissionCommandService;
+	private GlobalUserPermissionCommandService globalUserPermissionCommandService;
 
 	@BeforeEach
 	void setUp() {
-		userGlobalPermissionCommandService = new UserGlobalPermissionCommandService(globalPermissionRepository, userQueryService);
+		globalUserPermissionCommandService = new GlobalUserPermissionCommandService(globalUserPermissionRepository, userQueryService);
 	}
 
 	@DisplayName("Replaces user global permissions.")
 	@Test
-	void replaceUserGlobalPermissions() {
+	void replaceGlobalUserPermissions() {
 
 		given(userQueryService.getUserById("123")).willReturn(
 				Optional.of(
@@ -58,11 +59,13 @@ class UserGlobalPermissionCommandServiceTests {
 				)
 		);
 
-		given(globalPermissionRepository.saveAll(argThat(allOf(
+		given(userQueryService.exists("123")).willReturn(true);
+
+		given(globalUserPermissionRepository.saveAll(argThat(allOf(
 				isA(Iterable.class),
 				containsInAnyOrder(
 						allOf(
-								isA(GlobalPermission.class),
+								isA(GlobalUserPermission.class),
 								hasProperty("id", isA(String.class)),
 								hasProperty("scope", is(READ_USER_PROFILE)),
 								hasProperty("owner", equalTo(
@@ -73,9 +76,9 @@ class UserGlobalPermissionCommandServiceTests {
 								))
 						),
 						allOf(
-								isA(GlobalPermission.class),
+								isA(GlobalUserPermission.class),
 								hasProperty("id", isA(String.class)),
-								hasProperty("scope", is(SEE_AS_COACH)),
+								hasProperty("scope", is(FIND_AS_COACH)),
 								hasProperty("owner", equalTo(
 										User.builder()
 												.id("123")
@@ -86,7 +89,7 @@ class UserGlobalPermissionCommandServiceTests {
 				)
 		)))).willReturn(
 				Arrays.asList(
-						GlobalPermission.builder()
+						GlobalUserPermission.builder()
 								.id("abc")
 								.owner(
 										User.builder()
@@ -94,9 +97,9 @@ class UserGlobalPermissionCommandServiceTests {
 												.userName("tester")
 												.build()
 								)
-								.scope(SEE_AS_COACH)
+								.scope(FIND_AS_COACH)
 								.build(),
-						GlobalPermission.builder()
+						GlobalUserPermission.builder()
 								.id("def")
 								.owner(
 										User.builder()
@@ -109,21 +112,21 @@ class UserGlobalPermissionCommandServiceTests {
 				)
 		);
 
-		final Stream<GlobalPermission> globalPermissions = userGlobalPermissionCommandService.replaceUserGlobalPermissions(ReplaceUserGlobalPermissionListCommand.builder()
+		final Stream<GlobalUserPermission> globalPermissions = globalUserPermissionCommandService.replaceGlobalUserPermissions(ReplaceGlobalUserPermissionListCommand.builder()
 				.ownerId("123")
-				.globalPermissions(new HashSet<>(Arrays.asList(UserGlobalPermissionEntry
+				.globalPermissions(new HashSet<>(Arrays.asList(GlobalUserPermissionEntry
 								.builder()
 								.scope(READ_USER_PROFILE)
 								.build(),
-						UserGlobalPermissionEntry
+						GlobalUserPermissionEntry
 								.builder()
-								.scope(SEE_AS_COACH)
+								.scope(FIND_AS_COACH)
 								.build()
 				)))
 				.build()
 		);
 		assertThat(globalPermissions).containsExactlyInAnyOrder(
-				GlobalPermission.builder()
+				GlobalUserPermission.builder()
 						.id("abc")
 						.owner(
 								User.builder()
@@ -131,9 +134,9 @@ class UserGlobalPermissionCommandServiceTests {
 										.userName("tester")
 										.build()
 						)
-						.scope(SEE_AS_COACH)
+						.scope(FIND_AS_COACH)
 						.build(),
-				GlobalPermission.builder()
+				GlobalUserPermission.builder()
 						.id("def")
 						.owner(
 								User.builder()
@@ -146,10 +149,29 @@ class UserGlobalPermissionCommandServiceTests {
 		);
 	}
 
-	@DisplayName("Throws exception if command is null when replacing user global permissions.")
+	@DisplayName("Throws exception if command is null when replacing global user permissions.")
 	@Test
-	void throwExceptionIfCommandIsNullWhenReplacingUserGlobalPermissions() {
-		assertThrows(IllegalArgumentException.class, () -> userGlobalPermissionCommandService.replaceUserGlobalPermissions(null));
+	void throwExceptionIfCommandIsNullWhenReplacingGlobalUserPermissions() {
+		assertThrows(IllegalArgumentException.class, () -> globalUserPermissionCommandService.replaceGlobalUserPermissions(null));
+	}
+
+	@DisplayName("Throws exception if user does not exist when replacing global user permissions.")
+	@Test
+	void throwExceptionIfUserDoesNotExistWhenReplacingGlobalUserPermissions() {
+		given(userQueryService.exists("123")).willReturn(false);
+		assertThrows(NoSuchResourceException.class, () -> globalUserPermissionCommandService.replaceGlobalUserPermissions(ReplaceGlobalUserPermissionListCommand.builder()
+				.ownerId("123")
+				.globalPermissions(new HashSet<>(Arrays.asList(GlobalUserPermissionEntry
+								.builder()
+								.scope(READ_USER_PROFILE)
+								.build(),
+						GlobalUserPermissionEntry
+								.builder()
+								.scope(FIND_AS_COACH)
+								.build()
+				)))
+				.build()
+		));
 	}
 
 }

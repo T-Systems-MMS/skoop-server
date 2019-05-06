@@ -17,10 +17,10 @@ import javax.validation.constraints.NotBlank;
 		value = "GlobalPermissionRequest",
 		description = "Request object for creating or updating user global permission."
 )
-public class GlobalPermissionRequest {
+public class GlobalUserPermissionRequest {
 
 	@ApiModelProperty("Scope of access to be granted to all users.")
 	@NotBlank
-	private UserPermissionScope scope;
+	private GlobalUserPermissionScope scope;
 
 }

@@ -3,7 +3,7 @@ package com.tsmms.skoop.common;
 import com.tsmms.skoop.security.CurrentUserService;
 import com.tsmms.skoop.security.MethodSecurityConfiguration;
 import com.tsmms.skoop.user.UserPermissionScope;
-import com.tsmms.skoop.user.query.UserGlobalPermissionQueryService;
+import com.tsmms.skoop.user.query.GlobalUserPermissionQueryService;
 import com.tsmms.skoop.user.query.UserPermissionQueryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,7 @@ public abstract class AbstractControllerTests {
 	protected UserPermissionQueryService userPermissionQueryService;
 
 	@MockBean
-	protected UserGlobalPermissionQueryService userGlobalPermissionQueryService;
+	protected GlobalUserPermissionQueryService globalUserPermissionQueryService;
 
 	@Autowired
 	protected CurrentUserService currentUserService;
@@ -45,7 +45,7 @@ public abstract class AbstractControllerTests {
 	@BeforeEach
 	void prepareSecurityService() {
 		willReturn(false).given(userPermissionQueryService).hasUserPermission(any(), any(), any());
-		willReturn(false).given(userGlobalPermissionQueryService).isGlobalPermissionGranted(any(), any());
+		willReturn(false).given(globalUserPermissionQueryService).isGlobalUserPermissionGranted(any(), any());
 	}
 
 	protected UserConfigurationBuilder givenUser(String userId) {

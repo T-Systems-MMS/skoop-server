@@ -1,6 +1,6 @@
 package com.tsmms.skoop.security;
 
-import com.tsmms.skoop.user.query.UserGlobalPermissionQueryService;
+import com.tsmms.skoop.user.query.GlobalUserPermissionQueryService;
 import com.tsmms.skoop.user.query.UserPermissionQueryService;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
@@ -14,16 +14,16 @@ import static java.util.Objects.requireNonNull;
 public class MethodSecurityConfiguration extends GlobalMethodSecurityConfiguration {
 
 	private final UserPermissionQueryService userPermissionQueryService;
-	private final UserGlobalPermissionQueryService userGlobalPermissionQueryService;
+	private final GlobalUserPermissionQueryService globalUserPermissionQueryService;
 
 	public MethodSecurityConfiguration(UserPermissionQueryService userPermissionQueryService,
-									   UserGlobalPermissionQueryService userGlobalPermissionQueryService) {
+									   GlobalUserPermissionQueryService globalUserPermissionQueryService) {
 		this.userPermissionQueryService = requireNonNull(userPermissionQueryService);
-		this.userGlobalPermissionQueryService = requireNonNull(userGlobalPermissionQueryService);
+		this.globalUserPermissionQueryService = requireNonNull(globalUserPermissionQueryService);
 	}
 
 	@Override
 	protected MethodSecurityExpressionHandler createExpressionHandler() {
-		return new SkoopMethodSecurityExpressionHandler(userPermissionQueryService, userGlobalPermissionQueryService);
+		return new SkoopMethodSecurityExpressionHandler(userPermissionQueryService, globalUserPermissionQueryService);
 	}
 }

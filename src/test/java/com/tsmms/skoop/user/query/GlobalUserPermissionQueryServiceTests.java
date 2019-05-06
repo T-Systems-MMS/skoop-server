@@ -1,9 +1,8 @@
 package com.tsmms.skoop.user.query;
 
-import com.tsmms.skoop.user.GlobalPermission;
-import com.tsmms.skoop.user.GlobalPermissionRepository;
+import com.tsmms.skoop.user.GlobalUserPermission;
+import com.tsmms.skoop.user.GlobalUserPermissionRepository;
 import com.tsmms.skoop.user.User;
-import com.tsmms.skoop.user.UserPermissionScope;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,37 +15,38 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static com.tsmms.skoop.user.GlobalUserPermissionScope.*;
 
 @ExtendWith(MockitoExtension.class)
-class UserGlobalPermissionQueryServiceTests {
+class GlobalUserPermissionQueryServiceTests {
 
 	@Mock
-	private GlobalPermissionRepository globalPermissionRepository;
+	private GlobalUserPermissionRepository globalUserPermissionRepository;
 
-	private UserGlobalPermissionQueryService userGlobalPermissionQueryService;
+	private GlobalUserPermissionQueryService globalUserPermissionQueryService;
 
 	@BeforeEach
 	void setUp() {
-		userGlobalPermissionQueryService = new UserGlobalPermissionQueryService(globalPermissionRepository);
+		globalUserPermissionQueryService = new GlobalUserPermissionQueryService(globalUserPermissionRepository);
 	}
 
 	@DisplayName("Gets user global permissions.")
 	@Test
-	void getUserGlobalPermissions() {
-		given(globalPermissionRepository.findByOwnerId("123")).willReturn(
+	void getGlobalUserPermissions() {
+		given(globalUserPermissionRepository.findByOwnerId("123")).willReturn(
 				Stream.of(
-						GlobalPermission.builder()
+						GlobalUserPermission.builder()
 								.id("abc")
-								.scope(UserPermissionScope.READ_USER_PROFILE)
+								.scope(READ_USER_PROFILE)
 								.owner(User.builder()
 										.id("123")
 										.userName("tester")
 										.build()
 								)
 								.build(),
-						GlobalPermission.builder()
+						GlobalUserPermission.builder()
 								.id("abc")
-								.scope(UserPermissionScope.SEE_AS_COACH)
+								.scope(FIND_AS_COACH)
 								.owner(User.builder()
 										.id("123")
 										.userName("tester")
@@ -55,21 +55,21 @@ class UserGlobalPermissionQueryServiceTests {
 								.build()
 				)
 		);
-		final Stream<GlobalPermission> globalPermissions = userGlobalPermissionQueryService.getUserGlobalPermissions("123");
+		final Stream<GlobalUserPermission> globalPermissions = globalUserPermissionQueryService.getGlobalUserPermissions("123");
 
 		assertThat(globalPermissions).containsExactlyInAnyOrder(
-				GlobalPermission.builder()
+				GlobalUserPermission.builder()
 						.id("abc")
-						.scope(UserPermissionScope.READ_USER_PROFILE)
+						.scope(READ_USER_PROFILE)
 						.owner(User.builder()
 								.id("123")
 								.userName("tester")
 								.build()
 						)
 						.build(),
-				GlobalPermission.builder()
+				GlobalUserPermission.builder()
 						.id("abc")
-						.scope(UserPermissionScope.SEE_AS_COACH)
+						.scope(FIND_AS_COACH)
 						.owner(User.builder()
 								.id("123")
 								.userName("tester")
@@ -81,27 +81,27 @@ class UserGlobalPermissionQueryServiceTests {
 
 	@DisplayName("Throws exception if owner ID is null when getting user global permissions.")
 	@Test
-	void throwExceptionIfOwnerIdIsNullWhenGettingUserGlobalPermissions() {
-		assertThrows(IllegalArgumentException.class, () -> userGlobalPermissionQueryService.getUserGlobalPermissions(null));
+	void throwExceptionIfOwnerIdIsNullWhenGettingGlobalUserPermissions() {
+		assertThrows(IllegalArgumentException.class, () -> globalUserPermissionQueryService.getGlobalUserPermissions(null));
 	}
 
 	@DisplayName("Check if global permissions is granted.")
 	@Test
-	void isGlobalPermissionGranted() {
-		given(globalPermissionRepository.isGlobalPermissionGranted("123", UserPermissionScope.READ_USER_PROFILE)).willReturn(true);
-		assertThat(userGlobalPermissionQueryService.isGlobalPermissionGranted("123", UserPermissionScope.READ_USER_PROFILE)).isTrue();
+	void isGlobalUserPermissionGranted() {
+		given(globalUserPermissionRepository.isGlobalPermissionGranted("123", READ_USER_PROFILE)).willReturn(true);
+		assertThat(globalUserPermissionQueryService.isGlobalUserPermissionGranted("123", READ_USER_PROFILE)).isTrue();
 	}
 
 	@DisplayName("Throws exception if owner ID is null when checking if global permission granted.")
 	@Test
 	void throwExceptionIfOwnerIdIsNullWhenCheckingIfGlobalPermissionGranted() {
-		assertThrows(IllegalArgumentException.class, () -> userGlobalPermissionQueryService.isGlobalPermissionGranted(null, UserPermissionScope.READ_USER_PROFILE));
+		assertThrows(IllegalArgumentException.class, () -> globalUserPermissionQueryService.isGlobalUserPermissionGranted(null, READ_USER_PROFILE));
 	}
 
 	@DisplayName("Throws exception if scope is null when checking if global permission granted.")
 	@Test
 	void throwExceptionIfScopeIsNullWhenCheckingIfGlobalPermissionGranted() {
-		assertThrows(IllegalArgumentException.class, () -> userGlobalPermissionQueryService.isGlobalPermissionGranted("123", null));
+		assertThrows(IllegalArgumentException.class, () -> globalUserPermissionQueryService.isGlobalUserPermissionGranted("123", null));
 	}
 
 }

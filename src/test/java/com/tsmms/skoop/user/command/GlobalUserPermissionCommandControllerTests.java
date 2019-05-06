@@ -1,7 +1,7 @@
 package com.tsmms.skoop.user.command;
 
 import com.tsmms.skoop.common.AbstractControllerTests;
-import com.tsmms.skoop.user.GlobalPermission;
+import com.tsmms.skoop.user.GlobalUserPermission;
 import com.tsmms.skoop.user.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,7 +11,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import com.tsmms.skoop.user.command.ReplaceUserGlobalPermissionListCommand.UserGlobalPermissionEntry;
+import com.tsmms.skoop.user.command.ReplaceGlobalUserPermissionListCommand.GlobalUserPermissionEntry;
 
 import java.io.InputStream;
 import java.util.Arrays;
@@ -33,13 +33,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static com.tsmms.skoop.common.JwtAuthenticationFactory.withUser;
-import static com.tsmms.skoop.user.UserPermissionScope.*;
+import static com.tsmms.skoop.user.GlobalUserPermissionScope.*;
 
-@WebMvcTest(UserGlobalPermissionCommandController.class)
-class UserGlobalPermissionCommandControllerTests extends AbstractControllerTests {
+@WebMvcTest(GlobalUserPermissionCommandController.class)
+class GlobalUserPermissionCommandControllerTests extends AbstractControllerTests {
 
 	@MockBean
-	private UserGlobalPermissionCommandService userGlobalPermissionCommandService;
+	private GlobalUserPermissionCommandService globalUserPermissionCommandService;
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -62,33 +62,33 @@ class UserGlobalPermissionCommandControllerTests extends AbstractControllerTests
 				.languages(Collections.singletonList("Deutsch"))
 				.build();
 
-		given(userGlobalPermissionCommandService.replaceUserGlobalPermissions(argThat(allOf(
-				isA(ReplaceUserGlobalPermissionListCommand.class),
+		given(globalUserPermissionCommandService.replaceGlobalUserPermissions(argThat(allOf(
+				isA(ReplaceGlobalUserPermissionListCommand.class),
 				hasProperty("ownerId", is("adac977c-8e0d-4e00-98a8-da7b44aa5dd6")),
 				hasProperty("globalPermissions", containsInAnyOrder(
-						UserGlobalPermissionEntry.builder()
+						GlobalUserPermissionEntry.builder()
 								.scope(READ_USER_PROFILE)
 								.build(),
-						UserGlobalPermissionEntry.builder()
+						GlobalUserPermissionEntry.builder()
 								.scope(READ_USER_SKILLS)
 								.build(),
-						UserGlobalPermissionEntry.builder()
-								.scope(SEE_AS_COACH)
+						GlobalUserPermissionEntry.builder()
+								.scope(FIND_AS_COACH)
 								.build()
 						)
 				))))).willReturn(
 				Stream.of(
-						GlobalPermission.builder()
+						GlobalUserPermission.builder()
 								.id("123")
 								.scope(READ_USER_SKILLS)
 								.owner(owner)
 								.build(),
-						GlobalPermission.builder()
+						GlobalUserPermission.builder()
 								.id("456")
-								.scope(SEE_AS_COACH)
+								.scope(FIND_AS_COACH)
 								.owner(owner)
 								.build(),
-						GlobalPermission.builder()
+						GlobalUserPermission.builder()
 								.id("789")
 								.scope(READ_USER_PROFILE)
 								.owner(owner)
@@ -112,7 +112,7 @@ class UserGlobalPermissionCommandControllerTests extends AbstractControllerTests
 					.andExpect(jsonPath("$[?(@.id=='123')].owner.firstName", hasItem("John")))
 					.andExpect(jsonPath("$[?(@.id=='123')].owner.lastName", hasItem("Doe")))
 					.andExpect(jsonPath("$[?(@.id=='123')].owner.email", hasItem("john.doe@mail.com")))
-					.andExpect(jsonPath("$[?(@.id=='456')].scope", hasItem("SEE_AS_COACH")))
+					.andExpect(jsonPath("$[?(@.id=='456')].scope", hasItem("FIND_AS_COACH")))
 					.andExpect(jsonPath("$[?(@.id=='456')].owner.id", hasItem("adac977c-8e0d-4e00-98a8-da7b44aa5dd6")))
 					.andExpect(jsonPath("$[?(@.id=='456')].owner.userName", hasItem("johndoe")))
 					.andExpect(jsonPath("$[?(@.id=='456')].owner.firstName", hasItem("John")))

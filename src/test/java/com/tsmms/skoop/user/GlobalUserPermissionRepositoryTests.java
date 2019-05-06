@@ -9,12 +9,13 @@ import java.util.Arrays;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static com.tsmms.skoop.user.GlobalUserPermissionScope.*;
 
 @DataNeo4jTest
-class GlobalPermissionRepositoryTests {
+class GlobalUserPermissionRepositoryTests {
 
 	@Autowired
-	private GlobalPermissionRepository globalPermissionRepository;
+	private GlobalUserPermissionRepository globalUserPermissionRepository;
 
 	@DisplayName("Finds global permissions by owner ID.")
 	@Test
@@ -29,25 +30,25 @@ class GlobalPermissionRepositoryTests {
 				.userName("tester")
 				.build();
 
-		globalPermissionRepository.saveAll(Arrays.asList(
-				GlobalPermission.builder()
+		globalUserPermissionRepository.saveAll(Arrays.asList(
+				GlobalUserPermission.builder()
 						.id("abc")
 						.owner(tester)
-						.scope(UserPermissionScope.READ_USER_PROFILE)
+						.scope(READ_USER_PROFILE)
 						.build(),
-				GlobalPermission.builder()
+				GlobalUserPermission.builder()
 						.id("abc")
 						.owner(owner)
-						.scope(UserPermissionScope.READ_USER_PROFILE)
+						.scope(READ_USER_PROFILE)
 						.build()
 		));
 
-		final Stream<GlobalPermission> globalPermissions = globalPermissionRepository.findByOwnerId("123");
+		final Stream<GlobalUserPermission> globalPermissions = globalUserPermissionRepository.findByOwnerId("123");
 		assertThat(globalPermissions).containsExactlyInAnyOrder(
-				GlobalPermission.builder()
+				GlobalUserPermission.builder()
 						.id("abc")
 						.owner(owner)
-						.scope(UserPermissionScope.READ_USER_PROFILE)
+						.scope(READ_USER_PROFILE)
 						.build()
 		);
 	}
@@ -55,16 +56,16 @@ class GlobalPermissionRepositoryTests {
 	@DisplayName("Check if global permission granted.")
 	@Test
 	void isGlobalPermissionGranted() {
-		globalPermissionRepository.save(GlobalPermission.builder()
+		globalUserPermissionRepository.save(GlobalUserPermission.builder()
 				.id("abc")
 				.owner(User.builder()
 						.id("123")
 						.userName("owner")
 						.build())
-				.scope(UserPermissionScope.READ_USER_PROFILE)
+				.scope(READ_USER_PROFILE)
 				.build()
 		);
-		assertThat(globalPermissionRepository.isGlobalPermissionGranted("123", UserPermissionScope.READ_USER_PROFILE)).isTrue();
+		assertThat(globalUserPermissionRepository.isGlobalPermissionGranted("123", READ_USER_PROFILE)).isTrue();
 	}
 
 }

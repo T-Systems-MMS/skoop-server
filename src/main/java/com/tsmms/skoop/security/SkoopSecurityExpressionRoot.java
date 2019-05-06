@@ -1,7 +1,8 @@
 package com.tsmms.skoop.security;
 
+import com.tsmms.skoop.user.GlobalUserPermissionScope;
 import com.tsmms.skoop.user.UserPermissionScope;
-import com.tsmms.skoop.user.query.UserGlobalPermissionQueryService;
+import com.tsmms.skoop.user.query.GlobalUserPermissionQueryService;
 import com.tsmms.skoop.user.query.UserPermissionQueryService;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
@@ -13,14 +14,14 @@ public class SkoopSecurityExpressionRoot extends SecurityExpressionRoot implemen
 	private Object returnObject;
 	private Object target;
 	private final UserPermissionQueryService userPermissionQueryService;
-	private final UserGlobalPermissionQueryService userGlobalPermissionQueryService;
+	private final GlobalUserPermissionQueryService globalUserPermissionQueryService;
 
 	public SkoopSecurityExpressionRoot(Authentication authentication,
 									   UserPermissionQueryService userPermissionQueryService,
-									   UserGlobalPermissionQueryService userGlobalPermissionQueryService) {
+									   GlobalUserPermissionQueryService globalUserPermissionQueryService) {
 		super(authentication);
 		this.userPermissionQueryService = userPermissionQueryService;
-		this.userGlobalPermissionQueryService = userGlobalPermissionQueryService;
+		this.globalUserPermissionQueryService = globalUserPermissionQueryService;
 	}
 
 	/**
@@ -70,7 +71,7 @@ public class SkoopSecurityExpressionRoot extends SecurityExpressionRoot implemen
 	 * @return <code>true</code> if the user referenced by owner ID has granted the user global permission with the given scope.
 	 */
 	public boolean isGlobalPermissionGranted(String ownerId, String scope) {
-		return userGlobalPermissionQueryService.isGlobalPermissionGranted(ownerId, UserPermissionScope.valueOf(scope));
+		return globalUserPermissionQueryService.isGlobalUserPermissionGranted(ownerId, GlobalUserPermissionScope.valueOf(scope));
 	}
 
 	public void setFilterObject(Object filterObject) {

@@ -10,10 +10,6 @@ public enum UserPermissionScope {
 	 * Allows authorized users to view profile of the owning user and her / his personal information. For example, user Bob
 	 * can view the profile and personal information of user John.
 	 */
-	READ_USER_PROFILE,
-	/**
-	 * Allows authorized users to see the owning user as a coach. For example, user Bob
-	 * can see user John as a coach.
-	 */
-	SEE_AS_COACH
+	READ_USER_PROFILE
+
 }
