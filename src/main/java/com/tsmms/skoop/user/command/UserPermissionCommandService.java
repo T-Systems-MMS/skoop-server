@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @Service
 public class UserPermissionCommandService {
@@ -51,19 +52,23 @@ public class UserPermissionCommandService {
 		final List<UserPermission> userPermissions = new LinkedList<>();
 		scopeAuthorizedUsers.forEach((scope, authorizedUserIds) -> {
 			// Remove all existing user permissions for the owner.
-			userPermissionRepository.deleteByOwnerIdAndScope(command.getOwnerId(), scope);
+			userPermissionRepository.deleteByOwnerIdAndScope(owner.getId(), scope);
 			final List<User> authorizedUsers = new LinkedList<>();
 			if (CollectionUtils.isNotEmpty(authorizedUserIds)) {
 				userRepository.findAllById(authorizedUserIds).forEach(authorizedUsers::add);
 			}
-			UserPermission userPermission = UserPermission.builder()
+			final UserPermission userPermission = UserPermission.builder()
 					.id(UUID.randomUUID().toString())
 					.owner(owner)
 					.scope(scope)
 					.authorizedUsers(authorizedUsers)
 					.build();
-			userPermissions.add(userPermissionRepository.save(userPermission));
+			userPermissions.add(userPermission);
 		});
-		return userPermissions.stream();
+		if (userPermissions.isEmpty()) {
+			return Stream.empty();
+		} else {
+			return StreamSupport.stream(userPermissionRepository.saveAll(userPermissions).spliterator(), false);
+		}
 	}
 }

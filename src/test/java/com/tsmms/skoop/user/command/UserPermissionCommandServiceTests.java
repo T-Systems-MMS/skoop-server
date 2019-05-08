@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.isA;
@@ -62,42 +63,49 @@ class UserPermissionCommandServiceTests {
 						.userName("secondUser")
 						.build()
 		));
-		given(userPermissionRepository.save(argThat(allOf(
-				isA(UserPermission.class),
-				hasProperty("id", isA(String.class)),
-				hasProperty("owner", equalTo(User.builder()
-						.id("123")
-						.userName("owner")
-						.build())),
-				hasProperty("authorizedUsers", equalTo(Arrays.asList(
-						User.builder()
-								.id("456")
-								.userName("firstUser")
-								.build(),
-						User.builder()
-								.id("789")
-								.userName("secondUser")
-								.build()
-				)))
+		given(userPermissionRepository.saveAll(argThat(allOf(
+				isA(Iterable.class),
+				contains(
+						allOf(
+								isA(UserPermission.class),
+								hasProperty("id", isA(String.class)),
+								hasProperty("owner", equalTo(User.builder()
+										.id("123")
+										.userName("owner")
+										.build())),
+								hasProperty("authorizedUsers", equalTo(Arrays.asList(
+										User.builder()
+												.id("456")
+												.userName("firstUser")
+												.build(),
+										User.builder()
+												.id("789")
+												.userName("secondUser")
+												.build()
+								)))
+						)
+				)
 				))
-		)).willReturn(UserPermission.builder()
-				.id("abc")
-				.owner(User.builder()
-						.id("123")
-						.userName("owner")
-						.build())
-				.scope(UserPermissionScope.READ_USER_PROFILE)
-				.authorizedUsers(Arrays.asList(
-						User.builder()
-								.id("456")
-								.userName("firstUser")
-								.build(),
-						User.builder()
-								.id("789")
-								.userName("secondUser")
-								.build()
-				))
-				.build()
+		)).willReturn(Collections.singletonList(
+				UserPermission.builder()
+						.id("abc")
+						.owner(User.builder()
+								.id("123")
+								.userName("owner")
+								.build())
+						.scope(UserPermissionScope.READ_USER_PROFILE)
+						.authorizedUsers(Arrays.asList(
+								User.builder()
+										.id("456")
+										.userName("firstUser")
+										.build(),
+								User.builder()
+										.id("789")
+										.userName("secondUser")
+										.build()
+						))
+						.build()
+				)
 		);
 		final List<UserPermission> userPermissions = userPermissionCommandService.replaceOutboundUserPermissions(ReplaceUserPermissionListCommand.builder()
 				.ownerId("123")
