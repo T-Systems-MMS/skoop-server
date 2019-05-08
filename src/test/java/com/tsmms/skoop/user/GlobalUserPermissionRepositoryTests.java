@@ -32,7 +32,7 @@ class GlobalUserPermissionRepositoryTests {
 
 		globalUserPermissionRepository.saveAll(Arrays.asList(
 				GlobalUserPermission.builder()
-						.id("abc")
+						.id("def")
 						.owner(tester)
 						.scope(READ_USER_PROFILE)
 						.build(),
