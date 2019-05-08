@@ -3,22 +3,30 @@ package com.tsmms.skoop.user.command;
 import com.tsmms.skoop.exception.DuplicateResourceException;
 import com.tsmms.skoop.exception.NoSuchResourceException;
 import com.tsmms.skoop.exception.enums.Model;
+import com.tsmms.skoop.notification.command.NotificationCommandService;
 import com.tsmms.skoop.user.User;
 import com.tsmms.skoop.user.UserRepository;
 import com.tsmms.skoop.user.UserRequest;
+import com.tsmms.skoop.user.notification.UserWelcomeNotification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 
 @Service
 public class UserCommandService {
-	private UserRepository userRepository;
 
-	public UserCommandService(UserRepository userRepository) {
-		this.userRepository = userRepository;
+	private final UserRepository userRepository;
+	private final NotificationCommandService notificationCommandService;
+
+	public UserCommandService(UserRepository userRepository,
+							  NotificationCommandService notificationCommandService) {
+		this.userRepository = requireNonNull(userRepository);
+		this.notificationCommandService = requireNonNull(notificationCommandService);
 	}
 
 	/**
@@ -37,7 +45,7 @@ public class UserCommandService {
 					.message(format("User with name '%s' already exists", userName))
 					.build();
 		});
-		return userRepository.save(User.builder()
+		final User user = userRepository.save(User.builder()
 				.id(UUID.randomUUID().toString())
 				.referenceId(UUID.randomUUID().toString())
 				.userName(userName)
@@ -45,6 +53,13 @@ public class UserCommandService {
 				.lastName(lastName)
 				.email(email)
 				.build());
+		notificationCommandService.save(UserWelcomeNotification.builder()
+				.id(UUID.randomUUID().toString())
+				.creationDatetime(LocalDateTime.now())
+				.user(user)
+				.build()
+		);
+		return user;
 	}
 
 	/**

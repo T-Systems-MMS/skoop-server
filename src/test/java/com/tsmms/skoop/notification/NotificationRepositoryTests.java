@@ -18,6 +18,7 @@ import com.tsmms.skoop.communityuser.registration.InvitationToJoinCommunityNotif
 import com.tsmms.skoop.communityuser.registration.RequestToJoinCommunityNotification;
 import com.tsmms.skoop.user.User;
 import com.tsmms.skoop.user.UserRepository;
+import com.tsmms.skoop.user.notification.UserWelcomeNotification;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -215,9 +216,16 @@ class NotificationRepositoryTests {
 				.build()
 		);
 
+		notificationRepository.save(UserWelcomeNotification.builder()
+				.id("777")
+				.creationDatetime(LocalDateTime.of(2016, 5, 8, 16, 30))
+				.user(communityManager)
+				.build()
+		);
+
 		final List<Notification> notifications = notificationRepository.getUserNotifications("123").collect(toList());
 
-		Assertions.assertThat(notifications).hasSize(6);
+		Assertions.assertThat(notifications).hasSize(7);
 		Notification notification = notifications.get(0);
 		assertThat(notification.getId()).isEqualTo("def");
 		assertThat(notification.getCreationDatetime()).isEqualTo(LocalDateTime.of(2019, 3, 26, 11, 0));
@@ -291,6 +299,11 @@ class NotificationRepositoryTests {
 				.id("123456789")
 				.title("Changed community")
 				.build());
+
+		notification = notifications.get(6);
+		assertThat(notification.getId()).isEqualTo("777");
+		assertThat(notification.getCreationDatetime()).isEqualTo(LocalDateTime.of(2016, 5, 8, 16, 30));
+		assertThat(notification).isInstanceOf(UserWelcomeNotification.class);
 	}
 
 	@DisplayName("Get notifications sent to the user.")
@@ -372,9 +385,16 @@ class NotificationRepositoryTests {
 				.build()
 		);
 
+		notificationRepository.save(UserWelcomeNotification.builder()
+				.id("777")
+				.creationDatetime(LocalDateTime.of(2016, 5, 8, 16, 30))
+				.user(commonUser)
+				.build()
+		);
+
 		final List<Notification> notifications = notificationRepository.getUserNotifications("123").collect(toList());
 
-		Assertions.assertThat(notifications).hasSize(5);
+		Assertions.assertThat(notifications).hasSize(6);
 
 		Notification notification = notifications.get(0);
 		assertThat(notification.getId()).isEqualTo("abc");
@@ -436,6 +456,11 @@ class NotificationRepositoryTests {
 				.id("123456789")
 				.title("Changed community")
 				.build());
+
+		notification = notifications.get(5);
+		assertThat(notification.getId()).isEqualTo("777");
+		assertThat(notification.getCreationDatetime()).isEqualTo(LocalDateTime.of(2016, 5, 8, 16, 30));
+		assertThat(notification).isInstanceOf(UserWelcomeNotification.class);
 	}
 
 	@DisplayName("Get notifications sent to the communities the user is the manager of.")
@@ -723,7 +748,14 @@ class NotificationRepositoryTests {
 				.build()
 		);
 
-		assertThat(notificationRepository.getUserNotificationCounter("123")).isEqualTo(6);
+		notificationRepository.save(UserWelcomeNotification.builder()
+				.id("777")
+				.creationDatetime(LocalDateTime.of(2016, 5, 8, 16, 30))
+				.user(communityManager)
+				.build()
+		);
+
+		assertThat(notificationRepository.getUserNotificationCounter("123")).isEqualTo(7);
 	}
 
 }

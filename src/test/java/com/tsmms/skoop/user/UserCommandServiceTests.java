@@ -1,6 +1,7 @@
 package com.tsmms.skoop.user;
 
 import com.tsmms.skoop.exception.DuplicateResourceException;
+import com.tsmms.skoop.notification.command.NotificationCommandService;
 import com.tsmms.skoop.user.command.UserCommandService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,13 +19,18 @@ import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class UserCommandServiceTests {
+
 	@Mock
 	private UserRepository userRepository;
+
+	@Mock
+	private NotificationCommandService notificationCommandService;
+
 	private UserCommandService userCommandService;
 
 	@BeforeEach
 	void setUp() {
-		userCommandService = new UserCommandService(userRepository);
+		userCommandService = new UserCommandService(userRepository, notificationCommandService);
 	}
 
 	@Test

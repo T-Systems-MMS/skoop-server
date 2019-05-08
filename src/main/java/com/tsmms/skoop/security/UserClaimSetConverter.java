@@ -1,6 +1,5 @@
 package com.tsmms.skoop.security;
 
-import com.tsmms.skoop.user.User;
 import com.tsmms.skoop.user.command.UserCommandService;
 import com.tsmms.skoop.user.query.UserQueryService;
 import org.neo4j.driver.v1.exceptions.ClientException;
