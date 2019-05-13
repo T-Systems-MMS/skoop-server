@@ -166,6 +166,11 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 								.id("123456789")
 								.title("Changed community")
 								.build())
+						.build(),
+				UserWelcomeNotification.builder()
+						.id("777")
+						.creationDatetime(LocalDateTime.of(2016, 5, 8, 16, 30))
+						.user(tester)
 						.build()
 		));
 
@@ -174,7 +179,7 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 				.with(authentication(withUser(tester))))
 				.andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-				.andExpect(jsonPath("$.length()", is(equalTo(8))))
+				.andExpect(jsonPath("$.length()", is(equalTo(9))))
 				.andExpect(jsonPath("$[0].id", is(equalTo("123"))))
 				.andExpect(jsonPath("$[0].type", is(equalTo("InvitationToJoinCommunityNotification"))))
 				.andExpect(jsonPath("$[0].creationDatetime", is(equalTo("2019-03-27T09:34:00"))))
@@ -239,7 +244,10 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[7].communityName", is(equalTo("Changed community"))))
 				.andExpect(jsonPath("$[7].communityDetails", containsInAnyOrder(CommunityDetails.DESCRIPTION.toString(), CommunityDetails.TYPE.toString())))
 				.andExpect(jsonPath("$[7].community.id", is(equalTo("123456789"))))
-				.andExpect(jsonPath("$[7].community.title", is(equalTo("Changed community"))));
+				.andExpect(jsonPath("$[7].community.title", is(equalTo("Changed community"))))
+				.andExpect(jsonPath("$[8].id", is(equalTo("777"))))
+				.andExpect(jsonPath("$[8].type", is(equalTo("UserWelcomeNotification"))))
+				.andExpect(jsonPath("$[8].creationDatetime", is(equalTo("2016-05-08T16:30:00"))));
 	}
 
 	@DisplayName("Not authenticated user cannot get notifications.")

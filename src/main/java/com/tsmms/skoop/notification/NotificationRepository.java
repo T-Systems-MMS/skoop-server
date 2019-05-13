@@ -25,6 +25,8 @@ public interface NotificationRepository extends Neo4jRepository<Notification, St
 			" WITH notifications + collect(n) AS notifications " +
 			" OPTIONAL MATCH (n:CommunityChangedNotification)-[:RECIPIENT]->(:User {id: {userId}}) " +
 			" WITH notifications + collect(n) AS notifications " +
+			" OPTIONAL MATCH (n:UserWelcomeNotification)-[:RECIPIENT]->(:User {id: {userId}}) " +
+			" WITH notifications + collect(n) AS notifications " +
 			" OPTIONAL MATCH (n:RequestToJoinCommunityNotification)-[:CAUSED_BY]->(registration:CommunityUserRegistration)-[:community]->(c:Community)<-[:COMMUNITY_USER {role:'MANAGER'}]-(:User {id: {userId}}) " +
 			" WITH notifications + collect(n) AS notifications " +
 			" OPTIONAL MATCH (n:UserLeftCommunityNotification)-[:COMMUNITY]->(c:Community)<-[:COMMUNITY_USER {role:'MANAGER'}]-(:User {id: {userId}}) " +
@@ -55,6 +57,8 @@ public interface NotificationRepository extends Neo4jRepository<Notification, St
 			" OPTIONAL MATCH (n:CommunityDeletedNotification)-[:RECIPIENT]->(:User {id: {userId}}) " +
 			" WITH notifications + collect(n) AS notifications " +
 			" OPTIONAL MATCH (n:CommunityChangedNotification)-[:RECIPIENT]->(:User {id: {userId}}) " +
+			" WITH notifications + collect(n) AS notifications " +
+			" OPTIONAL MATCH (n:UserWelcomeNotification)-[:RECIPIENT]->(:User {id: {userId}}) " +
 			" WITH notifications + collect(n) AS notifications " +
 			" OPTIONAL MATCH (n:RequestToJoinCommunityNotification)-[:CAUSED_BY]->(registration:CommunityUserRegistration)-[:community]->(c:Community)<-[:COMMUNITY_USER {role:'MANAGER'}]-(:User {id: {userId}}) " +
 			" WITH notifications + collect(n) AS notifications " +
