@@ -19,6 +19,9 @@ neo4j:
 spring:
   datasource:
     driver-class-name: org.neo4j.jdbc.bolt.BoltDriver
+    hikari:
+      idle-timeout: 60000 # in milliseconds
+      minimum-idle: 0
   task:
     execution:
       pool:
