@@ -23,6 +23,9 @@ spring:
       idle-timeout: 60000 # in milliseconds
       minimum-idle: 0
       maximum-pool-size: 10
+  data:
+    neo4j:
+      connectionLivenessCheckTimeout: 0 # in milliseconds
   task:
     execution:
       pool:
