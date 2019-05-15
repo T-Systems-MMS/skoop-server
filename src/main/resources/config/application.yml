@@ -22,6 +22,7 @@ spring:
     hikari:
       idle-timeout: 60000 # in milliseconds
       minimum-idle: 0
+      maximum-pool-size: 10
   task:
     execution:
       pool:
