@@ -5,17 +5,21 @@ import com.tsmms.skoop.exception.NoSuchResourceException;
 import com.tsmms.skoop.project.Project;
 import com.tsmms.skoop.project.command.ProjectCommandService;
 import com.tsmms.skoop.project.query.ProjectQueryService;
+import com.tsmms.skoop.skill.Skill;
 import com.tsmms.skoop.skill.command.SkillCommandService;
 import com.tsmms.skoop.user.User;
 import com.tsmms.skoop.user.query.UserQueryService;
 import com.tsmms.skoop.exception.enums.Model;
 import com.tsmms.skoop.userproject.UserProject;
 import com.tsmms.skoop.userproject.UserProjectRepository;
+import com.tsmms.skoop.userskill.command.UserSkillCommandService;
+import com.tsmms.skoop.userskill.query.UserSkillQueryService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.tsmms.skoop.exception.enums.Model.USER;
@@ -31,15 +35,21 @@ public class UserProjectCommandService {
 	private final ProjectCommandService projectCommandService;
 	private final UserQueryService userQueryService;
 	private final SkillCommandService skillCommandService;
+	private final UserSkillCommandService userSkillCommandService;
+	private final UserSkillQueryService userSkillQueryService;
 
 	public UserProjectCommandService(UserProjectRepository userProjectRepository, ProjectQueryService projectQueryService, UserQueryService userQueryService,
 									 SkillCommandService skillCommandService,
-									 ProjectCommandService projectCommandService) {
+									 ProjectCommandService projectCommandService,
+									 UserSkillCommandService userSkillCommandService,
+									 UserSkillQueryService userSkillQueryService) {
 		this.userProjectRepository = requireNonNull(userProjectRepository);
 		this.projectQueryService = requireNonNull(projectQueryService);
 		this.userQueryService = requireNonNull(userQueryService);
 		this.skillCommandService = requireNonNull(skillCommandService);
 		this.projectCommandService = requireNonNull(projectCommandService);
+		this.userSkillCommandService = requireNonNull(userSkillCommandService);
+		this.userSkillQueryService = requireNonNull(userSkillQueryService);
 	}
 
 	@Transactional
@@ -60,7 +70,13 @@ public class UserProjectCommandService {
 		});
 		userProject.setProject(project);
 		userProject.setUser(user);
-		userProject.setSkills(skillCommandService.createNonExistentSkills(userProject.getSkills()));
+		final Set<Skill> skills = skillCommandService.createNonExistentSkills(userProject.getSkills());
+		userProject.setSkills(skills);
+		skills.forEach(skill -> {
+			if (userSkillQueryService.getUserSkillByUserIdAndSkillId(user.getId(), skill.getId()).isEmpty()) {
+				userSkillCommandService.createUserSkillBySkillId(user.getId(), skill.getId(), 0, 0, 0);
+			}
+		});
 		final LocalDateTime now = LocalDateTime.now();
 		userProject.setId(UUID.randomUUID().toString());
 		userProject.setCreationDate(now);
