@@ -58,6 +58,17 @@ public class UserProjectCommandService {
 		this.notificationCommandService = requireNonNull(notificationCommandService);
 	}
 
+	private Set<Skill> createNewUserSkills(String userId, Set<Skill> skills) {
+		final Set<Skill> newSkills = new HashSet<>();
+		skills.forEach(skill -> {
+			if (userSkillQueryService.getUserSkillByUserIdAndSkillId(userId, skill.getId()).isEmpty()) {
+				userSkillCommandService.createUserSkillBySkillId(userId, skill.getId(), 0, 0, 0);
+				newSkills.add(skill);
+			}
+		});
+		return newSkills;
+	}
+
 	@Transactional
 	@PreAuthorize("isPrincipalUserId(#userId)")
 	public UserProject assignProjectToUser(String projectName, String userId, UserProject userProject) {
@@ -76,15 +87,8 @@ public class UserProjectCommandService {
 		});
 		userProject.setProject(project);
 		userProject.setUser(user);
-		final Set<Skill> skills = skillCommandService.createNonExistentSkills(userProject.getSkills());
-		userProject.setSkills(skills);
-		final Set<Skill> newSkills = new HashSet<>();
-		skills.forEach(skill -> {
-			if (userSkillQueryService.getUserSkillByUserIdAndSkillId(user.getId(), skill.getId()).isEmpty()) {
-				userSkillCommandService.createUserSkillBySkillId(user.getId(), skill.getId(), 0, 0, 0);
-				newSkills.add(skill);
-			}
-		});
+		userProject.setSkills(skillCommandService.createNonExistentSkills(userProject.getSkills()));
+		final Set<Skill> newSkills = createNewUserSkills(user.getId(), userProject.getSkills());
 		if (!newSkills.isEmpty()) {
 			notificationCommandService.save(UserSkillsEstimationNotification.builder()
 					.id(UUID.randomUUID().toString())
@@ -113,7 +117,18 @@ public class UserProjectCommandService {
 		userProject.setTasks(command.getTasks());
 		userProject.setStartDate(command.getStartDate());
 		userProject.setEndDate(command.getEndDate());
+		final User user = userProject.getUser();
 		userProject.setSkills(skillCommandService.createNonExistentSkills(command.getSkills()));
+		final Set<Skill> newSkills = createNewUserSkills(userId, userProject.getSkills());
+		if (!newSkills.isEmpty()) {
+			notificationCommandService.save(UserSkillsEstimationNotification.builder()
+					.id(UUID.randomUUID().toString())
+					.creationDatetime(LocalDateTime.now())
+					.user(user)
+					.skills(newSkills)
+					.build()
+			);
+		}
 		final LocalDateTime now = LocalDateTime.now();
 		userProject.setLastModifiedDate(now);
 		return userProjectRepository.save(userProject);

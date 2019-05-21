@@ -314,6 +314,55 @@ class UserProjectCommandServiceTests {
 						.endDate(LocalDate.of(2019, 5, 11))
 						.build()
 		));
+		given(skillCommandService.createNonExistentSkills(
+				argThat(allOf(
+						isA(Collection.class),
+						containsInAnyOrder(
+								Skill.builder()
+										.name("Spring Boot")
+										.build(),
+								Skill.builder()
+										.id("222")
+										.name("Angular")
+										.build()
+						)
+				)))
+		).willReturn(new HashSet<>(Arrays.asList(
+				Skill.builder()
+						.id("111")
+						.name("Spring Boot")
+						.build(),
+				Skill.builder()
+						.id("222")
+						.name("Angular")
+						.build()
+		)));
+		when(userSkillQueryService.getUserSkillByUserIdAndSkillId(anyString(), anyString())).thenAnswer(invocation -> {
+			final String userId = invocation.getArgument(0);
+			final String skillId = invocation.getArgument(1);
+			if ("123".equals(userId) && "111".equals(skillId)) {
+				return Optional.empty();
+			} else if ("123".equals(userId) && "222".equals(skillId)) {
+				return Optional.of(
+						UserSkill.builder()
+								.id(123L)
+								.skill(Skill.builder()
+										.id("222")
+										.name("Angular")
+										.build())
+								.user(User.builder()
+										.id("123")
+										.userName("tester")
+										.build())
+								.currentLevel(1)
+								.desiredLevel(2)
+								.priority(2)
+								.build()
+				);
+			} else {
+				return Optional.empty();
+			}
+		});
 		given(userProjectRepository.save(ArgumentMatchers.isA(UserProject.class))).willReturn(
 			UserProject.builder()
 					.id("aaa")
@@ -330,6 +379,16 @@ class UserProjectCommandServiceTests {
 							.id("123")
 							.userName("tester")
 							.build())
+					.skills(new HashSet<>(Arrays.asList(
+							Skill.builder()
+									.id("111")
+									.name("Spring Boot")
+									.build(),
+							Skill.builder()
+									.id("222")
+									.name("Angular")
+									.build()
+					)))
 				.build()
 		);
 		UserProject userProject = userProjectCommandService.updateUserProject("123", "ABC", UpdateUserProjectCommand.builder()
@@ -337,6 +396,15 @@ class UserProjectCommandServiceTests {
 				.tasks("development")
 				.startDate(LocalDate.of(2019, 1, 10))
 				.endDate(LocalDate.of(2019, 5, 10))
+				.skills(new HashSet<>(Arrays.asList(
+						Skill.builder()
+								.name("Spring Boot")
+								.build(),
+						Skill.builder()
+								.id("222")
+								.name("Angular")
+								.build()
+				)))
 				.build()
 		);
 		assertThat(userProject).isNotNull();
