@@ -2,6 +2,7 @@ package com.tsmms.skoop.userproject.command;
 
 import com.tsmms.skoop.exception.DuplicateResourceException;
 import com.tsmms.skoop.exception.NoSuchResourceException;
+import com.tsmms.skoop.notification.command.NotificationCommandService;
 import com.tsmms.skoop.project.Project;
 import com.tsmms.skoop.project.command.ProjectCommandService;
 import com.tsmms.skoop.project.query.ProjectQueryService;
@@ -12,6 +13,7 @@ import com.tsmms.skoop.user.query.UserQueryService;
 import com.tsmms.skoop.exception.enums.Model;
 import com.tsmms.skoop.userproject.UserProject;
 import com.tsmms.skoop.userproject.UserProjectRepository;
+import com.tsmms.skoop.userskill.UserSkillsEstimationNotification;
 import com.tsmms.skoop.userskill.command.UserSkillCommandService;
 import com.tsmms.skoop.userskill.query.UserSkillQueryService;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -37,12 +40,14 @@ public class UserProjectCommandService {
 	private final SkillCommandService skillCommandService;
 	private final UserSkillCommandService userSkillCommandService;
 	private final UserSkillQueryService userSkillQueryService;
+	private final NotificationCommandService notificationCommandService;
 
 	public UserProjectCommandService(UserProjectRepository userProjectRepository, ProjectQueryService projectQueryService, UserQueryService userQueryService,
 									 SkillCommandService skillCommandService,
 									 ProjectCommandService projectCommandService,
 									 UserSkillCommandService userSkillCommandService,
-									 UserSkillQueryService userSkillQueryService) {
+									 UserSkillQueryService userSkillQueryService,
+									 NotificationCommandService notificationCommandService) {
 		this.userProjectRepository = requireNonNull(userProjectRepository);
 		this.projectQueryService = requireNonNull(projectQueryService);
 		this.userQueryService = requireNonNull(userQueryService);
@@ -50,6 +55,18 @@ public class UserProjectCommandService {
 		this.projectCommandService = requireNonNull(projectCommandService);
 		this.userSkillCommandService = requireNonNull(userSkillCommandService);
 		this.userSkillQueryService = requireNonNull(userSkillQueryService);
+		this.notificationCommandService = requireNonNull(notificationCommandService);
+	}
+
+	private Set<Skill> createNewUserSkills(String userId, Set<Skill> skills) {
+		final Set<Skill> newSkills = new HashSet<>();
+		skills.forEach(skill -> {
+			if (userSkillQueryService.getUserSkillByUserIdAndSkillId(userId, skill.getId()).isEmpty()) {
+				userSkillCommandService.createUserSkillBySkillId(userId, skill.getId(), 0, 0, 0);
+				newSkills.add(skill);
+			}
+		});
+		return newSkills;
 	}
 
 	@Transactional
@@ -70,13 +87,17 @@ public class UserProjectCommandService {
 		});
 		userProject.setProject(project);
 		userProject.setUser(user);
-		final Set<Skill> skills = skillCommandService.createNonExistentSkills(userProject.getSkills());
-		userProject.setSkills(skills);
-		skills.forEach(skill -> {
-			if (userSkillQueryService.getUserSkillByUserIdAndSkillId(user.getId(), skill.getId()).isEmpty()) {
-				userSkillCommandService.createUserSkillBySkillId(user.getId(), skill.getId(), 0, 0, 0);
-			}
-		});
+		userProject.setSkills(skillCommandService.createNonExistentSkills(userProject.getSkills()));
+		final Set<Skill> newSkills = createNewUserSkills(user.getId(), userProject.getSkills());
+		if (!newSkills.isEmpty()) {
+			notificationCommandService.save(UserSkillsEstimationNotification.builder()
+					.id(UUID.randomUUID().toString())
+					.creationDatetime(LocalDateTime.now())
+					.user(user)
+					.skills(newSkills)
+					.build()
+			);
+		}
 		final LocalDateTime now = LocalDateTime.now();
 		userProject.setId(UUID.randomUUID().toString());
 		userProject.setCreationDate(now);
@@ -96,7 +117,18 @@ public class UserProjectCommandService {
 		userProject.setTasks(command.getTasks());
 		userProject.setStartDate(command.getStartDate());
 		userProject.setEndDate(command.getEndDate());
+		final User user = userProject.getUser();
 		userProject.setSkills(skillCommandService.createNonExistentSkills(command.getSkills()));
+		final Set<Skill> newSkills = createNewUserSkills(userId, userProject.getSkills());
+		if (!newSkills.isEmpty()) {
+			notificationCommandService.save(UserSkillsEstimationNotification.builder()
+					.id(UUID.randomUUID().toString())
+					.creationDatetime(LocalDateTime.now())
+					.user(user)
+					.skills(newSkills)
+					.build()
+			);
+		}
 		final LocalDateTime now = LocalDateTime.now();
 		userProject.setLastModifiedDate(now);
 		return userProjectRepository.save(userProject);

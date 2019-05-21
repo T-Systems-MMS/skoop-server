@@ -16,9 +16,11 @@ import com.tsmms.skoop.communityuser.registration.CommunityUserRegistration;
 import com.tsmms.skoop.communityuser.registration.CommunityUserRegistrationRepository;
 import com.tsmms.skoop.communityuser.registration.InvitationToJoinCommunityNotification;
 import com.tsmms.skoop.communityuser.registration.RequestToJoinCommunityNotification;
+import com.tsmms.skoop.skill.Skill;
 import com.tsmms.skoop.user.User;
 import com.tsmms.skoop.user.UserRepository;
 import com.tsmms.skoop.user.notification.UserWelcomeNotification;
+import com.tsmms.skoop.userskill.UserSkillsEstimationNotification;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -223,9 +225,26 @@ class NotificationRepositoryTests {
 				.build()
 		);
 
+		notificationRepository.save(UserSkillsEstimationNotification.builder()
+				.id("896")
+				.creationDatetime(LocalDateTime.of(2015, 5, 8, 16, 30))
+				.user(communityManager)
+				.skills(new HashSet<>(Arrays.asList(
+						Skill.builder()
+								.id("123")
+								.name("Spring Boot")
+								.build(),
+						Skill.builder()
+								.id("456")
+								.name("Angular")
+								.build()
+				)))
+				.build()
+		);
+
 		final List<Notification> notifications = notificationRepository.getUserNotifications("123").collect(toList());
 
-		Assertions.assertThat(notifications).hasSize(7);
+		Assertions.assertThat(notifications).hasSize(8);
 		Notification notification = notifications.get(0);
 		assertThat(notification.getId()).isEqualTo("def");
 		assertThat(notification.getCreationDatetime()).isEqualTo(LocalDateTime.of(2019, 3, 26, 11, 0));
@@ -304,6 +323,22 @@ class NotificationRepositoryTests {
 		assertThat(notification.getId()).isEqualTo("777");
 		assertThat(notification.getCreationDatetime()).isEqualTo(LocalDateTime.of(2016, 5, 8, 16, 30));
 		assertThat(notification).isInstanceOf(UserWelcomeNotification.class);
+
+		notification = notifications.get(7);
+		assertThat(notification.getId()).isEqualTo("896");
+		assertThat(notification.getCreationDatetime()).isEqualTo(LocalDateTime.of(2015, 5, 8, 16, 30));
+		assertThat(notification).isInstanceOf(UserSkillsEstimationNotification.class);
+		final UserSkillsEstimationNotification userSkillsEstimationNotification = (UserSkillsEstimationNotification) notification;
+		assertThat(userSkillsEstimationNotification.getSkills()).containsExactlyInAnyOrder(
+				Skill.builder()
+						.id("123")
+						.name("Spring Boot")
+						.build(),
+				Skill.builder()
+						.id("456")
+						.name("Angular")
+						.build()
+		);
 	}
 
 	@DisplayName("Get notifications sent to the user.")
@@ -392,9 +427,26 @@ class NotificationRepositoryTests {
 				.build()
 		);
 
+		notificationRepository.save(UserSkillsEstimationNotification.builder()
+				.id("896")
+				.creationDatetime(LocalDateTime.of(2015, 5, 8, 16, 30))
+				.user(commonUser)
+				.skills(new HashSet<>(Arrays.asList(
+						Skill.builder()
+								.id("123")
+								.name("Spring Boot")
+								.build(),
+						Skill.builder()
+								.id("456")
+								.name("Angular")
+								.build()
+				)))
+				.build()
+		);
+
 		final List<Notification> notifications = notificationRepository.getUserNotifications("123").collect(toList());
 
-		Assertions.assertThat(notifications).hasSize(6);
+		Assertions.assertThat(notifications).hasSize(7);
 
 		Notification notification = notifications.get(0);
 		assertThat(notification.getId()).isEqualTo("abc");
@@ -461,6 +513,22 @@ class NotificationRepositoryTests {
 		assertThat(notification.getId()).isEqualTo("777");
 		assertThat(notification.getCreationDatetime()).isEqualTo(LocalDateTime.of(2016, 5, 8, 16, 30));
 		assertThat(notification).isInstanceOf(UserWelcomeNotification.class);
+
+		notification = notifications.get(6);
+		assertThat(notification.getId()).isEqualTo("896");
+		assertThat(notification.getCreationDatetime()).isEqualTo(LocalDateTime.of(2015, 5, 8, 16, 30));
+		assertThat(notification).isInstanceOf(UserSkillsEstimationNotification.class);
+		final UserSkillsEstimationNotification userSkillsEstimationNotification = (UserSkillsEstimationNotification) notification;
+		assertThat(userSkillsEstimationNotification.getSkills()).containsExactlyInAnyOrder(
+				Skill.builder()
+						.id("123")
+						.name("Spring Boot")
+						.build(),
+				Skill.builder()
+						.id("456")
+						.name("Angular")
+						.build()
+		);
 	}
 
 	@DisplayName("Get notifications sent to the communities the user is the manager of.")
@@ -755,7 +823,24 @@ class NotificationRepositoryTests {
 				.build()
 		);
 
-		assertThat(notificationRepository.getUserNotificationCounter("123")).isEqualTo(7);
+		notificationRepository.save(UserSkillsEstimationNotification.builder()
+				.id("896")
+				.creationDatetime(LocalDateTime.of(2015, 5, 8, 16, 30))
+				.user(communityManager)
+				.skills(new HashSet<>(Arrays.asList(
+						Skill.builder()
+								.id("123")
+								.name("Spring Boot")
+								.build(),
+						Skill.builder()
+								.id("456")
+								.name("Angular")
+								.build()
+				)))
+				.build()
+		);
+
+		assertThat(notificationRepository.getUserNotificationCounter("123")).isEqualTo(8);
 	}
 
 }
