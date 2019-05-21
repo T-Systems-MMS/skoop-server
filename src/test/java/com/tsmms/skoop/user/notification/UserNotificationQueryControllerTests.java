@@ -14,8 +14,10 @@ import com.tsmms.skoop.communityuser.registration.AcceptanceToCommunityNotificat
 import com.tsmms.skoop.communityuser.registration.CommunityUserRegistration;
 import com.tsmms.skoop.communityuser.registration.InvitationToJoinCommunityNotification;
 import com.tsmms.skoop.communityuser.registration.RequestToJoinCommunityNotification;
+import com.tsmms.skoop.skill.Skill;
 import com.tsmms.skoop.user.User;
 import com.tsmms.skoop.notification.query.NotificationQueryService;
+import com.tsmms.skoop.userskill.UserSkillsEstimationNotification;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -171,6 +173,21 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 						.id("777")
 						.creationDatetime(LocalDateTime.of(2016, 5, 8, 16, 30))
 						.user(tester)
+						.build(),
+				UserSkillsEstimationNotification.builder()
+						.id("896")
+						.creationDatetime(LocalDateTime.of(2015, 5, 8, 16, 30))
+						.user(tester)
+						.skills(new HashSet<>(Arrays.asList(
+								Skill.builder()
+										.id("123")
+										.name("Spring Boot")
+										.build(),
+								Skill.builder()
+										.id("456")
+										.name("Angular")
+										.build()
+						)))
 						.build()
 		));
 
@@ -179,7 +196,7 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 				.with(authentication(withUser(tester))))
 				.andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-				.andExpect(jsonPath("$.length()", is(equalTo(9))))
+				.andExpect(jsonPath("$.length()", is(equalTo(10))))
 				.andExpect(jsonPath("$[0].id", is(equalTo("123"))))
 				.andExpect(jsonPath("$[0].type", is(equalTo("InvitationToJoinCommunityNotification"))))
 				.andExpect(jsonPath("$[0].creationDatetime", is(equalTo("2019-03-27T09:34:00"))))
@@ -247,7 +264,14 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[7].community.title", is(equalTo("Changed community"))))
 				.andExpect(jsonPath("$[8].id", is(equalTo("777"))))
 				.andExpect(jsonPath("$[8].type", is(equalTo("UserWelcomeNotification"))))
-				.andExpect(jsonPath("$[8].creationDatetime", is(equalTo("2016-05-08T16:30:00"))));
+				.andExpect(jsonPath("$[8].creationDatetime", is(equalTo("2016-05-08T16:30:00"))))
+				.andExpect(jsonPath("$[9].id", is(equalTo("896"))))
+				.andExpect(jsonPath("$[9].type", is(equalTo("UserSkillsEstimationNotification"))))
+				.andExpect(jsonPath("$[9].creationDatetime", is(equalTo("2015-05-08T16:30:00"))))
+				.andExpect(jsonPath("$[9].skills[0].id", is(equalTo("123"))))
+				.andExpect(jsonPath("$[9].skills[0].name", is(equalTo("Spring Boot"))))
+				.andExpect(jsonPath("$[9].skills[1].id", is(equalTo("456"))))
+				.andExpect(jsonPath("$[9].skills[1].name", is(equalTo("Angular"))));
 	}
 
 	@DisplayName("Not authenticated user cannot get notifications.")

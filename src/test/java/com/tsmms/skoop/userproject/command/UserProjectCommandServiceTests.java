@@ -2,6 +2,7 @@ package com.tsmms.skoop.userproject.command;
 
 import com.tsmms.skoop.exception.DuplicateResourceException;
 import com.tsmms.skoop.exception.NoSuchResourceException;
+import com.tsmms.skoop.notification.command.NotificationCommandService;
 import com.tsmms.skoop.project.Project;
 import com.tsmms.skoop.project.command.ProjectCommandService;
 import com.tsmms.skoop.project.query.ProjectQueryService;
@@ -62,12 +63,15 @@ class UserProjectCommandServiceTests {
 	@Mock
 	private UserSkillQueryService userSkillQueryService;
 
+	@Mock
+	private NotificationCommandService notificationCommandService;
+
 	private UserProjectCommandService userProjectCommandService;
 
 	@BeforeEach
 	void setUp() {
 		userProjectCommandService = new UserProjectCommandService(userProjectRepository, projectQueryService, userQueryService, skillCommandService, projectCommandService,
-				userSkillCommandService, userSkillQueryService);
+				userSkillCommandService, userSkillQueryService, notificationCommandService);
 	}
 
 	@Test
