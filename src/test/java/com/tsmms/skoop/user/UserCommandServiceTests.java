@@ -1,6 +1,7 @@
 package com.tsmms.skoop.user;
 
 import com.tsmms.skoop.exception.DuplicateResourceException;
+import com.tsmms.skoop.exception.NoSuchResourceException;
 import com.tsmms.skoop.notification.command.NotificationCommandService;
 import com.tsmms.skoop.user.command.UserCommandService;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +17,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @ExtendWith(MockitoExtension.class)
 class UserCommandServiceTests {
@@ -76,6 +78,18 @@ class UserCommandServiceTests {
 		assertThat(user.getId()).isEqualTo("123");
 		assertThat(user.getUserName()).isEqualTo("tester1");
 		assertThat(user.getEmail()).isEqualTo("tester1@gmail.com");
+	}
+
+	@DisplayName("Throws exception when non existent user is updated.")
+	@Test
+	void throwExceptionWhenNonExistentUserIsUpdated() {
+		given(userRepository.findById("123")).willReturn(Optional.empty());
+		assertThrows(NoSuchResourceException.class, () -> userCommandService.updateUser("123", UserRequest.builder()
+						.userName("tester")
+						.firstName("firstTester")
+						.email("tester@skoop.io")
+						.build()
+		));
 	}
 
 	@DisplayName("Updates manager of a user.")
@@ -144,6 +158,49 @@ class UserCommandServiceTests {
 						.email("manager@skoop.com")
 						.build()
 		);
+	}
+
+	@DisplayName("Throws exception when updating manager of non existent user.")
+	@Test
+	void throwExceptionWhenUserWithSpecifiedIdentifierDoesNotExist() {
+		given(userRepository.findById("123")).willReturn(Optional.empty());
+		assertThrows(NoSuchResourceException.class, () -> userCommandService.updateUserManager("123", "manager"));
+	}
+
+	@DisplayName("Throws exception when assigning non existent manager to a user.")
+	@Test
+	void throwExceptionWhenUserWithSpecifiedManagerUserNameDoesNotExist() {
+		given(userRepository.findById("123"))
+				.willReturn(Optional.of(User.builder()
+						.id("123")
+						.userName("tester")
+						.firstName("tester")
+						.email("tester@skoop.com")
+						.build())
+				);
+		given(userRepository.findByUserName("manager")).willReturn(Optional.empty());
+		assertThrows(NoSuchResourceException.class, () -> userCommandService.updateUserManager("123", "manager"));
+	}
+
+	@DisplayName("Deletes user.")
+	@Test
+	void deleteUser() {
+		given(userRepository.findById("123"))
+				.willReturn(Optional.of(User.builder()
+						.id("123")
+						.userName("tester")
+						.firstName("tester")
+						.email("tester@skoop.com")
+						.build())
+				);
+		assertDoesNotThrow(() -> userCommandService.deleteUser("123"));
+	}
+
+	@DisplayName("Throws exception when deleting non existent user.")
+	@Test
+	void throwExceptionWhenDeletingNonExistentUser() {
+		given(userRepository.findById("123")).willReturn(Optional.empty());
+		assertThrows(NoSuchResourceException.class, () -> userCommandService.deleteUser("123"));
 	}
 
 }

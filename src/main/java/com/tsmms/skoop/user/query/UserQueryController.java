@@ -102,9 +102,7 @@ public class UserQueryController {
 	@PreAuthorize("isAuthenticated() and (isPrincipalUserId(#userId) or hasUserPermission(#userId, 'READ_USER_PROFILE') or isGlobalPermissionGranted(#userId, 'READ_USER_PROFILE'))")
 	@GetMapping(path = "/users/{userId}/manager", produces = MediaType.APPLICATION_JSON_VALUE)
 	public UserSimpleResponse getUserManager(@PathVariable("userId") String userId) {
-		return userQueryService.getUserById(userId)
-				.map(User::getManager)
-				.map(UserSimpleResponse::of)
+		final User user = userQueryService.getUserById(userId)
 				.orElseThrow(() -> {
 					String[] searchParamsMap = {"id", userId};
 					return NoSuchResourceException.builder()
@@ -112,6 +110,7 @@ public class UserQueryController {
 							.searchParamsMap(searchParamsMap)
 							.build();
 				});
+		return UserSimpleResponse.of(user.getManager());
 	}
 
 	/**
