@@ -22,6 +22,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.tsmms.skoop.user.UserPermissionScope.READ_USER_PROFILE;
 import static java.util.stream.Collectors.toList;
@@ -111,6 +112,25 @@ public class UserQueryController {
 							.build();
 				});
 		return UserSimpleResponse.of(user.getManager());
+	}
+
+	@ApiOperation(
+			value = "Get subordinates of a specific user",
+			notes = "Get subordinates of a specific user."
+	)
+	@ApiResponses({
+			@ApiResponse(code = 200, message = "Successful execution"),
+			@ApiResponse(code = 401, message = "Invalid authentication"),
+			@ApiResponse(code = 403, message = "Insufficient privileges to access resource, e.g. foreign user data"),
+			@ApiResponse(code = 404, message = "Resource not found"),
+			@ApiResponse(code = 500, message = "Error during execution")
+	})
+	@PreAuthorize("isAuthenticated() and isPrincipalUserId(#userId)")
+	@GetMapping(path = "/users/{userId}/subordinates", produces = MediaType.APPLICATION_JSON_VALUE)
+	public Set<UserSimpleResponse> getUserSubordinates(@PathVariable("userId") String userId) {
+		return userQueryService.getUserSubordinates(userId)
+				.map(UserSimpleResponse::of)
+				.collect(toSet());
 	}
 
 	/**

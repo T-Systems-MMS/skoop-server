@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.BDDMockito.given;
@@ -449,6 +450,59 @@ class UserQueryControllerTests extends AbstractControllerTests {
 				.willReturn(false);
 
 		mockMvc.perform(get("/users/d9d74c04-0ab0-479c-a1d7-d372990f11b6/manager")
+				.accept(MediaType.APPLICATION_JSON)
+				.with(authentication(withUser(owner))))
+				.andExpect(status().isForbidden());
+	}
+
+	@DisplayName("Gets user subordinates.")
+	@Test
+	void getUserSubordinates() throws Exception {
+		given(userQueryService.getUserSubordinates("56ef4778-a084-4509-9a3e-80b7895cf7b0")).willReturn(Stream.of(
+				User.builder()
+						.id("31c43af1-d745-4fbd-8ebf-f1974ef25792")
+						.userName("tester")
+						.firstName("Toni")
+						.lastName("Tester")
+						.email("toni.tester@skoop.io")
+						.build(),
+				User.builder()
+						.id("d9d74c04-0ab0-479c-a1d7-d372990f11b6")
+						.userName("testing")
+						.firstName("Tina")
+						.lastName("Testing")
+						.email("tina.testing@skoop.io")
+						.build()
+		));
+
+		mockMvc.perform(get("/users/56ef4778-a084-4509-9a3e-80b7895cf7b0/subordinates")
+				.accept(MediaType.APPLICATION_JSON)
+				.with(authentication(withUser(owner))))
+				.andExpect(status().isOk())
+				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+				.andExpect(jsonPath("$.length()", is(equalTo(2))))
+				.andExpect(jsonPath("$[?(@.id=='31c43af1-d745-4fbd-8ebf-f1974ef25792')].userName", hasItem("tester")))
+				.andExpect(jsonPath("$[?(@.id=='31c43af1-d745-4fbd-8ebf-f1974ef25792')].firstName", hasItem("Toni")))
+				.andExpect(jsonPath("$[?(@.id=='31c43af1-d745-4fbd-8ebf-f1974ef25792')].lastName", hasItem("Tester")))
+				.andExpect(jsonPath("$[?(@.id=='31c43af1-d745-4fbd-8ebf-f1974ef25792')].email", hasItem("toni.tester@skoop.io")))
+				.andExpect(jsonPath("$[?(@.id=='d9d74c04-0ab0-479c-a1d7-d372990f11b6')].userName", hasItem("testing")))
+				.andExpect(jsonPath("$[?(@.id=='d9d74c04-0ab0-479c-a1d7-d372990f11b6')].firstName", hasItem("Tina")))
+				.andExpect(jsonPath("$[?(@.id=='d9d74c04-0ab0-479c-a1d7-d372990f11b6')].lastName", hasItem("Testing")))
+				.andExpect(jsonPath("$[?(@.id=='d9d74c04-0ab0-479c-a1d7-d372990f11b6')].email", hasItem("tina.testing@skoop.io")));
+	}
+
+	@DisplayName("Not authenticated user cannot get user subordinates.")
+	@Test
+	void notAuthenticatedUserCannotGetUserSubordinates() throws Exception {
+		mockMvc.perform(get("/users/56ef4778-a084-4509-9a3e-80b7895cf7b0/subordinates")
+				.accept(MediaType.APPLICATION_JSON))
+				.andExpect(status().isUnauthorized());
+	}
+
+	@DisplayName("User cannot get subordinates of another user.")
+	@Test
+	void userCannotGetSubordinatesOfAnotherUser() throws Exception {
+		mockMvc.perform(get("/users/c45050b3-3a4d-4428-805f-d7f73f9cfe86/subordinates")
 				.accept(MediaType.APPLICATION_JSON)
 				.with(authentication(withUser(owner))))
 				.andExpect(status().isForbidden());

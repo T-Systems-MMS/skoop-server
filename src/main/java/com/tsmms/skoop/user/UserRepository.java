@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Repository
 public interface UserRepository extends Neo4jRepository<User, String> {
@@ -22,4 +23,6 @@ public interface UserRepository extends Neo4jRepository<User, String> {
 			"OR TOLOWER(user.lastName) CONTAINS TOLOWER({search}) " +
 			"RETURN user ORDER BY user.userName LIMIT 20")
 	Iterable<User> findBySearchTerm(@Param("search") String search);
+
+	Stream<User> findByManagerId(String managerId);
 }
