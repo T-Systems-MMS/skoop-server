@@ -27,3 +27,8 @@ security:
       jwt:
         # Set issuer URI
         jwk-set-uri: ${SECURITY_OAUTH2_RESOURCESERVER_JWT_JWKSETURI}
+
+skoop:
+  schedule:
+    reconciliation:
+      user: 0 0 */2 * * * # every two hours

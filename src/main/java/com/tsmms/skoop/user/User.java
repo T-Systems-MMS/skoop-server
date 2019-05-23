@@ -79,4 +79,9 @@ public class User {
 	@EqualsAndHashCode.Exclude
 	@Relationship(type = "HAS_GRANTED")
 	private List<UserPermission> userPermissions;
+
+	@ToString.Exclude
+	@EqualsAndHashCode.Exclude
+	@Relationship(type = "MANAGER")
+	private User manager;
 }

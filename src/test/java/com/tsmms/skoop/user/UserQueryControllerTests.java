@@ -338,4 +338,84 @@ class UserQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[1].languages", is(equalTo(Collections.singletonList("English")))));
 	}
 
+	@Test
+	@DisplayName("Responds with the manager of the requested user")
+	void respondsWithManagerOfRequestedUser() throws Exception {
+		given(userPermissionQueryService.hasUserPermission("d9d74c04-0ab0-479c-a1d7-d372990f11b6", owner.getId(), UserPermissionScope.READ_USER_PROFILE))
+				.willReturn(true);
+
+		given(userQueryService.getUserById("d9d74c04-0ab0-479c-a1d7-d372990f11b6"))
+				.willReturn(Optional.of(User.builder()
+						.id("d9d74c04-0ab0-479c-a1d7-d372990f11b6")
+						.userName("testing")
+						.firstName("Tina")
+						.lastName("Testing")
+						.email("tina.testing@skoop.io")
+						.academicDegree("Diplom-Wirtschaftsinformatiker")
+						.positionProfile("Software Engineer")
+						.summary("Tina's summary")
+						.industrySectors(Arrays.asList("Automotive", "Telecommunication"))
+						.specializations(Arrays.asList("IT Consulting", "Software Integration"))
+						.certificates(Collections.singletonList("Kotlin Certified Programmer"))
+						.languages(Collections.singletonList("English"))
+						.manager(User.builder()
+								.id("123")
+								.userName("manager")
+								.firstName("Tom")
+								.lastName("Testing")
+								.email("tom.testing@skoop.io")
+								.build()
+						)
+						.build()
+				));
+
+		mockMvc.perform(get("/users/d9d74c04-0ab0-479c-a1d7-d372990f11b6/manager")
+				.accept(MediaType.APPLICATION_JSON)
+				.with(authentication(JwtAuthenticationFactory.withUser(owner))))
+				.andExpect(status().isOk())
+				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+				.andExpect(jsonPath("$.id", is(equalTo("123"))))
+				.andExpect(jsonPath("$.userName", is(equalTo("manager"))))
+				.andExpect(jsonPath("$.firstName", is(equalTo("Tom"))))
+				.andExpect(jsonPath("$.lastName", is(equalTo("Testing"))))
+				.andExpect(jsonPath("$.email", is(equalTo("tom.testing@skoop.io"))));
+	}
+
+	@Test
+	@DisplayName("Not authenticated user cannot get other user profile.")
+	void notAuthenticatedUserCannotGetManagerOfAnotherUser() throws Exception {
+		given(userPermissionQueryService.hasUserPermission("d9d74c04-0ab0-479c-a1d7-d372990f11b6", owner.getId(), UserPermissionScope.READ_USER_PROFILE))
+				.willReturn(false);
+
+		given(userQueryService.getUserById("d9d74c04-0ab0-479c-a1d7-d372990f11b6"))
+				.willReturn(Optional.of(User.builder()
+						.id("d9d74c04-0ab0-479c-a1d7-d372990f11b6")
+						.userName("testing")
+						.firstName("Tina")
+						.lastName("Testing")
+						.email("tina.testing@skoop.io")
+						.academicDegree("Diplom-Wirtschaftsinformatiker")
+						.positionProfile("Software Engineer")
+						.summary("Tina's summary")
+						.industrySectors(Arrays.asList("Automotive", "Telecommunication"))
+						.specializations(Arrays.asList("IT Consulting", "Software Integration"))
+						.certificates(Collections.singletonList("Kotlin Certified Programmer"))
+						.languages(Collections.singletonList("English"))
+						.manager(User.builder()
+								.id("123")
+								.userName("manager")
+								.firstName("Tom")
+								.lastName("Testing")
+								.email("tom.testing@skoop.io")
+								.build()
+						)
+						.build()
+				));
+
+		mockMvc.perform(get("/users/d9d74c04-0ab0-479c-a1d7-d372990f11b6/manager")
+				.accept(MediaType.APPLICATION_JSON)
+				.with(authentication(JwtAuthenticationFactory.withUser(owner))))
+				.andExpect(status().isForbidden());
+	}
+
 }

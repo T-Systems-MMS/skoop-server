@@ -78,4 +78,72 @@ class UserCommandServiceTests {
 		assertThat(user.getEmail()).isEqualTo("tester1@gmail.com");
 	}
 
+	@DisplayName("Updates manager of a user.")
+	@Test
+	void updateUserManager() {
+		given(userRepository.findById("123"))
+				.willReturn(Optional.of(User.builder()
+						.id("123")
+						.userName("tester")
+						.firstName("tester")
+						.email("tester@skoop.com")
+						.build())
+				);
+
+		given(userRepository.findByUserName("manager"))
+				.willReturn(Optional.of(User.builder()
+						.id("456")
+						.userName("manager")
+						.firstName("manager")
+						.email("manager@skoop.com")
+						.build())
+				);
+
+		given(userRepository.save(
+				User.builder()
+						.id("123")
+						.userName("tester")
+						.firstName("tester")
+						.email("tester@skoop.com")
+						.manager(
+								User.builder()
+										.id("456")
+										.userName("manager")
+										.firstName("manager")
+										.email("manager@skoop.com")
+										.build()
+						)
+						.build()
+		)).willReturn(
+				User.builder()
+						.id("123")
+						.userName("tester")
+						.firstName("tester")
+						.email("tester@skoop.com")
+						.manager(
+								User.builder()
+										.id("456")
+										.userName("manager")
+										.firstName("manager")
+										.email("manager@skoop.com")
+										.build()
+						)
+						.build()
+		);
+
+		final User user = userCommandService.updateUserManager("123", "manager");
+		assertThat(user.getId()).isEqualTo("123");
+		assertThat(user.getUserName()).isEqualTo("tester");
+		assertThat(user.getFirstName()).isEqualTo("tester");
+		assertThat(user.getEmail()).isEqualTo("tester@skoop.com");
+		assertThat(user.getManager()).isEqualTo(
+				User.builder()
+						.id("456")
+						.userName("manager")
+						.firstName("manager")
+						.email("manager@skoop.com")
+						.build()
+		);
+	}
+
 }

@@ -90,6 +90,26 @@ public class UserCommandService {
 	}
 
 	@Transactional
+	public User updateUserManager(String userId, String managerUsername) {
+		final User user = userRepository.findById(userId).orElseThrow(() -> {
+			String[] searchParamsMap = {"id", userId};
+			return NoSuchResourceException.builder()
+					.model(Model.USER)
+					.searchParamsMap(searchParamsMap)
+					.build();
+		});
+		final User manager = userRepository.findByUserName(managerUsername).orElseThrow(() -> {
+			String[] searchParamsMap = {"username", managerUsername};
+			return NoSuchResourceException.builder()
+					.model(Model.USER)
+					.searchParamsMap(searchParamsMap)
+					.build();
+		});
+		user.setManager(manager);
+		return userRepository.save(user);
+	}
+
+	@Transactional
 	public void deleteUser(String id) {
 		User user = userRepository.findById(id).orElseThrow(() -> {
 			String[] searchParamsMap = {"id", id};

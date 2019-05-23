@@ -6,6 +6,7 @@ import com.tsmms.skoop.exception.enums.Model;
 import com.tsmms.skoop.user.GlobalUserPermissionScope;
 import com.tsmms.skoop.user.User;
 import com.tsmms.skoop.user.UserResponse;
+import com.tsmms.skoop.user.UserSimpleResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -78,6 +79,32 @@ public class UserQueryController {
 	public UserResponse getUserById(@PathVariable("userId") String userId) {
 		return userQueryService.getUserById(userId)
 				.map(UserResponse::of)
+				.orElseThrow(() -> {
+					String[] searchParamsMap = {"id", userId};
+					return NoSuchResourceException.builder()
+							.model(Model.USER)
+							.searchParamsMap(searchParamsMap)
+							.build();
+				});
+	}
+
+	@ApiOperation(
+			value = "Get manager of a specific user",
+			notes = "Get manager of a specific user currently stored in the system."
+	)
+	@ApiResponses({
+			@ApiResponse(code = 200, message = "Successful execution"),
+			@ApiResponse(code = 401, message = "Invalid authentication"),
+			@ApiResponse(code = 403, message = "Insufficient privileges to access resource, e.g. foreign user data"),
+			@ApiResponse(code = 404, message = "Resource not found"),
+			@ApiResponse(code = 500, message = "Error during execution")
+	})
+	@PreAuthorize("isAuthenticated() and (isPrincipalUserId(#userId) or hasUserPermission(#userId, 'READ_USER_PROFILE') or isGlobalPermissionGranted(#userId, 'READ_USER_PROFILE'))")
+	@GetMapping(path = "/users/{userId}/manager", produces = MediaType.APPLICATION_JSON_VALUE)
+	public UserSimpleResponse getUserManager(@PathVariable("userId") String userId) {
+		return userQueryService.getUserById(userId)
+				.map(User::getManager)
+				.map(UserSimpleResponse::of)
 				.orElseThrow(() -> {
 					String[] searchParamsMap = {"id", userId};
 					return NoSuchResourceException.builder()
