@@ -1,7 +1,6 @@
 package com.tsmms.skoop.user;
 
 import com.tsmms.skoop.common.AbstractControllerTests;
-import com.tsmms.skoop.common.JwtAuthenticationFactory;
 import com.tsmms.skoop.user.query.UserQueryController;
 import com.tsmms.skoop.user.query.UserQueryService;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +26,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static com.tsmms.skoop.common.JwtAuthenticationFactory.withUser;
 
 @WebMvcTest(UserQueryController.class)
 class UserQueryControllerTests extends AbstractControllerTests {
@@ -83,7 +83,7 @@ class UserQueryControllerTests extends AbstractControllerTests {
 
 		mockMvc.perform(get("/users")
 				.accept(MediaType.APPLICATION_JSON)
-				.with(authentication(JwtAuthenticationFactory.withUser(owner))))
+				.with(authentication(withUser(owner))))
 				.andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.length()", is(equalTo(2))))
@@ -138,7 +138,7 @@ class UserQueryControllerTests extends AbstractControllerTests {
 
 		mockMvc.perform(get("/users/d9d74c04-0ab0-479c-a1d7-d372990f11b6")
 				.accept(MediaType.APPLICATION_JSON)
-				.with(authentication(JwtAuthenticationFactory.withUser(owner))))
+				.with(authentication(withUser(owner))))
 				.andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.id", is(equalTo("d9d74c04-0ab0-479c-a1d7-d372990f11b6"))))
@@ -153,6 +153,21 @@ class UserQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$.specializations", is(equalTo(Arrays.asList("IT Consulting", "Software Integration")))))
 				.andExpect(jsonPath("$.certificates", is(equalTo(Collections.singletonList("Kotlin Certified Programmer")))))
 				.andExpect(jsonPath("$.languages", is(equalTo(Collections.singletonList("English")))));
+	}
+
+	@Test
+	@DisplayName("404 status code is returned when getting non existent user.")
+	void notFoundStatusWhenGettingNonExistentUser() throws Exception {
+		given(userPermissionQueryService.hasUserPermission("d9d74c04-0ab0-479c-a1d7-d372990f11b6", owner.getId(), UserPermissionScope.READ_USER_PROFILE))
+				.willReturn(true);
+
+		given(userQueryService.getUserById("d9d74c04-0ab0-479c-a1d7-d372990f11b6"))
+				.willReturn(Optional.empty());
+
+		mockMvc.perform(get("/users/d9d74c04-0ab0-479c-a1d7-d372990f11b6")
+				.accept(MediaType.APPLICATION_JSON)
+				.with(authentication(withUser(owner))))
+				.andExpect(status().isNotFound());
 	}
 
 	@Test
@@ -180,7 +195,7 @@ class UserQueryControllerTests extends AbstractControllerTests {
 
 		mockMvc.perform(get("/users/d9d74c04-0ab0-479c-a1d7-d372990f11b6")
 				.accept(MediaType.APPLICATION_JSON)
-				.with(authentication(JwtAuthenticationFactory.withUser(owner))))
+				.with(authentication(withUser(owner))))
 				.andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.id", is(equalTo("d9d74c04-0ab0-479c-a1d7-d372990f11b6"))))
@@ -222,7 +237,7 @@ class UserQueryControllerTests extends AbstractControllerTests {
 
 		mockMvc.perform(get("/users/d9d74c04-0ab0-479c-a1d7-d372990f11b6")
 				.accept(MediaType.APPLICATION_JSON)
-				.with(authentication(JwtAuthenticationFactory.withUser(owner))))
+				.with(authentication(withUser(owner))))
 				.andExpect(status().isForbidden());
 	}
 
@@ -248,7 +263,7 @@ class UserQueryControllerTests extends AbstractControllerTests {
 
 		mockMvc.perform(get("/users/56ef4778-a084-4509-9a3e-80b7895cf7b0")
 				.accept(MediaType.APPLICATION_JSON)
-				.with(authentication(JwtAuthenticationFactory.withUser(owner))))
+				.with(authentication(withUser(owner))))
 				.andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.id", is(equalTo("56ef4778-a084-4509-9a3e-80b7895cf7b0"))))
@@ -308,7 +323,7 @@ class UserQueryControllerTests extends AbstractControllerTests {
 
 		mockMvc.perform(get("/users")
 				.accept(MediaType.APPLICATION_JSON)
-				.with(authentication(JwtAuthenticationFactory.withUser(owner))))
+				.with(authentication(withUser(owner))))
 				.andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.length()", is(equalTo(2))))
@@ -336,6 +351,107 @@ class UserQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[1].specializations", is(equalTo(Arrays.asList("IT Consulting", "Software Integration")))))
 				.andExpect(jsonPath("$[1].certificates", is(equalTo(Collections.singletonList("Kotlin Certified Programmer")))))
 				.andExpect(jsonPath("$[1].languages", is(equalTo(Collections.singletonList("English")))));
+	}
+
+	@Test
+	@DisplayName("Responds with the manager of the requested user")
+	void respondsWithManagerOfRequestedUser() throws Exception {
+		given(userPermissionQueryService.hasUserPermission("d9d74c04-0ab0-479c-a1d7-d372990f11b6", owner.getId(), UserPermissionScope.READ_USER_PROFILE))
+				.willReturn(true);
+
+		given(userQueryService.getUserById("d9d74c04-0ab0-479c-a1d7-d372990f11b6"))
+				.willReturn(Optional.of(User.builder()
+						.id("d9d74c04-0ab0-479c-a1d7-d372990f11b6")
+						.userName("testing")
+						.firstName("Tina")
+						.lastName("Testing")
+						.email("tina.testing@skoop.io")
+						.academicDegree("Diplom-Wirtschaftsinformatiker")
+						.positionProfile("Software Engineer")
+						.summary("Tina's summary")
+						.industrySectors(Arrays.asList("Automotive", "Telecommunication"))
+						.specializations(Arrays.asList("IT Consulting", "Software Integration"))
+						.certificates(Collections.singletonList("Kotlin Certified Programmer"))
+						.languages(Collections.singletonList("English"))
+						.manager(User.builder()
+								.id("123")
+								.userName("manager")
+								.firstName("Tom")
+								.lastName("Testing")
+								.email("tom.testing@skoop.io")
+								.build()
+						)
+						.build()
+				));
+
+		mockMvc.perform(get("/users/d9d74c04-0ab0-479c-a1d7-d372990f11b6/manager")
+				.accept(MediaType.APPLICATION_JSON)
+				.with(authentication(withUser(owner))))
+				.andExpect(status().isOk())
+				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+				.andExpect(jsonPath("$.id", is(equalTo("123"))))
+				.andExpect(jsonPath("$.userName", is(equalTo("manager"))))
+				.andExpect(jsonPath("$.firstName", is(equalTo("Tom"))))
+				.andExpect(jsonPath("$.lastName", is(equalTo("Testing"))))
+				.andExpect(jsonPath("$.email", is(equalTo("tom.testing@skoop.io"))));
+	}
+
+
+	@DisplayName("404 status code is returned when getting a manager of a non existent user.")
+	@Test
+	void notFoundStatusWhenGettingManagerOfNonExistentUser() throws Exception {
+		given(userPermissionQueryService.hasUserPermission("d9d74c04-0ab0-479c-a1d7-d372990f11b6", owner.getId(), UserPermissionScope.READ_USER_PROFILE))
+				.willReturn(true);
+
+		given(userQueryService.getUserById("d9d74c04-0ab0-479c-a1d7-d372990f11b6"))
+				.willReturn(Optional.empty());
+
+		mockMvc.perform(get("/users/d9d74c04-0ab0-479c-a1d7-d372990f11b6/manager")
+				.accept(MediaType.APPLICATION_JSON)
+				.with(authentication(withUser(owner))))
+				.andExpect(status().isNotFound());
+	}
+
+	@DisplayName("Empty body is returned when getting a manager of a user with an undefined manager.")
+	@Test
+	void emptyBodyWhenGettingManagerOfUserWithUndefinedManager() throws Exception {
+		given(userPermissionQueryService.hasUserPermission("d9d74c04-0ab0-479c-a1d7-d372990f11b6", owner.getId(), UserPermissionScope.READ_USER_PROFILE))
+				.willReturn(true);
+
+		given(userQueryService.getUserById("d9d74c04-0ab0-479c-a1d7-d372990f11b6"))
+				.willReturn(Optional.of(User.builder()
+						.id("d9d74c04-0ab0-479c-a1d7-d372990f11b6")
+						.userName("testing")
+						.firstName("Tina")
+						.lastName("Testing")
+						.email("tina.testing@skoop.io")
+						.academicDegree("Diplom-Wirtschaftsinformatiker")
+						.positionProfile("Software Engineer")
+						.summary("Tina's summary")
+						.industrySectors(Arrays.asList("Automotive", "Telecommunication"))
+						.specializations(Arrays.asList("IT Consulting", "Software Integration"))
+						.certificates(Collections.singletonList("Kotlin Certified Programmer"))
+						.languages(Collections.singletonList("English"))
+						.build()
+				));
+
+		mockMvc.perform(get("/users/d9d74c04-0ab0-479c-a1d7-d372990f11b6/manager")
+				.accept(MediaType.APPLICATION_JSON)
+				.with(authentication(withUser(owner))))
+				.andExpect(status().isOk())
+				.andExpect(content().string(""));
+	}
+
+	@Test
+	@DisplayName("Not authenticated user cannot get other user profile.")
+	void notAuthenticatedUserCannotGetManagerOfAnotherUser() throws Exception {
+		given(userPermissionQueryService.hasUserPermission("d9d74c04-0ab0-479c-a1d7-d372990f11b6", owner.getId(), UserPermissionScope.READ_USER_PROFILE))
+				.willReturn(false);
+
+		mockMvc.perform(get("/users/d9d74c04-0ab0-479c-a1d7-d372990f11b6/manager")
+				.accept(MediaType.APPLICATION_JSON)
+				.with(authentication(withUser(owner))))
+				.andExpect(status().isForbidden());
 	}
 
 }

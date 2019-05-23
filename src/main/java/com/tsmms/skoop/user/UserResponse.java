@@ -51,6 +51,9 @@ public class UserResponse {
 	private List<String> languages;
 
 	public static UserResponse of(User user) {
+		if (user == null) {
+			return null;
+		}
 		return UserResponse.builder()
 				.id(user.getId())
 				.userName(user.getUserName())
