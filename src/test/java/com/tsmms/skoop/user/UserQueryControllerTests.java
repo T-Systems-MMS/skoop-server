@@ -397,6 +397,36 @@ class UserQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$.email", is(equalTo("tom.testing@skoop.io"))));
 	}
 
+	@Test
+	@DisplayName("A manager can get manager info of her / his subordinate.")
+	void managerCanGetManagerInfoOfHerSubordinate() throws Exception {
+		given(userQueryService.getUserById("d9d74c04-0ab0-479c-a1d7-d372990f11b6"))
+				.willReturn(Optional.of(User.builder()
+						.id("d9d74c04-0ab0-479c-a1d7-d372990f11b6")
+						.userName("testing")
+						.firstName("Tina")
+						.lastName("Testing")
+						.email("tina.testing@skoop.io")
+						.academicDegree("Diplom-Wirtschaftsinformatiker")
+						.positionProfile("Software Engineer")
+						.summary("Tina's summary")
+						.industrySectors(Arrays.asList("Automotive", "Telecommunication"))
+						.specializations(Arrays.asList("IT Consulting", "Software Integration"))
+						.certificates(Collections.singletonList("Kotlin Certified Programmer"))
+						.languages(Collections.singletonList("English"))
+						.manager(owner)
+						.build()
+				));
+
+		mockMvc.perform(get("/users/d9d74c04-0ab0-479c-a1d7-d372990f11b6/manager")
+				.accept(MediaType.APPLICATION_JSON)
+				.with(authentication(withUser(owner))))
+				.andExpect(status().isOk())
+				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+				.andExpect(jsonPath("$.id", is(equalTo("56ef4778-a084-4509-9a3e-80b7895cf7b0"))))
+				.andExpect(jsonPath("$.userName", is(equalTo("tester"))));
+	}
+
 
 	@DisplayName("404 status code is returned when getting a manager of a non existent user.")
 	@Test
@@ -448,6 +478,13 @@ class UserQueryControllerTests extends AbstractControllerTests {
 	void notAuthenticatedUserCannotGetManagerOfAnotherUser() throws Exception {
 		given(userPermissionQueryService.hasUserPermission("d9d74c04-0ab0-479c-a1d7-d372990f11b6", owner.getId(), UserPermissionScope.READ_USER_PROFILE))
 				.willReturn(false);
+
+		given(userQueryService.getUserById("d9d74c04-0ab0-479c-a1d7-d372990f11b6"))
+				.willReturn(Optional.of(User.builder()
+						.id("d9d74c04-0ab0-479c-a1d7-d372990f11b6")
+						.userName("anotherTester")
+						.build()
+				));
 
 		mockMvc.perform(get("/users/d9d74c04-0ab0-479c-a1d7-d372990f11b6/manager")
 				.accept(MediaType.APPLICATION_JSON)
@@ -506,6 +543,47 @@ class UserQueryControllerTests extends AbstractControllerTests {
 				.accept(MediaType.APPLICATION_JSON)
 				.with(authentication(withUser(owner))))
 				.andExpect(status().isForbidden());
+	}
+
+	@DisplayName("A manager can get user info of her / his subordinate.")
+	@Test
+	void managerCanGetUserInfoOfHerSubordinate() throws Exception {
+
+		given(userQueryService.getUserById("d9d74c04-0ab0-479c-a1d7-d372990f11b6"))
+				.willReturn(Optional.of(User.builder()
+						.id("d9d74c04-0ab0-479c-a1d7-d372990f11b6")
+						.userName("testing")
+						.firstName("Tina")
+						.lastName("Testing")
+						.email("tina.testing@skoop.io")
+						.academicDegree("Diplom-Wirtschaftsinformatiker")
+						.positionProfile("Software Engineer")
+						.summary("Tina's summary")
+						.industrySectors(Arrays.asList("Automotive", "Telecommunication"))
+						.specializations(Arrays.asList("IT Consulting", "Software Integration"))
+						.certificates(Collections.singletonList("Kotlin Certified Programmer"))
+						.languages(Collections.singletonList("English"))
+						.manager(owner)
+						.build()
+				));
+
+		mockMvc.perform(get("/users/d9d74c04-0ab0-479c-a1d7-d372990f11b6")
+				.accept(MediaType.APPLICATION_JSON)
+				.with(authentication(withUser(owner))))
+				.andExpect(status().isOk())
+				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+				.andExpect(jsonPath("$.id", is(equalTo("d9d74c04-0ab0-479c-a1d7-d372990f11b6"))))
+				.andExpect(jsonPath("$.userName", is(equalTo("testing"))))
+				.andExpect(jsonPath("$.firstName", is(equalTo("Tina"))))
+				.andExpect(jsonPath("$.lastName", is(equalTo("Testing"))))
+				.andExpect(jsonPath("$.email", is(equalTo("tina.testing@skoop.io"))))
+				.andExpect(jsonPath("$.academicDegree", is(equalTo("Diplom-Wirtschaftsinformatiker"))))
+				.andExpect(jsonPath("$.positionProfile", is(equalTo("Software Engineer"))))
+				.andExpect(jsonPath("$.summary", is(equalTo("Tina's summary"))))
+				.andExpect(jsonPath("$.industrySectors", is(equalTo(Arrays.asList("Automotive", "Telecommunication")))))
+				.andExpect(jsonPath("$.specializations", is(equalTo(Arrays.asList("IT Consulting", "Software Integration")))))
+				.andExpect(jsonPath("$.certificates", is(equalTo(Collections.singletonList("Kotlin Certified Programmer")))))
+				.andExpect(jsonPath("$.languages", is(equalTo(Collections.singletonList("English")))));
 	}
 
 }

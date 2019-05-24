@@ -1,6 +1,8 @@
 package com.tsmms.skoop.user.query;
 
 import com.tsmms.skoop.exception.NoSuchResourceException;
+import com.tsmms.skoop.exception.UserNotAuthorizedException;
+import com.tsmms.skoop.security.CurrentUserService;
 import com.tsmms.skoop.security.JwtClaims;
 import com.tsmms.skoop.exception.enums.Model;
 import com.tsmms.skoop.user.GlobalUserPermissionScope;
@@ -22,7 +24,6 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.tsmms.skoop.user.UserPermissionScope.READ_USER_PROFILE;
 import static java.util.stream.Collectors.toList;
@@ -33,16 +34,20 @@ import static java.util.Objects.requireNonNull;
 @Api(tags = "Users")
 @RestController
 public class UserQueryController {
-	private UserQueryService userQueryService;
-	private UserPermissionQueryService userPermissionQueryService;
-	private GlobalUserPermissionQueryService globalUserPermissionQueryService;
+
+	private final UserQueryService userQueryService;
+	private final UserPermissionQueryService userPermissionQueryService;
+	private final GlobalUserPermissionQueryService globalUserPermissionQueryService;
+	private final CurrentUserService currentUserService;
 
 	public UserQueryController(UserQueryService userQueryService,
 							   UserPermissionQueryService userPermissionQueryService,
-							   GlobalUserPermissionQueryService globalUserPermissionQueryService) {
+							   GlobalUserPermissionQueryService globalUserPermissionQueryService,
+							   CurrentUserService currentUserService) {
 		this.userQueryService = requireNonNull(userQueryService);
 		this.userPermissionQueryService = requireNonNull(userPermissionQueryService);
 		this.globalUserPermissionQueryService = requireNonNull(globalUserPermissionQueryService);
+		this.currentUserService = requireNonNull(currentUserService);
 	}
 
 	@ApiOperation(
@@ -75,11 +80,10 @@ public class UserQueryController {
 			@ApiResponse(code = 404, message = "Resource not found"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("isAuthenticated() and (isPrincipalUserId(#userId) or hasUserPermission(#userId, 'READ_USER_PROFILE') or isGlobalPermissionGranted(#userId, 'READ_USER_PROFILE'))")
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping(path = "/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public UserResponse getUserById(@PathVariable("userId") String userId) {
-		return userQueryService.getUserById(userId)
-				.map(UserResponse::of)
+		final User user = userQueryService.getUserById(userId)
 				.orElseThrow(() -> {
 					String[] searchParamsMap = {"id", userId};
 					return NoSuchResourceException.builder()
@@ -87,6 +91,14 @@ public class UserQueryController {
 							.searchParamsMap(searchParamsMap)
 							.build();
 				});
+		if (currentUserService.isAuthenticatedUserId(userId) ||
+				userPermissionQueryService.hasUserPermission(userId, currentUserService.getCurrentUserId(), READ_USER_PROFILE) ||
+				globalUserPermissionQueryService.isGlobalUserPermissionGranted(userId, GlobalUserPermissionScope.READ_USER_PROFILE) ||
+				(user.getManager() != null && currentUserService.getCurrentUserId().equals(user.getManager().getId()))) {
+			return UserResponse.of(user);
+		} else {
+			throw new UserNotAuthorizedException();
+		}
 	}
 
 	@ApiOperation(
@@ -100,7 +112,7 @@ public class UserQueryController {
 			@ApiResponse(code = 404, message = "Resource not found"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("isAuthenticated() and (isPrincipalUserId(#userId) or hasUserPermission(#userId, 'READ_USER_PROFILE') or isGlobalPermissionGranted(#userId, 'READ_USER_PROFILE'))")
+	@PreAuthorize("isAuthenticated()")
 	@GetMapping(path = "/users/{userId}/manager", produces = MediaType.APPLICATION_JSON_VALUE)
 	public UserSimpleResponse getUserManager(@PathVariable("userId") String userId) {
 		final User user = userQueryService.getUserById(userId)
@@ -111,7 +123,14 @@ public class UserQueryController {
 							.searchParamsMap(searchParamsMap)
 							.build();
 				});
-		return UserSimpleResponse.of(user.getManager());
+		if (currentUserService.isAuthenticatedUserId(userId) ||
+				userPermissionQueryService.hasUserPermission(userId, currentUserService.getCurrentUserId(), READ_USER_PROFILE) ||
+				globalUserPermissionQueryService.isGlobalUserPermissionGranted(userId, GlobalUserPermissionScope.READ_USER_PROFILE) ||
+				(user.getManager() != null && currentUserService.getCurrentUserId().equals(user.getManager().getId()))) {
+			return UserSimpleResponse.of(user.getManager());
+		} else {
+			throw new UserNotAuthorizedException();
+		}
 	}
 
 	@ApiOperation(
