@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class UserQueryServiceTests {
@@ -50,4 +51,46 @@ class UserQueryServiceTests {
 		assertThat(user.getUserName()).isEqualTo("tester2");
 		assertThat(user.getEmail()).isEqualTo("tester2@gmail.com");
 	}
+
+	@DisplayName("Gets user subordinates.")
+	@Test
+	void getUserSubordinates() {
+		final User manager = userRepository.save(User.builder()
+				.id("123")
+				.userName("manager")
+				.build()
+		);
+		given(userRepository.findByManagerId("123")).willReturn(Stream.of(
+				User.builder()
+						.id("456")
+						.userName("tester")
+						.manager(manager)
+						.build(),
+				User.builder()
+						.id("789")
+						.userName("anotherTester")
+						.manager(manager)
+						.build()
+				)
+		);
+		assertThat(userQueryService.getUserSubordinates("123")).containsExactlyInAnyOrder(
+				User.builder()
+						.id("456")
+						.userName("tester")
+						.manager(manager)
+						.build(),
+				User.builder()
+						.id("789")
+						.userName("anotherTester")
+						.manager(manager)
+						.build()
+		);
+	}
+
+	@DisplayName("Throws exception when getting user subordinates if user ID is null.")
+	@Test
+	void throwsExceptionWhenGettingUserSubordinatesIfUserIdIsNull() {
+		assertThrows(IllegalArgumentException.class, () -> userQueryService.getUserSubordinates(null));
+	}
+
 }

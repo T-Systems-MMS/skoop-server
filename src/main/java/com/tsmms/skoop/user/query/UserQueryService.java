@@ -60,4 +60,13 @@ public class UserQueryService {
 		}
 		return userRepository.existsById(userId);
 	}
+
+	@Transactional(readOnly = true)
+	public Stream<User> getUserSubordinates(String userId) {
+		if (userId == null) {
+			throw new IllegalArgumentException("User ID cannot be null.");
+		}
+		return userRepository.findByManagerId(userId);
+	}
+
 }

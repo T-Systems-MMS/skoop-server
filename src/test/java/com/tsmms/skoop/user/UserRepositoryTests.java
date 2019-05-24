@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.neo4j.DataNeo4jTest;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,4 +29,40 @@ class UserRepositoryTests {
 		assertThat(user.get().getUserName()).isEqualTo("tester");
 		assertThat(user.get().getLastName()).isNull();
 	}
+
+	@DisplayName("Gets user subordinates.")
+	@Test
+	void getSubordinates() {
+		final User manager = userRepository.save(User.builder()
+				.id("123")
+				.userName("manager")
+				.build()
+		);
+		userRepository.saveAll(Arrays.asList(
+				User.builder()
+						.id("456")
+						.userName("tester")
+						.manager(manager)
+						.build(),
+				User.builder()
+						.id("789")
+						.userName("anotherTester")
+						.manager(manager)
+						.build()
+				)
+		);
+		assertThat(userRepository.findByManagerId(manager.getId())).containsExactlyInAnyOrder(
+				User.builder()
+						.id("456")
+						.userName("tester")
+						.manager(manager)
+						.build(),
+				User.builder()
+						.id("789")
+						.userName("anotherTester")
+						.manager(manager)
+						.build()
+		);
+	}
+
 }
