@@ -521,4 +521,20 @@ class UserProjectQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[1].project.lastModifiedDate", is(equalTo("2018-01-12T10:10:00"))));
 	}
 
+	@DisplayName("404 status code is returned when getting projects of non existent user.")
+	@Test
+	void notFoundStatusWhenGettingProjectsOfNonExistentUser() throws Exception {
+		final User tester = User.builder()
+				.id("2a29ca1o-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build();
+
+		given(userQueryService.getUserById("2a29ca1o-b4d0-4119-9113-4677beb20ae2"))
+				.willReturn(Optional.empty());
+
+		mockMvc.perform(get("/users/1f37fb2a-b4d0-4119-9113-4677beb20ae2/projects")
+				.with(authentication(withUser(tester))))
+				.andExpect(status().isNotFound());
+	}
+
 }
