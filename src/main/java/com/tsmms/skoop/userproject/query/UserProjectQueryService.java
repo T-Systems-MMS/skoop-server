@@ -20,7 +20,6 @@ public class UserProjectQueryService {
 	}
 
 	@Transactional(readOnly = true)
-	@PreAuthorize("isPrincipalUserId(#userId) or hasUserPermission(#userId, 'READ_USER_SKILLS')")
 	public Stream<UserProject> getUserProjects(String userId) {
 		return StreamSupport.stream(userProjectRepository.findByUserId(userId)
 				.spliterator(), false);
