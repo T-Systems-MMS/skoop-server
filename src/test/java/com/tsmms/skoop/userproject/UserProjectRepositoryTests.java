@@ -10,6 +10,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.neo4j.DataNeo4jTest;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,19 +35,19 @@ class UserProjectRepositoryTests {
 	void retrievesUserProjectRelationshipByUserId() {
 		// Given
 		Project firstProject = Project.builder()
-				.id("1")
+				.id("a")
 				.name("First project")
 				.description("First project description")
 				.build();
 		firstProject = projectRepository.save(firstProject);
 		Project secondProject = Project.builder()
-				.id("2")
+				.id("b")
 				.name("Second project")
 				.description("Second project description")
 				.build();
 		secondProject = projectRepository.save(secondProject);
 		Project thirdProject = Project.builder()
-				.id("3")
+				.id("c")
 				.name("Third project")
 				.description("Third project description")
 				.build();
@@ -61,36 +64,37 @@ class UserProjectRepositoryTests {
 				.build();
 		other = userRepository.save(other);
 
-		UserProject testerFirstProject = UserProject.builder()
+		final UserProject testerFirstProject = UserProject.builder()
 				.id(UUID.randomUUID().toString())
 				.user(tester)
 				.project(firstProject)
 				.role("QA")
 				.tasks("testing")
 				.build();
-		userProjectRepository.save(testerFirstProject);
-		UserProject testerThirdProject = UserProject.builder()
+		final UserProject testerThirdProject = UserProject.builder()
 				.id(UUID.randomUUID().toString())
 				.user(tester)
 				.project(thirdProject)
 				.role("QA")
 				.tasks("testing")
 				.build();
-		userProjectRepository.save(testerThirdProject);
-		userProjectRepository.save(UserProject.builder()
-				.id(UUID.randomUUID().toString())
-				.user(other)
-				.project(firstProject)
-				.role("Developer")
-				.tasks("Development")
-				.build());
-		userProjectRepository.save(UserProject.builder()
-				.id(UUID.randomUUID().toString())
-				.user(other)
-				.project(secondProject)
-				.role("Developer")
-				.tasks("Development")
-				.build());
+		userProjectRepository.saveAll(Arrays.asList(testerFirstProject,
+				testerThirdProject,
+				UserProject.builder()
+						.id(UUID.randomUUID().toString())
+						.user(other)
+						.project(testerFirstProject.getProject())
+						.role("Developer")
+						.tasks("Development")
+						.build(),
+				UserProject.builder()
+						.id(UUID.randomUUID().toString())
+						.user(other)
+						.project(secondProject)
+						.role("Developer")
+						.tasks("Development")
+						.build()
+				));
 
 		// When
 		Iterable<UserProject> userSkills = userProjectRepository.findByUserId("1");

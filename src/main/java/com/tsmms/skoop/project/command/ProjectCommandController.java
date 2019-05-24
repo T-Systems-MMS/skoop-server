@@ -63,9 +63,9 @@ public class ProjectCommandController {
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<ProjectResponse> updateProject(@PathVariable("projectId") String projectId, @Valid @RequestBody ProjectRequest request) {
-		final Project project = convertProjectRequestToProjectDomain(request);
-		project.setId(projectId);
-		final Project result = projectCommandService.update(project);
+		final UpdateProjectCommand updateProjectCommand = convertProjectRequestToUpdateProjectCommand(request);
+		updateProjectCommand.setId(projectId);
+		final Project result = projectCommandService.update(updateProjectCommand);
 		return ResponseEntity.status(HttpStatus.OK).body(ProjectResponse.of(result));
 	}
 
@@ -83,6 +83,15 @@ public class ProjectCommandController {
 	public ResponseEntity<Void> deleteProject(@PathVariable("projectId") String projectId) {
 		projectCommandService.delete(projectId);
 		return ResponseEntity.noContent().build();
+	}
+
+	private UpdateProjectCommand convertProjectRequestToUpdateProjectCommand(ProjectRequest projectRequest) {
+		return UpdateProjectCommand.builder()
+				.name(projectRequest.getName())
+				.customer(projectRequest.getCustomer())
+				.industrySector(projectRequest.getIndustrySector())
+				.description(projectRequest.getDescription())
+				.build();
 	}
 
 	private Project convertProjectRequestToProjectDomain(ProjectRequest projectRequest) {

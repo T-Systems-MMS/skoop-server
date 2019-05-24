@@ -56,6 +56,9 @@ public class UserProjectResponse {
 	@ApiModelProperty("Skills user worked with during the project.")
 	private Set<SkillResponse> skills;
 
+	@ApiModelProperty("Flag indicating if project membership was approved.")
+	private Boolean approved;
+
 	public static UserProjectResponse of(UserProject userProject) {
 		return UserProjectResponse.builder()
 				.id(userProject.getId())
@@ -68,6 +71,7 @@ public class UserProjectResponse {
 				.project(ProjectResponse.of(userProject.getProject()))
 				.user(UserSimpleResponse.of(userProject.getUser()))
 				.skills(convertSkillListToSkillResponseSet(userProject.getSkills()))
+				.approved(userProject.isApproved())
 				.build();
 	}
 

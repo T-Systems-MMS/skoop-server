@@ -102,6 +102,7 @@ public class UserProjectCommandService {
 		userProject.setId(UUID.randomUUID().toString());
 		userProject.setCreationDate(now);
 		userProject.setLastModifiedDate(now);
+		userProject.setApproved(false);
 		return userProjectRepository.save(userProject);
 	}
 
@@ -131,6 +132,7 @@ public class UserProjectCommandService {
 		}
 		final LocalDateTime now = LocalDateTime.now();
 		userProject.setLastModifiedDate(now);
+		userProject.setApproved(false);
 		return userProjectRepository.save(userProject);
 	}
 
