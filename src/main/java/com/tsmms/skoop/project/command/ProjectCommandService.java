@@ -3,8 +3,10 @@ package com.tsmms.skoop.project.command;
 import com.tsmms.skoop.exception.DuplicateResourceException;
 import com.tsmms.skoop.exception.NoSuchResourceException;
 import com.tsmms.skoop.exception.enums.Model;
+import com.tsmms.skoop.notification.command.NotificationCommandService;
 import com.tsmms.skoop.project.Project;
 import com.tsmms.skoop.project.ProjectRepository;
+import com.tsmms.skoop.userproject.UserProjectNeedsApprovalNotification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,9 +21,12 @@ import static java.util.Objects.requireNonNull;
 public class ProjectCommandService {
 
 	private final ProjectRepository projectRepository;
+	private final NotificationCommandService notificationCommandService;
 
-	public ProjectCommandService(ProjectRepository projectRepository) {
+	public ProjectCommandService(ProjectRepository projectRepository,
+								 NotificationCommandService notificationCommandService) {
 		this.projectRepository = requireNonNull(projectRepository);
+		this.notificationCommandService = requireNonNull(notificationCommandService);
 	}
 
 	@Transactional
@@ -55,7 +60,15 @@ public class ProjectCommandService {
 		p.setIndustrySector(updateProjectCommand.getIndustrySector());
 		p.setLastModifiedDate(LocalDateTime.now());
 		if (p.getUserProjects() != null) {
-			p.getUserProjects().forEach(up -> up.setApproved(false));
+			p.getUserProjects().forEach(up -> {
+				up.setApproved(false);
+				notificationCommandService.save(UserProjectNeedsApprovalNotification.builder()
+						.id(UUID.randomUUID().toString())
+						.creationDatetime(LocalDateTime.now())
+						.userProject(up)
+						.build()
+				);
+			});
 		}
 		return projectRepository.save(p);
 	}

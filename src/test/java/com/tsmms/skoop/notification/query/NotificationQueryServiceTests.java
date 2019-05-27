@@ -16,6 +16,8 @@ import com.tsmms.skoop.communityuser.registration.RequestToJoinCommunityNotifica
 import com.tsmms.skoop.notification.Notification;
 import com.tsmms.skoop.notification.NotificationRepository;
 import com.tsmms.skoop.user.User;
+import com.tsmms.skoop.userproject.UserProject;
+import com.tsmms.skoop.userproject.UserProjectNeedsApprovalNotification;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -149,6 +151,34 @@ class NotificationQueryServiceTests {
 								.title("Changed community")
 								.build())
 						.communityDetails(new HashSet<>(Arrays.asList(CommunityDetails.DESCRIPTION, CommunityDetails.TYPE)))
+						.build(),
+				UserProjectNeedsApprovalNotification.builder()
+						.id("aaa")
+						.creationDatetime(LocalDateTime.of(2014, 5, 8, 16, 30))
+						.userProject(
+								UserProject.builder()
+										.id("abc")
+										.user(User.builder()
+												.id("123456")
+												.userName("firstSubordinate")
+												.build()
+										)
+										.build()
+						)
+						.build(),
+				UserProjectNeedsApprovalNotification.builder()
+						.id("bbb")
+						.creationDatetime(LocalDateTime.of(2014, 5, 8, 16, 29))
+						.userProject(
+								UserProject.builder()
+										.id("def")
+										.user(User.builder()
+												.id("654321")
+												.userName("secondSubordinate")
+												.build()
+										)
+										.build()
+						)
 						.build()
 		));
 
@@ -254,6 +284,32 @@ class NotificationQueryServiceTests {
 								.title("Changed community")
 								.build())
 						.communityDetails(new HashSet<>(Arrays.asList(CommunityDetails.DESCRIPTION, CommunityDetails.TYPE)))
+						.build(),
+				UserProjectNeedsApprovalNotification.builder()
+						.id("aaa")
+						.creationDatetime(LocalDateTime.of(2014, 5, 8, 16, 30))
+						.userProject(UserProject.builder()
+										.id("abc")
+										.user(User.builder()
+												.id("123456")
+												.userName("firstSubordinate")
+												.build()
+										)
+										.build()
+						)
+						.build(),
+				UserProjectNeedsApprovalNotification.builder()
+						.id("bbb")
+						.creationDatetime(LocalDateTime.of(2014, 5, 8, 16, 29))
+						.userProject(UserProject.builder()
+								.id("def")
+								.user(User.builder()
+										.id("654321")
+										.userName("secondSubordinate")
+										.build()
+								)
+								.build()
+						)
 						.build()
 		);
 	}

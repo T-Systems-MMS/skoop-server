@@ -35,6 +35,9 @@ public class ProjectResponse {
 	private LocalDateTime lastModifiedDate;
 
 	public static ProjectResponse of(Project project) {
+		if (project == null) {
+			return null;
+		}
 		return ProjectResponse.builder()
 				.id(project.getId())
 				.name(project.getName())

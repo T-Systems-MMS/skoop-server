@@ -17,6 +17,8 @@ import com.tsmms.skoop.communityuser.registration.RequestToJoinCommunityNotifica
 import com.tsmms.skoop.skill.Skill;
 import com.tsmms.skoop.user.User;
 import com.tsmms.skoop.notification.query.NotificationQueryService;
+import com.tsmms.skoop.userproject.UserProject;
+import com.tsmms.skoop.userproject.UserProjectNeedsApprovalNotification;
 import com.tsmms.skoop.userskill.UserSkillsEstimationNotification;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -188,6 +190,34 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 										.name("Angular")
 										.build()
 						)))
+						.build(),
+				UserProjectNeedsApprovalNotification.builder()
+						.id("aaa")
+						.creationDatetime(LocalDateTime.of(2014, 5, 8, 16, 30))
+						.userProject(
+								UserProject.builder()
+										.id("abc")
+										.user(User.builder()
+												.id("123456")
+												.userName("firstSubordinate")
+												.build()
+										)
+										.build()
+						)
+						.build(),
+				UserProjectNeedsApprovalNotification.builder()
+						.id("bbb")
+						.creationDatetime(LocalDateTime.of(2014, 5, 8, 16, 29))
+						.userProject(
+								UserProject.builder()
+										.id("def")
+										.user(User.builder()
+												.id("654321")
+												.userName("secondSubordinate")
+												.build()
+										)
+										.build()
+						)
 						.build()
 		));
 
@@ -196,7 +226,7 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 				.with(authentication(withUser(tester))))
 				.andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-				.andExpect(jsonPath("$.length()", is(equalTo(10))))
+				.andExpect(jsonPath("$.length()", is(equalTo(12))))
 				.andExpect(jsonPath("$[0].id", is(equalTo("123"))))
 				.andExpect(jsonPath("$[0].type", is(equalTo("InvitationToJoinCommunityNotification"))))
 				.andExpect(jsonPath("$[0].creationDatetime", is(equalTo("2019-03-27T09:34:00"))))
@@ -271,7 +301,17 @@ class UserNotificationQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[9].skills[0].id", is(equalTo("123"))))
 				.andExpect(jsonPath("$[9].skills[0].name", is(equalTo("Spring Boot"))))
 				.andExpect(jsonPath("$[9].skills[1].id", is(equalTo("456"))))
-				.andExpect(jsonPath("$[9].skills[1].name", is(equalTo("Angular"))));
+				.andExpect(jsonPath("$[9].skills[1].name", is(equalTo("Angular"))))
+				.andExpect(jsonPath("$[10].id", is(equalTo("aaa"))))
+				.andExpect(jsonPath("$[10].type", is(equalTo("UserProjectNeedsApprovalNotification"))))
+				.andExpect(jsonPath("$[10].creationDatetime", is(equalTo("2014-05-08T16:30:00"))))
+				.andExpect(jsonPath("$[10].userProject.user.id", is(equalTo(("123456")))))
+				.andExpect(jsonPath("$[10].userProject.user.userName", is(equalTo(("firstSubordinate")))))
+				.andExpect(jsonPath("$[11].id", is(equalTo("bbb"))))
+				.andExpect(jsonPath("$[11].type", is(equalTo("UserProjectNeedsApprovalNotification"))))
+				.andExpect(jsonPath("$[11].creationDatetime", is(equalTo("2014-05-08T16:29:00"))))
+				.andExpect(jsonPath("$[11].userProject.user.id", is(equalTo(("654321")))))
+				.andExpect(jsonPath("$[11].userProject.user.userName", is(equalTo(("secondSubordinate")))));
 	}
 
 	@DisplayName("Not authenticated user cannot get notifications.")

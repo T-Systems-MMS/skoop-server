@@ -2,6 +2,7 @@ package com.tsmms.skoop.project.command;
 
 import com.tsmms.skoop.exception.DuplicateResourceException;
 import com.tsmms.skoop.exception.NoSuchResourceException;
+import com.tsmms.skoop.notification.command.NotificationCommandService;
 import com.tsmms.skoop.project.Project;
 import com.tsmms.skoop.project.ProjectRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,11 +25,14 @@ class ProjectCommandServiceTests {
 	@Mock
 	private ProjectRepository projectRepository;
 
+	@Mock
+	private NotificationCommandService notificationCommandService;
+
 	private ProjectCommandService projectCommandService;
 
 	@BeforeEach
 	void setUp() {
-		projectCommandService = new ProjectCommandService(projectRepository);
+		projectCommandService = new ProjectCommandService(projectRepository, notificationCommandService);
 	}
 
 	@Test
