@@ -35,19 +35,19 @@ class UserProjectRepositoryTests {
 	void retrievesUserProjectRelationshipByUserId() {
 		// Given
 		Project firstProject = Project.builder()
-				.id("a")
+				.id("1")
 				.name("First project")
 				.description("First project description")
 				.build();
 		firstProject = projectRepository.save(firstProject);
 		Project secondProject = Project.builder()
-				.id("b")
+				.id("2")
 				.name("Second project")
 				.description("Second project description")
 				.build();
 		secondProject = projectRepository.save(secondProject);
 		Project thirdProject = Project.builder()
-				.id("c")
+				.id("3")
 				.name("Third project")
 				.description("Third project description")
 				.build();
