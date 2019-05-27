@@ -141,20 +141,20 @@ class ProjectCommandControllerTests extends AbstractControllerTests {
 				.userName("tester")
 				.build();
 		final ClassPathResource body = new ClassPathResource("update-project.json");
-		final Project project = Project.builder()
+		final UpdateProjectCommand updateProjectCommand = UpdateProjectCommand.builder()
 				.id("123")
 				.name("Development Project")
 				.customer("Some Customer")
 				.industrySector("Information Technology")
 				.description("New description of the project")
 				.build();
-		given(projectCommandService.update(project)).willReturn(
+		given(projectCommandService.update(updateProjectCommand)).willReturn(
 				Project.builder()
 						.id("123")
-						.name(project.getName())
-						.customer(project.getCustomer())
-						.industrySector(project.getIndustrySector())
-						.description(project.getDescription())
+						.name(updateProjectCommand.getName())
+						.customer(updateProjectCommand.getCustomer())
+						.industrySector(updateProjectCommand.getIndustrySector())
+						.description(updateProjectCommand.getDescription())
 						.creationDate(LocalDateTime.of(2019, 1, 9, 10, 30))
 						.lastModifiedDate(LocalDateTime.of(2019, 1, 9, 11, 30))
 						.build()

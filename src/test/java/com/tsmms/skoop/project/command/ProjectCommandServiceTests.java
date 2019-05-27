@@ -68,7 +68,7 @@ class ProjectCommandServiceTests {
 	@DisplayName("Update project throws an exception when there is no such a project")
 	void updateProjectThrowsExceptionWhenThereIsNoSuchProject() {
 		given(projectRepository.findById("123")).willReturn(Optional.empty());
-		assertThrows(NoSuchResourceException.class, () -> projectCommandService.update(Project.builder().id("123").name("Project").description("Project description").build()));
+		assertThrows(NoSuchResourceException.class, () -> projectCommandService.update(UpdateProjectCommand.builder().id("123").name("Project").description("Project description").build()));
 	}
 
 	@Test
@@ -80,7 +80,7 @@ class ProjectCommandServiceTests {
 		given(projectRepository.save(ArgumentMatchers.isA(Project.class)))
 				.willReturn(Project.builder().id("123").name("New project name").description("New project description").build());
 
-		Project project = projectCommandService.update(Project.builder().id("123").name("New project name").description("New project description").build());
+		Project project = projectCommandService.update(UpdateProjectCommand.builder().id("123").name("New project name").description("New project description").build());
 
 		assertThat(project).isNotNull();
 		assertThat(project.getId()).isNotNull();

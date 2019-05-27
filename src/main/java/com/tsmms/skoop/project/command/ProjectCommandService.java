@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 
 @Service
 public class ProjectCommandService {
@@ -20,7 +21,7 @@ public class ProjectCommandService {
 	private final ProjectRepository projectRepository;
 
 	public ProjectCommandService(ProjectRepository projectRepository) {
-		this.projectRepository = projectRepository;
+		this.projectRepository = requireNonNull(projectRepository);
 	}
 
 	@Transactional
@@ -40,17 +41,23 @@ public class ProjectCommandService {
 
 	@Transactional
 	@PreAuthorize("isAuthenticated()")
-	public Project update(Project project) {
-		final Project p = projectRepository.findById(project.getId()).orElseThrow(() -> {
-			final String[] searchParamsMap = {"id", project.getId()};
+	public Project update(UpdateProjectCommand updateProjectCommand) {
+		final Project p = projectRepository.findById(updateProjectCommand.getId()).orElseThrow(() -> {
+			final String[] searchParamsMap = {"id", updateProjectCommand.getId()};
 			return NoSuchResourceException.builder()
 					.model(Model.PROJECT)
 					.searchParamsMap(searchParamsMap)
 					.build();
 		});
-		project.setLastModifiedDate(LocalDateTime.now());
-		project.setCreationDate(p.getCreationDate());
-		return projectRepository.save(project);
+		p.setCustomer(updateProjectCommand.getCustomer());
+		p.setDescription(updateProjectCommand.getDescription());
+		p.setName(updateProjectCommand.getName());
+		p.setIndustrySector(updateProjectCommand.getIndustrySector());
+		p.setLastModifiedDate(LocalDateTime.now());
+		if (p.getUserProjects() != null) {
+			p.getUserProjects().forEach(up -> up.setApproved(false));
+		}
+		return projectRepository.save(p);
 	}
 
 	@Transactional

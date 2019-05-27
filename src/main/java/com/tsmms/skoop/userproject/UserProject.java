@@ -54,6 +54,9 @@ public class UserProject {
 	@Property(name = "lastModifiedDate")
 	private LocalDateTime lastModifiedDate;
 
+	@Property(name = "approved")
+	private boolean approved;
+
 	@Relationship(type = "REFERS_TO_SKILL")
 	private Set<Skill> skills;
 
