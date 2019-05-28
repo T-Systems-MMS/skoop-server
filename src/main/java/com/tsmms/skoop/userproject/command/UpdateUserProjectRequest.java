@@ -30,5 +30,7 @@ public class UpdateUserProjectRequest {
 	private LocalDate endDate;
 	@ApiModelProperty("Skills user worked with during the project.")
 	private Set<String> skills;
+	@ApiModelProperty("The flag indicating if the project membership has been approved.")
+	private Boolean approved;
 
 }

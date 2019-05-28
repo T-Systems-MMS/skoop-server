@@ -71,7 +71,6 @@ public class UserProjectCommandService {
 	}
 
 	@Transactional
-	@PreAuthorize("isPrincipalUserId(#userId)")
 	public UserProject assignProjectToUser(String projectName, String userId, UserProject userProject) {
 		final Project project = projectQueryService.getProjectByName(projectName).orElseGet(() -> projectCommandService.create(Project.builder()
 				.name(projectName)
@@ -115,7 +114,6 @@ public class UserProjectCommandService {
 	}
 
 	@Transactional
-	@PreAuthorize("isPrincipalUserId(#userId)")
 	public UserProject updateUserProject(String userId, String projectId, UpdateUserProjectCommand command) {
 		final UserProject userProject = userProjectRepository.findByUserIdAndProjectId(userId, projectId)
 				.orElseThrow(() -> NoSuchResourceException.builder()
@@ -140,19 +138,20 @@ public class UserProjectCommandService {
 		}
 		final LocalDateTime now = LocalDateTime.now();
 		userProject.setLastModifiedDate(now);
-		userProject.setApproved(false);
+		userProject.setApproved(command.isApproved());
 		final UserProject newUserProject = userProjectRepository.save(userProject);
-		notificationCommandService.save(UserProjectNeedsApprovalNotification.builder()
-				.id(UUID.randomUUID().toString())
-				.userProject(newUserProject)
-				.creationDatetime(LocalDateTime.now())
-				.build()
-		);
+		if (!newUserProject.isApproved()) {
+			notificationCommandService.save(UserProjectNeedsApprovalNotification.builder()
+					.id(UUID.randomUUID().toString())
+					.userProject(newUserProject)
+					.creationDatetime(LocalDateTime.now())
+					.build()
+			);
+		}
 		return newUserProject;
 	}
 
 	@Transactional
-	@PreAuthorize("isPrincipalUserId(#userId)")
 	public void deleteUserProject(String userId, String projectId) {
 		final UserProject userProject = userProjectRepository.findByUserIdAndProjectId(userId, projectId).orElseThrow(() -> NoSuchResourceException.builder()
 				.model(USER_PROJECT)
