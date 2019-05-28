@@ -42,4 +42,9 @@ public class NotificationQueryService {
 		return notificationRepository.findByRegistrationId(registrationId);
 	}
 
+	@Transactional(readOnly = true)
+	public Stream<Notification> getNotificationsByUserProjectId(String userProjectId) {
+		return notificationRepository.findByUserProjectId(userProjectId);
+	}
+
 }

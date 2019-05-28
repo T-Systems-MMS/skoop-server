@@ -3,6 +3,7 @@ package com.tsmms.skoop.userproject.command;
 import com.tsmms.skoop.exception.DuplicateResourceException;
 import com.tsmms.skoop.exception.NoSuchResourceException;
 import com.tsmms.skoop.notification.command.NotificationCommandService;
+import com.tsmms.skoop.notification.query.NotificationQueryService;
 import com.tsmms.skoop.project.Project;
 import com.tsmms.skoop.project.command.ProjectCommandService;
 import com.tsmms.skoop.project.query.ProjectQueryService;
@@ -42,13 +43,15 @@ public class UserProjectCommandService {
 	private final UserSkillCommandService userSkillCommandService;
 	private final UserSkillQueryService userSkillQueryService;
 	private final NotificationCommandService notificationCommandService;
+	private final NotificationQueryService notificationQueryService;
 
 	public UserProjectCommandService(UserProjectRepository userProjectRepository, ProjectQueryService projectQueryService, UserQueryService userQueryService,
 									 SkillCommandService skillCommandService,
 									 ProjectCommandService projectCommandService,
 									 UserSkillCommandService userSkillCommandService,
 									 UserSkillQueryService userSkillQueryService,
-									 NotificationCommandService notificationCommandService) {
+									 NotificationCommandService notificationCommandService,
+									 NotificationQueryService notificationQueryService) {
 		this.userProjectRepository = requireNonNull(userProjectRepository);
 		this.projectQueryService = requireNonNull(projectQueryService);
 		this.userQueryService = requireNonNull(userQueryService);
@@ -57,6 +60,7 @@ public class UserProjectCommandService {
 		this.userSkillCommandService = requireNonNull(userSkillCommandService);
 		this.userSkillQueryService = requireNonNull(userSkillQueryService);
 		this.notificationCommandService = requireNonNull(notificationCommandService);
+		this.notificationQueryService = requireNonNull(notificationQueryService);
 	}
 
 	private Set<Skill> createNewUserSkills(String userId, Set<Skill> skills) {
@@ -147,6 +151,9 @@ public class UserProjectCommandService {
 					.creationDatetime(LocalDateTime.now())
 					.build()
 			);
+		} else {
+			notificationQueryService.getNotificationsByUserProjectId(newUserProject.getId())
+					.forEach(notificationCommandService::delete);
 		}
 		return newUserProject;
 	}
