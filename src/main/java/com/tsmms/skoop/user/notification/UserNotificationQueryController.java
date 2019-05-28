@@ -47,7 +47,8 @@ public class UserNotificationQueryController {
 	@GetMapping(path = "/users/{userId}/notifications", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<AbstractNotificationResponse>> getUserNotifications(@PathVariable("userId") String userId) {
 		return ResponseEntity.ok(notificationQueryService.getUserNotifications(userId)
-				.map(n -> conversionService.convert(n, AbstractNotificationResponse.class)).collect(Collectors.toList()));
+				.map(n -> conversionService.convert(n, AbstractNotificationResponse.class))
+				.collect(Collectors.toList()));
 	}
 
 	@ApiOperation(value = "Gets user notification counter.",

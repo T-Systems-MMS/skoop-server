@@ -20,6 +20,8 @@ import com.tsmms.skoop.skill.Skill;
 import com.tsmms.skoop.user.User;
 import com.tsmms.skoop.user.UserRepository;
 import com.tsmms.skoop.user.notification.UserWelcomeNotification;
+import com.tsmms.skoop.userproject.UserProject;
+import com.tsmms.skoop.userproject.UserProjectNeedsApprovalNotification;
 import com.tsmms.skoop.userskill.UserSkillsEstimationNotification;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -242,9 +244,41 @@ class NotificationRepositoryTests {
 				.build()
 		);
 
+		notificationRepository.saveAll(
+				Arrays.asList(
+						UserProjectNeedsApprovalNotification.builder()
+								.id("aaa")
+								.creationDatetime(LocalDateTime.of(2014, 5, 8, 16, 30))
+								.userProject(UserProject.builder()
+										.id("abc")
+										.user(User.builder()
+												.id("123456")
+												.userName("firstSubordinate")
+												.manager(communityManager)
+												.build()
+										)
+										.build()
+								)
+								.build(),
+						UserProjectNeedsApprovalNotification.builder()
+								.id("bbb")
+								.creationDatetime(LocalDateTime.of(2014, 5, 8, 16, 29))
+								.userProject(UserProject.builder()
+										.id("def")
+										.user(User.builder()
+												.id("654321")
+												.userName("secondSubordinate")
+												.manager(communityManager)
+												.build()
+										)
+										.build()
+								)
+								.build()
+				));
+
 		final List<Notification> notifications = notificationRepository.getUserNotifications("123").collect(toList());
 
-		Assertions.assertThat(notifications).hasSize(8);
+		assertThat(notifications).hasSize(10);
 		Notification notification = notifications.get(0);
 		assertThat(notification.getId()).isEqualTo("def");
 		assertThat(notification.getCreationDatetime()).isEqualTo(LocalDateTime.of(2019, 3, 26, 11, 0));
@@ -337,6 +371,38 @@ class NotificationRepositoryTests {
 				Skill.builder()
 						.id("456")
 						.name("Angular")
+						.build()
+		);
+
+		notification = notifications.get(8);
+		assertThat(notification.getId()).isEqualTo("aaa");
+		assertThat(notification.getCreationDatetime()).isEqualTo(LocalDateTime.of(2014, 5, 8, 16, 30));
+		assertThat(notification).isInstanceOf(UserProjectNeedsApprovalNotification.class);
+		UserProjectNeedsApprovalNotification userProjectNeedsApprovalNotification = (UserProjectNeedsApprovalNotification) notification;
+		assertThat(userProjectNeedsApprovalNotification.getUserProject()).isEqualTo(
+				UserProject.builder()
+						.id("abc")
+						.user(User.builder()
+								.id("123456")
+								.userName("firstSubordinate")
+								.build()
+						)
+						.build()
+		);
+
+		notification = notifications.get(9);
+		assertThat(notification.getId()).isEqualTo("bbb");
+		assertThat(notification.getCreationDatetime()).isEqualTo(LocalDateTime.of(2014, 5, 8, 16, 29));
+		assertThat(notification).isInstanceOf(UserProjectNeedsApprovalNotification.class);
+		userProjectNeedsApprovalNotification = (UserProjectNeedsApprovalNotification) notification;
+		assertThat(userProjectNeedsApprovalNotification.getUserProject()).isEqualTo(
+				UserProject.builder()
+						.id("def")
+						.user(User.builder()
+								.id("654321")
+								.userName("secondSubordinate")
+								.build()
+						)
 						.build()
 		);
 	}
@@ -444,9 +510,41 @@ class NotificationRepositoryTests {
 				.build()
 		);
 
+		notificationRepository.saveAll(Arrays.asList(
+				UserProjectNeedsApprovalNotification.builder()
+						.id("aaa")
+						.creationDatetime(LocalDateTime.of(2014, 5, 8, 16, 30))
+						.userProject(UserProject.builder()
+								.id("abc")
+								.user(User.builder()
+										.id("123456")
+										.userName("firstSubordinate")
+										.manager(commonUser)
+										.build()
+								)
+								.build()
+						)
+						.build(),
+				UserProjectNeedsApprovalNotification.builder()
+						.id("bbb")
+						.creationDatetime(LocalDateTime.of(2014, 5, 8, 16, 29))
+						.userProject(UserProject.builder()
+								.id("def")
+								.user(User.builder()
+										.id("654321")
+										.userName("secondSubordinate")
+										.manager(commonUser)
+										.build()
+								)
+								.build()
+						)
+						.build()
+				)
+		);
+
 		final List<Notification> notifications = notificationRepository.getUserNotifications("123").collect(toList());
 
-		Assertions.assertThat(notifications).hasSize(7);
+		assertThat(notifications).hasSize(9);
 
 		Notification notification = notifications.get(0);
 		assertThat(notification.getId()).isEqualTo("abc");
@@ -527,6 +625,38 @@ class NotificationRepositoryTests {
 				Skill.builder()
 						.id("456")
 						.name("Angular")
+						.build()
+		);
+
+		notification = notifications.get(7);
+		assertThat(notification.getId()).isEqualTo("aaa");
+		assertThat(notification.getCreationDatetime()).isEqualTo(LocalDateTime.of(2014, 5, 8, 16, 30));
+		assertThat(notification).isInstanceOf(UserProjectNeedsApprovalNotification.class);
+		UserProjectNeedsApprovalNotification userProjectNeedsApprovalNotification = (UserProjectNeedsApprovalNotification) notification;
+		assertThat(userProjectNeedsApprovalNotification.getUserProject()).isEqualTo(
+				UserProject.builder()
+						.id("abc")
+						.user(User.builder()
+								.id("123456")
+								.userName("firstSubordinate")
+								.build()
+						)
+						.build()
+		);
+
+		notification = notifications.get(8);
+		assertThat(notification.getId()).isEqualTo("bbb");
+		assertThat(notification.getCreationDatetime()).isEqualTo(LocalDateTime.of(2014, 5, 8, 16, 29));
+		assertThat(notification).isInstanceOf(UserProjectNeedsApprovalNotification.class);
+		userProjectNeedsApprovalNotification = (UserProjectNeedsApprovalNotification) notification;
+		assertThat(userProjectNeedsApprovalNotification.getUserProject()).isEqualTo(
+				UserProject.builder()
+						.id("def")
+						.user(User.builder()
+								.id("654321")
+								.userName("secondSubordinate")
+								.build()
+						)
 						.build()
 		);
 	}
@@ -840,7 +970,41 @@ class NotificationRepositoryTests {
 				.build()
 		);
 
-		assertThat(notificationRepository.getUserNotificationCounter("123")).isEqualTo(8);
+		notificationRepository.saveAll(Arrays.asList(
+				UserProjectNeedsApprovalNotification.builder()
+						.id("aaa")
+						.creationDatetime(LocalDateTime.of(2014, 5, 8, 16, 30))
+						.userProject(
+								UserProject.builder()
+										.id("abc")
+										.user(User.builder()
+												.id("123456")
+												.userName("firstSubordinate")
+												.manager(communityManager)
+												.build()
+										)
+										.build()
+						)
+						.build(),
+				UserProjectNeedsApprovalNotification.builder()
+						.id("bbb")
+						.creationDatetime(LocalDateTime.of(2014, 5, 8, 16, 29))
+						.userProject(
+								UserProject.builder()
+										.id("def")
+										.user(User.builder()
+												.id("654321")
+												.userName("secondSubordinate")
+												.manager(communityManager)
+												.build()
+										)
+										.build()
+						)
+						.build()
+				)
+		);
+
+		assertThat(notificationRepository.getUserNotificationCounter("123")).isEqualTo(10);
 	}
 
 }

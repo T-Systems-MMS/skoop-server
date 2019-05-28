@@ -12,6 +12,7 @@ import com.tsmms.skoop.user.User;
 import com.tsmms.skoop.user.query.UserQueryService;
 import com.tsmms.skoop.exception.enums.Model;
 import com.tsmms.skoop.userproject.UserProject;
+import com.tsmms.skoop.userproject.UserProjectNeedsApprovalNotification;
 import com.tsmms.skoop.userproject.UserProjectRepository;
 import com.tsmms.skoop.userskill.UserSkillsEstimationNotification;
 import com.tsmms.skoop.userskill.command.UserSkillCommandService;
@@ -103,7 +104,14 @@ public class UserProjectCommandService {
 		userProject.setCreationDate(now);
 		userProject.setLastModifiedDate(now);
 		userProject.setApproved(false);
-		return userProjectRepository.save(userProject);
+		final UserProject newUserProject = userProjectRepository.save(userProject);
+		notificationCommandService.save(UserProjectNeedsApprovalNotification.builder()
+				.id(UUID.randomUUID().toString())
+				.userProject(newUserProject)
+				.creationDatetime(LocalDateTime.now())
+				.build()
+		);
+		return newUserProject;
 	}
 
 	@Transactional
@@ -133,7 +141,14 @@ public class UserProjectCommandService {
 		final LocalDateTime now = LocalDateTime.now();
 		userProject.setLastModifiedDate(now);
 		userProject.setApproved(false);
-		return userProjectRepository.save(userProject);
+		final UserProject newUserProject = userProjectRepository.save(userProject);
+		notificationCommandService.save(UserProjectNeedsApprovalNotification.builder()
+				.id(UUID.randomUUID().toString())
+				.userProject(newUserProject)
+				.creationDatetime(LocalDateTime.now())
+				.build()
+		);
+		return newUserProject;
 	}
 
 	@Transactional

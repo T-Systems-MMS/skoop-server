@@ -2,8 +2,11 @@ package com.tsmms.skoop.project.command;
 
 import com.tsmms.skoop.exception.DuplicateResourceException;
 import com.tsmms.skoop.exception.NoSuchResourceException;
+import com.tsmms.skoop.notification.command.NotificationCommandService;
 import com.tsmms.skoop.project.Project;
 import com.tsmms.skoop.project.ProjectRepository;
+import com.tsmms.skoop.user.User;
+import com.tsmms.skoop.userproject.UserProject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,6 +15,9 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,11 +30,14 @@ class ProjectCommandServiceTests {
 	@Mock
 	private ProjectRepository projectRepository;
 
+	@Mock
+	private NotificationCommandService notificationCommandService;
+
 	private ProjectCommandService projectCommandService;
 
 	@BeforeEach
 	void setUp() {
-		projectCommandService = new ProjectCommandService(projectRepository);
+		projectCommandService = new ProjectCommandService(projectRepository, notificationCommandService);
 	}
 
 	@Test
@@ -72,15 +81,43 @@ class ProjectCommandServiceTests {
 	}
 
 	@Test
-	@DisplayName("Tests if project is updated")
-	void testIfProjectIsUpdated() {
+	@DisplayName("The project is updated")
+	void projectIsUpdated() {
 		given(projectRepository.findById("123")).willReturn(Optional.of(
-				Project.builder().id("123").name("Project name").description("Project description").build()
+				Project.builder()
+						.id("123")
+						.name("Project name")
+						.description("Project description")
+						.userProjects(Arrays.asList(UserProject.builder()
+								.id("a")
+								.role("Software Developer")
+								.tasks("Development")
+								.startDate(LocalDate.of(2019, 5, 28))
+								.endDate(LocalDate.of(2019, 7, 30))
+								.creationDate(LocalDateTime.of(2019, 5, 28, 10, 0))
+								.lastModifiedDate(LocalDateTime.of(2019, 5, 28, 10, 0))
+								.approved(true)
+								.user(User.builder()
+										.id("1")
+										.userName("tester")
+										.build())
+								.build()))
+						.build()
 		));
 		given(projectRepository.save(ArgumentMatchers.isA(Project.class)))
-				.willReturn(Project.builder().id("123").name("New project name").description("New project description").build());
+				.willReturn(Project.builder()
+						.id("123")
+						.name("New project name")
+						.description("New project description")
+						.build()
+				);
 
-		Project project = projectCommandService.update(UpdateProjectCommand.builder().id("123").name("New project name").description("New project description").build());
+		Project project = projectCommandService.update(UpdateProjectCommand.builder()
+				.id("123")
+				.name("New project name")
+				.description("New project description")
+				.build()
+		);
 
 		assertThat(project).isNotNull();
 		assertThat(project.getId()).isNotNull();
