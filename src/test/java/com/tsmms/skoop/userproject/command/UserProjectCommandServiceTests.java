@@ -10,8 +10,10 @@ import com.tsmms.skoop.project.query.ProjectQueryService;
 import com.tsmms.skoop.skill.Skill;
 import com.tsmms.skoop.skill.command.SkillCommandService;
 import com.tsmms.skoop.user.User;
+import com.tsmms.skoop.user.UserPermission;
 import com.tsmms.skoop.user.query.UserQueryService;
 import com.tsmms.skoop.userproject.UserProject;
+import com.tsmms.skoop.userproject.UserProjectNeedsApprovalNotification;
 import com.tsmms.skoop.userproject.UserProjectRepository;
 import com.tsmms.skoop.userskill.UserSkill;
 import com.tsmms.skoop.userskill.command.UserSkillCommandService;
@@ -25,13 +27,18 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.isA;
 import static org.hamcrest.core.AllOf.allOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -409,6 +416,7 @@ class UserProjectCommandServiceTests {
 								.name("Angular")
 								.build()
 				)))
+				.approved(false)
 				.build()
 		);
 		assertThat(userProject).isNotNull();
@@ -436,6 +444,218 @@ class UserProjectCommandServiceTests {
 				.endDate(LocalDate.of(2019, 5, 10))
 				.build()
 		));
+	}
+
+	@DisplayName("Approves user project.")
+	@Test
+	void approveUserProject() {
+		given(userProjectRepository.findByUserIdAndProjectId("123", "ABC")).willReturn(Optional.of(
+				UserProject.builder()
+						.id("aaa")
+						.project(Project.builder()
+								.id("ABC")
+								.name("Project")
+								.description("Project description")
+								.build())
+						.user(User.builder()
+								.id("123")
+								.userName("tester")
+								.build())
+						.role("developer")
+						.tasks("development")
+						.skills(
+								new HashSet<>(Arrays.asList(
+										Skill.builder()
+												.id("111")
+												.name("Spring Boot")
+												.build(),
+										Skill.builder()
+												.id("222")
+												.name("Angular")
+												.build()
+								))
+						)
+						.startDate(LocalDate.of(2019, 1, 10))
+						.endDate(LocalDate.of(2019, 5, 10))
+						.build()
+		));
+		given(skillCommandService.createNonExistentSkills(
+				argThat(allOf(
+						isA(Collection.class),
+						containsInAnyOrder(
+								Skill.builder()
+										.id("111")
+										.name("Spring Boot")
+										.build(),
+								Skill.builder()
+										.id("222")
+										.name("Angular")
+										.build()
+						)
+				)))
+		).willReturn(new HashSet<>(Arrays.asList(
+				Skill.builder()
+						.id("111")
+						.name("Spring Boot")
+						.build(),
+				Skill.builder()
+						.id("222")
+						.name("Angular")
+						.build()
+		)));
+		when(userSkillQueryService.getUserSkillByUserIdAndSkillId(anyString(), anyString())).thenAnswer(invocation -> {
+			final String userId = invocation.getArgument(0);
+			final String skillId = invocation.getArgument(1);
+			if ("123".equals(userId) && "111".equals(skillId)) {
+				return Optional.empty();
+			} else if ("123".equals(userId) && "222".equals(skillId)) {
+				return Optional.of(
+						UserSkill.builder()
+								.id(123L)
+								.skill(Skill.builder()
+										.id("222")
+										.name("Angular")
+										.build())
+								.user(User.builder()
+										.id("123")
+										.userName("tester")
+										.build())
+								.currentLevel(1)
+								.desiredLevel(2)
+								.priority(2)
+								.build()
+				);
+			} else {
+				return Optional.empty();
+			}
+		});
+		given(notificationQueryService.getNotificationsByUserProjectId("aaa")).willReturn(
+				Stream.of(
+						UserProjectNeedsApprovalNotification.builder()
+						.id("abc")
+						.userProject(
+								UserProject.builder()
+										.id("aaa")
+										.project(Project.builder()
+												.id("ABC")
+												.name("Project")
+												.description("Project description")
+												.build())
+										.user(User.builder()
+												.id("123")
+												.userName("tester")
+												.build())
+										.role("developer")
+										.tasks("development")
+										.skills(
+												new HashSet<>(Arrays.asList(
+														Skill.builder()
+																.id("111")
+																.name("Spring Boot")
+																.build(),
+														Skill.builder()
+																.id("222")
+																.name("Angular")
+																.build()
+												))
+										)
+										.startDate(LocalDate.of(2019, 1, 10))
+										.endDate(LocalDate.of(2019, 5, 10))
+										.build()
+						)
+						.creationDatetime(LocalDateTime.of(2019, 1, 10, 12, 0))
+						.build()
+				)
+		);
+		given(userProjectRepository.save(
+				argThat(allOf(
+						isA(UserProject.class),
+						hasProperty("id", equalTo("aaa")),
+						hasProperty("role", equalTo("developer")),
+						hasProperty("tasks", equalTo("development")),
+						hasProperty("user", equalTo(User.builder()
+								.id("123")
+								.userName("tester")
+								.build())),
+						hasProperty("project", equalTo(
+								Project.builder()
+										.id("ABC")
+										.name("Project")
+										.description("Project description")
+										.build()
+						)),
+						hasProperty("startDate", equalTo(LocalDate.of(2019, 1, 10))),
+						hasProperty("endDate", equalTo(LocalDate.of(2019, 5, 10))),
+						hasProperty("skills", containsInAnyOrder(
+								Skill.builder()
+										.id("111")
+										.name("Spring Boot")
+										.build(),
+								Skill.builder()
+										.id("222")
+										.name("Angular")
+										.build()
+						))
+				))
+		)).willReturn(
+				UserProject.builder()
+						.id("aaa")
+						.role("developer")
+						.tasks("development")
+						.startDate(LocalDate.of(2019, 1, 10))
+						.endDate(LocalDate.of(2019, 5, 10))
+						.project(Project.builder()
+								.id("ABC")
+								.name("Project")
+								.description("Project description")
+								.build())
+						.user(User.builder()
+								.id("123")
+								.userName("tester")
+								.build())
+						.skills(new HashSet<>(Arrays.asList(
+								Skill.builder()
+										.id("111")
+										.name("Spring Boot")
+										.build(),
+								Skill.builder()
+										.id("222")
+										.name("Angular")
+										.build()
+						)))
+						.approved(true)
+						.build()
+		);
+		final UserProject userProject = userProjectCommandService.updateUserProject("123", "ABC", UpdateUserProjectCommand.builder()
+				.role("developer")
+				.tasks("development")
+				.startDate(LocalDate.of(2019, 1, 10))
+				.endDate(LocalDate.of(2019, 5, 10))
+				.skills(new HashSet<>(Arrays.asList(
+						Skill.builder()
+								.id("111")
+								.name("Spring Boot")
+								.build(),
+						Skill.builder()
+								.id("222")
+								.name("Angular")
+								.build()
+				)))
+				.approved(true)
+				.build()
+		);
+		assertThat(userProject).isNotNull();
+		assertThat(userProject.getRole()).isEqualTo("developer");
+		assertThat(userProject.getTasks()).isEqualTo("development");
+		assertThat(userProject.getStartDate()).isEqualTo(LocalDate.of(2019, 1, 10));
+		assertThat(userProject.getEndDate()).isEqualTo(LocalDate.of(2019, 5, 10));
+		assertThat(userProject.getUser()).isNotNull();
+		assertThat(userProject.getUser().getId()).isEqualTo("123");
+		assertThat(userProject.getUser().getUserName()).isEqualTo("tester");
+		assertThat(userProject.getProject()).isNotNull();
+		assertThat(userProject.getProject().getId()).isEqualTo("ABC");
+		assertThat(userProject.getProject().getName()).isEqualTo("Project");
+		assertThat(userProject.getProject().getDescription()).isEqualTo("Project description");
 	}
 
 }

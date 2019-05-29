@@ -379,4 +379,55 @@ class NotificationQueryServiceTests {
 		assertThrows(IllegalArgumentException.class, () -> notificationQueryService.getUserNotificationCounter(null));
 	}
 
+	@DisplayName("Gets notifications by user project ID.")
+	@Test
+	void getNotificationsByUserProjectId() {
+		given(notificationQueryService.getNotificationsByUserProjectId("abc")).willReturn(Stream.of(
+				UserProjectNeedsApprovalNotification.builder()
+						.id("aaa")
+						.creationDatetime(LocalDateTime.of(2014, 5, 8, 16, 30))
+						.userProject(
+								UserProject.builder()
+										.id("abc")
+										.user(User.builder()
+												.id("123456")
+												.userName("firstSubordinate")
+												.manager(User.builder()
+														.id("123")
+														.userName("communityManager")
+														.build())
+												.build()
+										)
+										.build()
+						)
+						.build()
+		));
+		assertThat(notificationQueryService.getNotificationsByUserProjectId("abc")).containsExactlyInAnyOrder(
+				UserProjectNeedsApprovalNotification.builder()
+						.id("aaa")
+						.creationDatetime(LocalDateTime.of(2014, 5, 8, 16, 30))
+						.userProject(
+								UserProject.builder()
+										.id("abc")
+										.user(User.builder()
+												.id("123456")
+												.userName("firstSubordinate")
+												.manager(User.builder()
+														.id("123")
+														.userName("communityManager")
+														.build())
+												.build()
+										)
+										.build()
+						)
+						.build()
+		);
+	}
+
+	@DisplayName("Throws exception when getting notifications by user project ID if user project ID is null.")
+	@Test
+	void throwExceptionWhenGettingNotificationsByUserProjectIdIfUserProjectIdIsNull() {
+		assertThrows(IllegalArgumentException.class, () -> notificationQueryService.getNotificationsByUserProjectId(null));
+	}
+
 }
