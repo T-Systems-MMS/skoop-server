@@ -23,5 +23,6 @@ public class UpdateUserProjectCommand {
 	private LocalDate startDate;
 	private LocalDate endDate;
 	private Set<Skill> skills;
+	private boolean approved;
 
 }

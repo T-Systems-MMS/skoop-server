@@ -42,4 +42,12 @@ public class NotificationQueryService {
 		return notificationRepository.findByRegistrationId(registrationId);
 	}
 
+	@Transactional(readOnly = true)
+	public Stream<Notification> getNotificationsByUserProjectId(String userProjectId) {
+		if (userProjectId == null) {
+			throw new IllegalArgumentException("User project ID cannot be null.");
+		}
+		return notificationRepository.findByUserProjectId(userProjectId);
+	}
+
 }

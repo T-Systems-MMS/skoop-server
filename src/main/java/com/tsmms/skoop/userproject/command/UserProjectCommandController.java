@@ -1,6 +1,12 @@
 package com.tsmms.skoop.userproject.command;
 
+import com.tsmms.skoop.exception.NoSuchResourceException;
+import com.tsmms.skoop.exception.UserNotAuthorizedException;
+import com.tsmms.skoop.exception.enums.Model;
+import com.tsmms.skoop.security.CurrentUserService;
 import com.tsmms.skoop.skill.query.SkillQueryService;
+import com.tsmms.skoop.user.User;
+import com.tsmms.skoop.user.query.UserQueryService;
 import com.tsmms.skoop.userproject.UserProject;
 import com.tsmms.skoop.userproject.UserProjectResponse;
 import io.swagger.annotations.Api;
@@ -21,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 
 import static java.util.Objects.requireNonNull;
+import static java.lang.String.format;
 
 @Api(tags = "UserProjects")
 @RestController
@@ -28,11 +35,17 @@ public class UserProjectCommandController {
 
 	private final UserProjectCommandService userProjectCommandService;
 	private final SkillQueryService skillQueryService;
+	private final CurrentUserService currentUserService;
+	private final UserQueryService userQueryService;
 
 	public UserProjectCommandController(UserProjectCommandService userProjectCommandService,
-										SkillQueryService skillQueryService) {
+										SkillQueryService skillQueryService,
+										CurrentUserService currentUserService,
+										UserQueryService userQueryService) {
 		this.userProjectCommandService = requireNonNull(userProjectCommandService);
 		this.skillQueryService = requireNonNull(skillQueryService);
+		this.currentUserService = requireNonNull(currentUserService);
+		this.userQueryService = requireNonNull(userQueryService);
 	}
 
 	@ApiOperation(value = "Assign a project to a user.",
@@ -72,16 +85,32 @@ public class UserProjectCommandController {
 			@ApiResponse(code = 404, message = "Resource not found, e.g. user does not exist or skill not assigned"),
 			@ApiResponse(code = 500, message = "Error during execution")
 	})
-	@PreAuthorize("isPrincipalUserId(#userId)")
+	@PreAuthorize("isAuthenticated()")
 	@PutMapping(path = "/users/{userId}/projects/{projectId}",
 			consumes = MediaType.APPLICATION_JSON_VALUE,
 			produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<UserProjectResponse> updateUserProject(@PathVariable("userId") String userId,
 																 @PathVariable("projectId") String projectId,
 																 @Valid @RequestBody UpdateUserProjectRequest request) {
-		final UserProject result = userProjectCommandService.updateUserProject(userId, projectId, updateUserProjectRequestToUpdateUserProjectCommand(request));
-		return ResponseEntity.status(HttpStatus.OK)
-				.body(UserProjectResponse.of(result));
+		final User user = userQueryService.getUserById(userId).orElseThrow(() -> {
+			final String[] searchParamsMap = {"id", userId};
+			return NoSuchResourceException.builder()
+					.model(Model.USER)
+					.searchParamsMap(searchParamsMap)
+					.build();
+		});
+		final UpdateUserProjectCommand updateUserProjectCommand = updateUserProjectRequestToUpdateUserProjectCommand(request);
+		final boolean isUserManager = user.getManager() != null && currentUserService.getCurrentUserId().equals(user.getManager().getId());
+		if (updateUserProjectCommand.isApproved() && !isUserManager) {
+			throw new UserNotAuthorizedException(format("Only the manager of the user with ID %s can approve user's project memberships.", userId));
+		}
+		if (currentUserService.isAuthenticatedUserId(userId) || isUserManager) {
+			final UserProject result = userProjectCommandService.updateUserProject(userId, projectId, updateUserProjectCommand);
+			return ResponseEntity.status(HttpStatus.OK)
+					.body(UserProjectResponse.of(result));
+		} else {
+			throw new UserNotAuthorizedException(format("The authenticated user is not authorized to update the project membership of the user with ID %s", userId));
+		}
 	}
 
 	@ApiOperation(value = "Delete a relationship between a user and a project",
@@ -107,6 +136,7 @@ public class UserProjectCommandController {
 				.tasks(request.getTasks())
 				.startDate(request.getStartDate())
 				.endDate(request.getEndDate())
+				.approved(Boolean.TRUE.equals(request.getApproved()))
 				.skills(skillQueryService.convertSkillNamesToSkillsSet(request.getSkills()))
 				.build();
 	}

@@ -1007,4 +1007,68 @@ class NotificationRepositoryTests {
 		assertThat(notificationRepository.getUserNotificationCounter("123")).isEqualTo(10);
 	}
 
+	@DisplayName("Finds by user project.")
+	@Test
+	void findByUserProject() {
+		notificationRepository.saveAll(Arrays.asList(
+				UserProjectNeedsApprovalNotification.builder()
+						.id("aaa")
+						.creationDatetime(LocalDateTime.of(2014, 5, 8, 16, 30))
+						.userProject(
+								UserProject.builder()
+										.id("abc")
+										.user(User.builder()
+												.id("123456")
+												.userName("firstSubordinate")
+												.manager(User.builder()
+														.id("123")
+														.userName("communityManager")
+														.build())
+												.build()
+										)
+										.build()
+						)
+						.build(),
+				UserProjectNeedsApprovalNotification.builder()
+						.id("bbb")
+						.creationDatetime(LocalDateTime.of(2014, 5, 8, 16, 29))
+						.userProject(
+								UserProject.builder()
+										.id("def")
+										.user(User.builder()
+												.id("654321")
+												.userName("secondSubordinate")
+												.manager(User.builder()
+														.id("123")
+														.userName("communityManager")
+														.build())
+												.build()
+										)
+										.build()
+						)
+						.build()
+				)
+		);
+		assertThat(notificationRepository.findByUserProjectId("abc")).containsExactlyInAnyOrder(
+				UserProjectNeedsApprovalNotification.builder()
+						.id("aaa")
+						.creationDatetime(LocalDateTime.of(2014, 5, 8, 16, 30))
+						.userProject(
+								UserProject.builder()
+										.id("abc")
+										.user(User.builder()
+												.id("123456")
+												.userName("firstSubordinate")
+												.manager(User.builder()
+														.id("123")
+														.userName("communityManager")
+														.build())
+												.build()
+										)
+										.build()
+						)
+						.build()
+		);
+	}
+
 }

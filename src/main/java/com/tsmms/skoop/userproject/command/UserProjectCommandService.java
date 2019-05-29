@@ -3,6 +3,7 @@ package com.tsmms.skoop.userproject.command;
 import com.tsmms.skoop.exception.DuplicateResourceException;
 import com.tsmms.skoop.exception.NoSuchResourceException;
 import com.tsmms.skoop.notification.command.NotificationCommandService;
+import com.tsmms.skoop.notification.query.NotificationQueryService;
 import com.tsmms.skoop.project.Project;
 import com.tsmms.skoop.project.command.ProjectCommandService;
 import com.tsmms.skoop.project.query.ProjectQueryService;
@@ -42,13 +43,15 @@ public class UserProjectCommandService {
 	private final UserSkillCommandService userSkillCommandService;
 	private final UserSkillQueryService userSkillQueryService;
 	private final NotificationCommandService notificationCommandService;
+	private final NotificationQueryService notificationQueryService;
 
 	public UserProjectCommandService(UserProjectRepository userProjectRepository, ProjectQueryService projectQueryService, UserQueryService userQueryService,
 									 SkillCommandService skillCommandService,
 									 ProjectCommandService projectCommandService,
 									 UserSkillCommandService userSkillCommandService,
 									 UserSkillQueryService userSkillQueryService,
-									 NotificationCommandService notificationCommandService) {
+									 NotificationCommandService notificationCommandService,
+									 NotificationQueryService notificationQueryService) {
 		this.userProjectRepository = requireNonNull(userProjectRepository);
 		this.projectQueryService = requireNonNull(projectQueryService);
 		this.userQueryService = requireNonNull(userQueryService);
@@ -57,6 +60,7 @@ public class UserProjectCommandService {
 		this.userSkillCommandService = requireNonNull(userSkillCommandService);
 		this.userSkillQueryService = requireNonNull(userSkillQueryService);
 		this.notificationCommandService = requireNonNull(notificationCommandService);
+		this.notificationQueryService = requireNonNull(notificationQueryService);
 	}
 
 	private Set<Skill> createNewUserSkills(String userId, Set<Skill> skills) {
@@ -71,7 +75,6 @@ public class UserProjectCommandService {
 	}
 
 	@Transactional
-	@PreAuthorize("isPrincipalUserId(#userId)")
 	public UserProject assignProjectToUser(String projectName, String userId, UserProject userProject) {
 		final Project project = projectQueryService.getProjectByName(projectName).orElseGet(() -> projectCommandService.create(Project.builder()
 				.name(projectName)
@@ -115,7 +118,6 @@ public class UserProjectCommandService {
 	}
 
 	@Transactional
-	@PreAuthorize("isPrincipalUserId(#userId)")
 	public UserProject updateUserProject(String userId, String projectId, UpdateUserProjectCommand command) {
 		final UserProject userProject = userProjectRepository.findByUserIdAndProjectId(userId, projectId)
 				.orElseThrow(() -> NoSuchResourceException.builder()
@@ -140,19 +142,23 @@ public class UserProjectCommandService {
 		}
 		final LocalDateTime now = LocalDateTime.now();
 		userProject.setLastModifiedDate(now);
-		userProject.setApproved(false);
+		userProject.setApproved(command.isApproved());
 		final UserProject newUserProject = userProjectRepository.save(userProject);
-		notificationCommandService.save(UserProjectNeedsApprovalNotification.builder()
-				.id(UUID.randomUUID().toString())
-				.userProject(newUserProject)
-				.creationDatetime(LocalDateTime.now())
-				.build()
-		);
+		if (!newUserProject.isApproved()) {
+			notificationCommandService.save(UserProjectNeedsApprovalNotification.builder()
+					.id(UUID.randomUUID().toString())
+					.userProject(newUserProject)
+					.creationDatetime(LocalDateTime.now())
+					.build()
+			);
+		} else {
+			notificationQueryService.getNotificationsByUserProjectId(newUserProject.getId())
+					.forEach(notificationCommandService::delete);
+		}
 		return newUserProject;
 	}
 
 	@Transactional
-	@PreAuthorize("isPrincipalUserId(#userId)")
 	public void deleteUserProject(String userId, String projectId) {
 		final UserProject userProject = userProjectRepository.findByUserIdAndProjectId(userId, projectId).orElseThrow(() -> NoSuchResourceException.builder()
 				.model(USER_PROJECT)
