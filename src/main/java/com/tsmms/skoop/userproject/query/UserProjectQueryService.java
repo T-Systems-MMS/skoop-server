@@ -31,4 +31,9 @@ public class UserProjectQueryService {
 		return userProjectRepository.findByUserIdAndProjectId(userId, projectId);
 	}
 
+	@Transactional(readOnly = true)
+	public Stream<UserProject> getNotApprovedUserProjects() {
+		return userProjectRepository.findByApprovedIsFalse();
+	}
+
 }

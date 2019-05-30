@@ -20,6 +20,9 @@ spring:
     url: jdbc:neo4j:${SPRING_DATA_NEO4J_URI}
     username: ${SPRING_DATA_NEO4J_USERNAME}
     password: ${SPRING_DATA_NEO4J_PASSWORD}
+  mail:
+    host: ${SMTP_SERVER_HOST} # SMTP server
+    port: ${SMTP_SERVER_PORT} # SMTP port
 
 security:
   oauth2:
@@ -32,3 +35,6 @@ skoop:
   schedule:
     reconciliation:
       user: 0 0 */2 * * * # every two hours
+  email:
+    manager-notification:
+      app-link: ${SERVER_DOMAIN}
