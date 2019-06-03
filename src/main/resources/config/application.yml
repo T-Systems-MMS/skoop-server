@@ -35,3 +35,8 @@ spring:
     cache-names: userIds
     caffeine:
       spec: maximumSize=2000,expireAfterAccess=3600s
+
+skoop:
+  email:
+    manager-notification:
+      app-link: 'http://localhost:4200'

@@ -5,6 +5,9 @@ spring:
       uri: 'bolt://localhost:7687'
   datasource:
     url: jdbc:neo4j:bolt://localhost:7687
+  mail:
+    host: localhost # SMTP server
+    port: 25 # SMTP port
 
 logging:
   level:
