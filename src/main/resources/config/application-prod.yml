@@ -37,4 +37,4 @@ skoop:
       user: 0 0 */2 * * * # every two hours
   email:
     manager-notification:
-      app-link: ${SERVER_DOMAIN}
+      app-link: ${SERVER_NAME}
