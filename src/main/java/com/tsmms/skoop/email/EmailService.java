@@ -1,6 +1,6 @@
 package com.tsmms.skoop.email;
 
-import com.tsmms.skoop.exception.EmailSendingFailedException;
+import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -33,7 +33,7 @@ public class EmailService {
 			mail.setText(content, true);
 			mailSender.send(mimeMessage);
 		} catch (MessagingException e) {
-			throw new EmailSendingFailedException("E-mail sending failed.", e);
+			throw new MailSendException("E-mail sending failed.", e);
 		}
 	}
 
