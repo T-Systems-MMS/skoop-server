@@ -13,6 +13,7 @@ import static java.util.stream.Collectors.joining;
 import static java.util.Objects.requireNonNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import static java.util.stream.Collectors.toMap;
 import static org.springframework.util.StreamUtils.copyToString;
 
 @Service
@@ -46,7 +47,10 @@ public class ManagerNotificationService {
 			return;
 		}
 		final String userNames = userProjects.stream()
-				.map(up -> up.getUser().getFirstName() + " " + up.getUser().getLastName())
+				.collect(toMap(up -> up.getUser().getId(), UserProject::getUser, (firstUser, secondUser) -> firstUser))
+				.values()
+				.stream()
+				.map(u -> u.getFirstName() + " " + u.getLastName())
 				.collect(joining(", "));
 		final String content = contentTemplate
 				.replace("{userNames}", userNames)

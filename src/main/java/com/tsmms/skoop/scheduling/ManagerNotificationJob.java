@@ -1,6 +1,5 @@
 package com.tsmms.skoop.scheduling;
 
-import com.google.common.collect.Sets;
 import com.tsmms.skoop.email.ManagerNotificationService;
 import com.tsmms.skoop.user.User;
 import com.tsmms.skoop.userproject.UserProject;
@@ -8,13 +7,13 @@ import com.tsmms.skoop.userproject.query.UserProjectQueryService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toSet;
 
 @Component
 public class ManagerNotificationJob {
@@ -39,7 +38,7 @@ public class ManagerNotificationJob {
 					}
 					return managerIsPresent;
 				})
-				.collect(toMap(up -> up.getUser().getManager().getId(), Collections::singleton, Sets::union));
+				.collect(groupingBy(up -> up.getUser().getManager().getId(), toSet()));
 		if (userProjects.isEmpty()) {
 			return;
 		}
