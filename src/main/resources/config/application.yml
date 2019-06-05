@@ -39,4 +39,4 @@ spring:
 skoop:
   email:
     manager-notification:
-      app-link: 'http://localhost:4200'
+      subordinate-link-template: http://localhost:4200/my-subordinates/{subordinateId}/project-memberships

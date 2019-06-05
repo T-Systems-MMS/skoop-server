@@ -271,9 +271,7 @@
       "clientAuthenticatorType": "client-secret",
       "secret": "**********",
       "redirectUris": [
-        "/silent-refresh.html",
-        "/index.html",
-        "/"
+		"/*"
       ],
       "webOrigins": [],
       "notBefore": 0,

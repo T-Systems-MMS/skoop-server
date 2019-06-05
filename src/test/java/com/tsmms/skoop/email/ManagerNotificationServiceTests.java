@@ -28,7 +28,7 @@ class ManagerNotificationServiceTests {
 	void setUp() throws IOException {
 		this.managerNotificationService = new ManagerNotificationService(emailService,
 				"There are user project memberships pending for your approval.",
-				"localhost");
+				"http://localhost:4200/my-subordinates/{subordinateId}/project-memberships");
 	}
 
 	@DisplayName("Sends notification.")
