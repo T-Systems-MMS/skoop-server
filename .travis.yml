@@ -3,9 +3,17 @@ addons:
     organization: "t-systems-mms"
     token:
       secure: $SONAR_TOKEN
+services:
+  - docker
 language: java
 jdk: openjdk11
 script:
 - ./mvnw install sonar:sonar -Ptravis -Dmaven.javadoc.skip=true -B -V
 after_success:
 - bash <(curl -s https://codecov.io/bash)
+deploy:
+  skip_cleanup: true
+  provider: script
+  script: bash docker_push
+  on:
+    branch: master
