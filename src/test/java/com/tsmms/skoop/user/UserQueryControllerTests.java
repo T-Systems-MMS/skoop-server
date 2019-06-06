@@ -239,7 +239,20 @@ class UserQueryControllerTests extends AbstractControllerTests {
 		mockMvc.perform(get("/users/d9d74c04-0ab0-479c-a1d7-d372990f11b6")
 				.accept(MediaType.APPLICATION_JSON)
 				.with(authentication(withUser(owner))))
-				.andExpect(status().isForbidden());
+				.andExpect(status().isOk())
+				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+				.andExpect(jsonPath("$.id", is(equalTo("d9d74c04-0ab0-479c-a1d7-d372990f11b6"))))
+				.andExpect(jsonPath("$.userName", is(equalTo("testing"))))
+				.andExpect(jsonPath("$.firstName", is(equalTo("Tina"))))
+				.andExpect(jsonPath("$.lastName", is(equalTo("Testing"))))
+				.andExpect(jsonPath("$.email", is(equalTo("tina.testing@skoop.io"))))
+				.andExpect(jsonPath("$.academicDegree").doesNotExist())
+				.andExpect(jsonPath("$.positionProfile").doesNotExist())
+				.andExpect(jsonPath("$.summary").doesNotExist())
+				.andExpect(jsonPath("$.industrySectors").doesNotExist())
+				.andExpect(jsonPath("$.specializations").doesNotExist())
+				.andExpect(jsonPath("$.certificates").doesNotExist())
+				.andExpect(jsonPath("$.languages").doesNotExist());
 	}
 
 	@Test

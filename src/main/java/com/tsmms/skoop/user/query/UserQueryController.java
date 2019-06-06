@@ -82,7 +82,7 @@ public class UserQueryController {
 	})
 	@PreAuthorize("isAuthenticated()")
 	@GetMapping(path = "/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public UserResponse getUserById(@PathVariable("userId") String userId) {
+	public UserSimpleResponse getUserById(@PathVariable("userId") String userId) {
 		final User user = userQueryService.getUserById(userId)
 				.orElseThrow(() -> {
 					String[] searchParamsMap = {"id", userId};
@@ -97,7 +97,7 @@ public class UserQueryController {
 				(user.getManager() != null && currentUserService.getCurrentUserId().equals(user.getManager().getId()))) {
 			return UserResponse.of(user);
 		} else {
-			throw new UserNotAuthorizedException();
+			return UserSimpleResponse.of(user);
 		}
 	}
 

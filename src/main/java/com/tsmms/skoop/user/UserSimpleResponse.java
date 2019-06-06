@@ -11,7 +11,6 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 
 @Data
-@Builder
 @ApiModel(
 		value = "UserSimpleResponse",
 		description = "This holds information of a user. It will be used for sending user information to client."
@@ -33,14 +32,20 @@ public class UserSimpleResponse {
 	@ApiModelProperty("Email of the user.")
 	private String email;
 
-	@ApiModelProperty("Show as coach?")
-	private Boolean coach;
+	@Builder(builderMethodName = "userSimpleResponseBuilder")
+	public UserSimpleResponse(String id, String userName, String firstName, String lastName, String email) {
+		this.id = id;
+		this.userName = userName;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+	}
 
 	public static UserSimpleResponse of(User user) {
 		if (user == null) {
 			return null;
 		}
-		return UserSimpleResponse.builder()
+		return UserSimpleResponse.userSimpleResponseBuilder()
 				.id(user.getId())
 				.userName(user.getUserName())
 				.firstName(user.getFirstName())

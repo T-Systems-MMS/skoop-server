@@ -8,26 +8,11 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-@Builder
 @ApiModel(
 		value = "UserResponse",
 		description = "This holds extended information of a user. It will be used for sending user information to client."
 )
-public class UserResponse {
-	@ApiModelProperty("User id")
-	private String id;
-
-	@ApiModelProperty("UserName of the user. It can not be null.")
-	private String userName;
-
-	@ApiModelProperty("First name of the user.")
-	private String firstName;
-
-	@ApiModelProperty("Last name of the user.")
-	private String lastName;
-
-	@ApiModelProperty("Email of the user.")
-	private String email;
+public class UserResponse extends UserSimpleResponse {
 
 	@ApiModelProperty("Academic degree of the user.")
 	private String academicDegree;
@@ -49,6 +34,29 @@ public class UserResponse {
 
 	@ApiModelProperty("Languages which the user knows.")
 	private List<String> languages;
+
+	@Builder
+	public UserResponse(String id,
+						String userName,
+						String firstName,
+						String lastName,
+						String email,
+						String academicDegree,
+						String positionProfile,
+						String summary,
+						List<String> industrySectors,
+						List<String> specializations,
+						List<String> certificates,
+						List<String> languages) {
+		super(id, userName, firstName, lastName, email);
+		this.academicDegree = academicDegree;
+		this.positionProfile = positionProfile;
+		this.summary = summary;
+		this.industrySectors = industrySectors;
+		this.specializations = specializations;
+		this.certificates = certificates;
+		this.languages = languages;
+	}
 
 	public static UserResponse of(User user) {
 		if (user == null) {
