@@ -32,9 +32,6 @@ security:
         jwk-set-uri: ${SECURITY_OAUTH2_RESOURCESERVER_JWT_JWKSETURI}
 
 skoop:
-  schedule:
-    reconciliation:
-      user: 0 0 */2 * * * # every two hours
   email:
     manager-notification:
       app-link: ${SERVER_NAME}/my-subordinates/{subordinateId}/project-memberships
