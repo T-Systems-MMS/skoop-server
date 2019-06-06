@@ -1,6 +1,5 @@
 #!/bin/bash
 JAR_FILE=$(find ./target -type f -iname "skoop-server-*.jar")
-docker build -t skoop-server:latest --build-arg JAR_FILE=$JAR_FILE .
-docker tag skoop-server:latest tsystemsmms/skoop-server:latest
+docker build -t tsystemsmms/skoop-server:latest --build-arg JAR_FILE=$JAR_FILE .
 echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 docker push tsystemsmms/skoop-server:latest
