@@ -34,4 +34,4 @@ security:
 skoop:
   email:
     manager-notification:
-      app-link: ${SERVER_NAME}/my-subordinates/{subordinateId}/project-memberships
+      subordinate-link-template: ${SERVER_NAME}/my-subordinates/{subordinateId}/project-memberships
