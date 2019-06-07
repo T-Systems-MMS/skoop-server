@@ -13,6 +13,8 @@ public interface GlobalUserPermissionRepository extends Neo4jRepository<GlobalUs
 
 	Stream<GlobalUserPermission> findByOwnerId(String ownerId);
 
+	Stream<GlobalUserPermission> findByScope(GlobalUserPermissionScope scope);
+
 	@Query("MATCH (:User {id:{ownerId}})-[r:HAS_GRANTED]->(:GlobalUserPermission {scope:{scope}}) RETURN COUNT(r) > 0")
 	Boolean isGlobalPermissionGranted(String ownerId, GlobalUserPermissionScope scope);
 

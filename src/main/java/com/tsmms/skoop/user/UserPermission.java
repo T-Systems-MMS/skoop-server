@@ -14,21 +14,19 @@ import java.util.List;
 import static org.neo4j.ogm.annotation.Relationship.INCOMING;
 
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @NodeEntity
-public class UserPermission {
-	@Id
-	@Property(name = "id")
-	private String id;
+public class UserPermission extends Permission {
 
 	@Property(name = "scope")
 	private UserPermissionScope scope;
 
-	@Relationship(type = "HAS_GRANTED", direction = INCOMING)
-	private User owner;
-
 	@Relationship(type = "AUTHORIZES")
 	private List<User> authorizedUsers;
+
+	@Builder
+	public UserPermission(String id, User owner, UserPermissionScope scope, List<User> authorizedUsers) {
+		super(id, owner);
+		this.scope = scope;
+		this.authorizedUsers = authorizedUsers;
+	}
 }

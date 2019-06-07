@@ -29,6 +29,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(UserPermissionQueryController.class)
 class UserPermissionQueryControllerTests extends AbstractControllerTests {
 
+	@MockBean
+	private PermissionQueryService permissionQueryService;
+
 	@Autowired
 	private MockMvc mockMvc;
 

@@ -12,20 +12,14 @@ import org.neo4j.ogm.annotation.Relationship;
 import static org.neo4j.ogm.annotation.Relationship.INCOMING;
 
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@NodeEntity
-public class GlobalUserPermission {
-
-	@Id
-	@Property(name = "id")
-	private String id;
+public class GlobalUserPermission extends Permission {
 
 	@Property(name = "scope")
 	private GlobalUserPermissionScope scope;
 
-	@Relationship(type = "HAS_GRANTED", direction = INCOMING)
-	private User owner;
-
+	@Builder
+	public GlobalUserPermission(String id, User owner, GlobalUserPermissionScope scope) {
+		super(id, owner);
+		this.scope = scope;
+	}
 }
