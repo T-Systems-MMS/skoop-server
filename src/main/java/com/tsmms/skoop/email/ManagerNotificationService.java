@@ -15,6 +15,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import static java.util.stream.Collectors.toMap;
 import static org.springframework.util.StreamUtils.copyToString;
+import static java.lang.String.format;
 
 @Service
 public class ManagerNotificationService {
@@ -23,15 +24,15 @@ public class ManagerNotificationService {
 
 	private final String subjectTemplate;
 	private final String contentTemplate;
-	private final String applicationLink;
+	private final String subordinateLinkTemplate;
 
 	public ManagerNotificationService(EmailService emailService,
 									  @Value("${skoop.email.manager-notification.subject:" +
 															 "User project memberships are pending for your approval.}") String subjectTemplate,
-									  @Value("${skoop.email.manager-notification.app-link:#{null}}") String applicationLink) throws IOException {
+									  @Value("${skoop.email.manager-notification.subordinate-link-template:#{null}}") String subordinateLinkTemplate) throws IOException {
 		this.emailService = requireNonNull(emailService);
 		this.subjectTemplate = requireNonNull(subjectTemplate);
-		this.applicationLink = requireNonNull(applicationLink);
+		this.subordinateLinkTemplate = requireNonNull(subordinateLinkTemplate);
 		final ClassPathResource contentTemplateFile = new ClassPathResource("templates/manager-notification-template.html");
 		this.contentTemplate = copyToString(contentTemplateFile.getInputStream(), UTF_8);
 	}
@@ -46,16 +47,17 @@ public class ManagerNotificationService {
 		if (userProjects.isEmpty()) {
 			return;
 		}
-		final String userNames = userProjects.stream()
+		final String subordinateLinks = userProjects.stream()
 				.collect(toMap(up -> up.getUser().getId(), UserProject::getUser, (firstUser, secondUser) -> firstUser))
 				.values()
 				.stream()
-				.map(u -> u.getFirstName() + " " + u.getLastName())
+				.map(u -> format("<a href=\"%s\">%s</a>",
+						subordinateLinkTemplate.replace("{subordinateId}", u.getId()),
+						u.getFirstName() + " " + u.getLastName()))
 				.collect(joining(", "));
 		final String content = contentTemplate
-				.replace("{userNames}", userNames)
 				.replace("{managerName}", manager.getFirstName())
-				.replace("{applicationLink}", applicationLink);
+				.replace("{subordinateLinks}", subordinateLinks);
 		emailService.send(subjectTemplate, content, manager.getEmail());
 	}
 
