@@ -29,7 +29,7 @@ public class PermissionQueryService {
 
 	@Transactional(readOnly = true)
 	public Stream<Permission> getIncomingPermissionsByScope(String userId, String scope) {
-		return concat(getUserPermissionStream(userId, scope), getGlobalUserPermissionStream(scope));
+		return concat(getUserPermissionStream(userId, scope), getGlobalUserPermissionStream(userId, scope));
 	}
 
 	private Stream<UserPermission> getUserPermissionStream(String userId, String scope) {
@@ -44,14 +44,14 @@ public class PermissionQueryService {
 		return userPermissions;
 	}
 
-	private Stream<GlobalUserPermission> getGlobalUserPermissionStream(String scope) {
+	private Stream<GlobalUserPermission> getGlobalUserPermissionStream(String userId, String scope) {
 		final Stream<GlobalUserPermission> globalUserPermissionStream;
 		final Optional<GlobalUserPermissionScope> globalUserPermissionScope = Enums.getIfPresent(GlobalUserPermissionScope.class, scope)
 				.transform(Optional::of).or(Optional.empty());
 		if (globalUserPermissionScope.isPresent()) {
-			globalUserPermissionStream = globalUserPermissionQueryService.getGlobalUserPermissionsByScope(globalUserPermissionScope.get());
+			globalUserPermissionStream = globalUserPermissionQueryService.getGlobalUserPermissionsByScope(userId, globalUserPermissionScope.get());
 		} else {
-			globalUserPermissionStream = globalUserPermissionQueryService.getGlobalUserPermissions();
+			globalUserPermissionStream = globalUserPermissionQueryService.getGlobalUserPermissionsGrantedToUser(userId);
 		}
 		return globalUserPermissionStream;
 	}

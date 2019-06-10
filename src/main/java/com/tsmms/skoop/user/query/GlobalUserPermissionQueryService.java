@@ -29,8 +29,8 @@ public class GlobalUserPermissionQueryService {
 	}
 
 	@Transactional(readOnly = true)
-	public Stream<GlobalUserPermission> getGlobalUserPermissions() {
-		return stream(globalUserPermissionRepository.findAll().spliterator(), false);
+	public Stream<GlobalUserPermission> getGlobalUserPermissionsGrantedToUser(String userId) {
+		return stream(globalUserPermissionRepository.getGlobalUserPermissionsGrantedToUser(userId).spliterator(), false);
 	}
 
 	@Transactional(readOnly = true)
@@ -45,11 +45,14 @@ public class GlobalUserPermissionQueryService {
 	}
 
 	@Transactional(readOnly = true)
-	public Stream<GlobalUserPermission> getGlobalUserPermissionsByScope(GlobalUserPermissionScope scope) {
+	public Stream<GlobalUserPermission> getGlobalUserPermissionsByScope(String userId, GlobalUserPermissionScope scope) {
+		if (userId == null) {
+			throw new IllegalArgumentException("User ID cannot be null.");
+		}
 		if (scope == null) {
 			throw new IllegalArgumentException("Scope cannot be null.");
 		}
-		return globalUserPermissionRepository.findByScope(scope);
+		return stream(globalUserPermissionRepository.getGlobalUserPermissionsByScopeGrantedToUser(userId, scope).spliterator(), false);
 	}
 
 }
