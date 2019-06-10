@@ -9,7 +9,10 @@ import java.util.stream.Stream;
 
 @Repository
 public interface UserPermissionRepository extends Neo4jRepository<UserPermission, String> {
+
 	Iterable<UserPermission> findByOwnerId(String ownerId);
+
+	Stream<UserPermission> findByOwnerIdAndScope(String ownerId, UserPermissionScope scope);
 
 	Long deleteByOwnerIdAndScope(String ownerId, UserPermissionScope scope);
 

@@ -25,6 +25,11 @@ public class UserPermissionQueryService {
 	}
 
 	@Transactional(readOnly = true)
+	public Stream<UserPermission> getOutboundUserPermissionsByOwnerIdAndScope(String ownerId, UserPermissionScope scope) {
+		return userPermissionRepository.findByOwnerIdAndScope(ownerId, scope);
+	}
+
+	@Transactional(readOnly = true)
 	public Stream<User> getUsersWhoGrantedPermission(String authorizedUserId, UserPermissionScope scope) {
 		return stream(userPermissionRepository.findUsersWhoGrantedPermission(authorizedUserId, scope)
 				.spliterator(), false);
@@ -43,12 +48,6 @@ public class UserPermissionQueryService {
 
 	@Transactional(readOnly = true)
 	public Stream<UserPermission> getInboundUserPermissionsByAuthorizedUserIdAndScope(String authorizedUserId, UserPermissionScope scope) {
-		if (authorizedUserId == null) {
-			throw new IllegalArgumentException("Authorized user ID cannot be null.");
-		}
-		if (scope == null) {
-			throw new IllegalArgumentException("Scope cannot be null.");
-		}
 		return userPermissionRepository.findByAuthorizedUsersIdAndScope(authorizedUserId, scope);
 	}
 

@@ -1,42 +1,33 @@
 package com.tsmms.skoop.user.query;
 
-import com.tsmms.skoop.user.PermissionResponse;
+import com.google.common.base.Enums;
+import com.tsmms.skoop.user.UserPermission;
 import com.tsmms.skoop.user.UserPermissionResponse;
+import com.tsmms.skoop.user.UserPermissionScope;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.springframework.core.convert.ConversionService;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.Optional;
+import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
-import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.toSet;
 
 @Api(tags = "UserPermissions")
 @RestController
 public class UserPermissionQueryController {
+	private UserPermissionQueryService userPermissionQueryService;
 
-	private final UserPermissionQueryService userPermissionQueryService;
-	private final PermissionQueryService permissionQueryService;
-	private final ConversionService conversionService;
-
-	public UserPermissionQueryController(UserPermissionQueryService userPermissionQueryService,
-										 PermissionQueryService permissionQueryService,
-										 ConversionService conversionService) {
-		this.userPermissionQueryService = requireNonNull(userPermissionQueryService);
-		this.permissionQueryService = requireNonNull(permissionQueryService);
-		this.conversionService = requireNonNull(conversionService);
+	public UserPermissionQueryController(UserPermissionQueryService userPermissionQueryService) {
+		this.userPermissionQueryService = userPermissionQueryService;
 	}
 
 	@ApiOperation(
@@ -52,10 +43,17 @@ public class UserPermissionQueryController {
 	})
 	@PreAuthorize("isPrincipalUserId(#userId)")
 	@GetMapping(path = "/users/{userId}/outbound-permissions", produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<UserPermissionResponse> getOutboundUserPermissions(@PathVariable("userId") String userId) {
-		return userPermissionQueryService.getOutboundUserPermissionsByOwnerId(userId)
-				.map(UserPermissionResponse::of)
-				.collect(toList());
+	public List<UserPermissionResponse> getOutboundUserPermissions(@PathVariable("userId") String userId,
+																   @RequestParam(name = "scope", required = false) String scope) {
+		final Optional<UserPermissionScope> userPermissionScope = scope != null ? Enums.getIfPresent(UserPermissionScope.class, scope)
+				.transform(java.util.Optional::of).or(java.util.Optional.empty()) : Optional.empty();
+		final Stream<UserPermission> userPermissionStream;
+		if (userPermissionScope.isPresent()) {
+			userPermissionStream = userPermissionQueryService.getOutboundUserPermissionsByOwnerIdAndScope(userId, userPermissionScope.get());
+		} else {
+			userPermissionStream = userPermissionQueryService.getOutboundUserPermissionsByOwnerId(userId);
+		}
+		return userPermissionStream.map(UserPermissionResponse::of).collect(toList());
 	}
 
 	@ApiOperation(
@@ -71,29 +69,17 @@ public class UserPermissionQueryController {
 	})
 	@PreAuthorize("isPrincipalUserId(#userId)")
 	@GetMapping(path = "/users/{userId}/inbound-permissions", produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<UserPermissionResponse> getInboundUserPermissions(@PathVariable("userId") String userId) {
-		return userPermissionQueryService.getInboundUserPermissionsByAuthorizedUserId(userId)
-				.map(UserPermissionResponse::of)
-				.collect(toList());
-	}
-
-	@ApiOperation(
-			value = "Get all user permissions granted to the user.",
-			notes = "Get all user permissions the given user has been granted by other users in the system."
-	)
-	@ApiResponses({
-			@ApiResponse(code = 200, message = "Successful execution"),
-			@ApiResponse(code = 401, message = "Invalid authentication"),
-			@ApiResponse(code = 403, message = "Insufficient privileges to access resource, e.g. foreign user data"),
-			@ApiResponse(code = 404, message = "Resource not found"),
-			@ApiResponse(code = 500, message = "Error during execution")
-	})
-	@PreAuthorize("isPrincipalUserId(#userId)")
-	@GetMapping(path = "/users/{userId}/permissions/{scope}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Set<PermissionResponse> getInboundUserPermissions(@PathVariable("userId") String userId, @PathVariable("scope") String scope) {
-		return permissionQueryService.getIncomingPermissionsByScope(userId, scope)
-				.map(p -> conversionService.convert(p, PermissionResponse.class))
-				.collect(toSet());
+	public List<UserPermissionResponse> getInboundUserPermissions(@PathVariable("userId") String userId,
+																  @RequestParam(name = "scope", required = false) String scope) {
+		final Optional<UserPermissionScope> userPermissionScope = scope != null ? Enums.getIfPresent(UserPermissionScope.class, scope)
+				.transform(java.util.Optional::of).or(java.util.Optional.empty()) : Optional.empty();
+		final Stream<UserPermission> userPermissionStream;
+		if (userPermissionScope.isPresent()) {
+			userPermissionStream = userPermissionQueryService.getInboundUserPermissionsByAuthorizedUserIdAndScope(userId, userPermissionScope.get());
+		} else {
+			userPermissionStream = userPermissionQueryService.getInboundUserPermissionsByAuthorizedUserId(userId);
+		}
+		return userPermissionStream.map(UserPermissionResponse::of).collect(toList());
 	}
 
 }
