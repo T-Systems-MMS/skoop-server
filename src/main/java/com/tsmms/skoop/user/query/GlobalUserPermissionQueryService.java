@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.StreamSupport.stream;
 
 @Service
 public class GlobalUserPermissionQueryService {
@@ -20,11 +21,41 @@ public class GlobalUserPermissionQueryService {
 	}
 
 	@Transactional(readOnly = true)
-	public Stream<GlobalUserPermission> getGlobalUserPermissions(String ownerId) {
+	public Stream<GlobalUserPermission> getOutboundGlobalUserPermissions(String ownerId) {
 		if (ownerId == null) {
 			throw new IllegalArgumentException("Owner ID cannot be null.");
 		}
 		return globalUserPermissionRepository.findByOwnerId(ownerId);
+	}
+
+	@Transactional(readOnly = true)
+	public Stream<GlobalUserPermission> getOutboundGlobalUserPermissionsByScope(String ownerId, GlobalUserPermissionScope scope) {
+		if (scope == null) {
+			throw new IllegalArgumentException("Global user permission scope cannot be null.");
+		}
+ 		if (ownerId == null) {
+			throw new IllegalArgumentException("Owner ID cannot be null.");
+		}
+		return globalUserPermissionRepository.findByOwnerIdAndScope(ownerId, scope);
+	}
+
+	@Transactional(readOnly = true)
+	public Stream<GlobalUserPermission> getInboundGlobalUserPermissions(String ownerId) {
+		if (ownerId == null) {
+			throw new IllegalArgumentException("Owner ID cannot be null.");
+		}
+		return stream(globalUserPermissionRepository.getInboundGlobalUserPermissions(ownerId).spliterator(), false);
+	}
+
+	@Transactional(readOnly = true)
+	public Stream<GlobalUserPermission> getInboundGlobalUserPermissionsByScope(String ownerId, GlobalUserPermissionScope scope) {
+		if (scope == null) {
+			throw new IllegalArgumentException("Global user permission scope cannot be null.");
+		}
+		if (ownerId == null) {
+			throw new IllegalArgumentException("Owner ID cannot be null.");
+		}
+		return stream(globalUserPermissionRepository.getInboundGlobalUserPermissionsByScope(ownerId, scope).spliterator(), false);
 	}
 
 	@Transactional(readOnly = true)
