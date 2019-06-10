@@ -46,7 +46,7 @@ public class UserPermissionQueryController {
 	public List<UserPermissionResponse> getOutboundUserPermissions(@PathVariable("userId") String userId,
 																   @RequestParam(name = "scope", required = false) String scope) {
 		final Optional<UserPermissionScope> userPermissionScope = scope != null ? Enums.getIfPresent(UserPermissionScope.class, scope)
-				.transform(java.util.Optional::of).or(java.util.Optional.empty()) : Optional.empty();
+				.transform(Optional::of).or(Optional.empty()) : Optional.empty();
 		final Stream<UserPermission> userPermissionStream;
 		if (userPermissionScope.isPresent()) {
 			userPermissionStream = userPermissionQueryService.getOutboundUserPermissionsByOwnerIdAndScope(userId, userPermissionScope.get());
@@ -72,7 +72,7 @@ public class UserPermissionQueryController {
 	public List<UserPermissionResponse> getInboundUserPermissions(@PathVariable("userId") String userId,
 																  @RequestParam(name = "scope", required = false) String scope) {
 		final Optional<UserPermissionScope> userPermissionScope = scope != null ? Enums.getIfPresent(UserPermissionScope.class, scope)
-				.transform(java.util.Optional::of).or(java.util.Optional.empty()) : Optional.empty();
+				.transform(Optional::of).or(Optional.empty()) : Optional.empty();
 		final Stream<UserPermission> userPermissionStream;
 		if (userPermissionScope.isPresent()) {
 			userPermissionStream = userPermissionQueryService.getInboundUserPermissionsByAuthorizedUserIdAndScope(userId, userPermissionScope.get());
