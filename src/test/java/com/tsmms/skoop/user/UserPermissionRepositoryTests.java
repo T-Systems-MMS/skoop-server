@@ -73,4 +73,79 @@ class UserPermissionRepositoryTests {
 		assertThat(userPermissionRepository.count()).isEqualTo(1L);
 	}
 
+	@DisplayName("Finds by owner ID and scope.")
+	@Test
+	void findsByOwnerAndScope() {
+
+		final User owner = User.builder().id("123").userName("owner")
+				.firstName("owner").email("owner@gmail.com").build();
+		userRepository.save(owner);
+
+		final User authorizedUser = User.builder().id("456").userName("authorizedUser")
+				.firstName("authorizedUser").email("authorizeduser@gmail.com").build();
+		userRepository.save(authorizedUser);
+
+		userPermissionRepository.saveAll(Arrays.asList(
+				UserPermission.builder()
+						.owner(owner)
+						.authorizedUsers(Collections.singletonList(authorizedUser))
+						.scope(UserPermissionScope.READ_USER_SKILLS)
+						.id("ABC")
+						.build(),
+				UserPermission.builder()
+						.owner(owner)
+						.authorizedUsers(Collections.singletonList(authorizedUser))
+						.scope(UserPermissionScope.READ_USER_PROFILE)
+						.id("DEF")
+						.build()
+		));
+
+		assertThat(userPermissionRepository.findByOwnerIdAndScope("123", UserPermissionScope.READ_USER_SKILLS))
+				.containsExactlyInAnyOrder(
+						UserPermission.builder()
+								.owner(owner)
+								.authorizedUsers(Collections.singletonList(authorizedUser))
+								.scope(UserPermissionScope.READ_USER_SKILLS)
+								.id("ABC")
+								.build()
+				);
+	}
+
+	@DisplayName("Finds by authorized user ID and scope.")
+	@Test
+	void findsByAuthorizedUsersIdAndScope() {
+		final User owner = User.builder().id("123").userName("owner")
+				.firstName("owner").email("owner@gmail.com").build();
+		userRepository.save(owner);
+
+		final User authorizedUser = User.builder().id("456").userName("authorizedUser")
+				.firstName("authorizedUser").email("authorizeduser@gmail.com").build();
+		userRepository.save(authorizedUser);
+
+		userPermissionRepository.saveAll(Arrays.asList(
+				UserPermission.builder()
+						.owner(owner)
+						.authorizedUsers(Collections.singletonList(authorizedUser))
+						.scope(UserPermissionScope.READ_USER_SKILLS)
+						.id("ABC")
+						.build(),
+				UserPermission.builder()
+						.owner(owner)
+						.authorizedUsers(Collections.singletonList(authorizedUser))
+						.scope(UserPermissionScope.READ_USER_PROFILE)
+						.id("DEF")
+						.build()
+		));
+
+		assertThat(userPermissionRepository.findByAuthorizedUsersIdAndScope("456", UserPermissionScope.READ_USER_SKILLS))
+				.containsExactlyInAnyOrder(
+						UserPermission.builder()
+								.owner(owner)
+								.authorizedUsers(Collections.singletonList(authorizedUser))
+								.scope(UserPermissionScope.READ_USER_SKILLS)
+								.id("ABC")
+								.build()
+				);
+	}
+
 }

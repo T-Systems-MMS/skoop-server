@@ -8,7 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+
+import static java.util.stream.StreamSupport.stream;
 
 @Service
 public class UserPermissionQueryService {
@@ -20,12 +21,17 @@ public class UserPermissionQueryService {
 
 	@Transactional(readOnly = true)
 	public Stream<UserPermission> getOutboundUserPermissionsByOwnerId(String ownerId) {
-		return StreamSupport.stream(userPermissionRepository.findByOwnerId(ownerId).spliterator(), false);
+		return stream(userPermissionRepository.findByOwnerId(ownerId).spliterator(), false);
+	}
+
+	@Transactional(readOnly = true)
+	public Stream<UserPermission> getOutboundUserPermissionsByOwnerIdAndScope(String ownerId, UserPermissionScope scope) {
+		return userPermissionRepository.findByOwnerIdAndScope(ownerId, scope);
 	}
 
 	@Transactional(readOnly = true)
 	public Stream<User> getUsersWhoGrantedPermission(String authorizedUserId, UserPermissionScope scope) {
-		return StreamSupport.stream(userPermissionRepository.findUsersWhoGrantedPermission(authorizedUserId, scope)
+		return stream(userPermissionRepository.findUsersWhoGrantedPermission(authorizedUserId, scope)
 				.spliterator(), false);
 	}
 
@@ -36,8 +42,13 @@ public class UserPermissionQueryService {
 
 	@Transactional(readOnly = true)
 	public Stream<UserPermission> getInboundUserPermissionsByAuthorizedUserId(String authorizedUserId) {
-		return StreamSupport.stream(userPermissionRepository.findByAuthorizedUsersId(authorizedUserId)
+		return stream(userPermissionRepository.findByAuthorizedUsersId(authorizedUserId)
 				.spliterator(), false);
+	}
+
+	@Transactional(readOnly = true)
+	public Stream<UserPermission> getInboundUserPermissionsByAuthorizedUserIdAndScope(String authorizedUserId, UserPermissionScope scope) {
+		return userPermissionRepository.findByAuthorizedUsersIdAndScope(authorizedUserId, scope);
 	}
 
 }

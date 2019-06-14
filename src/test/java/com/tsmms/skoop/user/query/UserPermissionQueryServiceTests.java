@@ -63,4 +63,67 @@ class UserPermissionQueryServiceTests {
 		assertThat(result.getAuthorizedUsers()).isEqualTo(Collections.singletonList(authorizedUser));
 	}
 
+	@Test
+	@DisplayName("Gets inbound user permissions filtered by scope which were granted to the authorized user.")
+	void getsInboundUserPermissionsByAuthorizedUserIdAndScope() {
+
+		User owner = User.builder().id("123").userName("owner")
+				.firstName("owner").email("owner@gmail.com").build();
+
+		User authorizedUser = User.builder().id("456").userName("authorizedUser")
+				.firstName("authorizedUser").email("authorizeduser@gmail.com").build();
+
+		UserPermission userPermission = UserPermission.builder()
+				.owner(owner)
+				.authorizedUsers(Collections.singletonList(authorizedUser))
+				.scope(UserPermissionScope.READ_USER_SKILLS)
+				.id("ABC")
+				.build();
+
+		given(userPermissionRepository.findByAuthorizedUsersIdAndScope("456", UserPermissionScope.READ_USER_SKILLS)).willReturn(Stream.of(userPermission));
+
+		Stream<UserPermission> userPermissions = userPermissionQueryService
+				.getInboundUserPermissionsByAuthorizedUserIdAndScope("456", UserPermissionScope.READ_USER_SKILLS);
+
+		assertThat(userPermissions).isNotNull();
+		List<UserPermission> userPermissionsList = userPermissions.collect(toList());
+		assertThat(userPermissionsList).hasSize(1);
+		UserPermission result = userPermissionsList.get(0);
+		assertThat(result.getId()).isEqualTo("ABC");
+		assertThat(result.getScope()).isEqualTo(UserPermissionScope.READ_USER_SKILLS);
+		assertThat(result.getOwner()).isEqualTo(owner);
+		assertThat(result.getAuthorizedUsers()).isEqualTo(Collections.singletonList(authorizedUser));
+	}
+
+	@DisplayName("Gets outbound user permissions filtered by scope which were granted by the user to other users.")
+	@Test
+	void getsOutboundUserPermissionsByOwnerIdAndScope() {
+		User owner = User.builder().id("123").userName("owner")
+				.firstName("owner").email("owner@gmail.com").build();
+
+		User authorizedUser = User.builder().id("456").userName("authorizedUser")
+				.firstName("authorizedUser").email("authorizeduser@gmail.com").build();
+
+		UserPermission userPermission = UserPermission.builder()
+				.owner(owner)
+				.authorizedUsers(Collections.singletonList(authorizedUser))
+				.scope(UserPermissionScope.READ_USER_SKILLS)
+				.id("ABC")
+				.build();
+
+		given(userPermissionRepository.findByOwnerIdAndScope("123", UserPermissionScope.READ_USER_SKILLS)).willReturn(Stream.of(userPermission));
+
+		Stream<UserPermission> userPermissions = userPermissionQueryService
+				.getOutboundUserPermissionsByOwnerIdAndScope("123", UserPermissionScope.READ_USER_SKILLS);
+
+		assertThat(userPermissions).isNotNull();
+		List<UserPermission> userPermissionsList = userPermissions.collect(toList());
+		assertThat(userPermissionsList).hasSize(1);
+		UserPermission result = userPermissionsList.get(0);
+		assertThat(result.getId()).isEqualTo("ABC");
+		assertThat(result.getScope()).isEqualTo(UserPermissionScope.READ_USER_SKILLS);
+		assertThat(result.getOwner()).isEqualTo(owner);
+		assertThat(result.getAuthorizedUsers()).isEqualTo(Collections.singletonList(authorizedUser));
+	}
+
 }
