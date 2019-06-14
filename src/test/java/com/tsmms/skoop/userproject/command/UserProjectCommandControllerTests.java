@@ -271,6 +271,42 @@ class UserProjectCommandControllerTests extends AbstractControllerTests {
 		}
 	}
 
+	@DisplayName("User cannot update the project of another user.")
+	@Test
+	void userCannotUpdateTheProjectOfAnotherUser() throws Exception {
+		final User owner = User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.firstName("test")
+				.lastName("testing")
+				.email("test@mail.com")
+				.userName("tester")
+				.build();
+		final ClassPathResource body = new ClassPathResource("user-project/update-user-project.json");
+		given(skillQueryService.convertSkillNamesToSkillsSet(new HashSet<>(Arrays.asList("Spring Boot", "Java")))).willReturn(new HashSet<>(
+				Arrays.asList(
+						Skill.builder()
+								.id("123")
+								.name("Spring Boot")
+								.build(),
+						Skill.builder()
+								.name("Java")
+								.build()
+				)
+		));given(userQueryService.getUserById("9cc7fab3-49b8-4d40-bf8a-ea5cad71c5f3")).willReturn(Optional.of(
+				User.builder()
+						.id("9cc7fab3-49b8-4d40-bf8a-ea5cad71c5f3")
+						.userName("anotherUser")
+						.build()
+		));
+		try (final InputStream is = body.getInputStream()) {
+			mockMvc.perform(put("/users/9cc7fab3-49b8-4d40-bf8a-ea5cad71c5f3/projects/123").contentType(MediaType.APPLICATION_JSON)
+					.content(is.readAllBytes())
+					.with(authentication(withUser(owner)))
+					.with(csrf()))
+					.andExpect(status().isForbidden());
+		}
+	}
+
 	@DisplayName("User project can be approved by user's manager.")
 	@Test
 	void userProjectCanBeApprovedByManager() throws Exception {
@@ -408,6 +444,24 @@ class UserProjectCommandControllerTests extends AbstractControllerTests {
 					.with(authentication(withUser(owner)))
 					.with(csrf()))
 					.andExpect(status().isForbidden());
+		}
+	}
+
+	@DisplayName("The user update the project membership of non existent user.")
+	@Test
+	void userCannotUpdateTheProjectMembershipOfNonExistentUser() throws Exception {
+		final ClassPathResource body = new ClassPathResource("user-project/approve-user-project.json");
+		final User owner = User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build();
+		given(userQueryService.getUserById("9cc7fab3-49b8-4d40-bf8a-ea5cad71c5f3")).willReturn(Optional.empty());
+		try (final InputStream is = body.getInputStream()) {
+			mockMvc.perform(put("/users/9cc7fab3-49b8-4d40-bf8a-ea5cad71c5f3/projects/123").contentType(MediaType.APPLICATION_JSON)
+					.content(is.readAllBytes())
+					.with(authentication(withUser(owner)))
+					.with(csrf()))
+					.andExpect(status().isNotFound());
 		}
 	}
 
@@ -640,6 +694,24 @@ class UserProjectCommandControllerTests extends AbstractControllerTests {
 		}
 	}
 
+	@DisplayName("The user cannot update the project memberships of non existent user.")
+	@Test
+	void userCannotUpdateTheProjectMembershipsOfNonExistingUser() throws Exception {
+		final ClassPathResource body = new ClassPathResource("user-project/approve-user-projects.json");
+		final User owner = User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build();
+		given(userQueryService.getUserById("9cc7fab3-49b8-4d40-bf8a-ea5cad71c5f3")).willReturn(Optional.empty());
+		try (final InputStream is = body.getInputStream()) {
+			mockMvc.perform(put("/users/9cc7fab3-49b8-4d40-bf8a-ea5cad71c5f3/projects").contentType(MediaType.APPLICATION_JSON)
+					.content(is.readAllBytes())
+					.with(authentication(withUser(owner)))
+					.with(csrf()))
+					.andExpect(status().isNotFound());
+		}
+	}
+
 	@DisplayName("BAD_REQUEST status is returned if no project ID is passed when updating user project memberships.")
 	@Test
 	void badRequestStatusCodeIfNoProjectIdIsPassedWhenUpdatingUserProjectMemberships() throws Exception {
@@ -676,6 +748,44 @@ class UserProjectCommandControllerTests extends AbstractControllerTests {
 					.with(authentication(withUser(manager)))
 					.with(csrf()))
 					.andExpect(status().isBadRequest());
+		}
+	}
+
+	@DisplayName("User cannot approve project memberships of another user.")
+	@Test
+	void userCannotApproveProjectMembershipsOfAnotherUser() throws Exception {
+		final ClassPathResource body = new ClassPathResource("user-project/approve-user-projects.json");
+		final User manager = User.builder()
+				.id("9cc7fab3-49b8-4d40-bf8a-ea5cad71c5f3")
+				.userName("user")
+				.build();
+		final User owner = User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.firstName("test")
+				.lastName("testing")
+				.email("test@mail.com")
+				.userName("tester")
+				.build();
+		given(skillQueryService.convertSkillNamesToSkillsSet(new HashSet<>(Arrays.asList("Spring Boot", "Java")))).willReturn(new HashSet<>(
+				Arrays.asList(
+						Skill.builder()
+								.id("123")
+								.name("Spring Boot")
+								.build(),
+						Skill.builder()
+								.id("456")
+								.name("Java")
+								.build()
+				)
+		));
+
+		given(userQueryService.getUserById("1f37fb2a-b4d0-4119-9113-4677beb20ae2")).willReturn(Optional.of(owner));
+		try (final InputStream is = body.getInputStream()) {
+			mockMvc.perform(put("/users/1f37fb2a-b4d0-4119-9113-4677beb20ae2/projects").contentType(MediaType.APPLICATION_JSON)
+					.content(is.readAllBytes())
+					.with(authentication(withUser(manager)))
+					.with(csrf()))
+					.andExpect(status().isForbidden());
 		}
 	}
 
