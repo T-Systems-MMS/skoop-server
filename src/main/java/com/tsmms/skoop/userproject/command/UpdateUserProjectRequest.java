@@ -19,6 +19,8 @@ import java.util.Set;
 @AllArgsConstructor
 public class UpdateUserProjectRequest {
 
+	@ApiModelProperty("ID of the project to update")
+	private String projectId;
 	@ApiModelProperty("Role the user has/had working on the project")
 	private String role;
 	@ApiModelProperty("Tasks the user works/worked on")

@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Set;
 
 @Data
@@ -17,6 +16,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class UpdateUserProjectCommand {
 
+	private String projectId;
 	private String role;
 	private String tasks;
 	@NotNull

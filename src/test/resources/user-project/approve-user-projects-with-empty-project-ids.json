@@ -1,0 +1,18 @@
+[
+	{
+		"role": "developer",
+		"tasks": "development",
+		"startDate": "2019-01-09",
+		"endDate": "2019-05-01",
+		"skills": ["Spring Boot", "Java"],
+		"approved": true
+	},
+	{
+		"role": "developer",
+		"tasks": "development",
+		"startDate": "2019-05-02",
+		"endDate": "2019-12-01",
+		"skills": ["Spring Boot", "Java"],
+		"approved": true
+	}
+]
