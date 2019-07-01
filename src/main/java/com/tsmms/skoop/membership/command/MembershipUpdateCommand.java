@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -18,6 +19,8 @@ public class MembershipUpdateCommand {
 	private String name;
 	private String description;
 	private String link;
+	private LocalDate startDate;
+	private LocalDate endDate;
 	private Set<Skill> skills;
 
 }

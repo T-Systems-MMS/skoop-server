@@ -2,5 +2,7 @@
 	"name": "First membership",
 	"description": "First membership description",
 	"link": "http://first-link.com",
+	"startDate": "2019-07-01",
+	"endDate": "2019-08-01",
 	"skills": ["Java", "Spring Boot"]
 }

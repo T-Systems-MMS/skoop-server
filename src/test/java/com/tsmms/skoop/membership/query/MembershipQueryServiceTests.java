@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -52,6 +53,8 @@ class MembershipQueryServiceTests {
 								.name("First membership")
 								.description("First membership description")
 								.link("http://first-link.com")
+								.startDate(LocalDate.of(2019, 7, 1))
+								.endDate(LocalDate.of(2019, 8, 1))
 								.skills(new HashSet<>(Arrays.asList(
 										Skill.builder()
 												.id("123")
@@ -71,6 +74,8 @@ class MembershipQueryServiceTests {
 								.name("Second membership")
 								.description("Second membership description")
 								.link("http://second-link.com")
+								.startDate(LocalDate.of(2020, 7, 1))
+								.endDate(LocalDate.of(2020, 8, 1))
 								.skills(new HashSet<>(Collections.singletonList(
 										Skill.builder()
 												.id("123")
@@ -90,6 +95,8 @@ class MembershipQueryServiceTests {
 		assertThat(membership.getName()).isEqualTo("First membership");
 		assertThat(membership.getDescription()).isEqualTo("First membership description");
 		assertThat(membership.getLink()).isEqualTo("http://first-link.com");
+		assertThat(membership.getStartDate()).isEqualTo(LocalDate.of(2019, 7, 1));
+		assertThat(membership.getEndDate()).isEqualTo(LocalDate.of(2019, 8, 1));
 		assertThat(membership.getSkills()).containsExactlyInAnyOrder(Skill.builder()
 						.id("123")
 						.name("Java")
@@ -108,6 +115,8 @@ class MembershipQueryServiceTests {
 		assertThat(membership.getName()).isEqualTo("Second membership");
 		assertThat(membership.getDescription()).isEqualTo("Second membership description");
 		assertThat(membership.getLink()).isEqualTo("http://second-link.com");
+		assertThat(membership.getStartDate()).isEqualTo(LocalDate.of(2020, 7, 1));
+		assertThat(membership.getEndDate()).isEqualTo(LocalDate.of(2020, 8, 1));
 		assertThat(membership.getSkills()).containsExactlyInAnyOrder(Skill.builder()
 				.id("123")
 				.name("Java")

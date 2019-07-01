@@ -12,6 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -55,6 +56,8 @@ class MembershipQueryControllerTests extends AbstractControllerTests {
 								.name("First membership")
 								.description("First membership description")
 								.link("http://first-link.com")
+								.startDate(LocalDate.of(2019, 7, 1))
+								.endDate(LocalDate.of(2019, 8, 1))
 								.skills(new HashSet<>(Arrays.asList(
 										Skill.builder()
 												.id("123")
@@ -74,6 +77,8 @@ class MembershipQueryControllerTests extends AbstractControllerTests {
 								.name("Second membership")
 								.description("Second membership description")
 								.link("http://second-link.com")
+								.startDate(LocalDate.of(2020, 7, 1))
+								.endDate(LocalDate.of(2020, 8, 1))
 								.skills(new HashSet<>(Collections.singletonList(
 										Skill.builder()
 												.id("123")
@@ -97,6 +102,8 @@ class MembershipQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[0].name", is(equalTo("First membership"))))
 				.andExpect(jsonPath("$[0].description", is(equalTo("First membership description"))))
 				.andExpect(jsonPath("$[0].link", is(equalTo("http://first-link.com"))))
+				.andExpect(jsonPath("$[0].startDate", is(equalTo("2019-07-01"))))
+				.andExpect(jsonPath("$[0].endDate", is(equalTo("2019-08-01"))))
 				.andExpect(jsonPath("$[0].creationDatetime", is(equalTo("2019-04-19T13:00:00"))))
 				.andExpect(jsonPath("$[0].lastModifiedDatetime", is(equalTo("2019-04-19T13:00:00"))))
 				.andExpect(jsonPath("$[0].skills[?(@.id=='123')].name", hasItem("Java")))
@@ -105,6 +112,8 @@ class MembershipQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[1].name", is(equalTo("Second membership"))))
 				.andExpect(jsonPath("$[1].description", is(equalTo("Second membership description"))))
 				.andExpect(jsonPath("$[1].link", is(equalTo("http://second-link.com"))))
+				.andExpect(jsonPath("$[1].startDate", is(equalTo("2020-07-01"))))
+				.andExpect(jsonPath("$[1].endDate", is(equalTo("2020-08-01"))))
 				.andExpect(jsonPath("$[1].creationDatetime", is(equalTo("2019-04-20T13:00:00"))))
 				.andExpect(jsonPath("$[1].lastModifiedDatetime", is(equalTo("2019-04-20T13:00:00"))))
 				.andExpect(jsonPath("$[1].skills[?(@.id=='123')].name", hasItem("Java")));

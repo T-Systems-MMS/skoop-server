@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -33,6 +34,10 @@ public class MembershipResponse {
 	private String description;
 	@ApiModelProperty("Link to organisation / web-site / blog.")
 	private String link;
+	@ApiModelProperty("The start date.")
+	private LocalDate startDate;
+	@ApiModelProperty("The end date.")
+	private LocalDate endDate;
 	@ApiModelProperty("The datetime when membership was created.")
 	private LocalDateTime creationDatetime;
 	@ApiModelProperty("The datetime when membership was last edited.")
@@ -46,6 +51,8 @@ public class MembershipResponse {
 				.name(membership.getName())
 				.description(membership.getDescription())
 				.link(membership.getLink())
+				.startDate(membership.getStartDate())
+				.endDate(membership.getEndDate())
 				.creationDatetime(membership.getCreationDatetime())
 				.lastModifiedDatetime(membership.getLastModifiedDatetime())
 				.skills(convertSkillListToSkillResponseSet(membership.getSkills()))

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.neo4j.DataNeo4jTest;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -51,6 +52,8 @@ class MembershipRepositoryTests {
 								.name("First membership")
 								.description("First membership description")
 								.link("http://first-link.com")
+								.startDate(LocalDate.of(2019, 7, 1))
+								.endDate(LocalDate.of(2019, 8, 1))
 								.skills(new HashSet<>(Arrays.asList(
 										Skill.builder()
 												.id("123")
@@ -70,6 +73,8 @@ class MembershipRepositoryTests {
 								.name("Second membership")
 								.description("Second membership description")
 								.link("http://second-link.com")
+								.startDate(LocalDate.of(2020, 7, 1))
+								.endDate(LocalDate.of(2020, 8, 1))
 								.skills(new HashSet<>(Collections.singletonList(
 										Skill.builder()
 												.id("123")
@@ -85,6 +90,8 @@ class MembershipRepositoryTests {
 								.name("Third membership")
 								.description("Third membership description")
 								.link("http://third-link.com")
+								.startDate(LocalDate.of(2021, 7, 1))
+								.endDate(LocalDate.of(2021, 8, 1))
 								.skills(new HashSet<>(Collections.singletonList(
 										Skill.builder()
 												.id("456")
@@ -104,6 +111,8 @@ class MembershipRepositoryTests {
 		assertThat(membership.getName()).isEqualTo("Third membership");
 		assertThat(membership.getDescription()).isEqualTo("Third membership description");
 		assertThat(membership.getLink()).isEqualTo("http://third-link.com");
+		assertThat(membership.getStartDate()).isEqualTo(LocalDate.of(2021, 7, 1));
+		assertThat(membership.getEndDate()).isEqualTo(LocalDate.of(2021, 8, 1));
 		assertThat(membership.getSkills()).containsExactlyInAnyOrder(Skill.builder()
 				.id("456")
 				.name("Spring Boot")
@@ -118,6 +127,8 @@ class MembershipRepositoryTests {
 		assertThat(membership.getName()).isEqualTo("First membership");
 		assertThat(membership.getDescription()).isEqualTo("First membership description");
 		assertThat(membership.getLink()).isEqualTo("http://first-link.com");
+		assertThat(membership.getStartDate()).isEqualTo(LocalDate.of(2019, 7, 1));
+		assertThat(membership.getEndDate()).isEqualTo(LocalDate.of(2019, 8, 1));
 		assertThat(membership.getSkills()).containsExactlyInAnyOrder(Skill.builder()
 						.id("123")
 						.name("Java")
