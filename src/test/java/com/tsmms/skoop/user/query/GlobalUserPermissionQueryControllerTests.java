@@ -67,6 +67,11 @@ class GlobalUserPermissionQueryControllerTests extends AbstractControllerTests {
 								.id("789")
 								.scope(READ_USER_SKILLS)
 								.owner(owner)
+								.build(),
+						GlobalUserPermission.builder()
+								.id("321")
+								.scope(ALLOW_SALES_TO_USE_PERSONALIZED_PROFILE)
+								.owner(owner)
 								.build()
 				)
 		);
@@ -76,7 +81,7 @@ class GlobalUserPermissionQueryControllerTests extends AbstractControllerTests {
 				.with(authentication(withUser(owner))))
 				.andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-				.andExpect(jsonPath("$.length()", is(equalTo(3))))
+				.andExpect(jsonPath("$.length()", is(equalTo(4))))
 				.andExpect(jsonPath("$[?(@.id=='123')].scope", hasItem("READ_USER_PROFILE")))
 				.andExpect(jsonPath("$[?(@.id=='123')].owner.id", hasItem("adac977c-8e0d-4e00-98a8-da7b44aa5dd6")))
 				.andExpect(jsonPath("$[?(@.id=='123')].owner.userName", hasItem("johndoe")))
@@ -94,7 +99,13 @@ class GlobalUserPermissionQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[?(@.id=='789')].owner.userName", hasItem("johndoe")))
 				.andExpect(jsonPath("$[?(@.id=='789')].owner.firstName", hasItem("John")))
 				.andExpect(jsonPath("$[?(@.id=='789')].owner.lastName", hasItem("Doe")))
-				.andExpect(jsonPath("$[?(@.id=='789')].owner.email", hasItem("john.doe@mail.com")));
+				.andExpect(jsonPath("$[?(@.id=='789')].owner.email", hasItem("john.doe@mail.com")))
+				.andExpect(jsonPath("$[?(@.id=='321')].scope", hasItem("ALLOW_SALES_TO_USE_PERSONALIZED_PROFILE")))
+				.andExpect(jsonPath("$[?(@.id=='321')].owner.id", hasItem("adac977c-8e0d-4e00-98a8-da7b44aa5dd6")))
+				.andExpect(jsonPath("$[?(@.id=='321')].owner.userName", hasItem("johndoe")))
+				.andExpect(jsonPath("$[?(@.id=='321')].owner.firstName", hasItem("John")))
+				.andExpect(jsonPath("$[?(@.id=='321')].owner.lastName", hasItem("Doe")))
+				.andExpect(jsonPath("$[?(@.id=='321')].owner.email", hasItem("john.doe@mail.com")));
 	}
 
 	@DisplayName("Gets outbound global user permissions by scope.")
@@ -226,6 +237,17 @@ class GlobalUserPermissionQueryControllerTests extends AbstractControllerTests {
 										.lastName("test")
 										.email("test@skoop.io")
 										.build())
+								.build(),
+						GlobalUserPermission.builder()
+								.id("321")
+								.scope(ALLOW_SALES_TO_USE_PERSONALIZED_PROFILE)
+								.owner(User.builder()
+										.id("abc")
+										.userName("tester")
+										.firstName("test")
+										.lastName("test")
+										.email("test@skoop.io")
+										.build())
 								.build()
 				)
 		);
@@ -235,7 +257,7 @@ class GlobalUserPermissionQueryControllerTests extends AbstractControllerTests {
 				.with(authentication(withUser(owner))))
 				.andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-				.andExpect(jsonPath("$.length()", is(equalTo(3))))
+				.andExpect(jsonPath("$.length()", is(equalTo(4))))
 				.andExpect(jsonPath("$[?(@.id=='123')].scope", hasItem("READ_USER_PROFILE")))
 				.andExpect(jsonPath("$[?(@.id=='123')].owner.id", hasItem("abc")))
 				.andExpect(jsonPath("$[?(@.id=='123')].owner.userName", hasItem("tester")))
@@ -253,7 +275,13 @@ class GlobalUserPermissionQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[?(@.id=='789')].owner.userName", hasItem("tester")))
 				.andExpect(jsonPath("$[?(@.id=='789')].owner.firstName", hasItem("test")))
 				.andExpect(jsonPath("$[?(@.id=='789')].owner.lastName", hasItem("test")))
-				.andExpect(jsonPath("$[?(@.id=='789')].owner.email", hasItem("test@skoop.io")));
+				.andExpect(jsonPath("$[?(@.id=='789')].owner.email", hasItem("test@skoop.io")))
+				.andExpect(jsonPath("$[?(@.id=='321')].scope", hasItem("ALLOW_SALES_TO_USE_PERSONALIZED_PROFILE")))
+				.andExpect(jsonPath("$[?(@.id=='321')].owner.id", hasItem("abc")))
+				.andExpect(jsonPath("$[?(@.id=='321')].owner.userName", hasItem("tester")))
+				.andExpect(jsonPath("$[?(@.id=='321')].owner.firstName", hasItem("test")))
+				.andExpect(jsonPath("$[?(@.id=='321')].owner.lastName", hasItem("test")))
+				.andExpect(jsonPath("$[?(@.id=='321')].owner.email", hasItem("test@skoop.io")));
 	}
 
 	@DisplayName("Gets inbound global user permissions by scope.")

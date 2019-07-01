@@ -74,6 +74,9 @@ class GlobalUserPermissionCommandControllerTests extends AbstractControllerTests
 								.build(),
 						GlobalUserPermissionEntry.builder()
 								.scope(FIND_AS_COACH)
+								.build(),
+						GlobalUserPermissionEntry.builder()
+								.scope(ALLOW_SALES_TO_USE_PERSONALIZED_PROFILE)
 								.build()
 						)
 				))))).willReturn(
@@ -92,6 +95,11 @@ class GlobalUserPermissionCommandControllerTests extends AbstractControllerTests
 								.id("789")
 								.scope(READ_USER_PROFILE)
 								.owner(owner)
+								.build(),
+						GlobalUserPermission.builder()
+								.id("321")
+								.scope(ALLOW_SALES_TO_USE_PERSONALIZED_PROFILE)
+								.owner(owner)
 								.build()
 				)
 		);
@@ -105,7 +113,7 @@ class GlobalUserPermissionCommandControllerTests extends AbstractControllerTests
 					.with(authentication(withUser(owner)))
 					.with(csrf()))
 					.andExpect(status().isOk())
-					.andExpect(jsonPath("$.length()", is(equalTo(3))))
+					.andExpect(jsonPath("$.length()", is(equalTo(4))))
 					.andExpect(jsonPath("$[?(@.id=='123')].scope", hasItem("READ_USER_SKILLS")))
 					.andExpect(jsonPath("$[?(@.id=='123')].owner.id", hasItem("adac977c-8e0d-4e00-98a8-da7b44aa5dd6")))
 					.andExpect(jsonPath("$[?(@.id=='123')].owner.userName", hasItem("johndoe")))
@@ -123,7 +131,13 @@ class GlobalUserPermissionCommandControllerTests extends AbstractControllerTests
 					.andExpect(jsonPath("$[?(@.id=='789')].owner.userName", hasItem("johndoe")))
 					.andExpect(jsonPath("$[?(@.id=='789')].owner.firstName", hasItem("John")))
 					.andExpect(jsonPath("$[?(@.id=='789')].owner.lastName", hasItem("Doe")))
-					.andExpect(jsonPath("$[?(@.id=='789')].owner.email", hasItem("john.doe@mail.com")));
+					.andExpect(jsonPath("$[?(@.id=='789')].owner.email", hasItem("john.doe@mail.com")))
+					.andExpect(jsonPath("$[?(@.id=='321')].scope", hasItem("ALLOW_SALES_TO_USE_PERSONALIZED_PROFILE")))
+					.andExpect(jsonPath("$[?(@.id=='321')].owner.id", hasItem("adac977c-8e0d-4e00-98a8-da7b44aa5dd6")))
+					.andExpect(jsonPath("$[?(@.id=='321')].owner.userName", hasItem("johndoe")))
+					.andExpect(jsonPath("$[?(@.id=='321')].owner.firstName", hasItem("John")))
+					.andExpect(jsonPath("$[?(@.id=='321')].owner.lastName", hasItem("Doe")))
+					.andExpect(jsonPath("$[?(@.id=='321')].owner.email", hasItem("john.doe@mail.com")));
 		}
 	}
 

@@ -13,6 +13,10 @@ public enum GlobalUserPermissionScope {
 	/**
 	 * Allows all users to see the owning user as a coach.
 	 */
-	FIND_AS_COACH
+	FIND_AS_COACH,
+	/**
+	 * Allows sales persons to use personalized profile (e.g. to pass it to customers).
+	 */
+	ALLOW_SALES_TO_USE_PERSONALIZED_PROFILE
 
 }
