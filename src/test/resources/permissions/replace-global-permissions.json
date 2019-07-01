@@ -7,5 +7,8 @@
 	},
 	{
 		"scope": "READ_USER_SKILLS"
+	},
+	{
+		"scope": "ALLOW_SALES_TO_USE_PERSONALIZED_PROFILE"
 	}
 ]
