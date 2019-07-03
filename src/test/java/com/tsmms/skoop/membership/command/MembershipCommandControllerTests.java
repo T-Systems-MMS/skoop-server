@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
@@ -90,6 +91,8 @@ class MembershipCommandControllerTests extends AbstractControllerTests {
 				.name("First membership")
 				.description("First membership description")
 				.link("http://first-link.com")
+				.startDate(LocalDate.of(2019, 7, 1))
+				.endDate(LocalDate.of(2019, 8, 1))
 				.skills(new HashSet<>(Arrays.asList(
 						Skill.builder()
 								.id("123")
@@ -110,6 +113,8 @@ class MembershipCommandControllerTests extends AbstractControllerTests {
 						.name("First membership")
 						.description("First membership description")
 						.link("http://first-link.com")
+						.startDate(LocalDate.of(2019, 7, 1))
+						.endDate(LocalDate.of(2019, 8, 1))
 						.skills(new HashSet<>(Arrays.asList(
 								Skill.builder()
 										.id("123")
@@ -144,6 +149,8 @@ class MembershipCommandControllerTests extends AbstractControllerTests {
 					.andExpect(jsonPath("$.creationDatetime", is(equalTo("2019-04-19T13:00:00"))))
 					.andExpect(jsonPath("$.lastModifiedDatetime", is(equalTo("2019-04-19T13:00:00"))))
 					.andExpect(jsonPath("$.link", is(equalTo("http://first-link.com"))))
+					.andExpect(jsonPath("$.startDate", is(equalTo("2019-07-01"))))
+					.andExpect(jsonPath("$.endDate", is(equalTo("2019-08-01"))))
 					.andExpect(jsonPath("$.skills[0].id", is(equalTo("123"))))
 					.andExpect(jsonPath("$.skills[0].name", is(equalTo("Java"))))
 					.andExpect(jsonPath("$.skills[1].id", is(equalTo("456"))))
@@ -221,6 +228,8 @@ class MembershipCommandControllerTests extends AbstractControllerTests {
 				.name("First membership updated")
 				.description("First membership description updated")
 				.link("http://first-updated-link.com")
+				.startDate(LocalDate.of(2019, 7, 1))
+				.endDate(LocalDate.of(2019, 8, 1))
 				.skills(new HashSet<>(
 						Arrays.asList(
 								Skill.builder()
@@ -243,6 +252,8 @@ class MembershipCommandControllerTests extends AbstractControllerTests {
 						.name("First membership updated")
 						.description("First membership description updated")
 						.link("http://first-updated-link.com")
+						.startDate(LocalDate.of(2019, 7, 1))
+						.endDate(LocalDate.of(2019, 8, 1))
 						.skills(new HashSet<>(Arrays.asList(
 								Skill.builder()
 										.id("123")
@@ -275,6 +286,8 @@ class MembershipCommandControllerTests extends AbstractControllerTests {
 					.andExpect(jsonPath("$.id", is(equalTo("123"))))
 					.andExpect(jsonPath("$.name", is(equalTo("First membership updated"))))
 					.andExpect(jsonPath("$.description", is(equalTo("First membership description updated"))))
+					.andExpect(jsonPath("$.startDate", is(equalTo("2019-07-01"))))
+					.andExpect(jsonPath("$.endDate", is(equalTo("2019-08-01"))))
 					.andExpect(jsonPath("$.creationDatetime", is(equalTo("2019-04-22T13:00:00"))))
 					.andExpect(jsonPath("$.lastModifiedDatetime", is(equalTo("2019-04-22T13:00:00"))))
 					.andExpect(jsonPath("$.link", is(equalTo("http://first-updated-link.com"))))

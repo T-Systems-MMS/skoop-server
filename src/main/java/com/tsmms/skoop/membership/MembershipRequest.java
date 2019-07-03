@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -29,6 +30,10 @@ public class MembershipRequest {
 	private String description;
 	@ApiModelProperty("Link to organisation / web-site / blog.")
 	private String link;
+	@ApiModelProperty("The start date.")
+	private LocalDate startDate;
+	@ApiModelProperty("The end date.")
+	private LocalDate endDate;
 	@ApiModelProperty("Skills linked to the membership.")
 	private List<String> skills;
 

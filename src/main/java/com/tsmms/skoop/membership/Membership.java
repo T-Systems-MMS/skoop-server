@@ -11,6 +11,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Property;
 import org.neo4j.ogm.annotation.Relationship;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -30,6 +31,10 @@ public class Membership {
 	private String description;
 	@Property(name = "link")
 	private String link;
+	@Property(name = "startDate")
+	private LocalDate startDate;
+	@Property(name = "endDate")
+	private LocalDate endDate;
 	@Property(name = "creationDatetime")
 	private LocalDateTime creationDatetime;
 	@Property(name = "lastModifiedDatetime")

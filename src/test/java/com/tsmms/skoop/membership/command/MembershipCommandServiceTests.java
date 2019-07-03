@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
@@ -87,6 +88,8 @@ class MembershipCommandServiceTests {
 						hasProperty("name", is("First membership")),
 						hasProperty("description", is("First membership description")),
 						hasProperty("link", equalTo("http://first-link.com")),
+						hasProperty("startDate", equalTo(LocalDate.of(2019, 7, 1))),
+						hasProperty("endDate", equalTo(LocalDate.of(2019, 8, 1))),
 						hasProperty("creationDatetime", isA(LocalDateTime.class)),
 						hasProperty("lastModifiedDatetime", isA(LocalDateTime.class)),
 						hasProperty("user", equalTo(User.builder()
@@ -110,6 +113,8 @@ class MembershipCommandServiceTests {
 						.name("First membership")
 						.description("First membership description")
 						.link("http://first-link.com")
+						.startDate(LocalDate.of(2019, 7, 1))
+						.endDate(LocalDate.of(2019, 8, 1))
 						.skills(new HashSet<>(Arrays.asList(
 								Skill.builder()
 										.id("123")
@@ -134,6 +139,8 @@ class MembershipCommandServiceTests {
 						.name("First membership")
 						.description("First membership description")
 						.link("http://first-link.com")
+						.startDate(LocalDate.of(2019, 7, 1))
+						.endDate(LocalDate.of(2019, 8, 1))
 						.skills(new HashSet<>(Arrays.asList(
 								Skill.builder()
 										.id("123")
@@ -154,6 +161,8 @@ class MembershipCommandServiceTests {
 		assertThat(membership.getName()).isEqualTo("First membership");
 		assertThat(membership.getDescription()).isEqualTo("First membership description");
 		assertThat(membership.getLink()).isEqualTo("http://first-link.com");
+		assertThat(membership.getStartDate()).isEqualTo(LocalDate.of(2019, 7, 1));
+		assertThat(membership.getEndDate()).isEqualTo(LocalDate.of(2019, 8, 1));
 		assertThat(membership.getSkills()).containsExactlyInAnyOrder(Skill.builder()
 						.id("123")
 						.name("Java")
@@ -180,6 +189,8 @@ class MembershipCommandServiceTests {
 								.name("First membership")
 								.description("First membership description")
 								.link("http://first-link.com")
+								.startDate(LocalDate.of(2019, 7, 1))
+								.endDate(LocalDate.of(2019, 8, 1))
 								.skills(new HashSet<>(Arrays.asList(
 										Skill.builder()
 												.id("123")
@@ -240,6 +251,8 @@ class MembershipCommandServiceTests {
 						hasProperty("name", is("First membership updated")),
 						hasProperty("description", is("First membership description updated")),
 						hasProperty("link", equalTo("http://first-updated-link.com")),
+						hasProperty("startDate", equalTo(LocalDate.of(2019, 7, 1))),
+						hasProperty("endDate", equalTo(LocalDate.of(2019, 8, 1))),
 						hasProperty("creationDatetime", isA(LocalDateTime.class)),
 						hasProperty("lastModifiedDatetime", isA(LocalDateTime.class)),
 						hasProperty("user", equalTo(User.builder()
@@ -267,6 +280,8 @@ class MembershipCommandServiceTests {
 						.name("First membership updated")
 						.description("First membership description updated")
 						.link("http://first-updated-link.com")
+						.startDate(LocalDate.of(2019, 7, 1))
+						.endDate(LocalDate.of(2019, 8, 1))
 						.skills(new HashSet<>(Arrays.asList(
 								Skill.builder()
 										.id("123")
@@ -294,6 +309,8 @@ class MembershipCommandServiceTests {
 				.name("First membership updated")
 				.description("First membership description updated")
 				.link("http://first-updated-link.com")
+				.startDate(LocalDate.of(2019, 7, 1))
+				.endDate(LocalDate.of(2019, 8, 1))
 				.skills(new HashSet<>(
 						Arrays.asList(
 								Skill.builder()
@@ -316,6 +333,8 @@ class MembershipCommandServiceTests {
 		assertThat(membership.getName()).isEqualTo("First membership updated");
 		assertThat(membership.getDescription()).isEqualTo("First membership description updated");
 		assertThat(membership.getLink()).isEqualTo("http://first-updated-link.com");
+		assertThat(membership.getStartDate()).isEqualTo(LocalDate.of(2019, 7, 1));
+		assertThat(membership.getEndDate()).isEqualTo(LocalDate.of(2019, 8, 1));
 		assertThat(membership.getSkills()).containsExactlyInAnyOrder(Skill.builder()
 						.id("123")
 						.name("Java")
@@ -377,6 +396,8 @@ class MembershipCommandServiceTests {
 						.name("First membership")
 						.description("First membership description")
 						.link("http://first-link.com")
+						.startDate(LocalDate.of(2019, 7, 1))
+						.endDate(LocalDate.of(2019, 8, 1))
 						.skills(new HashSet<>(Arrays.asList(
 								Skill.builder()
 										.id("123")

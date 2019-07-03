@@ -90,6 +90,8 @@ public class MembershipCommandController {
 				.name(request.getName())
 				.description(request.getDescription())
 				.link(request.getLink())
+				.startDate(request.getStartDate())
+				.endDate(request.getEndDate())
 				.skills(skillQueryService.convertSkillNamesToSkillsSet(request.getSkills()))
 				.build();
 		return ResponseEntity.status(HttpStatus.OK).body(MembershipResponse.of(membershipCommandService.update(membershipId, command)));
@@ -117,6 +119,8 @@ public class MembershipCommandController {
 				.name(request.getName())
 				.description(request.getDescription())
 				.link(request.getLink())
+				.startDate(request.getStartDate())
+				.endDate(request.getEndDate())
 				.skills(skillQueryService.convertSkillNamesToSkillsSet(request.getSkills()))
 				.build();
 	}

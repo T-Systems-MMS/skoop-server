@@ -53,6 +53,8 @@ public class MembershipCommandService {
 		membership.setLastModifiedDatetime(LocalDateTime.now());
 		membership.setLink(command.getLink());
 		membership.setDescription(command.getDescription());
+		membership.setStartDate(command.getStartDate());
+		membership.setEndDate(command.getEndDate());
 		membership.setName(command.getName());
 		membership.setSkills(skillCommandService.createNonExistentSkills(command.getSkills()));
 		return membershipRepository.save(membership);
