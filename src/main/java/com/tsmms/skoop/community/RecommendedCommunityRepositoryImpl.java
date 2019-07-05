@@ -13,8 +13,8 @@ import static java.util.Objects.requireNonNull;
 
 public class RecommendedCommunityRepositoryImpl implements RecommendedCommunityRepository {
 
-	private static final String QUERY = "MATCH (community:Community)-[:RELATES_TO]-(skill:Skill)-[r:RELATED_TO]-(user:User {id:{userId}})\n" +
-			" WHERE r.priority >= 2 AND NOT (community)-[:COMMUNITY_USER]-(user) " +
+	private static final String QUERY = "MATCH (community:Community)-[:RELATES_TO]-(skill:Skill)-[r:RELATED_TO]-(user:User {id:{userId}}) " +
+			" WHERE (r.priority >= 2 OR r.favourite = true) AND NOT (community)-[:COMMUNITY_USER]-(user) " +
 			" WITH community, size(collect(skill)) as counter " +
 			" OPTIONAL MATCH (:Community {id: community.id})-[r1:COMMUNITY_USER {role:'MANAGER'}]->(manager: User) " +
 			" WITH collect(properties(manager)) as managers, community, counter, r1 " +

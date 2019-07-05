@@ -83,12 +83,14 @@ class UserSkillQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[0].currentLevel", is(equalTo(2))))
 				.andExpect(jsonPath("$[0].desiredLevel", is(equalTo(3))))
 				.andExpect(jsonPath("$[0].priority", is(equalTo(4))))
+				.andExpect(jsonPath("$[0].favourite", is(equalTo(false))))
 				.andExpect(jsonPath("$[1].skill.id", is(equalTo("3d4236c9-d84a-420a-baee-27b263118a28"))))
 				.andExpect(jsonPath("$[1].skill.name", is(equalTo("Spring Boot"))))
 				.andExpect(jsonPath("$[1].skill.description", is(equalTo("Java Framework"))))
 				.andExpect(jsonPath("$[1].currentLevel", is(equalTo(1))))
 				.andExpect(jsonPath("$[1].desiredLevel", is(equalTo(2))))
-				.andExpect(jsonPath("$[1].priority", is(equalTo(3))));
+				.andExpect(jsonPath("$[1].priority", is(equalTo(3))))
+				.andExpect(jsonPath("$[1].favourite", is(equalTo(false))));
 	}
 
 	@Test
@@ -125,7 +127,8 @@ class UserSkillQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$.skill.description", is(equalTo("JavaScript Framework"))))
 				.andExpect(jsonPath("$.currentLevel", is(equalTo(2))))
 				.andExpect(jsonPath("$.desiredLevel", is(equalTo(3))))
-				.andExpect(jsonPath("$.priority", is(equalTo(4))));
+				.andExpect(jsonPath("$.priority", is(equalTo(4))))
+				.andExpect(jsonPath("$.favourite", is(equalTo(false))));
 	}
 
 	@Test
@@ -248,7 +251,9 @@ class UserSkillQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[0].skill.description", is(equalTo("JavaScript Framework"))))
 				.andExpect(jsonPath("$[0].currentLevel", is(equalTo(2))))
 				.andExpect(jsonPath("$[0].desiredLevel", is(equalTo(3))))
-				.andExpect(jsonPath("$[0].priority", is(equalTo(4))));
+				.andExpect(jsonPath("$[0].priority", is(equalTo(4))))
+				.andExpect(jsonPath("$[0].favourite", is(equalTo(false))));
+
 	}
 
 	@Test
@@ -309,7 +314,8 @@ class UserSkillQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$[0].skill.description", is(equalTo("JavaScript Framework"))))
 				.andExpect(jsonPath("$[0].currentLevel", is(equalTo(2))))
 				.andExpect(jsonPath("$[0].desiredLevel", is(equalTo(3))))
-				.andExpect(jsonPath("$[0].priority", is(equalTo(4))));
+				.andExpect(jsonPath("$[0].priority", is(equalTo(4))))
+				.andExpect(jsonPath("$[0].favourite", is(equalTo(false))));
 	}
 
 	@Test
@@ -353,7 +359,8 @@ class UserSkillQueryControllerTests extends AbstractControllerTests {
 				.andExpect(jsonPath("$.skill.description", is(equalTo("JavaScript Framework"))))
 				.andExpect(jsonPath("$.currentLevel", is(equalTo(2))))
 				.andExpect(jsonPath("$.desiredLevel", is(equalTo(3))))
-				.andExpect(jsonPath("$.priority", is(equalTo(4))));
+				.andExpect(jsonPath("$.priority", is(equalTo(4))))
+				.andExpect(jsonPath("$.favourite", is(equalTo(false))));
 	}
 
 }

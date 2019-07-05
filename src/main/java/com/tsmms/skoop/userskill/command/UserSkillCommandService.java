@@ -100,10 +100,11 @@ public class UserSkillCommandService {
 	 */
 	@Transactional
 	@PreAuthorize("isPrincipalUserId(#userSkill.user.id) || hasRole('ADMIN')")
-	public UserSkill updateUserSkill(Integer currentLevel, Integer desiredLevel, Integer priority, UserSkill userSkill) {
-		userSkill.setCurrentLevel(currentLevel);
-		userSkill.setDesiredLevel(desiredLevel);
-		userSkill.setPriority(priority);
+	public UserSkill updateUserSkill(CreateUserSkillCommand command, UserSkill userSkill) {
+		userSkill.setCurrentLevel(command.getCurrentLevel());
+		userSkill.setDesiredLevel(command.getDesiredLevel());
+		userSkill.setPriority(command.getPriority());
+		userSkill.setFavourite(Boolean.TRUE.equals(command.getFavourite()));
 		return userSkillRepository.save(userSkill);
 	}
 

@@ -3,7 +3,6 @@ package com.tsmms.skoop.userskill.command;
 import com.tsmms.skoop.aspect.CheckBindingResult;
 import com.tsmms.skoop.exception.BusinessException;
 import com.tsmms.skoop.exception.EmptyInputException;
-import com.tsmms.skoop.skill.SkillResponse;
 import com.tsmms.skoop.userskill.UserSkill;
 import com.tsmms.skoop.userskill.UserSkillResponse;
 import io.swagger.annotations.Api;
@@ -63,12 +62,7 @@ public class UserSkillCommandController {
 					.message("Either the property 'skillId' or 'skillName' is required!")
 					.build();
 		}
-		return ResponseEntity.status(HttpStatus.CREATED).body(UserSkillResponse.builder()
-				.skill(SkillResponse.of(userSkill.getSkill()))
-				.currentLevel(userSkill.getCurrentLevel())
-				.desiredLevel(userSkill.getDesiredLevel())
-				.priority(userSkill.getPriority())
-				.build());
+		return ResponseEntity.status(HttpStatus.CREATED).body(UserSkillResponse.of(userSkill));
 	}
 
 	@ApiOperation(value = "Update a relationship between a user and a skill",
@@ -93,19 +87,13 @@ public class UserSkillCommandController {
 		UserSkill userSkill = null;
 		try {
 			userSkill = userSkillCommandService.getUserSkill(userId, skillId);
-			userSkill = userSkillCommandService.updateUserSkill(request.getCurrentLevel(),
-					request.getDesiredLevel(), request.getPriority(), userSkill);
+			userSkill = userSkillCommandService.updateUserSkill(request.command(), userSkill);
 		} catch (BusinessException e) {
 			e.setDebugMessage("An exception has occurred in updating a relationship between a user and a skill!");
 			e.setSuggestion("Make sure that the skill is related to the user!");
 			throw e;
 		}
-		return UserSkillResponse.builder()
-				.skill(SkillResponse.of(userSkill.getSkill()))
-				.currentLevel(userSkill.getCurrentLevel())
-				.desiredLevel(userSkill.getDesiredLevel())
-				.priority(userSkill.getPriority())
-				.build();
+		return UserSkillResponse.of(userSkill);
 	}
 
 	@ApiOperation(value = "Delete a relationship between a user and a skill",
