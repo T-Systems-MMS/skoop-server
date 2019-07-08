@@ -33,6 +33,9 @@ public class UserSkill {
 	@Property(name = "priority")
 	private Integer priority;
 
+	@Property(name = "favourite")
+	private boolean favourite;
+
 	@StartNode
 	private User user;
 

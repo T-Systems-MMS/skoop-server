@@ -26,4 +26,18 @@ public class UserSkillResponse {
 
 	@ApiModelProperty("Priority to reach the desired level (range: 0-4 where 0 = no action needed, 4 = urgent)")
 	private Integer priority;
+
+	@ApiModelProperty("The flag to indicate if the skill is a favourite one.")
+	private boolean favourite;
+
+	public static UserSkillResponse of(UserSkill userSkill) {
+		return UserSkillResponse.builder()
+				.skill(SkillResponse.of(userSkill.getSkill()))
+				.currentLevel(userSkill.getCurrentLevel())
+				.desiredLevel(userSkill.getDesiredLevel())
+				.priority(userSkill.getPriority())
+				.favourite(userSkill.isFavourite())
+				.build();
+	}
+
 }

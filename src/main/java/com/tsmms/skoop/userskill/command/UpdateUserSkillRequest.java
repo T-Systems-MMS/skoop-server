@@ -32,4 +32,17 @@ public class UpdateUserSkillRequest {
 	@Min(0)
 	@Max(4)
 	private Integer priority;
+
+	@ApiModelProperty("The flag to indicate if the skill is a favourite one.")
+	private Boolean favourite;
+
+	public CreateUserSkillCommand command() {
+		return CreateUserSkillCommand.builder()
+				.currentLevel(currentLevel)
+				.desiredLevel(desiredLevel)
+				.priority(priority)
+				.favourite(favourite)
+				.build();
+	}
+
 }

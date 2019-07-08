@@ -1,7 +1,6 @@
 package com.tsmms.skoop.userskill.query;
 
 import com.tsmms.skoop.exception.NoSuchResourceException;
-import com.tsmms.skoop.skill.SkillResponse;
 import com.tsmms.skoop.user.UserSimpleResponse;
 import com.tsmms.skoop.exception.enums.Model;
 import com.tsmms.skoop.userskill.UserSkillResponse;
@@ -42,12 +41,7 @@ public class UserSkillQueryController {
 	@GetMapping(path = "/users/{userId}/skills", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<UserSkillResponse> getUserSkills(@PathVariable("userId") String userId) {
 		return userSkillQueryService.getUserSkillsByUserId(userId)
-				.map(userSkill -> UserSkillResponse.builder()
-						.skill(SkillResponse.of(userSkill.getSkill()))
-						.currentLevel(userSkill.getCurrentLevel())
-						.desiredLevel(userSkill.getDesiredLevel())
-						.priority(userSkill.getPriority())
-						.build())
+				.map(UserSkillResponse::of)
 				.collect(toList());
 	}
 
@@ -66,12 +60,7 @@ public class UserSkillQueryController {
 	public UserSkillResponse getUserSkill(@PathVariable("userId") String userId,
 										  @PathVariable("skillId") String skillId) {
 		return userSkillQueryService.getUserSkillByUserIdAndSkillId(userId, skillId)
-				.map(userSkill -> UserSkillResponse.builder()
-						.skill(SkillResponse.of(userSkill.getSkill()))
-						.currentLevel(userSkill.getCurrentLevel())
-						.desiredLevel(userSkill.getDesiredLevel())
-						.priority(userSkill.getPriority())
-						.build())
+				.map(UserSkillResponse::of)
 				.orElseThrow(() -> NoSuchResourceException.builder()
 						.model(Model.USER_SKILL)
 						.searchParamsMap(new String[]{"userId", userId, "skillId", skillId})

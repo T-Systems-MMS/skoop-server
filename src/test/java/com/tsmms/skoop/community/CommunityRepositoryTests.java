@@ -172,6 +172,12 @@ class CommunityRepositoryTests {
 				.description("Java Security Framework")
 				.build();
 		springSecurity = skillRepository.save(springSecurity);
+		Skill scala = Skill.builder()
+				.id("6a3e27d3-ca20-498a-9121-844349b57bdc")
+				.name("Scala")
+				.description("Scala programming language.")
+				.build();
+		scala = skillRepository.save(scala);
 
 		User tester = User.builder()
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
@@ -215,6 +221,15 @@ class CommunityRepositoryTests {
 				.desiredLevel(3)
 				.priority(4)
 				.build());
+		userSkillRepository.save(UserSkill.builder()
+				.user(tester)
+				.skill(scala)
+				.currentLevel(1)
+				.desiredLevel(1)
+				.favourite(true)
+				.priority(1)
+				.build()
+		);
 
 		Community javaUserGroup = communityRepository.save(
 				Community.builder()
@@ -222,6 +237,16 @@ class CommunityRepositoryTests {
 						.title("Java User Group")
 						.description("Group for Java developers")
 						.skills(new HashSet<>(Arrays.asList(springBoot, angular)))
+						.type(CommunityType.OPEN)
+						.build()
+		);
+
+		Community scalaUserGroup = communityRepository.save(
+				Community.builder()
+						.id(UUID.randomUUID().toString())
+						.title("Scala User Group")
+						.description("Group for Scala developers")
+						.skills(singleton(scala))
 						.type(CommunityType.OPEN)
 						.build()
 		);
@@ -280,7 +305,7 @@ class CommunityRepositoryTests {
 
 		List<Community> communities = communitiesStream.collect(toList());
 
-		assertThat(communities).containsExactly(javaUserGroup);
+		assertThat(communities).containsExactly(javaUserGroup, scalaUserGroup);
 
 	}
 
