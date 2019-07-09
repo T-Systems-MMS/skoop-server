@@ -62,7 +62,31 @@ java -jar target/skoop-server-0.0.1-SNAPSHOT.jar \
 
 === Running as Docker container
 
-We do not offer public Docker images at the moment but you can create your own after completing the Maven build. Run the following command in the project root (mind the dot at the end):
+At first you must create a network to enable the server app to connect to the database and the SKOOP web app.
+
+----
+docker network create --driver bridge skoop_nw
+----
+
+We provide https://hub.docker.com/r/tsystemsmms/skoop-server[the public Docker image] on Docker Hub.
+
+You can start the container from the public image:
+
+----
+docker run \
+  --name skoop-server \
+  --rm \
+  -p 8080:8080 \
+  -e SMTP_SERVER_HOST=localhost \
+  -e SMTP_SERVER_PORT=25 \
+  -e SERVER_NAME=skoop-server \
+  -e SECURITY_OAUTH2_RESOURCESERVER_JWT_JWKSETURI=http://keycloak:8080/auth/realms/SKOOP/protocol/openid-connect/certs \
+  -e SPRING_DATA_NEO4J_URI=bolt://neo4j:7687 \
+  --network=skoop_nw -itd \
+  tsystemsmms/skoop-server
+----
+
+Alternatively you can still create your own after completing the Maven build. Run the following command in the project root (mind the dot at the end):
 
 ----
 docker build \
@@ -78,6 +102,12 @@ docker run \
   --name skoop-server \
   --rm \
   -p 8080:8080 \
+  -e SMTP_SERVER_HOST=localhost \
+  -e SMTP_SERVER_PORT=25 \
+  -e SERVER_NAME=skoop-server \
+  -e SECURITY_OAUTH2_RESOURCESERVER_JWT_JWKSETURI=http://keycloak:8080/auth/realms/SKOOP/protocol/openid-connect/certs \
+  -e SPRING_DATA_NEO4J_URI=bolt://neo4j:7687 \
+  --network=skoop_nw -itd \
   skoop/server:latest
 ----
 
