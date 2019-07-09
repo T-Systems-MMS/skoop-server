@@ -83,7 +83,7 @@ docker run \
   -e SECURITY_OAUTH2_RESOURCESERVER_JWT_JWKSETURI=http://keycloak:8080/auth/realms/SKOOP/protocol/openid-connect/certs \
   -e SPRING_DATA_NEO4J_URI=bolt://neo4j:7687 \
   --network=skoop_nw -itd \
-  tsystemsmms/skoop-server
+  tsystemsmms/skoop-server:latest
 ----
 
 Alternatively you can still create your own after completing the Maven build. Run the following command in the project root (mind the dot at the end):
@@ -152,6 +152,7 @@ docker run ^
   -p 7474:7474 ^
   -p 7687:7687 ^
   -e NEO4J_AUTH=none ^
+  --network=skoop_nw -itd ^
   neo4j:3.4
 ----
 
@@ -164,6 +165,7 @@ docker run \
   -p 7474:7474 \
   -p 7687:7687 \
   -e NEO4J_AUTH=none \
+  --network=skoop_nw -itd \
   neo4j:3.4
 ----
 
@@ -220,6 +222,7 @@ docker run ^
   -p 9000:8080 ^
   -e KEYCLOAK_USER=admin ^
   -e KEYCLOAK_PASSWORD=admin ^
+  --network=skoop_nw -itd ^
   jboss/keycloak:4.5.0.Final
 ----
 * On Unix/Mac:
@@ -231,6 +234,7 @@ docker run \
   -p 9000:8080 \
   -e KEYCLOAK_USER=admin \
   -e KEYCLOAK_PASSWORD=admin \
+  --network=skoop_nw -itd \
   jboss/keycloak:4.5.0.Final
 ----
 
