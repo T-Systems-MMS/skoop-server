@@ -111,6 +111,8 @@ docker run \
   skoop/server:latest
 ----
 
+Both the database and the KeyCloak server are expected to be connected to the `skoop_nw` network.
+
 === Testing the setup
 
 Once the application has started the API documentation should be available at http://localhost:8080/swagger-ui.html
