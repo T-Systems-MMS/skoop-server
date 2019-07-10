@@ -38,8 +38,8 @@ class ProjectCommandControllerTests extends AbstractControllerTests {
 	private ProjectCommandService projectCommandService;
 
 	@Test
-	@DisplayName("Tests if a project can be created.")
-	void testIfProjectIsCreated() throws Exception {
+	@DisplayName("Project can be created.")
+	void projectIsCreated() throws Exception {
 		final User owner = User.builder()
 				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
 				.userName("tester")
@@ -78,6 +78,43 @@ class ProjectCommandControllerTests extends AbstractControllerTests {
 					.andExpect(jsonPath("$.description", is(equalTo("Description of the project"))))
 					.andExpect(jsonPath("$.creationDate", is(equalTo("2019-01-09T10:30:00"))))
 					.andExpect(jsonPath("$.lastModifiedDate", is(equalTo("2019-01-09T11:30:00"))));
+		}
+	}
+
+	@Test
+	@DisplayName("Project cannot be created when CSRF token is not present.")
+	void projectCannotBeCreatedWhenCsrfTokenIsNotPresent() throws Exception {
+		final User owner = User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build();
+		final ClassPathResource body = new ClassPathResource("create-project.json");
+		try (final InputStream is = body.getInputStream()) {
+			mockMvc.perform(post("/projects")
+					.accept(MediaType.APPLICATION_JSON)
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(is.readAllBytes())
+					.with(authentication(withUser(owner))))
+					.andExpect(status().isForbidden());
+		}
+	}
+
+	@Test
+	@DisplayName("Project cannot be created when an invalid CSRF token is used.")
+	void projectCannotBeCreatedWhenInvalidCsrfTokenIsUsed() throws Exception {
+		final User owner = User.builder()
+				.id("1f37fb2a-b4d0-4119-9113-4677beb20ae2")
+				.userName("tester")
+				.build();
+		final ClassPathResource body = new ClassPathResource("create-project.json");
+		try (final InputStream is = body.getInputStream()) {
+			mockMvc.perform(post("/projects")
+					.accept(MediaType.APPLICATION_JSON)
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(is.readAllBytes())
+					.with(authentication(withUser(owner)))
+					.with(csrf().useInvalidToken()))
+					.andExpect(status().isForbidden());
 		}
 	}
 
@@ -200,7 +237,8 @@ class ProjectCommandControllerTests extends AbstractControllerTests {
 				.userName("tester")
 				.build();
 		mockMvc.perform(delete("/projects/123")
-				.with(authentication(withUser(owner, "ADMIN"))))
+				.with(authentication(withUser(owner, "ADMIN")))
+				.with(csrf()))
 				.andExpect(status().isNoContent());
 	}
 
@@ -212,14 +250,16 @@ class ProjectCommandControllerTests extends AbstractControllerTests {
 				.userName("tester")
 				.build();
 		mockMvc.perform(delete("/projects/123")
-				.with(authentication(withUser(owner))))
+				.with(authentication(withUser(owner)))
+				.with(csrf()))
 				.andExpect(status().isForbidden());
 	}
 
 	@Test
 	@DisplayName("Tests if not authorized status code is returned when project is deleted by not authenticated user.")
 	void testIfNotAuthorizedStatusCodeIsReturnedWhenProjectIsDeletedByNotAuthenticatedUser() throws Exception {
-		mockMvc.perform(delete("/projects/123"))
+		mockMvc.perform(delete("/projects/123")
+				.with(csrf()))
 				.andExpect(status().isUnauthorized());
 	}
 

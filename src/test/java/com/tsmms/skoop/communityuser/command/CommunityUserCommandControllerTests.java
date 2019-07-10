@@ -30,6 +30,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -95,7 +96,8 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 					.content(is.readAllBytes())
 					.accept(MediaType.APPLICATION_JSON)
 					.contentType(MediaType.APPLICATION_JSON)
-					.with(authentication(withUser(tester))))
+					.with(authentication(withUser(tester)))
+					.with(csrf()))
 					.andExpect(status().isCreated())
 					.andExpect(jsonPath("$.role", is(equalTo(CommunityRole.MEMBER.toString()))))
 					.andExpect(jsonPath("$.user.id", is(equalTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))))
@@ -120,7 +122,8 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 					.content(is.readAllBytes())
 					.accept(MediaType.APPLICATION_JSON)
 					.contentType(MediaType.APPLICATION_JSON)
-					.with(authentication(withUser(tester))))
+					.with(authentication(withUser(tester)))
+					.with(csrf()))
 					.andExpect(status().isNotFound());
 		}
 	}
@@ -150,7 +153,8 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 					.content(is.readAllBytes())
 					.accept(MediaType.APPLICATION_JSON)
 					.contentType(MediaType.APPLICATION_JSON)
-					.with(authentication(withUser(tester))))
+					.with(authentication(withUser(tester)))
+					.with(csrf()))
 					.andExpect(status().isNotFound());
 		}
 	}
@@ -181,7 +185,8 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 					.content(is.readAllBytes())
 					.accept(MediaType.APPLICATION_JSON)
 					.contentType(MediaType.APPLICATION_JSON)
-					.with(authentication(withUser(tester))))
+					.with(authentication(withUser(tester)))
+					.with(csrf()))
 					.andExpect(status().isForbidden());
 		}
 	}
@@ -221,7 +226,8 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 					.content(is.readAllBytes())
 					.accept(MediaType.APPLICATION_JSON)
 					.contentType(MediaType.APPLICATION_JSON)
-					.with(authentication(withUser(tester))))
+					.with(authentication(withUser(tester)))
+					.with(csrf()))
 					.andExpect(status().isForbidden());
 		}
 	}
@@ -333,7 +339,8 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 					.content(is.readAllBytes())
 					.accept(MediaType.APPLICATION_JSON)
 					.contentType(MediaType.APPLICATION_JSON)
-					.with(authentication(withUser(tester))))
+					.with(authentication(withUser(tester)))
+					.with(csrf()))
 					.andExpect(status().isCreated())
 					.andExpect(jsonPath("$.role", is(equalTo(CommunityRole.MEMBER.toString()))))
 					.andExpect(jsonPath("$.user.id", is(equalTo("1f37fb2a-b4d0-4119-9113-4677beb20ae2"))))
@@ -369,7 +376,8 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 					.content(is.readAllBytes())
 					.accept(MediaType.APPLICATION_JSON)
 					.contentType(MediaType.APPLICATION_JSON)
-					.with(authentication(withUser(owner))))
+					.with(authentication(withUser(owner)))
+					.with(csrf()))
 					.andExpect(status().isOk())
 					.andExpect(jsonPath("$.role", is(equalTo(CommunityRole.MANAGER.toString()))))
 					.andExpect(jsonPath("$.user.id", is(equalTo("4f09647e-c7d3-4aa6-ab3d-0faff66b951f"))))
@@ -394,7 +402,8 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 					.content(is.readAllBytes())
 					.accept(MediaType.APPLICATION_JSON)
 					.contentType(MediaType.APPLICATION_JSON)
-					.with(authentication(withUser(owner))))
+					.with(authentication(withUser(owner)))
+					.with(csrf()))
 					.andExpect(status().isForbidden());
 		}
 	}
@@ -407,7 +416,8 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 		try (InputStream is = body.getInputStream()) {
 			mockMvc.perform(put("/communities/123/users/4f09647e-c7d3-4aa6-ab3d-0faff66b951f")
 					.content(is.readAllBytes())
-					.contentType(MediaType.APPLICATION_JSON))
+					.contentType(MediaType.APPLICATION_JSON)
+					.with(csrf()))
 					.andExpect(status().isUnauthorized());
 		}
 	}
@@ -427,7 +437,8 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 					.content(is.readAllBytes())
 					.accept(MediaType.APPLICATION_JSON)
 					.contentType(MediaType.APPLICATION_JSON)
-					.with(authentication(withUser(owner))))
+					.with(authentication(withUser(owner)))
+					.with(csrf()))
 					.andExpect(status().isForbidden());
 		}
 	}
@@ -449,7 +460,8 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 					.content(is.readAllBytes())
 					.accept(MediaType.APPLICATION_JSON)
 					.contentType(MediaType.APPLICATION_JSON)
-					.with(authentication(withUser(owner))))
+					.with(authentication(withUser(owner)))
+					.with(csrf()))
 					.andExpect(status().isBadRequest());
 		}
 	}
@@ -457,7 +469,8 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 	@Test
 	@DisplayName("Not authenticated user is not allowed to join the community.")
 	void notAuthenticatedUserIsNotAllowedToJoinCommunity() throws Exception {
-		mockMvc.perform(post("/communities/123/users"))
+		mockMvc.perform(post("/communities/123/users")
+				.with(csrf()))
 				.andExpect(status().isUnauthorized());
 	}
 
@@ -472,14 +485,16 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 		given(communityQueryService.isCommunityManager(owner.getId(), "123")).willReturn(false);
 
 		mockMvc.perform(delete("/communities/123/users/1f37fb2a-b4d0-4119-9113-4677beb20ae2")
-				.with(authentication(withUser(owner))))
+				.with(authentication(withUser(owner)))
+				.with(csrf()))
 				.andExpect(status().isNoContent());
 	}
 
 	@Test
 	@DisplayName("Not authenticated user is not allowed to leave the community.")
 	void notAuthenticatedUserIsNotAllowedToLeaveCommunity() throws Exception {
-		mockMvc.perform(delete("/communities/123/members"))
+		mockMvc.perform(delete("/communities/123/members")
+				.with(csrf()))
 				.andExpect(status().isUnauthorized());
 	}
 
@@ -494,7 +509,8 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 		given(communityQueryService.isCommunityManager(owner.getId(), "123")).willReturn(true);
 
 		mockMvc.perform(delete("/communities/123/users/a396d5a8-a6b1-4c71-9498-a16e655dae2e")
-				.with(authentication(withUser(owner))))
+				.with(authentication(withUser(owner)))
+				.with(csrf()))
 				.andExpect(status().isNoContent());
 	}
 
@@ -509,7 +525,8 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 		given(communityQueryService.isCommunityManager(owner.getId(), "123")).willReturn(true);
 
 		mockMvc.perform(delete("/communities/123/users/1f37fb2a-b4d0-4119-9113-4677beb20ae2")
-				.with(authentication(withUser(owner))))
+				.with(authentication(withUser(owner)))
+				.with(csrf()))
 				.andExpect(status().isForbidden());
 	}
 
@@ -524,7 +541,8 @@ class CommunityUserCommandControllerTests extends AbstractControllerTests {
 		given(communityQueryService.isCommunityManager(owner.getId(), "123")).willReturn(false);
 
 		mockMvc.perform(delete("/communities/123/users/a396d5a8-a6b1-4c71-9498-a16e655dae2e")
-				.with(authentication(withUser(owner))))
+				.with(authentication(withUser(owner)))
+				.with(csrf()))
 				.andExpect(status().isForbidden());
 	}
 

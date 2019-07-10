@@ -437,7 +437,8 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 				.build();
 		given(communityQueryService.isCommunityManager(owner.getId(), "123")).willReturn(true);
 		mockMvc.perform(delete("/communities/123")
-				.with(authentication(withUser(owner))))
+				.with(authentication(withUser(owner)))
+				.with(csrf()))
 				.andExpect(status().isNoContent());
 	}
 
@@ -450,7 +451,8 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 				.build();
 		given(communityQueryService.isCommunityManager(owner.getId(), "123")).willReturn(false);
 		mockMvc.perform(delete("/communities/123")
-				.with(authentication(withUser(owner, "ADMIN"))))
+				.with(authentication(withUser(owner, "ADMIN")))
+				.with(csrf()))
 				.andExpect(status().isForbidden());
 	}
 
@@ -462,14 +464,16 @@ class CommunityCommandControllerTests extends AbstractControllerTests {
 				.userName("tester")
 				.build();
 		mockMvc.perform(delete("/communities/123")
-				.with(authentication(withUser(owner))))
+				.with(authentication(withUser(owner)))
+				.with(csrf()))
 				.andExpect(status().isForbidden());
 	}
 
 	@Test
 	@DisplayName("Tests if not authorized status code is returned when community is deleted by not authenticated user.")
 	void testIfNotAuthorizedStatusCodeIsReturnedWhenCommunityIsDeletedByNotAuthenticatedUser() throws Exception {
-		mockMvc.perform(delete("/communities/123"))
+		mockMvc.perform(delete("/communities/123")
+				.with(csrf()))
 				.andExpect(status().isUnauthorized());
 	}
 

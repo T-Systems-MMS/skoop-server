@@ -33,6 +33,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -126,7 +127,8 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 			mockMvc.perform(post("/communities/123/user-registrations").content(is.readAllBytes())
 					.accept(MediaType.APPLICATION_JSON)
 					.contentType(MediaType.APPLICATION_JSON)
-					.with(authentication(withUser(tester))))
+					.with(authentication(withUser(tester)))
+					.with(csrf()))
 					.andExpect(status().isCreated())
 					.andExpect(jsonPath("$[0].user.userName", is(equalTo("firstUser"))))
 					.andExpect(jsonPath("$[0].approvedByUser", nullValue()))
@@ -185,7 +187,8 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 			mockMvc.perform(post("/communities/123/user-registrations").content(is.readAllBytes())
 					.accept(MediaType.APPLICATION_JSON)
 					.contentType(MediaType.APPLICATION_JSON)
-					.with(authentication(withUser(tester))))
+					.with(authentication(withUser(tester)))
+					.with(csrf()))
 					.andExpect(status().isCreated())
 					.andExpect(jsonPath("$[0].user.userName", is(equalTo("tester"))))
 					.andExpect(jsonPath("$[0].approvedByUser", is(equalTo(true))))
@@ -252,7 +255,8 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 			mockMvc.perform(post("/communities/123/user-registrations").content(is.readAllBytes())
 					.accept(MediaType.APPLICATION_JSON)
 					.contentType(MediaType.APPLICATION_JSON)
-					.with(authentication(withUser(tester))))
+					.with(authentication(withUser(tester)))
+					.with(csrf()))
 					.andExpect(status().isCreated())
 					.andExpect(jsonPath("$[0].user.userName", is(equalTo("tester"))))
 					.andExpect(jsonPath("$[0].approvedByUser", is(equalTo(true))))
@@ -328,7 +332,8 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 			mockMvc.perform(post("/communities/123/user-registrations").content(is.readAllBytes())
 					.accept(MediaType.APPLICATION_JSON)
 					.contentType(MediaType.APPLICATION_JSON)
-					.with(authentication(withUser(tester))))
+					.with(authentication(withUser(tester)))
+					.with(csrf()))
 					.andExpect(status().isCreated())
 					.andExpect(jsonPath("$[0].user.userName", is(equalTo("firstUser"))))
 					.andExpect(jsonPath("$[0].approvedByUser", nullValue()))
@@ -375,7 +380,8 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 			mockMvc.perform(post("/communities/123/user-registrations").content(is.readAllBytes())
 					.accept(MediaType.APPLICATION_JSON)
 					.contentType(MediaType.APPLICATION_JSON)
-					.with(authentication(withUser(tester))))
+					.with(authentication(withUser(tester)))
+					.with(csrf()))
 					.andExpect(status().isForbidden());
 		}
 	}
@@ -409,7 +415,8 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 			mockMvc.perform(post("/communities/123/user-registrations").content(is.readAllBytes())
 					.accept(MediaType.APPLICATION_JSON)
 					.contentType(MediaType.APPLICATION_JSON)
-					.with(authentication(withUser(tester))))
+					.with(authentication(withUser(tester)))
+					.with(csrf()))
 					.andExpect(status().isNotFound());
 		}
 	}
@@ -444,7 +451,8 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 			mockMvc.perform(post("/communities/123/user-registrations").content(is.readAllBytes())
 					.accept(MediaType.APPLICATION_JSON)
 					.contentType(MediaType.APPLICATION_JSON)
-					.with(authentication(withUser(tester))))
+					.with(authentication(withUser(tester)))
+					.with(csrf()))
 					.andExpect(status().isForbidden());
 		}
 	}
@@ -521,7 +529,8 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 			mockMvc.perform(put("/communities/123/user-registrations/456").content(is.readAllBytes())
 					.accept(MediaType.APPLICATION_JSON)
 					.contentType(MediaType.APPLICATION_JSON)
-					.with(authentication(withUser(tester))))
+					.with(authentication(withUser(tester)))
+					.with(csrf()))
 					.andExpect(status().isOk())
 					.andExpect(jsonPath("$.user.userName", is(equalTo("tester"))))
 					.andExpect(jsonPath("$.approvedByUser", is(equalTo(true))))
@@ -603,7 +612,8 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 			mockMvc.perform(put("/communities/123/user-registrations/456").content(is.readAllBytes())
 					.accept(MediaType.APPLICATION_JSON)
 					.contentType(MediaType.APPLICATION_JSON)
-					.with(authentication(withUser(tester))))
+					.with(authentication(withUser(tester)))
+					.with(csrf()))
 					.andExpect(status().isOk())
 					.andExpect(jsonPath("$.user.userName", is(equalTo("anotherTester"))))
 					.andExpect(jsonPath("$.approvedByUser", is(equalTo(true))))
@@ -624,7 +634,8 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 			mockMvc.perform(put("/communities/123/user-registrations/456").content(is.readAllBytes())
 					.accept(MediaType.APPLICATION_JSON)
 					.contentType(MediaType.APPLICATION_JSON)
-					.with(authentication(withUser(tester))))
+					.with(authentication(withUser(tester)))
+					.with(csrf()))
 					.andExpect(status().isNotFound());
 		}
 	}
@@ -664,7 +675,8 @@ class CommunityUserRegistrationCommandControllerTests extends AbstractController
 			mockMvc.perform(put("/communities/123/user-registrations/456").content(is.readAllBytes())
 					.accept(MediaType.APPLICATION_JSON)
 					.contentType(MediaType.APPLICATION_JSON)
-					.with(authentication(withUser(tester))))
+					.with(authentication(withUser(tester)))
+					.with(csrf()))
 					.andExpect(status().isForbidden());
 		}
 	}

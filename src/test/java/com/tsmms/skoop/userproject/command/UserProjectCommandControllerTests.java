@@ -144,7 +144,8 @@ class UserProjectCommandControllerTests extends AbstractControllerTests {
 				.userName("tester")
 				.build();
 		mockMvc.perform(delete("/users/1f37fb2a-b4d0-4119-9113-4677beb20ae2/projects/123")
-				.with(authentication(withUser(owner))))
+				.with(authentication(withUser(owner)))
+				.with(csrf()))
 				.andExpect(status().isNoContent());
 	}
 
@@ -156,14 +157,16 @@ class UserProjectCommandControllerTests extends AbstractControllerTests {
 				.userName("tester")
 				.build();
 		mockMvc.perform(delete("/users/1f37cb2a-a5d0-f229-8634-4647beb20ae2/projects/123")
-				.with(authentication(withUser(owner))))
+				.with(authentication(withUser(owner)))
+				.with(csrf()))
 				.andExpect(status().isForbidden());
 	}
 
 	@Test
 	@DisplayName("Tests if user project relationship cannot be deleted by not authenticated user.")
 	void testIfUserProjectCannotBeDeletedByNotAuthenticatedUser() throws Exception {
-		mockMvc.perform(delete("/users/1f37cb2a-a5d0-f229-8634-4647beb20ae2/projects/123"))
+		mockMvc.perform(delete("/users/1f37cb2a-a5d0-f229-8634-4647beb20ae2/projects/123")
+				.with(csrf()))
 				.andExpect(status().isUnauthorized());
 	}
 

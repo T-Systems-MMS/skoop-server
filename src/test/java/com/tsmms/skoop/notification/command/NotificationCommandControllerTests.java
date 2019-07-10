@@ -23,6 +23,7 @@ import java.util.stream.Stream;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static com.tsmms.skoop.common.JwtAuthenticationFactory.withUser;
@@ -124,7 +125,8 @@ class NotificationCommandControllerTests extends AbstractControllerTests {
 		);
 		mockMvc.perform(delete("/notifications/789")
 				.accept(MediaType.APPLICATION_JSON)
-				.with(authentication(withUser(tester))))
+				.with(authentication(withUser(tester)))
+				.with(csrf()))
 				.andExpect(status().isNoContent());
 	}
 
@@ -198,7 +200,8 @@ class NotificationCommandControllerTests extends AbstractControllerTests {
 		);
 		mockMvc.perform(delete("/notifications/789")
 				.accept(MediaType.APPLICATION_JSON)
-				.with(authentication(withUser(tester))))
+				.with(authentication(withUser(tester)))
+				.with(csrf()))
 				.andExpect(status().isForbidden());
 	}
 
@@ -291,7 +294,8 @@ class NotificationCommandControllerTests extends AbstractControllerTests {
 		);
 		mockMvc.perform(delete("/notifications/123")
 				.accept(MediaType.APPLICATION_JSON)
-				.with(authentication(withUser(tester))))
+				.with(authentication(withUser(tester)))
+				.with(csrf()))
 				.andExpect(status().isForbidden());
 	}
 
@@ -305,7 +309,8 @@ class NotificationCommandControllerTests extends AbstractControllerTests {
 		given(notificationQueryService.getNotification("123")).willReturn(Optional.empty());
 		mockMvc.perform(delete("/notifications/123")
 				.accept(MediaType.APPLICATION_JSON)
-				.with(authentication(withUser(tester))))
+				.with(authentication(withUser(tester)))
+				.with(csrf()))
 				.andExpect(status().isNotFound());
 	}
 
@@ -314,7 +319,8 @@ class NotificationCommandControllerTests extends AbstractControllerTests {
 	void unauthenticatedUserCannotDeleteNotification() throws Exception {
 		given(notificationQueryService.getNotification("123")).willReturn(Optional.empty());
 		mockMvc.perform(delete("/notifications/123")
-				.accept(MediaType.APPLICATION_JSON))
+				.accept(MediaType.APPLICATION_JSON)
+				.with(csrf()))
 				.andExpect(status().isUnauthorized());
 	}
 
