@@ -285,10 +285,13 @@ class UserCommandServiceTests {
 		);
 		final List<UserPermission> userPermissions = userCommandService.replaceOutboundUserPermissions(ReplaceUserPermissionListCommand.builder()
 				.ownerId("123")
-				.userPermissions(Collections.singletonList(ReplaceUserPermissionListCommand.UserPermissionEntry.builder()
-						.scope(UserPermissionScope.READ_USER_PROFILE)
-						.authorizedUserIds(Arrays.asList("456", "789"))
-						.build()
+				.userPermissions(Arrays.asList(ReplaceUserPermissionListCommand.UserPermissionEntry.builder()
+								.scope(UserPermissionScope.READ_USER_PROFILE)
+								.authorizedUserIds(Arrays.asList("456", "789"))
+								.build(),
+						ReplaceUserPermissionListCommand.UserPermissionEntry.builder()
+								.scope(UserPermissionScope.READ_USER_SKILLS)
+								.build()
 				))
 				.build()
 		).collect(Collectors.toList());
@@ -308,6 +311,45 @@ class UserCommandServiceTests {
 						.userName("secondUser")
 						.build());
 		assertThat(userPermission.getScope()).isEqualTo(UserPermissionScope.READ_USER_PROFILE);
+	}
+
+	@DisplayName("The permissions must not be granted to the owner.")
+	@Test
+	void permissionsMustNotBeGrantedToOwner() {
+		assertThrows(IllegalArgumentException.class, () -> userCommandService.replaceOutboundUserPermissions(ReplaceUserPermissionListCommand.builder()
+				.ownerId("123")
+				.userPermissions(Collections.singletonList(ReplaceUserPermissionListCommand.UserPermissionEntry.builder()
+						.scope(UserPermissionScope.READ_USER_PROFILE)
+						.authorizedUserIds(Arrays.asList("123", "456"))
+						.build()
+				))
+				.build()
+		));
+	}
+
+	@DisplayName("The user is not found when replacing outbound permissions.")
+	@Test
+	void userNotFoundWhenReplacingOutboundPermissions() {
+		given(userRepository.findById("123")).willReturn(Optional.empty());
+		given(userRepository.findAllById(new HashSet<>(Arrays.asList("456", "789")))).willReturn(Arrays.asList(
+				User.builder()
+						.id("456")
+						.userName("firstUser")
+						.build(),
+				User.builder()
+						.id("789")
+						.userName("secondUser")
+						.build()
+		));
+		assertThrows(NoSuchResourceException.class, () -> userCommandService.replaceOutboundUserPermissions(ReplaceUserPermissionListCommand.builder()
+				.ownerId("123")
+				.userPermissions(Collections.singletonList(ReplaceUserPermissionListCommand.UserPermissionEntry.builder()
+						.scope(UserPermissionScope.READ_USER_PROFILE)
+						.authorizedUserIds(Arrays.asList("456", "789"))
+						.build()
+				))
+				.build()
+		));
 	}
 
 }

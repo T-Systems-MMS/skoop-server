@@ -162,17 +162,13 @@ public class UserCommandService {
 					.build();
 			userPermissions.add(userPermission);
 		});
-		if (userPermissions.isEmpty()) {
-			return Stream.empty();
-		} else {
-			// Determine the owner of the user permission.
-			final User owner = userRepository.findById(command.getOwnerId()).orElseThrow(() -> NoSuchResourceException.builder()
-					.model(Model.USER)
-					.searchParamsMap(new String[]{"id", command.getOwnerId()})
-					.build());
-			owner.setUserPermissions(userPermissions);
-			return userRepository.save(owner).getUserPermissions().stream();
-		}
+		// Determine the owner of the user permission.
+		final User owner = userRepository.findById(command.getOwnerId()).orElseThrow(() -> NoSuchResourceException.builder()
+				.model(Model.USER)
+				.searchParamsMap(new String[]{"id", command.getOwnerId()})
+				.build());
+		owner.setUserPermissions(userPermissions);
+		return userRepository.save(owner).getUserPermissions().stream();
 	}
 
 
