@@ -3,6 +3,7 @@ package com.tsmms.skoop.user;
 import com.tsmms.skoop.exception.DuplicateResourceException;
 import com.tsmms.skoop.exception.NoSuchResourceException;
 import com.tsmms.skoop.notification.command.NotificationCommandService;
+import com.tsmms.skoop.user.command.ReplaceUserPermissionListCommand;
 import com.tsmms.skoop.user.command.UserCommandService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,7 +13,12 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -201,6 +207,107 @@ class UserCommandServiceTests {
 	void throwExceptionWhenDeletingNonExistentUser() {
 		given(userRepository.findById("123")).willReturn(Optional.empty());
 		assertThrows(NoSuchResourceException.class, () -> userCommandService.deleteUser("123"));
+	}
+
+	@DisplayName("Replaces outbound user permissions.")
+	@Test
+	void replaceOutboundUserPermissions() {
+		given(userRepository.findById("123")).willReturn(Optional.of(
+				User.builder()
+						.id("123")
+						.userName("owner")
+						.build()
+		));
+		given(userRepository.findAllById(new HashSet<>(Arrays.asList("456", "789")))).willReturn(Arrays.asList(
+				User.builder()
+						.id("456")
+						.userName("firstUser")
+						.build(),
+				User.builder()
+						.id("789")
+						.userName("secondUser")
+						.build()
+		));
+		given(userRepository.save(
+				User.builder()
+						.id("123")
+						.userName("owner")
+						.userPermissions(
+								Collections.singletonList(
+										UserPermission.builder()
+												.id("abc")
+												.owner(User.builder()
+														.id("123")
+														.userName("owner")
+														.build())
+												.scope(UserPermissionScope.READ_USER_PROFILE)
+												.authorizedUsers(Arrays.asList(
+														User.builder()
+																.id("456")
+																.userName("firstUser")
+																.build(),
+														User.builder()
+																.id("789")
+																.userName("secondUser")
+																.build()
+												))
+												.build()
+								)
+						)
+						.build()
+		)).willReturn(
+				User.builder()
+						.id("123")
+						.userName("owner")
+						.userPermissions(
+								Collections.singletonList(
+										UserPermission.builder()
+												.id("abc")
+												.owner(User.builder()
+														.id("123")
+														.userName("owner")
+														.build())
+												.scope(UserPermissionScope.READ_USER_PROFILE)
+												.authorizedUsers(Arrays.asList(
+														User.builder()
+																.id("456")
+																.userName("firstUser")
+																.build(),
+														User.builder()
+																.id("789")
+																.userName("secondUser")
+																.build()
+												))
+												.build()
+								)
+						)
+						.build()
+		);
+		final List<UserPermission> userPermissions = userCommandService.replaceOutboundUserPermissions(ReplaceUserPermissionListCommand.builder()
+				.ownerId("123")
+				.userPermissions(Collections.singletonList(ReplaceUserPermissionListCommand.UserPermissionEntry.builder()
+						.scope(UserPermissionScope.READ_USER_PROFILE)
+						.authorizedUserIds(Arrays.asList("456", "789"))
+						.build()
+				))
+				.build()
+		).collect(Collectors.toList());
+		assertThat(userPermissions).hasSize(1);
+		UserPermission userPermission = userPermissions.get(0);
+		assertThat(userPermission.getId()).isEqualTo("abc");
+		assertThat(userPermission.getOwner()).isEqualTo(User.builder()
+				.id("123")
+				.userName("owner")
+				.build());
+		assertThat(userPermission.getAuthorizedUsers()).containsExactlyInAnyOrder(User.builder()
+						.id("456")
+						.userName("firstUser")
+						.build(),
+				User.builder()
+						.id("789")
+						.userName("secondUser")
+						.build());
+		assertThat(userPermission.getScope()).isEqualTo(UserPermissionScope.READ_USER_PROFILE);
 	}
 
 }

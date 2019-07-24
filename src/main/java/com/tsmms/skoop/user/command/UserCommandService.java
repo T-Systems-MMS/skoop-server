@@ -5,14 +5,24 @@ import com.tsmms.skoop.exception.NoSuchResourceException;
 import com.tsmms.skoop.exception.enums.Model;
 import com.tsmms.skoop.notification.command.NotificationCommandService;
 import com.tsmms.skoop.user.User;
+import com.tsmms.skoop.user.UserPermission;
+import com.tsmms.skoop.user.UserPermissionScope;
 import com.tsmms.skoop.user.UserRepository;
 import com.tsmms.skoop.user.UserRequest;
 import com.tsmms.skoop.user.notification.UserWelcomeNotification;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
@@ -120,5 +130,50 @@ public class UserCommandService {
 		});
 		userRepository.delete(user);
 	}
+
+	@Transactional
+	public Stream<UserPermission> replaceOutboundUserPermissions(ReplaceUserPermissionListCommand command) {
+		// Create mapping for each scope to the authorized users (merges potential duplicate scope entries).
+		final EnumMap<UserPermissionScope, Set<String>> scopeAuthorizedUsers = new EnumMap<>(UserPermissionScope.class);
+		command.getUserPermissions().forEach(userPermissionEntry -> {
+			if (CollectionUtils.isEmpty(userPermissionEntry.getAuthorizedUserIds())) {
+				scopeAuthorizedUsers.put(userPermissionEntry.getScope(), Collections.emptySet());
+			} else {
+				Set<String> authorizedUsers = scopeAuthorizedUsers.computeIfAbsent(
+						userPermissionEntry.getScope(), scope -> new HashSet<>());
+				if (userPermissionEntry.getAuthorizedUserIds().stream().anyMatch(userId -> command.getOwnerId().equals(userId))) {
+					throw new IllegalArgumentException("Permissions must not be granted to the owner.");
+				}
+				authorizedUsers.addAll(userPermissionEntry.getAuthorizedUserIds());
+			}
+		});
+
+		// Create new user permissions for the given scopes and authorized users.
+		final List<UserPermission> userPermissions = new LinkedList<>();
+		scopeAuthorizedUsers.forEach((scope, authorizedUserIds) -> {
+			final List<User> authorizedUsers = new LinkedList<>();
+			if (CollectionUtils.isNotEmpty(authorizedUserIds)) {
+				userRepository.findAllById(authorizedUserIds).forEach(authorizedUsers::add);
+			}
+			final UserPermission userPermission = UserPermission.builder()
+					.id(UUID.randomUUID().toString())
+					.scope(scope)
+					.authorizedUsers(authorizedUsers)
+					.build();
+			userPermissions.add(userPermission);
+		});
+		if (userPermissions.isEmpty()) {
+			return Stream.empty();
+		} else {
+			// Determine the owner of the user permission.
+			final User owner = userRepository.findById(command.getOwnerId()).orElseThrow(() -> NoSuchResourceException.builder()
+					.model(Model.USER)
+					.searchParamsMap(new String[]{"id", command.getOwnerId()})
+					.build());
+			owner.setUserPermissions(userPermissions);
+			return userRepository.save(owner).getUserPermissions().stream();
+		}
+	}
+
 
 }
