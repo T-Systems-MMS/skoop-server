@@ -49,7 +49,7 @@ public class NotificationCommandController {
 		if (notificationQueryService.getNotification(notificationId).isEmpty()) {
 			final String[] searchParamsMap = {"id", notificationId};
 			throw NoSuchResourceException.builder()
-					.model(Model.USER)
+					.model(Model.NOTIFICATION)
 					.searchParamsMap(searchParamsMap)
 					.build();
 		}
