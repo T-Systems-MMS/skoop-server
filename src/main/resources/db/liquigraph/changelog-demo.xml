@@ -40,15 +40,15 @@
 		<query>CREATE (:User {id: randomUUID(), firstName: 'Second user', lastName: 'Second user\'s surname', userName: 'us2', email: 'us2@mail.com', referenceId: randomUUID()})</query>
 		<query>CREATE (:User {id: randomUUID(), firstName: 'Third user', lastName: 'Third user\'s surname', userName: 'us3', email: 'us3@mail.com', referenceId: randomUUID()})</query>
 
-		<query>MATCH (u:User {userName: 'dmle'}) CREATE (:UserWelcomeNotification:WelcomeNotification {id: randomUUID(), creationDatetime: toString(localdatetime())})-[:RECIPIENT]->(u)</query>
-		<query>MATCH (u:User {userName: 'sviv'}) CREATE (:UserWelcomeNotification:WelcomeNotification {id: randomUUID(), creationDatetime: toString(localdatetime())})-[:RECIPIENT]->(u)</query>
-		<query>MATCH (u:User {userName: 'frwt'}) CREATE (:UserWelcomeNotification:WelcomeNotification {id: randomUUID(), creationDatetime: toString(localdatetime())})-[:RECIPIENT]->(u)</query>
-		<query>MATCH (u:User {userName: 'rju'}) CREATE (:UserWelcomeNotification:WelcomeNotification {id: randomUUID(), creationDatetime: toString(localdatetime())})-[:RECIPIENT]->(u)</query>
-		<query>MATCH (u:User {userName: 'phin'}) CREATE (:UserWelcomeNotification:WelcomeNotification {id: randomUUID(), creationDatetime: toString(localdatetime())})-[:RECIPIENT]->(u)</query>
-		<query>MATCH (u:User {userName: 'frn'}) CREATE (:UserWelcomeNotification:WelcomeNotification {id: randomUUID(), creationDatetime: toString(localdatetime())})-[:RECIPIENT]->(u)</query>
-		<query>MATCH (u:User {userName: 'us1'}) CREATE (:UserWelcomeNotification:WelcomeNotification {id: randomUUID(), creationDatetime: toString(localdatetime())})-[:RECIPIENT]->(u)</query>
-		<query>MATCH (u:User {userName: 'us2'}) CREATE (:UserWelcomeNotification:WelcomeNotification {id: randomUUID(), creationDatetime: toString(localdatetime())})-[:RECIPIENT]->(u)</query>
-		<query>MATCH (u:User {userName: 'us3'}) CREATE (:UserWelcomeNotification:WelcomeNotification {id: randomUUID(), creationDatetime: toString(localdatetime())})-[:RECIPIENT]->(u)</query>
+		<query>MATCH (u:User {userName: 'dmle'}) CREATE (:UserWelcomeNotification:Notification {id: randomUUID(), creationDatetime: toString(localdatetime())})-[:RECIPIENT]->(u)</query>
+		<query>MATCH (u:User {userName: 'sviv'}) CREATE (:UserWelcomeNotification:Notification {id: randomUUID(), creationDatetime: toString(localdatetime())})-[:RECIPIENT]->(u)</query>
+		<query>MATCH (u:User {userName: 'frwt'}) CREATE (:UserWelcomeNotification:Notification {id: randomUUID(), creationDatetime: toString(localdatetime())})-[:RECIPIENT]->(u)</query>
+		<query>MATCH (u:User {userName: 'rju'}) CREATE (:UserWelcomeNotification:Notification {id: randomUUID(), creationDatetime: toString(localdatetime())})-[:RECIPIENT]->(u)</query>
+		<query>MATCH (u:User {userName: 'phin'}) CREATE (:UserWelcomeNotification:Notification {id: randomUUID(), creationDatetime: toString(localdatetime())})-[:RECIPIENT]->(u)</query>
+		<query>MATCH (u:User {userName: 'frn'}) CREATE (:UserWelcomeNotification:Notification {id: randomUUID(), creationDatetime: toString(localdatetime())})-[:RECIPIENT]->(u)</query>
+		<query>MATCH (u:User {userName: 'us1'}) CREATE (:UserWelcomeNotification:Notification {id: randomUUID(), creationDatetime: toString(localdatetime())})-[:RECIPIENT]->(u)</query>
+		<query>MATCH (u:User {userName: 'us2'}) CREATE (:UserWelcomeNotification:Notification {id: randomUUID(), creationDatetime: toString(localdatetime())})-[:RECIPIENT]->(u)</query>
+		<query>MATCH (u:User {userName: 'us3'}) CREATE (:UserWelcomeNotification:Notification {id: randomUUID(), creationDatetime: toString(localdatetime())})-[:RECIPIENT]->(u)</query>
 
 		<query>MATCH (u:User {userName: 'dmle'}), (s:Skill {name: 'Spring Boot'}) CREATE (u)-[:RELATED_TO {currentLevel: 1, desiredLevel: 2, priority: 2}]->(s)</query>
 		<query>MATCH (u:User {userName: 'dmle'}), (s:Skill {name: 'Java'}) CREATE (u)-[:RELATED_TO {currentLevel: 2, desiredLevel: 3, priority: 1}]->(s)</query>
