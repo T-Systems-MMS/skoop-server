@@ -34,7 +34,7 @@ class UserPermissionCommandControllerTests extends AbstractControllerTests {
 	private MockMvc mockMvc;
 
 	@MockBean
-	private UserPermissionCommandService userPermissionCommandService;
+	private UserCommandService userCommandService;
 
 	@Test
 	@DisplayName("Stores and returns the given list of user permissions")
@@ -66,7 +66,7 @@ class UserPermissionCommandControllerTests extends AbstractControllerTests {
 				.build();
 
 		willThrow(new IllegalArgumentException("Unexpected data in command object!"))
-				.given(userPermissionCommandService).replaceOutboundUserPermissions(any());
+				.given(userCommandService).replaceOutboundUserPermissions(any());
 		BDDMockito.willReturn(Stream.of(UserPermission.builder()
 				.scope(UserPermissionScope.READ_USER_SKILLS)
 				.owner(owner)
@@ -101,7 +101,7 @@ class UserPermissionCommandControllerTests extends AbstractControllerTests {
 								.build()
 				))
 				.build()))
-				.given(userPermissionCommandService).replaceOutboundUserPermissions(expectedCommand);
+				.given(userCommandService).replaceOutboundUserPermissions(expectedCommand);
 
 		String requestContent = "[{" +
 				"\"scope\":\"READ_USER_SKILLS\"," +

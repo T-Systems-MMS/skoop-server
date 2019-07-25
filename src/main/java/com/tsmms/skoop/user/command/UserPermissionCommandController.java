@@ -24,10 +24,11 @@ import static java.util.stream.Collectors.toList;
 @Api(tags = "UserPermissions")
 @RestController
 public class UserPermissionCommandController {
-	private UserPermissionCommandService userPermissionCommandService;
 
-	public UserPermissionCommandController(UserPermissionCommandService userPermissionCommandService) {
-		this.userPermissionCommandService = userPermissionCommandService;
+	private UserCommandService userCommandService;
+
+	public UserPermissionCommandController(UserCommandService userCommandService) {
+		this.userCommandService = userCommandService;
 	}
 
 	@ApiOperation(
@@ -50,7 +51,7 @@ public class UserPermissionCommandController {
 	public List<UserPermissionResponse> replaceOutboundUserPermissions(@PathVariable("userId") String userId,
 																	   @Valid @RequestBody List<UserPermissionRequest> userPermissionRequests,
 																	   BindingResult bindingResult) {
-		return userPermissionCommandService.replaceOutboundUserPermissions(
+		return userCommandService.replaceOutboundUserPermissions(
 				ReplaceUserPermissionListCommand.builder()
 						.ownerId(userId)
 						.userPermissions(userPermissionRequests.stream()
